@@ -1,0 +1,5 @@
+numpy
+matplotlib
+scipy
+netCDF4
+basic-modeling-interface

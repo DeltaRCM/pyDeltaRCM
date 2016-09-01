@@ -1,0 +1,38 @@
+model_output__site_prefix: ''
+model_output__case_prefix: ''
+model_output__out_dir: 'deltaRCM_Output'
+model__total_timesteps: 10
+model_grid__length: 5000
+model_grid__width: 10000
+model_grid__cell_size: 100
+land_surface__width: 300.0
+land_surface__slope: 0.00015
+model__max_iteration: 1
+water__number_parcels: 1000
+channel__flow_velocity: 1.0
+channel__width: 50.0
+channel__flow_depth: 5.0
+sea_water_surface__mean_elevation: 0.0
+sea_water_surface__rate_change_elevation: 0.0
+sediment__number_parcels: 1000
+sediment__bedload_fraction: 0.25    
+sediment__influx_concentration: 0.1                            
+basin__opt_subsidence: True
+basin__maximum_subsidence_rate: 0.000825                            
+basin__subsidence_start_timestep: 0
+model_output__opt_eta_figs: True
+model_output__opt_stage_figs: False
+model_output__opt_depth_figs: False
+model_output__opt_eta_grids: True
+model_output__opt_stage_grids: False
+model_output__opt_depth_grids: False
+model_output__opt_time_interval: 2     
+basin__opt_stratigraphy: True                                    
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
