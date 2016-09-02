@@ -1,0 +1,291 @@
+model_output__site_prefix:
+  name: Site prefix
+  description: Site prefix for output file names
+  value:
+    type: string
+    default: 
+    units: -
+model_output__case_prefix:
+  name: Case prefix
+  description: Case prefix for output file names
+  value:
+    type: string
+    default:
+    units: -
+model_output__out_dir:
+  name: Output directory
+  description: Output directory
+  value:
+    type: string
+    default: deltaRCM_Output
+    units: -
+model__total_timesteps:
+  name: Total timesteps
+  description: Total number of timesteps of model run
+  value:
+    type: int
+    default: 100
+    range:
+      min: 1
+      max: 20000
+    units: -
+model_grid__length:
+  name: Grid length
+  description: Length of model grid perpendicular to shore
+  value:
+    type: float
+    default: 5000.0
+    range:
+      min: 500.0
+      max: 50000.0
+    units: meters
+model_grid__width:
+  name: Grid width
+  description: Width of model grid parallel to shore
+  value:
+    type: float
+    default: 10000.0
+    range:
+      min: 1000.0
+      max: 100000.0
+    units: meters
+model_grid__cell_size:
+  name: Cell size
+  description: Size of cells in model grid
+  value:
+    type: float
+    default: 100.0
+    range:
+      min: 1.0
+      max: 500.0
+    units: meters
+land_surface__width:
+  name: Land width
+  description: Width of land surface
+  value:
+    type: float
+    default: 300.0
+    range:
+      min: 1
+      max: 1000
+    units: meters
+land_surface__slope:
+  name: Land slope
+  description: Characteristic slope of the domain
+  value:
+    type: float
+    default: 0.00015
+    range:
+      min: 0.000001
+      max: 0.01
+    units: m/m
+model__max_iteration:
+  name: Max iterations
+  description: Maximum number of iterations of water flow routing per timestep
+  value:
+    type: int
+    default: 1
+    range:
+      min: 1
+      max: 10
+    units: -
+water__number_parcels:
+  name: Number of water parcels
+  description: Number of parcels of water routed per iteration
+  value:
+    type: int
+    default: 1000
+    range:
+      min: 100
+      max: 10000
+    units: -
+channel__flow_velocity:
+  name: Channel flow velocity
+  description: Flow velocity in the inlet channel
+  value:
+    type: float
+    default: 1.0
+    range:
+      min: 0.1
+      max: 3.0
+    units: m/s
+channel__width:
+  name: Channel width
+  description: Width of inlet channel
+  value:
+    type: float
+    default: 50.0
+    range:
+      min: 10
+      max: 1000
+    units: meters
+channel__flow_depth:
+  name: Channel depth
+  description: Depth of flow in the inlet channel
+  value:
+    type: float
+    default: 5.0
+    range:
+      min: 1.
+      max: 50.0
+    units: meters
+sea_water_surface__mean_elevation:
+  name: Sea level
+  description: Mean elevation of sea surface
+  value:
+    type: float
+    default: 0.0
+    range:
+      min: -100.
+      max: 100.
+    units: meters
+sea_water_surface__rate_change_elevation:
+  name: Sea level change
+  description: Rate of change of sea level
+  value:
+    type: float
+    default: 0.0
+    range:
+      min: 0.0001
+      max: 1
+    units: m/timestep
+sediment__number_parcels:
+  name: Number of sediment parcels
+  description: Number of parcels of sediment routed per timestep
+  value:
+    type: int
+    default: 1000
+    range:
+      min: 100
+      max: 10000
+    units: -
+sediment__bedload_fraction:
+  name: Bedload fraction
+  description: Fraction of sediment that is bedload
+  value:
+    type: float
+    default: 0.25
+    range:
+      min: 0.0
+      max: 1.0
+    units: -
+sediment__influx_concentration:
+  name: Sediment concentration
+  description: Concentration of sediment in water inflow
+  value:
+    type: float
+    default: 0.1
+    range:
+      min: 0.01
+      max: 30.0
+    units: percent
+basin__opt_subsidence:
+  name: Toggle subsidence
+  description: Option to apply subsidence to basin
+  value:
+    type: choice
+    default: False
+    choices:
+    - Yes
+    - No
+    units: -
+basin__maximum_subsidence_rate:
+  name: Basin subsidence rate
+  description: Maximum subsidence rate of the basin
+  value:
+    type: float
+    default: 0.000825
+    range:
+      min: 0.0001
+      max: 1.
+    units: m/timestep
+basin__subsidence_start_timestep:
+  name: Start of subsidence
+  description: Timestep when basin subsidence starts
+  value:
+    type: float
+    default: 0
+    range:
+      min: 0
+      max: 1000
+    units: -        
+model_output__opt_eta_figs:
+  name: Save plot of eta
+  description: Option to save plots of topography (eta)
+  value:
+    type: choice
+    default: False
+    choices:
+    - Yes
+    - No
+    units: -
+model_output__opt_stage_figs:
+  name: Save plot of stage
+  description: Option to save plots of stage
+  value:
+    type: choice
+    default: False
+    choices:
+    - Yes
+    - No
+    units: -
+model_output__opt_depth_figs:
+  name: Save plot of depth
+  description: Option to save plots of water depth
+  value:
+    type: choice
+    default: False
+    choices:
+    - Yes
+    - No
+    units: -
+model_output__opt_eta_grids:
+  name: Save grid of eta
+  description: Option to save grid of topography (eta)
+  value:
+    type: choice
+    default: False
+    choices:
+    - Yes
+    - No
+    units: -
+model_output__opt_stage_grids:
+  name: Save grid of stage
+  description: Option to save grid of stage
+  value:
+    type: choice
+    default: False
+    choices:
+    - Yes
+    - No
+    units: -
+model_output__opt_depth_grids:
+  name: Save grid of depth
+  description: Option to save grid of water depth
+  value:
+    type: choice
+    default: False
+    choices:
+    - Yes
+    - No
+    units: -
+model_output__opt_time_interval:
+  name: Output time interval
+  description: Number of timesteps between outputs
+  value:
+    type: int
+    default: 10
+    range:
+      min: 0
+      max: 10000
+    units: -
+basin__opt_stratigraphy:
+  name: Save stratigraphy
+  description: Option to save grids of sand fraction and depth of deposited layers
+  value:
+    type: choice
+    default: False
+    choices:
+    - Yes
+    - No
+    units: -
