@@ -1,6 +1,6 @@
-model_output__site_prefix: ''
-model_output__case_prefix: ''
-model_output__out_dir: 'deltaRCM_Output'
+model_output__site_prefix:
+model_output__case_prefix: 
+model_output__out_dir: deltaRCM_Output
 model__total_timesteps: 10
 model_grid__length: 5000
 model_grid__width: 10000
@@ -27,7 +27,7 @@ model_output__opt_eta_grids: True
 model_output__opt_stage_grids: False
 model_output__opt_depth_grids: False
 model_output__opt_time_interval: 2     
-basin__opt_stratigraphy: True                                    
+basin__opt_stratigraphy: True            
                                             
                                             
                                             

@@ -1065,6 +1065,10 @@ class Tools(object):
     
         # self.prefix
         self.prefix = self.out_dir
+        
+        if self.out_dir[-1] is not '/':
+            self.prefix = self.out_dir + '/'
+        
         if self.site_prefix:
             self.prefix += self.site_prefix + '_'
         if self.case_prefix:
