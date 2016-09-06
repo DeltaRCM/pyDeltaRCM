@@ -38,7 +38,7 @@ class BmiDelta(Bmi):
         self._grids = {}
         self._grid_type = {}
 
-    def initialize(self, filename='bmi.yaml'):
+    def initialize(self, filename='deltaRCM.yaml'):
         """Initialize the model.
 
         Parameters
