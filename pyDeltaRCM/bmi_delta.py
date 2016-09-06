@@ -25,7 +25,7 @@ class BmiDelta(Bmi):
          
     _output_var_names = (
         'sea_water_surface__elevation',
-        'sea_water__depth,
+        'sea_water__depth',
         'sea_bottom_surface__elevation',
         )
 
