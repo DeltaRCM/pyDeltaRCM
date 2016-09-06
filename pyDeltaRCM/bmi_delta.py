@@ -69,7 +69,7 @@ class BmiDelta(Bmi):
             'sea_water_surface__mean_elevation': 'm',
             'sea_water_surface__rate_change_elevation': 'm yr-1',
             'sediment__bedload_fraction': 'fraction', 
-            'sediment__influx_concentration': 'm3 m-3,
+            'sediment__influx_concentration': 'm3 m-3',
             'sea_water_surface__elevation': 'm',
             'sea_water__depth': 'm',
             'sea_bottom_surface__elevation': 'm',
