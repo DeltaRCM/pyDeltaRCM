@@ -101,7 +101,7 @@ class pyDeltaRCM(Tools):
         ''' Get channel flow velocity '''
         return self.u0
         
-    @property.setter
+    @channel_flow_velocity.setter
     def channel_flow_velocity(self, new_u0):
         self.u0 = new_u0
         self.create_other_variables()
@@ -111,7 +111,7 @@ class pyDeltaRCM(Tools):
         ''' Get channel width '''
         return self.N0_meters
         
-    @property.setter
+    @channel_width.setter
     def channel_width(self, new_N0):
         self.N0_meters = new_N0
         self.create_other_variables()
@@ -121,8 +121,8 @@ class pyDeltaRCM(Tools):
         ''' Get channel flow depth '''
         return self.h0
         
-    @property.setter
-    def channel_flow_velocity(self, new_d):
+    @channel_flow_depth.setter
+    def channel_flow_depth(self, new_d):
         self.h0 = new_d
         self.create_other_variables()        
 
@@ -131,7 +131,7 @@ class pyDeltaRCM(Tools):
         ''' Get sea surface mean elevation '''
         return self.H_SL
         
-    @property.setter
+    @sea_surface_mean_elevation.setter
     def sea_surface_mean_elevation(self, new_se):
         self.H_SL = new_se
         
@@ -140,7 +140,7 @@ class pyDeltaRCM(Tools):
         ''' Get rate of change of sea surface elevation, per timestep'''
         return self.SLR
         
-    @property.setter
+    @sea_surface_elevation_change.setter
     def sea_surface_elevation_change(self, new_SLR):
         ''' Set rate of change of sea surface elevation, per timestep'''
         self.SLR = new_SLR
@@ -150,7 +150,7 @@ class pyDeltaRCM(Tools):
         ''' Get bedload fraction '''
         return self.f_bedload
         
-    @property.setter
+    @bedload_fraction.setter
     def bedload_fraction(self, new_u0):
         self.f_bedload = new_u0
 
@@ -159,7 +159,7 @@ class pyDeltaRCM(Tools):
         ''' Get influx sediment concentration '''
         return self.C0_percent
         
-    @property.setter
+    @influx_sediment_concentration.setter
     def influx_sediment_concentration(self, new_u0):
         self.C0_percent = new_u0
         self.create_other_variables()
