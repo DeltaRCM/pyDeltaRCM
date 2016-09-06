@@ -178,7 +178,7 @@ sediment__influx_concentration:
     range:
       min: 0.01
       max: 30.0
-    units: percent
+    units: kg/kg
 basin__opt_subsidence:
   name: Toggle subsidence
   description: Option to apply subsidence to basin
