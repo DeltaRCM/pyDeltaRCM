@@ -38,7 +38,7 @@ model_grid__length:
     range:
       min: 500.0
       max: 50000.0
-    units: meters
+    units: m
 model_grid__width:
   name: Grid width
   description: Width of model grid parallel to shore
@@ -48,7 +48,7 @@ model_grid__width:
     range:
       min: 1000.0
       max: 100000.0
-    units: meters
+    units: m
 model_grid__cell_size:
   name: Cell size
   description: Size of cells in model grid
@@ -58,7 +58,7 @@ model_grid__cell_size:
     range:
       min: 1.0
       max: 500.0
-    units: meters
+    units: m
 land_surface__width:
   name: Land width
   description: Width of land surface
@@ -68,7 +68,7 @@ land_surface__width:
     range:
       min: 1
       max: 1000
-    units: meters
+    units: m
 land_surface__slope:
   name: Land slope
   description: Characteristic slope of the domain
@@ -118,7 +118,7 @@ channel__width:
     range:
       min: 10
       max: 1000
-    units: meters
+    units: m
 channel__flow_depth:
   name: Channel depth
   description: Depth of flow in the inlet channel
@@ -128,7 +128,7 @@ channel__flow_depth:
     range:
       min: 1.
       max: 50.0
-    units: meters
+    units: m
 sea_water_surface__mean_elevation:
   name: Sea level
   description: Mean elevation of sea surface
@@ -138,17 +138,17 @@ sea_water_surface__mean_elevation:
     range:
       min: -100.
       max: 100.
-    units: meters
+    units: m
 sea_water_surface__rate_change_elevation:
   name: Sea level change
-  description: Rate of change of sea level
+  description: Rate of change of sea level (meters per timestep)
   value:
     type: float
     default: 0.0
     range:
       min: 0.0001
       max: 1
-    units: m/timestep
+    units: m
 sediment__number_parcels:
   name: Number of sediment parcels
   description: Number of parcels of sediment routed per timestep
@@ -191,14 +191,14 @@ basin__opt_subsidence:
     units: -
 basin__maximum_subsidence_rate:
   name: Basin subsidence rate
-  description: Maximum subsidence rate of the basin
+  description: Maximum subsidence rate of the basin (meters per timestep)
   value:
     type: float
     default: 0.000825
     range:
       min: 0.0001
       max: 1.
-    units: m/timestep
+    units: m
 basin__subsidence_start_timestep:
   name: Start of subsidence
   description: Timestep when basin subsidence starts

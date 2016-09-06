@@ -13,4 +13,5 @@ setup(name='pyDeltaRCM',
       long_description=open('README.md').read(),
       packages=find_packages(exclude=['*.tests']),
       url='https://github.com/mperignon/pyDeltaRCM_WMT',
+      install_requires=['numpy','matplotlib','scipy','netCDF4','basic-modeling-interface'],
 )
