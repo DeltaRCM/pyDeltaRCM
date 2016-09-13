@@ -439,7 +439,7 @@ class Tools(object):
 
         self.qxn[:] = 0; self.qyn[:] = 0; self.qwn[:] = 0
 
-        self.indices = np.zeros((self.Np_water, int(self.itmax/2)), dtype = np.int)
+        self.indices = np.zeros((self.Np_water, self.itmax/2), dtype = np.int)
         self.path_number = np.arange(self.Np_water)
         self.save_paths = []
 
@@ -464,26 +464,27 @@ class Tools(object):
             new_indices = these_indices + self.walk_flat[ngh]
             new_ind_type = self.cell_type.flat[new_indices]
 
-            # save the path numbers of the ones that reached the edge
-            if self.path_number[new_ind_type == -1].any():
-                self.save_paths.append( list(self.path_number[new_ind_type == -1]) )
+            keepers = new_ind_type >= 0
+            
+            # save the path numbers of the ones that reached the edge or gone on land
+            if self.path_number[~keepers].any():
+                self.save_paths.append( list(self.path_number[~keepers]) )
+                
 
             walk_vals = self.walk[ngh]
             self.qxn.flat[these_indices] += walk_vals[:,0]
             self.qyn.flat[these_indices] += walk_vals[:,1]
-
-            walk_vals = self.walk[list( np.array(ngh)[new_ind_type >= -1] )]
-            n_these_indices = new_indices[new_ind_type >= -1]
-            n_path_number = self.path_number[new_ind_type >= -1]
-            for i in range(len(n_these_indices)):
-                self.qxn.flat[n_these_indices[i]] += walk_vals[i,0]
-                self.qyn.flat[n_these_indices[i]] += walk_vals[i,1]
+            
+            ngh = np.array(ngh)[keepers]
+            walk_vals = self.walk[ngh]
+            
+            these_indices = new_indices[keepers]
+            self.path_number = self.path_number[keepers]
+            
+            self.qxn.flat[these_indices] += walk_vals[:,0]
+            self.qyn.flat[these_indices] += walk_vals[:,1]
 
             it += 1
-            self.indices[n_path_number,it] = n_these_indices
-
-            these_indices = new_indices[new_ind_type >= 0]
-            self.path_number = self.path_number[new_ind_type >= 0]
 
             # check for looping
             if len(self.path_number)>0:
@@ -500,6 +501,8 @@ class Tools(object):
 
                     these_indices = these_indices[keeper == 1]
                     self.path_number = self.path_number[keeper == 1]
+                    
+            self.indices[self.path_number,it] = these_indices
 
             if it == self.itmax-1 or len(these_indices)==0:
                 water_continue = False
@@ -796,6 +799,7 @@ class Tools(object):
                 qs_loc = self.qs.flat[these_indices]
 
                 if (qs_loc > qs_cap).any():
+                
 
                     update_ind = these_indices[qs_loc > qs_cap]
                     update_path = path_number[qs_loc > qs_cap]
@@ -817,9 +821,11 @@ class Tools(object):
                     update_uwqw = [self.uw.flat[i]/self.qw.flat[i] if self.qw.flat[i]>0 else 0 for i in update_ind]
                     self.ux.flat[update_ind] = self.qx.flat[update_ind] * update_uwqw
                     self.uy.flat[update_ind] = self.qy.flat[update_ind] * update_uwqw
+                    
 
 
                 if ((qs_loc < qs_cap) * (self.uw.flat[these_indices] > self.U_ero_sand)).any():
+                
 
                     update_ind = these_indices[(qs_loc < qs_cap) * (self.uw.flat[these_indices] > self.U_ero_sand)]
                     update_path = path_number[(qs_loc < qs_cap) * (self.uw.flat[these_indices] > self.U_ero_sand)]
@@ -844,12 +850,14 @@ class Tools(object):
                     self.uy.flat[update_ind] = self.qy.flat[update_ind] * update_uwqw
 
                     self.Vp_res[update_path] += self.Vp_ero
+                    
 
 
                 if it == self.itmax-1 or len(these_indices)==0:
                     sed_continue = False
 
         self.topo_diffusion()
+        
 
 
 
@@ -867,6 +875,7 @@ class Tools(object):
         self.depth[0,self.inlet] = self.h0
 
         self.H_SL = self.H_SL + self.SLR * self.dt
+        
 
 
 
@@ -1144,6 +1153,8 @@ class Tools(object):
         self.inlet = list(np.unique(np.where(self.cell_type == 1)[1]))
         self.eta = self.stage - self.depth
         
+        self.clim_eta = (-self.h0 - 1, 0.05)
+        
     
     
     def init_stratigraphy(self):
@@ -1269,8 +1280,9 @@ class Tools(object):
         for iteration in range(self.itermax):
 
             self.init_water_iteration()
+            
             self.run_water_iteration()
-
+            
             ########################################
             # Not calculating water surface profiles
             ########################################
@@ -1278,6 +1290,7 @@ class Tools(object):
 #                 self.get_profiles()
 
             self.finalize_water_iteration(iteration)
+            
 
         self.init_sed_timestep()
 
@@ -1390,19 +1403,23 @@ class Tools(object):
             if self.save_eta_figs:
                     
                 plt.pcolor(self.eta)
+                plt.clim(self.clim_eta[0], self.clim_eta[1])
                 plt.colorbar()
+                plt.axis('equal')
                 self.save_figure(self.prefix + "eta_" + str(timestep))
             
             if self.save_stage_figs:
                     
                 plt.pcolor(self.stage)
                 plt.colorbar()
+                plt.axis('equal')
                 self.save_figure(self.prefix + "stage_" + str(timestep))
                         
             if self.save_depth_figs:
                     
                 plt.pcolor(self.depth)
                 plt.colorbar()
+                plt.axis('equal')
                 self.save_figure(self.prefix + "depth_" + str(timestep))
                 
                 
