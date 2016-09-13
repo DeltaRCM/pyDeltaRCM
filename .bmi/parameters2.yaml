@@ -19,16 +19,6 @@ model_output__out_dir:
     type: string
     default: deltaRCM_Output
     units: -
-model__total_timesteps:
-  name: Total timesteps
-  description: Total number of timesteps of model run
-  value:
-    type: int
-    default: 100
-    range:
-      min: 1
-      max: 20000
-    units: -
 model_grid__length:
   name: Grid length
   description: Length of model grid perpendicular to shore

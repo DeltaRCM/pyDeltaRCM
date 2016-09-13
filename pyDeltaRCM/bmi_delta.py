@@ -89,8 +89,10 @@ class BmiDelta(Bmi):
 
     def update(self):
         """Advance model by one time step."""
+        
         self._delta.update()
         self._time += self.get_time_step()
+
 
     def update_frac(self, time_frac):
         """Update model by a fraction of a time step.
@@ -101,9 +103,12 @@ class BmiDelta(Bmi):
             Fraction fo a time step.
         """
         time_step = self.get_time_step()
+        
         self._delta.time_step = time_frac * time_step
         self.update()
+        
         self._delta.time_step = time_step
+
 
     def update_until(self, then):
         """Update model until a particular time.
@@ -113,16 +118,28 @@ class BmiDelta(Bmi):
         then : float
             Time to run model until.
         """
+        
+        if self.get_current_time() != int(self.get_current_time()):
+        
+            remainder = self.get_current_time() - int(self.get_current_time())
+            self.update_frac(remainder)
+            
+            
         n_steps = (then - self.get_current_time()) / self.get_time_step()
 
         for _ in range(int(n_steps)):
             self.update()
-        self.update_frac(n_steps - int(n_steps))
+            
+        remainder = n_steps - int(n_steps)
+        if remainder > 0:
+            self.update_frac(remainder)
+
 
     def finalize(self):
         """Finalize model."""
         self._delta.finalize()
         self._delta = None
+
 
     def get_var_type(self, var_name):
         """Data type of variable.

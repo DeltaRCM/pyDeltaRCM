@@ -8,7 +8,6 @@ class pyDeltaRCM(Tools):
         'model_output__site_prefix': {'name':'site_prefix', 'type': 'string', 'default': ''},
         'model_output__case_prefix': {'name':'case_prefix', 'type': 'string', 'default': ''},
         'model_output__out_dir': {'name':'out_dir', 'type': 'string', 'default': 'deltaRCM_Output/'},
-        'model__total_timesteps': {'name':'n_steps', 'type': 'long', 'default': 200},
         'model_grid__length': {'name':'Length', 'type': 'float', 'default': 5000.},
         'model_grid__width': {'name':'Width', 'type': 'float', 'default': 10000.},
         'model_grid__cell_size': {'name':'dx', 'type': 'float', 'default': 100.},
@@ -46,7 +45,7 @@ class pyDeltaRCM(Tools):
         'coeff__topographic_diffusion': {'name': 'alpha', 'type': 'float', 'default': 0.1},
         'basin__opt_subsidence': {'name':'toggle_subsidence', 'type': 'choice', 'default': False},
         'basin__maximum_subsidence_rate': {'name': 'sigma_max', 'type': 'float', 'default': 0.000825},
-        'basin__subsidence_start_timestep': {'name': 'start_subsidence', 'type': 'long', 'default': 0},
+        'basin__subsidence_start_timestep': {'name': 'start_subsidence', 'type': 'float', 'default': 0},
         'basin__opt_stratigraphy': {'name': 'save_strata', 'type': 'choice', 'default': False}
         }
         
@@ -63,8 +62,8 @@ class pyDeltaRCM(Tools):
         Calls functions to set the rest and create the domain (for cleanliness)
         '''
         
-        self._time = 0
-        self._time_step = 1
+        self._time = 0.
+        self._time_step = 1.
         
         self.verbose = True
         self.input_file = input_file
@@ -92,9 +91,12 @@ class pyDeltaRCM(Tools):
             warnings.warn('Using a very small timestep.')
             warnings.warn('Delta might evolve very slowly.')
             
-        self.Np_sed *= new_dt * self.init_Np_sed
-        self.Np_water *= new_dt * self.init_Np_water
-            
+        self.Np_sed = int(new_dt * self.init_Np_sed)
+        self.Np_water = int(new_dt * self.init_Np_water)
+        
+        if self.toggle_subsidence:
+            self.sigma = self.subsidence_mask * self.sigma_max * new_dt
+        
         self._time_step = new_dt
 
     @property
@@ -191,13 +193,15 @@ class pyDeltaRCM(Tools):
         Run the model for one full instance
         '''
         
-        self.run_one_timestep(self._time)
+        self.run_one_timestep()
         
-        self.apply_subsidence(self._time)
-        self.record_stratigraphy(self._time)
+        self.apply_subsidence()
+        self.record_stratigraphy()
         
-        self.finalize_timestep(self._time)
-        self.output_data(self._time)
+        self.finalize_timestep()
+        self.output_data()
+        
+        self._time += self.time_step
         
         
     def finalize(self):

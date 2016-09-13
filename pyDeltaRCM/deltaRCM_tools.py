@@ -7,7 +7,7 @@ from scipy import ndimage
 import sys, os, re, string
 from netCDF4 import Dataset
 import time as time_lib
-from scipy.sparse import lil_matrix, csc_matrix
+from scipy.sparse import lil_matrix, csc_matrix, hstack
 
 class Tools(object):
 
@@ -83,7 +83,7 @@ class Tools(object):
         if close: plt.close()
             
             
-    def save_grids(self, var_name, var, timestep):
+    def save_grids(self, var_name, var):
         '''
         Save a grid into an existing netCDF file.
         File should already be open (by init_output_grid) as self.output_netcdf
@@ -95,6 +95,8 @@ class Tools(object):
         timestep : int
                 The current timestep (+1, so human readable)
         '''
+        
+        timestep = self._time
         
         try:
             shape = self.output_netcdf[var_name].shape
@@ -375,10 +377,12 @@ class Tools(object):
                 
     
 
-    def update_flow_field(self, timestep, iteration):
+    def update_flow_field(self, iteration):
         '''
         Update water discharge after one water iteration
         '''
+        
+        timestep = self._time
 
         dloc = (self.qxn**2 + self.qyn**2)**(0.5)
         
@@ -435,7 +439,7 @@ class Tools(object):
 
         self.qxn[:] = 0; self.qyn[:] = 0; self.qwn[:] = 0
 
-        self.indices = np.zeros((self.Np_water, self.itmax/2), dtype = np.int)
+        self.indices = np.zeros((self.Np_water, int(self.itmax/2)), dtype = np.int)
         self.path_number = np.arange(self.Np_water)
         self.save_paths = []
 
@@ -447,7 +451,7 @@ class Tools(object):
         '''
 
         these_indices = map(lambda x: self.random_pick_inlet(self.inlet), range(self.Np_water))
-
+        
         self.indices[:,0] = these_indices
         self.qxn.flat[these_indices] += 1
 
@@ -515,7 +519,7 @@ class Tools(object):
 
 
 
-    def finalize_water_iteration(self, timestep, iteration):
+    def finalize_water_iteration(self, iteration):
         '''
         Finish updating flow fields
         Clean up at end of water iteration
@@ -524,7 +528,7 @@ class Tools(object):
         self.stage = np.maximum(self.stage, self.H_SL)
         self.depth = np.maximum(self.stage - self.eta, 0)
 
-        self.update_flow_field(timestep, iteration)
+        self.update_flow_field(iteration)
         self.update_velocity_field()
 
 
@@ -849,7 +853,7 @@ class Tools(object):
 
 
 
-    def finalize_timestep(self, timestep):
+    def finalize_timestep(self):
         '''
         Clean up after sediment routing
         Update sea level if baselevel changes
@@ -857,9 +861,9 @@ class Tools(object):
         
         self.flooding_correction()
         self.stage = np.maximum(self.stage, self.H_SL)
-        self.depth = np.maximum(self.stage-self.eta, 0)
+        self.depth = np.maximum(self.stage - self.eta, 0)
 
-        self.eta[0,self.inlet] = self.stage[0,self.inlet] - self.h0
+        self.eta[0,self.inlet] = self.stage[0, self.inlet] - self.h0
         self.depth[0,self.inlet] = self.h0
 
         self.H_SL = self.H_SL + self.SLR * self.dt
@@ -999,7 +1003,7 @@ class Tools(object):
             
             self.subsidence_mask[:self.L0,:] = False
             
-            self.sigma = self.subsidence_mask * self.sigma_max
+            self.sigma = self.subsidence_mask * self.sigma_max * self.time_step
 
 
       
@@ -1148,10 +1152,26 @@ class Tools(object):
         '''
         
         if self.save_strata:
+        
+            self.n_steps = 10 * self.save_dt
+        
             self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps), dtype=np.float32)
             
             self.init_eta = self.eta.copy()
             self.strata_eta = lil_matrix((self.L * self.W, self.n_steps), dtype=np.float32)
+
+
+    def expand_stratigraphy(self):
+        '''
+        Expand the size of arrays that store stratigraphy data
+        '''
+        
+        if self.verbose: print 'Expanding stratigraphy arrays'
+        
+        lil_blank = lil_matrix((self.L * self.W, self.n_steps), dtype=np.float32)
+        
+        self.strata_eta = hstack([self.strata_eta, lil_blank], format='lil')
+        self.strata_sand_frac = hstack([self.strata_sand_frac, lil_blank], format='lil')
 
             
         
@@ -1234,14 +1254,16 @@ class Tools(object):
     ############# run_one_timestep ##############
     #############################################
 
-    def run_one_timestep(self, timestep):
+    def run_one_timestep(self):
         '''
         Run the time loop once
         '''
+        
+        timestep = self._time
 
         if self.verbose:
             print '-'*20
-            print 'Time = ' + str(timestep+1) + ' of ' + str(self.n_steps)
+            print 'Time = ' + str(self._time)
 
 
         for iteration in range(self.itermax):
@@ -1255,7 +1277,7 @@ class Tools(object):
 #             if timestep>0:
 #                 self.get_profiles()
 
-            self.finalize_water_iteration(timestep, iteration)
+            self.finalize_water_iteration(iteration)
 
         self.init_sed_timestep()
 
@@ -1266,7 +1288,7 @@ class Tools(object):
 
         
         
-    def record_stratigraphy(self, timestep):
+    def record_stratigraphy(self):
         '''
         Saves the sand fraction of deposited sediment
         into a sparse array created by init_stratigraphy().
@@ -1274,7 +1296,16 @@ class Tools(object):
         Only runs if save_strata is True
         '''
         
-        if self.save_strata:
+        timestep = self._time
+        
+        if self.save_strata and (timestep % self.save_dt == 0):
+        
+            timestep = int(timestep)
+            
+        
+            if self.strata_eta.shape[1] <= timestep:
+                self.expand_stratigraphy()
+        
             
             if self.verbose:
                 print 'Storing stratigraphy data'
@@ -1316,17 +1347,17 @@ class Tools(object):
             
             self.strata_eta[:,timestep] = eta_sparse
             
-            if self.toggle_subsidence:
-             
+            if self.toggle_subsidence and self.start_subsidence <= timestep:
+            
                 sigma_change = self.strata_eta[:,:timestep] - self.sigma.flatten()[:,np.newaxis]
-                self.strata_eta[:,:timestep] = lil_matrix(self.strata_eta[:,:timestep])
+                self.strata_eta[:,:timestep] = lil_matrix(sigma_change)
             
         
         
         
         
         
-    def apply_subsidence(self, timestep):
+    def apply_subsidence(self):
         '''
         Apply subsidence to domain if
         toggle_subsidence is True and
@@ -1334,6 +1365,8 @@ class Tools(object):
         '''
         
         if self.toggle_subsidence:
+            
+            timestep = self._time
         
             if self.start_subsidence <= timestep:
                 
@@ -1344,45 +1377,47 @@ class Tools(object):
                 
         
 
-    def output_data(self, timestep):
+    def output_data(self):
         '''
         Plots and saves figures of eta, depth, and stage
         '''
+        
+        timestep = self._time
 
-        if int(timestep+1) % self.save_dt == 0:
+        if timestep % self.save_dt == 0:
             
             ############ FIGURES #############
             if self.save_eta_figs:
                     
                 plt.pcolor(self.eta)
                 plt.colorbar()
-                self.save_figure(self.prefix + "eta_" + str(timestep+1))
+                self.save_figure(self.prefix + "eta_" + str(timestep))
             
             if self.save_stage_figs:
                     
                 plt.pcolor(self.stage)
                 plt.colorbar()
-                self.save_figure(self.prefix + "stage_" + str(timestep+1))
+                self.save_figure(self.prefix + "stage_" + str(timestep))
                         
             if self.save_depth_figs:
                     
                 plt.pcolor(self.depth)
                 plt.colorbar()
-                self.save_figure(self.prefix + "depth_" + str(timestep+1))
+                self.save_figure(self.prefix + "depth_" + str(timestep))
                 
                 
             ############ GRIDS #############
             if self.save_eta_grids:
                 if self.verbose: print 'Saving grid: eta'
-                self.save_grids('eta', self.eta, timestep+1)
+                self.save_grids('eta', self.eta)
             
             if self.save_depth_grids:
                 if self.verbose: print 'Saving grid: depth'  
-                self.save_grids('depth', self.depth, timestep+1)
+                self.save_grids('depth', self.depth)
 
             if self.save_stage_grids:
                 if self.verbose: print 'Saving grid: stage'
-                self.save_grids('stage', self.stage, timestep+1)                
+                self.save_grids('stage', self.stage)                
     
     
     
