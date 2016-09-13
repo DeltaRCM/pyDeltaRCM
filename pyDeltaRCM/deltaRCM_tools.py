@@ -2,6 +2,8 @@
 from math import floor, sqrt, pi
 import numpy as np
 from random import shuffle
+import matplotlib
+matplotlib.use('agg')
 from matplotlib import pyplot as plt
 from scipy import ndimage
 import sys, os, re, string
