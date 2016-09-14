@@ -251,7 +251,7 @@ class Tools(object):
         wet = [(wet_cells[0][i],wet_cells[1][i]) for i in range(len(wet_cells[0]))]
 
         # new weights to those cells - partitioned equally among the wet neighbors
-        new_vals = [wet_mask_nh[:,i[0],i[1]]/sum(wet_mask_nh[:,i[0],i[1]]) for i in wet]
+        new_vals = [0 if sum(wet_mask_nh[:,i[0],i[1]])==0 else wet_mask_nh[:,i[0],i[1]]/sum(wet_mask_nh[:,i[0],i[1]]) for i in wet]
 
         for i in range(len(new_vals)):
             wgt[:,wet[i][0],wet[i][1]] = new_vals[i]
@@ -441,7 +441,7 @@ class Tools(object):
 
         self.qxn[:] = 0; self.qyn[:] = 0; self.qwn[:] = 0
 
-        self.indices = np.zeros((self.Np_water, self.itmax/2), dtype = np.int)
+        self.indices = np.zeros((self.Np_water, self.size_indices), dtype = np.int)
         self.path_number = np.arange(self.Np_water)
         self.save_paths = []
 
@@ -503,6 +503,26 @@ class Tools(object):
 
                     these_indices = these_indices[keeper == 1]
                     self.path_number = self.path_number[keeper == 1]
+                    
+                    
+                    
+            if it >= self.indices.shape[1]:
+                '''
+                Initial size of self.indices is half of self.itmax because the number of
+                iterations doesn't go beyond that for many timesteps.
+                
+                Once it reaches it > self.itmax/2 once, make the size self.iter for all
+                further timesteps
+                '''
+            
+                if self.verbose: print 'Increasing size of self.indices'
+            
+                indices_blank = np.zeros((self.Np_water, self.itmax/2), dtype = np.int)
+                self.indices = np.hstack((self.indices, indices_blank))
+                
+                self.size_indices = self.itmax
+            
+                
                     
             self.indices[self.path_number,it] = these_indices
 
@@ -1069,6 +1089,8 @@ class Tools(object):
         self.Vp_sed = self.dVs / self.Np_sed    # volume of each sediment parcel
     
         self.itmax = 2 * (self.L + self.W)      # max number of jumps for parcel
+        self.size_indices = int(self.itmax/2)   # initial width of self.indices
+        
         self.dt = self.dVs / self.Qs0           # time step size
 
         self.omega_flow = 0.9
