@@ -466,25 +466,36 @@ class Tools(object):
             new_indices = these_indices + self.walk_flat[ngh]
             new_ind_type = self.cell_type.flat[new_indices]
 
-            keepers = new_ind_type >= 0
+            edgers = new_ind_type == -1
             
             # save the path numbers of the ones that reached the edge or gone on land
-            if self.path_number[~keepers].any():
-                self.save_paths.append( list(self.path_number[~keepers]) )
+            if self.path_number[edgers].any():
+                self.save_paths.append( list(self.path_number[edgers]) )
                 
 
             walk_vals = self.walk[ngh]
             self.qxn.flat[these_indices] += walk_vals[:,0]
             self.qyn.flat[these_indices] += walk_vals[:,1]
             
+            
+            
+            keepers = new_ind_type >= -1
+            
             ngh = np.array(ngh)[keepers]
             walk_vals = self.walk[ngh]
             
+            n_these_indices = new_indices[keepers]
+            n_path_number = self.path_number[keepers]
+            
+            self.qxn.flat[n_these_indices] += walk_vals[:,0]
+            self.qyn.flat[n_these_indices] += walk_vals[:,1]
+
+
+            keepers = new_ind_type >= 0
+
+            self.indices[n_path_number,it] = n_these_indices		
             these_indices = new_indices[keepers]
             self.path_number = self.path_number[keepers]
-            
-            self.qxn.flat[these_indices] += walk_vals[:,0]
-            self.qyn.flat[these_indices] += walk_vals[:,1]
 
             it += 1
 
