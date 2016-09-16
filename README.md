@@ -16,6 +16,6 @@ The example script `run_pyDeltaRCM.py` with:
 
 ``` $ python run_pyDeltaRCM.py```
 
-It reads the input file `deltaRCM.yaml` and runs a 2000 timestep simulation. This script will create an output folder in the working directory and save a PNG file of the parameter ‘eta’ (surface elevation) every 50 timesteps.
+It reads the input file `deltaRCM.yaml` and runs a 2000 timestep simulation. This script will create an output folder in the working directory and save a PNG file of the parameter `eta` (surface elevation) every 50 timesteps.
 
 Change the parameters in the YAML file to customize the simulation.
