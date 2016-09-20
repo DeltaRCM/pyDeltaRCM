@@ -4,21 +4,21 @@ model_output__site_prefix:
   value:
     type: string
     default: 
-    units: -
+    units: '-'
 model_output__case_prefix:
   name: Case prefix
   description: Case prefix for output file names
   value:
     type: string
     default:
-    units: -
+    units: '-'
 model_output__out_dir:
   name: Output directory
   description: Output directory
   value:
     type: string
     default: deltaRCM_Output
-    units: -
+    units: '-'
 model_grid__length:
   name: Grid length
   description: Length of model grid perpendicular to shore
@@ -78,7 +78,7 @@ model__max_iteration:
     range:
       min: 1
       max: 10
-    units: -
+    units: '-'
 water__number_parcels:
   name: Number of water parcels
   description: Number of parcels of water routed per iteration
@@ -88,7 +88,7 @@ water__number_parcels:
     range:
       min: 100
       max: 10000
-    units: -
+    units: '-'
 channel__flow_velocity:
   name: Channel flow velocity
   description: Flow velocity in the inlet channel
@@ -148,7 +148,7 @@ sediment__number_parcels:
     range:
       min: 100
       max: 10000
-    units: -
+    units: '-'
 sediment__bedload_fraction:
   name: Bedload fraction
   description: Fraction of sediment that is bedload
@@ -158,7 +158,7 @@ sediment__bedload_fraction:
     range:
       min: 0.0
       max: 1.0
-    units: -
+    units: '-'
 sediment__influx_concentration:
   name: Sediment concentration
   description: Concentration of sediment in water inflow
@@ -178,7 +178,7 @@ basin__opt_subsidence:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 basin__maximum_subsidence_rate:
   name: Basin subsidence rate
   description: Maximum subsidence rate of the basin (meters per timestep)
@@ -198,7 +198,7 @@ basin__subsidence_start_timestep:
     range:
       min: 0
       max: 1000
-    units: -        
+    units: '-'        
 model_output__opt_eta_figs:
   name: Save plot of eta
   description: Option to save plots of topography (eta)
@@ -208,7 +208,7 @@ model_output__opt_eta_figs:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_stage_figs:
   name: Save plot of stage
   description: Option to save plots of stage
@@ -218,7 +218,7 @@ model_output__opt_stage_figs:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_depth_figs:
   name: Save plot of depth
   description: Option to save plots of water depth
@@ -228,7 +228,7 @@ model_output__opt_depth_figs:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_eta_grids:
   name: Save grid of eta
   description: Option to save grid of topography (eta)
@@ -238,7 +238,7 @@ model_output__opt_eta_grids:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_stage_grids:
   name: Save grid of stage
   description: Option to save grid of stage
@@ -248,7 +248,7 @@ model_output__opt_stage_grids:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_depth_grids:
   name: Save grid of depth
   description: Option to save grid of water depth
@@ -258,7 +258,7 @@ model_output__opt_depth_grids:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_time_interval:
   name: Output time interval
   description: Number of timesteps between outputs
@@ -268,7 +268,7 @@ model_output__opt_time_interval:
     range:
       min: 0
       max: 10000
-    units: -
+    units: '-'
 basin__opt_stratigraphy:
   name: Save stratigraphy
   description: Option to save grids of sand fraction and depth of deposited layers
@@ -278,4 +278,4 @@ basin__opt_stratigraphy:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'

@@ -4,21 +4,21 @@ model_output__site_prefix:
   value:
     type: string
     default: 
-    units: -
+    units: '-'
 model_output__case_prefix:
   name: Case prefix
   description: Case prefix for output file names
   value:
     type: string
     default:
-    units: -
+    units: '-'
 model_output__out_dir:
   name: Output directory
   description: Output directory
   value:
     type: string
     default: deltaRCM_Output
-    units: -
+    units: '-'
 model_grid__length:
   name: Grid length
   description: Length of model grid perpendicular to shore
@@ -78,7 +78,7 @@ model__max_iteration:
     range:
       min: 1
       max: 10
-    units: -
+    units: '-'
 water__number_parcels:
   name: Number of water parcels
   description: Number of parcels of water routed per iteration
@@ -88,7 +88,7 @@ water__number_parcels:
     range:
       min: 100
       max: 10000
-    units: -
+    units: '-'
 channel__flow_velocity:
   name: Channel flow velocity
   description: Flow velocity in the inlet channel
@@ -148,7 +148,7 @@ sediment__number_parcels:
     range:
       min: 100
       max: 10000
-    units: -
+    units: '-'
 sediment__bedload_fraction:
   name: Bedload fraction
   description: Fraction of sediment that is bedload
@@ -158,7 +158,7 @@ sediment__bedload_fraction:
     range:
       min: 0.0
       max: 1.0
-    units: -
+    units: '-'
 sediment__influx_concentration:
   name: Sediment concentration
   description: Concentration of sediment in water inflow
@@ -178,7 +178,7 @@ basin__opt_subsidence:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 basin__maximum_subsidence_rate:
   name: Basin subsidence rate
   description: Maximum subsidence rate of the basin (meters per timestep)
@@ -198,7 +198,7 @@ basin__subsidence_start_timestep:
     range:
       min: 0
       max: 1000
-    units: -        
+    units: '-'
 model_output__opt_eta_figs:
   name: Save plot of eta
   description: Option to save plots of topography (eta)
@@ -208,7 +208,7 @@ model_output__opt_eta_figs:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_stage_figs:
   name: Save plot of stage
   description: Option to save plots of stage
@@ -218,7 +218,7 @@ model_output__opt_stage_figs:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_depth_figs:
   name: Save plot of depth
   description: Option to save plots of water depth
@@ -228,7 +228,7 @@ model_output__opt_depth_figs:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_eta_grids:
   name: Save grid of eta
   description: Option to save grid of topography (eta)
@@ -238,7 +238,7 @@ model_output__opt_eta_grids:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_stage_grids:
   name: Save grid of stage
   description: Option to save grid of stage
@@ -248,7 +248,7 @@ model_output__opt_stage_grids:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_depth_grids:
   name: Save grid of depth
   description: Option to save grid of water depth
@@ -258,7 +258,7 @@ model_output__opt_depth_grids:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 model_output__opt_time_interval:
   name: Output time interval
   description: Number of timesteps between outputs
@@ -268,7 +268,7 @@ model_output__opt_time_interval:
     range:
       min: 0
       max: 10000
-    units: -
+    units: '-'
 basin__opt_stratigraphy:
   name: Save stratigraphy
   description: Option to save grids of sand fraction and depth of deposited layers
@@ -278,7 +278,7 @@ basin__opt_stratigraphy:
     choices:
     - Yes
     - No
-    units: -
+    units: '-'
 coeff__surface_smoothing:
   name: Coefficient of surface smoothing
   description: Coefficient of surface smoothing
@@ -288,7 +288,7 @@ coeff__surface_smoothing:
     range:
       min: 0.0
       max: 1.0
-    units: -
+    units: '-'
 coeff__under_relaxation__water_surface:
   name: Coefficient of under relaxation of water surface
   description: Coefficient of under relaxation of water surface
@@ -298,7 +298,7 @@ coeff__under_relaxation__water_surface:
     range:
       min: 0.0
       max: 1.0
-    units: -
+    units: '-'
 coeff__under_relaxation__water_flow:
   name: Coefficient of under relaxation of water flow
   description: Coefficient of under relaxation of water flow
@@ -308,7 +308,7 @@ coeff__under_relaxation__water_flow:
     range:
       min: 0.0
       max: 1.0
-    units: -
+    units: '-'
 coeff__iterations_smoothing_algorithm:
   name: Iterations of smoothing algorithm
   description: Number of times to repeat the surface smoothing algorithm
@@ -318,7 +318,7 @@ coeff__iterations_smoothing_algorithm:
     range:
       min: 0
       max: 20
-    units: -
+    units: '-'
 coeff__depth_dependence__water:
   name: Coefficient of depth dependence for water velocity
   description: Coefficient of depth dependence for water velocity
@@ -328,7 +328,7 @@ coeff__depth_dependence__water:
     range:
       min: 0.0
       max: 10.0
-    units: -
+    units: '-'
 coeff__depth_dependence__sand:
   name: Coefficient of depth dependence for sand transport velocity
   description: Coefficient of depth dependence for sand transport velocity
@@ -338,7 +338,7 @@ coeff__depth_dependence__sand:
     range:
       min: 0.0
       max: 10.0
-    units: -
+    units: '-'
 coeff__depth_dependence__mud:
   name: Coefficient of depth dependence for mud transport velocity
   description: Coefficient of depth dependence for mud transport velocity
@@ -348,7 +348,7 @@ coeff__depth_dependence__mud:
     range:
       min: 0.0
       max: 10.0
-    units: -
+    units: '-'
 coeff__non_linear_exp_sed_flux_flow_velocity:
   name: Non-linear exponent for sediment flux
   description: Non-linear exponent for sediment flux
@@ -358,7 +358,7 @@ coeff__non_linear_exp_sed_flux_flow_velocity:
     range:
       min: 0
       max: 10
-    units: -
+    units: '-'
 coeff__sedimentation_lag:
   name: Sedimentation lag
   description: Sedimentation lag
@@ -368,7 +368,7 @@ coeff__sedimentation_lag:
     range:
       min: 0.0
       max: 10.0
-    units: -
+    units: '-'
 coeff__velocity_deposition_mud:
   name: Coefficient of velocity of mud deposition
   description: Coefficient of velocity of mud deposition
@@ -378,7 +378,7 @@ coeff__velocity_deposition_mud:
     range:
       min: 0.0
       max: 10.0
-    units: -
+    units: '-'
 coeff__velocity_erosion_mud:
   name: Coefficient of velocity of mud erosion
   description: Coefficient of velocity of mud erosion
@@ -388,7 +388,7 @@ coeff__velocity_erosion_mud:
     range:
       min: 0.0
       max: 10.0
-    units: -
+    units: '-'
 coeff__velocity_erosion_sand:
   name: Coefficient of velocity of sand erosion
   description: Coefficient of velocity of sand erosion
@@ -398,7 +398,7 @@ coeff__velocity_erosion_sand:
     range:
       min: 0.0
       max: 10.0
-    units: -
+    units: '-'
 coeff__topographic_diffusion:
   name: Coefficient of topographic diffusion
   description: Coefficient of topographic diffusion
@@ -408,4 +408,4 @@ coeff__topographic_diffusion:
     range:
       min: 0.0
       max: 1.0
-    units: -
+    units: '-'
