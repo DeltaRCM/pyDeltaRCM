@@ -14,15 +14,15 @@ class BmiDelta(Bmi):
     _name = 'pyDeltaRCM'
     
     _input_var_names = (
-        'channel__flow_velocity',
-         'channel__flow_depth',
-         'sediment__bedload_fraction',
-         'channel__width',
-         'sea_water_surface__rate_change_elevation',
-         'sea_water_surface__mean_elevation',
-         'sediment__influx_concentration',
+        'channel_exit_water_flow__speed',
+        'channel_exit_water_x-section__depth',
+        'channel_exit_water_x-section__width',
+        'channel_exit_water_sediment~bedload__volume_fraction',
+        'channel_exit_water_sediment~suspended__mass_concentration',
+        'sea_water_surface__rate_change_elevation',
+        'sea_water_surface__mean_elevation',
          )
-         
+
     _output_var_names = (
         'sea_water_surface__elevation',
         'sea_water__depth',
@@ -50,26 +50,26 @@ class BmiDelta(Bmi):
         self._delta = pyDeltaRCM(filename)
 
         self._values = {
-            'channel__flow_velocity': self._delta.u0,
-            'channel__width': self._delta.N0_meters,
-            'channel__flow_depth': self._delta.h0,
+            'channel_exit_water_flow__speed': self._delta.u0,
+            'channel_exit_water_x-section__width': self._delta.N0_meters,
+            'channel_exit_water_x-section__depth': self._delta.h0,
             'sea_water_surface__mean_elevation': self._delta.H_SL,
             'sea_water_surface__rate_change_elevation': self._delta.SLR,
-            'sediment__bedload_fraction': self._delta.f_bedload, 
-            'sediment__influx_concentration': self._delta.C0_percent,
+            'channel_exit_water_sediment~bedload__volume_fraction': self._delta.f_bedload,
+            'channel_exit_water_sediment~suspended__mass_concentration': self._delta.C0_percent,
             'sea_water_surface__elevation': self._delta.stage,
             'sea_water__depth': self._delta.depth,
             'sea_bottom_surface__elevation': self._delta.eta,
             }
             
         self._var_units = {
-            'channel__flow_velocity': 'm s-1',
-            'channel__width': 'm',
-            'channel__flow_depth': 'm',
+            'channel_exit_water_flow__speed': 'm s-1',
+            'channel_exit_water_x-section__width': 'm',
+            'channel_exit_water_x-section__depth': 'm',
             'sea_water_surface__mean_elevation': 'm',
             'sea_water_surface__rate_change_elevation': 'm yr-1',
-            'sediment__bedload_fraction': 'fraction', 
-            'sediment__influx_concentration': 'm3 m-3',
+            'channel_exit_water_sediment~bedload__volume_fraction': 'fraction',
+            'channel_exit_water_sediment~suspended__mass_concentration': 'm3 m-3',
             'sea_water_surface__elevation': 'm',
             'sea_water__depth': 'm',
             'sea_bottom_surface__elevation': 'm',
