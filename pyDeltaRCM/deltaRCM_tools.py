@@ -1078,7 +1078,6 @@ class Tools(object):
 
         # (m) critial depth to switch to "dry" node
         self.dry_depth = min(0.1, 0.1*self.h0)
-        self.CTR = floor(self.W / 2.)
 
         self.gamma = self.g * self.S0 * self.dx / (self.u0**2)
 
@@ -1161,9 +1160,14 @@ class Tools(object):
         cell_ocean = 0
         cell_edge = -1
         
+        # define domain
+        CTR = floor(self.W / 2.)
+        domain_edge = np.sqrt((self.y - 2)**2 + (self.x - CTR + 1)**2) > self.L-5
+        self.cell_type[domain_edge] = -1
+        
         self.cell_type[:self.L0,:] = cell_land
         
-        channel_inds = int(self.CTR - round(self.N0 / 2))
+        channel_inds = int(CTR - round(self.N0 / 2))
         self.cell_type[:self.L0, channel_inds:channel_inds + self.N0 + 1] = cell_channel
 
         self.stage = np.maximum(0, self.L0 - self.y - 1) * self.dx * self.S0
