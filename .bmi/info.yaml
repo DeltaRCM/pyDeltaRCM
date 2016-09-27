@@ -2,3 +2,4 @@ url: http://csdms.colorado.edu/wiki/Model:PyDeltaRCM
 author: Mariela Perignon
 email: perignon@colorado.edu
 version: 0.1
+initialize_args: "deltaRCM.yaml"
