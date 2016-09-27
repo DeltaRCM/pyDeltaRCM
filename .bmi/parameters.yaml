@@ -134,9 +134,9 @@ sea_water_surface__rate_change_elevation:
   description: Rate of change of sea level (meters per timestep)
   value:
     type: float
-    default: 0.0
+    default: 0.0001
     range:
-      min: 0.0001
+      min: 0
       max: 1
     units: m
 sediment__number_parcels:
