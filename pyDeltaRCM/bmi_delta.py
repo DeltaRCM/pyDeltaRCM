@@ -86,7 +86,6 @@ class BmiDelta(Bmi):
             2: 'uniform_rectilinear_grid',
         }
 
-
     def update(self):
         """Advance model by one time step."""
         
@@ -327,7 +326,7 @@ class BmiDelta(Bmi):
 
     def get_grid_spacing(self, grid_id):
         """Spacing of rows and columns of uniform rectilinear grid."""
-        return self._delta.dx
+        return (self._delta.dx, self._delta.dx)
 
     def get_grid_origin(self, grid_id):
         """Origin of uniform rectilinear grid."""
