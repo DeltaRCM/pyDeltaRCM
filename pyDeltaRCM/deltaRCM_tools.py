@@ -896,7 +896,7 @@ class Tools(object):
         self.eta[0,self.inlet] = self.stage[0, self.inlet] - self.h0
         self.depth[0,self.inlet] = self.h0
 
-        self.H_SL = self.H_SL + self.SLR * self.dt
+        self.H_SL = self.H_SL + self.SLR * self.time_step
         
 
 
