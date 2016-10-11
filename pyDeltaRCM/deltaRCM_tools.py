@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 from math import floor, sqrt, pi
 import numpy as np
+from random import shuffle
 import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
@@ -367,7 +368,7 @@ class Tools(object):
             
             crossflux = np.sum(crossflux_nb, axis=0)
             
-            self.eta[:] = self.eta + crossflux
+            self.eta = self.eta + crossflux
 
 
 
@@ -549,8 +550,8 @@ class Tools(object):
         Clean up at end of water iteration
         '''
         
-        self.stage[:] = np.maximum(self.stage, self.H_SL)
-        self.depth[:] = np.maximum(self.stage - self.eta, 0)
+        self.stage = np.maximum(self.stage, self.H_SL)
+        self.depth = np.maximum(self.stage - self.eta, 0)
 
         self.update_flow_field(iteration)
         self.update_velocity_field()
@@ -889,8 +890,8 @@ class Tools(object):
         '''
         
         self.flooding_correction()
-        self.stage[:] = np.maximum(self.stage, self.H_SL)
-        self.depth[:] = np.maximum(self.stage - self.eta, 0)
+        self.stage = np.maximum(self.stage, self.H_SL)
+        self.depth = np.maximum(self.stage - self.eta, 0)
 
         self.eta[0,self.inlet] = self.stage[0, self.inlet] - self.h0
         self.depth[0,self.inlet] = self.h0
@@ -1174,7 +1175,7 @@ class Tools(object):
         self.cell_type[:,-1] = cell_edge
     
         self.inlet = list(np.unique(np.where(self.cell_type == 1)[1]))
-        self.eta[:] = self.stage - self.depth
+        self.eta = self.stage - self.depth
         
         self.clim_eta = (-self.h0 - 1, 0.05)
         
@@ -1309,8 +1310,8 @@ class Tools(object):
             ########################################
             # Not calculating water surface profiles
             ########################################
-            if timestep>0:
-                self.get_profiles()
+#             if timestep>0:
+#                 self.get_profiles()
 
             self.finalize_water_iteration(iteration)
             
@@ -1409,7 +1410,7 @@ class Tools(object):
                 if self.verbose:
                     print 'Applying subsidence'
             
-                self.eta[:] = self.eta - self.sigma
+                self.eta = self.eta - self.sigma
                 
         
 
