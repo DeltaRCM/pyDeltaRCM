@@ -368,7 +368,7 @@ class Tools(object):
             
             crossflux = np.sum(crossflux_nb, axis=0)
             
-            self.eta = self.eta + crossflux
+            self.eta[:] = self.eta + crossflux
 
 
 
@@ -550,8 +550,8 @@ class Tools(object):
         Clean up at end of water iteration
         '''
         
-        self.stage = np.maximum(self.stage, self.H_SL)
-        self.depth = np.maximum(self.stage - self.eta, 0)
+        self.stage[:] = np.maximum(self.stage, self.H_SL)
+        self.depth[:] = np.maximum(self.stage - self.eta, 0)
 
         self.update_flow_field(iteration)
         self.update_velocity_field()
@@ -636,7 +636,7 @@ class Tools(object):
             if np.max(v) > 0:
                 stageTemp.flat[k] = v[0]/v[1]
 
-        self.stage = self.smoothing_filter(stageTemp)
+        self.stage[:] = self.smoothing_filter(stageTemp)
 
 
 
@@ -890,8 +890,8 @@ class Tools(object):
         '''
         
         self.flooding_correction()
-        self.stage = np.maximum(self.stage, self.H_SL)
-        self.depth = np.maximum(self.stage - self.eta, 0)
+        self.stage[:] = np.maximum(self.stage, self.H_SL)
+        self.depth[:] = np.maximum(self.stage - self.eta, 0)
 
         self.eta[0,self.inlet] = self.stage[0, self.inlet] - self.h0
         self.depth[0,self.inlet] = self.h0
@@ -1155,7 +1155,7 @@ class Tools(object):
         channel_inds = int(self.CTR - round(self.N0 / 2))
         self.cell_type[:self.L0, channel_inds:channel_inds + self.N0 + 1] = cell_channel
 
-        self.stage = np.maximum(0, self.L0 - self.y - 1) * self.dx * self.S0
+        self.stage[:] = np.maximum(0, self.L0 - self.y - 1) * self.dx * self.S0
         self.stage[self.cell_type == cell_ocean] = 0.
         
         self.depth[self.cell_type == cell_ocean] = self.h0
@@ -1175,7 +1175,7 @@ class Tools(object):
         self.cell_type[:,-1] = cell_edge
     
         self.inlet = list(np.unique(np.where(self.cell_type == 1)[1]))
-        self.eta = self.stage - self.depth
+        self.eta[:] = self.stage - self.depth
         
         self.clim_eta = (-self.h0 - 1, 0.05)
         
@@ -1410,7 +1410,7 @@ class Tools(object):
                 if self.verbose:
                     print 'Applying subsidence'
             
-                self.eta = self.eta - self.sigma
+                self.eta[:] = self.eta - self.sigma
                 
         
 
