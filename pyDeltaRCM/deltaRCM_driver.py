@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 import warnings
+import logging
 from .deltaRCM_tools import Tools
+import datetime
+
 
 class pyDeltaRCM(Tools):
 
@@ -66,6 +69,7 @@ class pyDeltaRCM(Tools):
         self._time_step = 1.
         
         self.verbose = True
+        self.init_logger()
         self.input_file = input_file
         
         self.create_dicts()
@@ -210,7 +214,8 @@ class pyDeltaRCM(Tools):
         
         try:
             self.output_netcdf.close()
-            if self.verbose: print 'Closed output netcdf file.'
+            if self.verbose:
+                print 'Closed output netcdf file.'
         except:
             pass
             

@@ -10,9 +10,28 @@ import sys, os, re, string
 from netCDF4 import Dataset
 import time as time_lib
 from scipy.sparse import lil_matrix, csc_matrix, hstack
+import logging
+import time
 
 class Tools(object):
 
+
+    def init_logger(self):
+    
+        self.logger = logging.getLogger("driver")
+        self.logger.setLevel(logging.INFO)
+
+        # create the logging file handler
+        st = timestr = time.strftime("%Y%m%d-%H%M%S")
+        fh = logging.FileHandler("pyDeltaRCM_" + st + ".log")
+
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+
+        # add handler to logger object
+        self.logger.addHandler(fh)
+    
+        
 
     #############################################
     ############### randomization ###############
@@ -76,7 +95,8 @@ class Tools(object):
         if directory == '': directory = '.'
 
         if not os.path.exists(directory):
-            if self.verbose: print 'Creating output directory'
+            if self.verbose:
+                self.logger.info('Creating output directory')
             os.makedirs(directory)
 
         savepath = os.path.join(directory, filename)
@@ -107,7 +127,7 @@ class Tools(object):
             self.output_netcdf['time'][shape[0]] = timestep
             
         except:
-            print 'Error: Cannot save grid to netCDF file.'
+            self.logger.info('Error: Cannot save grid to netCDF file.')
         
       
       
@@ -311,6 +331,7 @@ class Tools(object):
                 (1-self.Csmooth) * local_mean[wet_mask]
 
         returnval = (1-self.omega_sfc) * self.stage + self.omega_sfc * stageT
+        
 
         return returnval
 
@@ -515,7 +536,7 @@ class Tools(object):
                 further timesteps
                 '''
             
-                if self.verbose: print 'Increasing size of self.indices'
+                if self.verbose: self.logger.info('Increasing size of self.indices')
             
                 indices_blank = np.zeros((self.Np_water, self.itmax/2), dtype = np.int)
                 self.indices = np.hstack((self.indices, indices_blank))
@@ -912,7 +933,7 @@ class Tools(object):
 
     def import_file(self):
 
-        if self.verbose: print 'Reading input file...'
+        if self.verbose: self.logger.info('Reading input file: ' + self.input_file)
 
         self.input_file_vars = dict()
         numvars = 0
@@ -966,7 +987,7 @@ class Tools(object):
         for k,v in self.input_file_vars.items():
             setattr(self, self.get_var_name(k), v)
         
-        if self.verbose: print 'Finished reading ' + str(numvars) + ' variables from input file.'
+        if self.verbose: self.logger.info('Finished reading ' + str(numvars) + ' variables from input file.')
 
  
         
@@ -1179,6 +1200,13 @@ class Tools(object):
         
         self.clim_eta = (-self.h0 - 1, 0.05)
         
+        epsilon = 0.000001
+        
+        self.eta[:] = self.eta + np.random.rand(self.L,self.W) * epsilon
+        self.stage[:] = self.stage + np.random.rand(self.L,self.W) * epsilon
+        self.depth[:] = self.depth + np.random.rand(self.L,self.W) * epsilon
+        
+        
     
     
     def init_stratigraphy(self):
@@ -1201,7 +1229,7 @@ class Tools(object):
         Expand the size of arrays that store stratigraphy data
         '''
         
-        if self.verbose: print 'Expanding stratigraphy arrays'
+        if self.verbose: self.logger.info('Expanding stratigraphy arrays')
         
         lil_blank = lil_matrix((self.L * self.W, self.n_steps), dtype=np.float32)
         
@@ -1220,19 +1248,19 @@ class Tools(object):
         
         if self.save_eta_grids or self.save_depth_grids or self.save_stage_grids or self.save_strata:
         
-            if self.verbose: print 'Generating netCDF file for output grids...'
+            if self.verbose: self.logger.info('Generating netCDF file for output grids...')
             
             directory = self.prefix
             filename = 'pyDeltaRCM_output.nc'
 
             if not os.path.exists(directory):
-                if self.verbose: print 'Creating output directory'
+                if self.verbose: self.logger.info('Creating output directory')
                 os.makedirs(directory)
 
             file_path = os.path.join(directory, filename)
 
             if os.path.exists(file_path):
-                if self.verbose: print '*** Replaced existing netCDF file ***'
+                if self.verbose: self.logger.info('*** Replaced existing netCDF file ***')
                 os.remove(file_path)
 
             self.output_netcdf = Dataset(file_path, 'w', format='NETCDF4_CLASSIC')
@@ -1281,7 +1309,7 @@ class Tools(object):
                 
                 
                 
-            if self.verbose: print 'Output netCDF file created.'
+            if self.verbose: self.logger.info('Output netCDF file created.')
 
 
 
@@ -1345,7 +1373,7 @@ class Tools(object):
         
             
             if self.verbose:
-                print 'Storing stratigraphy data'
+                self.logger.info('Storing stratigraphy data')
                 
             ################### sand frac ###################
             # -1 for cells with deposition volumes < vol_limit
@@ -1408,7 +1436,7 @@ class Tools(object):
             if self.start_subsidence <= timestep:
                 
                 if self.verbose:
-                    print 'Applying subsidence'
+                    self.logger.info('Applying subsidence')
             
                 self.eta[:] = self.eta - self.sigma
                 
@@ -1449,15 +1477,15 @@ class Tools(object):
                 
             ############ GRIDS #############
             if self.save_eta_grids:
-                if self.verbose: print 'Saving grid: eta'
+                if self.verbose: self.logger.info('Saving grid: eta')
                 self.save_grids('eta', self.eta)
             
             if self.save_depth_grids:
-                if self.verbose: print 'Saving grid: depth'  
+                if self.verbose: self.logger.info('Saving grid: depth')  
                 self.save_grids('depth', self.depth)
 
             if self.save_stage_grids:
-                if self.verbose: print 'Saving grid: stage'
+                if self.verbose: self.logger.info('Saving grid: stage')
                 self.save_grids('stage', self.stage)                
     
     
@@ -1471,7 +1499,7 @@ class Tools(object):
         if self.save_strata:
         
             if self.verbose:
-                print '\nSaving final stratigraphy data to netCDF files...'
+                self.logger.info('\nSaving final stratigraphy data to netCDF files...')
            
                
             shape = self.strata_eta.shape
@@ -1513,7 +1541,7 @@ class Tools(object):
 
 
             if self.verbose:
-                print 'Stratigraphy data saved.'
+                self.logger.info('Stratigraphy data saved.')
         
         
         
