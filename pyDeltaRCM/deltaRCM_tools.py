@@ -1310,8 +1310,8 @@ class Tools(object):
             ########################################
             # Not calculating water surface profiles
             ########################################
-#             if timestep>0:
-#                 self.get_profiles()
+            if timestep>0:
+                self.get_profiles()
 
             self.finalize_water_iteration(iteration)
             
