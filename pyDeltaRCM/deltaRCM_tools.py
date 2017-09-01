@@ -121,10 +121,11 @@ class Tools(object):
         timestep = self._time
         
         try:
-            shape = self.output_netcdf[var_name].shape
-            self.output_netcdf[var_name][shape[0],:,:] = var
+            shape = self.output_netcdf.variables[var_name].shape
             
-            self.output_netcdf['time'][shape[0]] = timestep
+            self.output_netcdf.variables[var_name][shape[0],:,:] = var
+            
+            self.output_netcdf.variables['time'][shape[0]] = timestep
             
         except:
             self.logger.info('Error: Cannot save grid to netCDF file.')
@@ -1275,9 +1276,9 @@ class Tools(object):
             
                 
 
-            x = self.output_netcdf.createVariable('x', np.float32, ('length','width'))
-            y = self.output_netcdf.createVariable('y', np.float32, ('length','width'))
-            time = self.output_netcdf.createVariable('time', np.int32, ('total_time',))
+            x = self.output_netcdf.createVariable('x', 'f4', ('length','width'))
+            y = self.output_netcdf.createVariable('y', 'f4', ('length','width'))
+            time = self.output_netcdf.createVariable('time', 'f4', ('total_time',))
 
             x.units = 'meters'
             y.units = 'meters'
@@ -1289,21 +1290,21 @@ class Tools(object):
                            
             if self.save_eta_grids:
                 eta = self.output_netcdf.createVariable('eta',
-                                                        np.float32,
+                                                        'f4',
                                                         ('total_time','length','width'))
                 eta.units = 'meters'
                            
                     
             if self.save_stage_grids:
                 stage = self.output_netcdf.createVariable('stage',
-                                                          np.float32,
+                                                          'f4',
                                                           ('total_time','length','width'))
                 stage.units = 'meters'
                            
                     
             if self.save_depth_grids:
                 depth = self.output_netcdf.createVariable('depth',
-                                                          np.float32,
+                                                          'f4',
                                                           ('total_time','length','width'))
                 depth.units = 'meters'
                 
@@ -1511,7 +1512,7 @@ class Tools(object):
                                                             np.int32,
                                                             ('total_strata_age'))
             strata_age.units = 'timesteps'
-            self.output_netcdf['strata_age'][:] = range(shape[1]-1, -1, -1)
+            self.output_netcdf.variables['strata_age'][:] = range(shape[1]-1, -1, -1)
 
 
             sand_frac = self.output_netcdf.createVariable('strata_sand_frac',
@@ -1532,12 +1533,12 @@ class Tools(object):
                 sf = self.strata_sand_frac[:,i].toarray().reshape(self.eta.shape)
                 sf[sf == 0] = -1
 
-                self.output_netcdf['strata_sand_frac'][i,:,:] = sf
+                self.output_netcdf.variables['strata_sand_frac'][i,:,:] = sf
 
                 sz = self.strata_eta[:,i].toarray().reshape(self.eta.shape)
                 sz[sz == 0] = self.init_eta[sz == 0]
 
-                self.output_netcdf['strata_depth'][i,:,:] = sz
+                self.output_netcdf.variables['strata_depth'][i,:,:] = sz
 
 
             if self.verbose:
