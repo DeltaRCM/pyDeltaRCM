@@ -105,7 +105,7 @@ class Tools(object):
         if close: plt.close()
             
             
-    def save_grids(self, var_name, var):
+    def save_grids(self, var_name, var, ts):
         '''
         Save a grid into an existing netCDF file.
         File should already be open (by init_output_grid) as self.output_netcdf
@@ -118,14 +118,9 @@ class Tools(object):
                 The current timestep (+1, so human readable)
         '''
         
-        timestep = self._time
-        
         try:
-            shape = self.output_netcdf.variables[var_name].shape
             
-            self.output_netcdf.variables[var_name][shape[0],:,:] = var
-            
-            self.output_netcdf.variables['time'][shape[0]] = timestep
+            self.output_netcdf.variables[var_name][ts,:,:] = var
             
         except:
             self.logger.info('Error: Cannot save grid to netCDF file.')
@@ -1451,6 +1446,10 @@ class Tools(object):
         timestep = self._time
 
         if timestep % self.save_dt == 0:
+        
+            timestep = self._time
+            shape = self.output_netcdf.variables['time'].shape
+            self.output_netcdf.variables['time'][shape[0]] = timestep
             
             ############ FIGURES #############
             if self.save_eta_figs:
@@ -1479,15 +1478,15 @@ class Tools(object):
             ############ GRIDS #############
             if self.save_eta_grids:
                 if self.verbose: self.logger.info('Saving grid: eta')
-                self.save_grids('eta', self.eta)
+                self.save_grids('eta', self.eta, shape[0])
             
             if self.save_depth_grids:
                 if self.verbose: self.logger.info('Saving grid: depth')  
-                self.save_grids('depth', self.depth)
+                self.save_grids('depth', self.depth, shape[0])
 
             if self.save_stage_grids:
                 if self.verbose: self.logger.info('Saving grid: stage')
-                self.save_grids('stage', self.stage)                
+                self.save_grids('stage', self.stage, shape[0])                
     
     
     
