@@ -1,20 +1,20 @@
 model_output__site_prefix:
 model_output__case_prefix: 
 model_output__out_dir: deltaRCM_Output
-model_grid__length: 5000
-model_grid__width: 5000
-model_grid__cell_size: 100
-land_surface__width: 300.0
-land_surface__slope: 0.00015
+model_grid__length: 2000
+model_grid__width: 4000
+model_grid__cell_size: 50
+land_surface__width: 150.0
+land_surface__slope: 0.0002
 model__max_iteration: 1
 water__number_parcels: 1000
 channel__flow_velocity: 1.0
-channel__width: 50.0
+channel__width: 200.0
 channel__flow_depth: 5.0
 sea_water_surface__mean_elevation: 0.0
 sea_water_surface__rate_change_elevation: 0.0
-sediment__number_parcels: 1000
-sediment__bedload_fraction: 0.25    
+sediment__number_parcels: 500
+sediment__bedload_fraction: 0.5    
 sediment__influx_concentration: 0.1                            
 basin__opt_subsidence: False
 basin__maximum_subsidence_rate: 0.000825                            
