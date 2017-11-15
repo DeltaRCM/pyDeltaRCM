@@ -337,39 +337,68 @@ class Tools(object):
         #####################################################################
         
         
+        self.topo_diffusion()
+#         
+#         for crossdiff in range(self.N_crossdiff):
+#         
+#             eta_diff = self.eta
+#             
+#             for i in range(1, self.L-1):
+#             
+#                 for j in range(1, self.W-1):
+#                 
+#                     if ((self.cell_type[i,j] >= -1)):
+#                         
+#                         crossflux = 0
+#                         
+#                         for k in range(self.Nnbr[i,j]):
+#                         
+#                             inbr,jnbr = self.walk(i,j,k)
+#                             
+#                             if self.cell_type[inbr,jnbr] >= -1:
+#                             
+#                                 crossflux_nb = (self.dt / self.N_crossdiff *
+#                                 self.alpha * 0.5 * (self.qs[i,j] +
+#                                 self.qs[inbr,jnbr]) * self.dx *
+#                                 (self.eta[inbr,jnbr] - self.eta[i,j]) / self.dx)
+#                                  #diffusion based on slope and sand flux
+#                                  
+#                                  
+#                                 crossflux = crossflux + crossflux_nb
+#                                 
+#                                 eta_diff[i,j] = (eta_diff[i,j] +
+#                                                  crossflux_nb /
+#                                                  self.dx / self.dx)
+#                                                  
+#                                                  
+#             self.eta = eta_diff
+            
+            
+            
+    def topo_diffusion(self):
+        '''
+        Diffuse topography after routing all coarse sediment parcels
+        '''
+        
+        
         for crossdiff in range(self.N_crossdiff):
         
-            eta_diff = self.eta
+            a = ndimage.convolve(self.eta, self.kernel1, mode='constant')
+            b = ndimage.convolve(self.qs, self.kernel2, mode='constant')
+            c = ndimage.convolve(self.qs * self.eta, self.kernel2,
+                                 mode='constant')
+        
+            self.cf = (self.diffusion_multiplier *
+                     (self.qs * a - self.eta * b + c))
             
-            for i in range(1, self.L-1):
             
-                for j in range(1, self.W-1):
-                
-                    if ((self.cell_type[i,j] >= -1)):
-                        
-                        crossflux = 0
-                        
-                        for k in range(self.Nnbr[i,j]):
-                        
-                            inbr,jnbr = self.walk(i,j,k)
-                            
-                            if self.cell_type[inbr,jnbr] >= -1:
-                            
-                                crossflux_nb = (self.dt / self.N_crossdiff *
-                                self.alpha * 0.5 * (self.qs[i,j] +
-                                self.qs[inbr,jnbr]) * self.dx *
-                                (self.eta[inbr,jnbr] - self.eta[i,j]) / self.dx)
-                                 #diffusion based on slope and sand flux
-                                 
-                                 
-                                crossflux = crossflux + crossflux_nb
-                                
-                                eta_diff[i,j] = (eta_diff[i,j] +
-                                                 crossflux_nb /
-                                                 self.dx / self.dx)
-                                                 
-                                                 
-            self.eta = eta_diff
+            self.cf[self.cell_type == -2] = 0
+            self.cf[0,:] = 0
+            
+            self.eta += self.cf
+            
+            
+            
     
     
     
@@ -395,28 +424,7 @@ class Tools(object):
     
     
     
-
-    
-    
-    
-    
-#     def update_sed(self,timestep):
-#         '''updates after sediment routing
-#            save stratigraphy'''
-#            
-#  
-# 
-#         self.flooding_correction()
-#         
-#         self.depth = self.stage - self.eta
-#         
-#         self.eta.flat[self.inlet] = (
-#                     self.stage.flat[self.inlet] - self.h0)
-#         #upstream boundary condition - constant depth
-#         
-#         self.H_SL = self.H_SL + self.SLR * self.dt #sea level rise
-
-
+ 
 
     def finalize_timestep(self):
         '''
@@ -1377,26 +1385,26 @@ class Tools(object):
 
 
 
-    def topo_diffusion(self):
-        '''
-        Diffuse topography after routing all coarse sediment parcels
-        '''
-
-        wgt_cell_type = self.build_weight_array(self.cell_type > -2)
-        wgt_qs = self.build_weight_array(self.qs) + self.qs
-        wet_mask_nh = self.get_wet_mask_nh()
-
-        multiplier = self.dt/self.N_crossdiff * self.alpha * 0.5 / self.dx**2
-
-        for n in range(self.N_crossdiff):
-
-            wgt_eta = self.build_weight_array(self.eta) - self.eta
-
-            crossflux_nb = multiplier * wgt_qs * wgt_eta * wet_mask_nh
-            
-            crossflux = np.sum(crossflux_nb, axis=0)
-            
-            self.eta[:] = self.eta + crossflux
+#     def topo_diffusion(self):
+#         '''
+#         Diffuse topography after routing all coarse sediment parcels
+#         '''
+# 
+#         wgt_cell_type = self.build_weight_array(self.cell_type > -2)
+#         wgt_qs = self.build_weight_array(self.qs) + self.qs
+#         wet_mask_nh = self.get_wet_mask_nh()
+# 
+#         multiplier = self.dt/self.N_crossdiff * self.alpha * 0.5 / self.dx**2
+# 
+#         for n in range(self.N_crossdiff):
+# 
+#             wgt_eta = self.build_weight_array(self.eta) - self.eta
+# 
+#             crossflux_nb = multiplier * wgt_qs * wgt_eta * wet_mask_nh
+#             
+#             crossflux = np.sum(crossflux_nb, axis=0)
+#             
+#             self.eta[:] = self.eta + crossflux
 
 
 
@@ -1448,9 +1456,12 @@ class Tools(object):
 
         mask = (self.depth > self.dry_depth) * (self.qw > 0)
         
-        self.uw = mask * np.minimum(self.u_max, self.qw / self.depth)
-        self.ux = mask * self.uw * self.qx / self.qw
-        self.uy = mask * self.uw * self.qy / self.qw
+        self.uw[mask] = np.minimum(self.u_max, self.qw[mask] / self.depth[mask])
+        self.uw[~mask] = 0
+        self.ux[mask]= self.uw[mask] * self.qx[mask] / self.qw[mask]
+        self.ux[~mask] = 0
+        self.uy[mask]= self.uw[mask] * self.qy[mask] / self.qw[mask]
+        self.uy[~mask] = 0
 
 
 
@@ -1576,6 +1587,16 @@ class Tools(object):
 
         self.walk_flat = np.array([1, -self.W+1, -self.W, -self.W-1,
                                     -1, self.W-1, self.W, self.W+1])
+                                    
+                                    
+        self.kernel1 = np.array([[1, 1, 1],
+                                 [1, -8, 1],
+                                 [1, 1, 1]])
+
+        self.kernel2 = np.array([[1, 1, 1],
+                                 [1, 0, 1],
+                                 [1, 1, 1]])
+
 
 
 
@@ -1642,6 +1663,10 @@ class Tools(object):
         self.N_crossdiff = int(round(self.dVs / self.V0))
         
         self._lambda = 1.                       # sedimentation lag
+        
+        
+        self.diffusion_multiplier = (self.dt/self.N_crossdiff * self.alpha *
+                                    0.5 / self.dx**2)
  
     
         # self.prefix
