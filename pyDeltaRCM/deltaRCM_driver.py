@@ -110,7 +110,7 @@ class pyDeltaRCM(Tools):
         self._time = 0.
         self._time_step = 1.
         
-        self.verbose = True
+        self.verbose = False
         self.input_file = input_file
         
         self.create_dicts()

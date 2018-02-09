@@ -1735,9 +1735,12 @@ class Tools(object):
         Creates sparse array to store stratigraphy data
         '''
         
+        
         if self.save_strata:
         
-            self.n_steps = 10 * self.save_dt
+            self.strata_counter = 0
+        
+            self.n_steps = 5 * self.save_dt
         
             self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps),
                                                 dtype=np.float32)
@@ -1893,7 +1896,9 @@ class Tools(object):
         
         timestep = self._time
         
+        
         if self.save_strata and (timestep % self.save_dt == 0):
+        
         
             timestep = int(timestep)
             
@@ -1929,7 +1934,7 @@ class Tools(object):
                                       shape=(self.L * self.W, 1))
 
             # store sand_sparse into strata_sand_frac
-            self.strata_sand_frac[:,timestep] = sand_sparse
+            self.strata_sand_frac[:,self.strata_counter] = sand_sparse
             
             
             ################### eta ###################
@@ -1943,13 +1948,16 @@ class Tools(object):
             eta_sparse = csc_matrix((data_s, (row_s, col_s)),
                                     shape=(self.L * self.W, 1))
             
-            self.strata_eta[:,timestep] = eta_sparse
+            self.strata_eta[:,self.strata_counter] = eta_sparse
             
             if self.toggle_subsidence and self.start_subsidence <= timestep:
             
-                sigma_change = (self.strata_eta[:,:timestep] -
+                sigma_change = (self.strata_eta[:,:self.strata_counter] -
                                 self.sigma.flatten()[:,np.newaxis])
-                self.strata_eta[:,:timestep] = lil_matrix(sigma_change)
+                self.strata_eta[:,:self.strata_counter] = lil_matrix(sigma_change)
+                
+                
+            self.strata_counter += 1
             
         
         
@@ -2045,9 +2053,11 @@ class Tools(object):
         
             if self.verbose:
                 self.logger.info('\nSaving final stratigraphy to netCDF file')
-           
+            
+            self.strata_eta = self.strata_eta[:, :self.strata_counter]
                
             shape = self.strata_eta.shape
+            
            
             total_strata_age = self.output_netcdf.createDimension(
                                                             'total_strata_age',

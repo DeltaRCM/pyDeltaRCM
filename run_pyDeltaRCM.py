@@ -6,8 +6,10 @@ if __name__ == '__main__':
     delta.initialize('deltaRCM.yaml')
     
 
-    for time in range(0,1000):
-        print 'Timestep:', delta.get_time_step()
+    for time in range(0,11):
+        print 'Time:', delta.get_current_time()
         delta.update()
+        
+    delta.finalize()
         
         
