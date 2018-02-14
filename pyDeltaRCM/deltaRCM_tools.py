@@ -1781,6 +1781,8 @@ class Tools(object):
         if (self.save_eta_grids or
             self.save_depth_grids or
             self.save_stage_grids or
+            self.save_discharge_grids or
+            self.save_velocity_grids or
             self.save_strata):
         
             if self.verbose:
@@ -1845,6 +1847,20 @@ class Tools(object):
                                              'f4',
                                             ('total_time','length','width'))
                 depth.units = 'meters'
+                
+                
+            if self.save_discharge_grids:
+                discharge = self.output_netcdf.createVariable('discharge',
+                                             'f4',
+                                            ('total_time','length','width'))
+                discharge.units = 'cubic meters per second'
+                
+                
+            if self.save_velocity_grids:
+                velocity = self.output_netcdf.createVariable('velocity',
+                                             'f4',
+                                            ('total_time','length','width'))
+                velocity.units = 'meters per second'
                 
                 
                 
@@ -1998,6 +2014,8 @@ class Tools(object):
             if (self.save_eta_grids or
             self.save_depth_grids or
             self.save_stage_grids or
+            self.save_discharge_grids or
+            self.save_velocity_grids or
             self.save_strata):
         
                 timestep = self._time
@@ -2027,6 +2045,20 @@ class Tools(object):
                 plt.axis('equal')
                 self.save_figure(self.prefix + "depth_" + str(timestep))
                 
+            if self.save_discharge_figs:
+                    
+                plt.pcolor(self.qw)
+                plt.colorbar()
+                plt.axis('equal')
+                self.save_figure(self.prefix + "discharge_" + str(timestep))
+                
+            if self.save_velocity_figs:
+                    
+                plt.pcolor(self.uw)
+                plt.colorbar()
+                plt.axis('equal')
+                self.save_figure(self.prefix + "velocity_" + str(timestep))
+                
                 
             ############ GRIDS #############
             if self.save_eta_grids:
@@ -2039,7 +2071,15 @@ class Tools(object):
 
             if self.save_stage_grids:
                 if self.verbose: self.logger.info('Saving grid: stage')
-                self.save_grids('stage', self.stage, shape[0])                
+                self.save_grids('stage', self.stage, shape[0])       
+                
+            if self.save_discharge_grids:
+                if self.verbose: self.logger.info('Saving grid: discharge')  
+                self.save_grids('discharge', self.qw, shape[0])
+
+            if self.save_velocity_grids:
+                if self.verbose: self.logger.info('Saving grid: velocity')
+                self.save_grids('velocity', self.uw, shape[0])            
     
     
     
