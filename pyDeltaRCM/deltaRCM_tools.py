@@ -44,6 +44,28 @@ class Tools(object):
             
         self.sed_route()
 
+
+
+
+    def finalize_timestep(self):
+        '''
+        Clean up after sediment routing
+        Update sea level if baselevel changes
+        '''
+        
+        self.flooding_correction()
+        self.stage[:] = np.maximum(self.stage, self.H_SL)
+        self.depth[:] = np.maximum(self.stage - self.eta, 0)
+
+        self.eta[0,self.inlet] = self.stage[0, self.inlet] - self.h0
+        self.depth[0,self.inlet] = self.h0
+
+        self.H_SL = self.H_SL + self.SLR * self.dt
+        
+
+
+
+
 #################################
 
 
@@ -61,23 +83,10 @@ class Tools(object):
         
         self.sand_route()
         self.mud_route()
-
-
-
-
-
-
-    def update_u(self, px, py):
-        '''update velocities after erosion or deposition'''
         
-        if self.qw[px,py] > 0:
-        
-            self.ux[px,py] = self.uw[px,py] * self.qx[px,py] / self.qw[px,py]
-            self.uy[px,py] = self.uw[px,py] * self.qy[px,py] / self.qw[px,py]
-            
-        else:
-            self.ux[px,py] = 0
-            self.uy[px,py] = 0
+        self.topo_diffusion()
+
+
 
 
 
@@ -136,6 +145,17 @@ class Tools(object):
         
         
         
+    def update_u(self, px, py):
+        '''update velocities after erosion or deposition'''
+        
+        if self.qw[px,py] > 0:
+        
+            self.ux[px,py] = self.uw[px,py] * self.qx[px,py] / self.qw[px,py]
+            self.uy[px,py] = self.uw[px,py] * self.qy[px,py] / self.qw[px,py]
+            
+        else:
+            self.ux[px,py] = 0
+            self.uy[px,py] = 0
         
         
         
@@ -265,7 +285,7 @@ class Tools(object):
        
             
             ########################################################
-            #deposition and erosion
+            # deposition and erosion
             ########################################################
             if sed == 'sand': #sand
             
@@ -323,7 +343,7 @@ class Tools(object):
                               
             self.sed_parcel(theta_sed, 'sand', px, py)   
         
-        self.topo_diffusion()
+#         self.topo_diffusion()
 
 
 
@@ -380,131 +400,6 @@ class Tools(object):
     
     
  
-
-    def finalize_timestep(self):
-        '''
-        Clean up after sediment routing
-        Update sea level if baselevel changes
-        '''
-        
-        self.flooding_correction()
-        self.stage[:] = np.maximum(self.stage, self.H_SL)
-        self.depth[:] = np.maximum(self.stage - self.eta, 0)
-
-        self.eta[0,self.inlet] = self.stage[0, self.inlet] - self.h0
-        self.depth[0,self.inlet] = self.h0
-
-        self.H_SL = self.H_SL + self.SLR * self.dt
-        
-
-
-
-
-#     def walk(self, i, j, k):
-#     
-#         dxn = self.get_dxn(i,j,k)
-#         
-#         inbr = i + self.dxn_iwalk[dxn - 1]
-#         jnbr = j + self.dxn_jwalk[dxn - 1]
-#         
-#         return inbr, jnbr
-        
-
-# 
-# 
-#     def nbrs(self, dxn, px, py):
-#         '''location and distance to neighbor in dxn'''
-#         
-#         pxn = px + self.dxn_iwalk[dxn - 1]
-#         pyn = py + self.dxn_jwalk[dxn - 1]
-#         
-#         dist = self.dxn_dist[dxn-1]
-#         
-#         return pxn, pyn, dist
-
-
-
-#     def get_dxn(self, i, j, k):
-#         '''get direction of neighbor i,j,k'''
-#         
-#         return int(self.nbr[i,j,k])
-
-
-# 
-# 
-# 
-#     def direction_setup(self):
-#         '''set up grid with # of neighbors and directions'''
-#     
-#         Nnbr = np.zeros((self.L,self.W), dtype=np.int)
-#         nbr = np.zeros((self.L,self.W,8))
-#         
-#         ################
-#         #center nodes
-#         ################
-#         Nnbr[1:self.L-1, 1:self.W-1] = 8
-#         nbr[1:self.L-1, 1:self.W-1, :] = [(k+1) for k in range(8)]  
-#         
-#         
-#         ################
-#         # left side
-#         ################
-#         Nnbr[0, 1:self.W-1] = 5
-#         
-#         for k in range(5):
-#             nbr[0, 1:self.W-1, k] = (6 + (k + 1)) % 8
-#             
-#         nbr[0, 1:self.W-1, 1] = 8 #replace zeros with 8   
-#           
-#           
-#         ################
-#         # upper side
-#         ################
-#         Nnbr[1:self.L-1, self.W-1] = 5
-#         
-#         for k in range(5):
-#             nbr[1:self.L-1, self.W-1, k] = (4 + (k + 1)) % 8
-#             
-#         nbr[1:self.L-1, self.W-1, 3] = 8 #replace zeros with 8   
-#            
-#            
-#         ################
-#         # lower side
-#         ################
-#         Nnbr[1:self.L-1, 0] = 5
-#         
-#         for k in range(5):
-#             nbr[1:self.L-1, 0, k] = (k + 1) % 8   
-#             
-#             
-#         ####################
-#         # lower-left corner
-#         ####################
-#         Nnbr[0,0] = 3
-#         
-#         for k in range(3):
-#             nbr[0, 0, k] = (k + 1) % 8
-#         
-#         
-#         ####################
-#         # upper-left corner
-#         ####################
-#         Nnbr[0, self.W-1] = 3
-#         
-#         for k in range(3):
-#             nbr[0, self.W-1, k] = (6 + (k + 1)) % 8
-#             
-#         nbr[0, self.W-1, 1] = 8 #replace zeros with 8
-#         
-#         
-#         
-#         self.Nnbr = Nnbr
-#         self.nbr = nbr
-# 
-# 
-# 
-
-
 
 
 
@@ -875,297 +770,7 @@ class Tools(object):
         self.update_flow_field(iteration)
         self.update_velocity_field()
 
-# 
-# 
-# 
-#     #############################################
-#     ################# sed flow ##################
-#     #############################################
-# 
-#     def init_sed_timestep(self):
-#         '''
-#         Set up arrays to start sed routing timestep
-#         '''
-# 
-#         self.qs[:] = 0
-#         self.Vp_dep_sand[:] = 0
-#         self.Vp_dep_mud[:] = 0
-# 
-# 
-# 
-#     def one_fine_timestep(self):
-#         '''
-#         Route all parcels of fine sediment
-#         '''
-# 
-#         self.num_fine = int(self.Np_sed - self.num_coarse)
-# 
-#         if self.num_fine>0:
-# 
-#             these_indices = map(lambda x: self.random_pick_inlet(self.inlet),range(self.num_fine))
-#             
-#             self.indices = np.zeros((self.num_fine, self.itmax), dtype=np.int)
-#             self.indices[:,0] = these_indices
-# 
-#             path_number = np.arange(self.num_fine)
-#             self.Vp_res = np.zeros((self.Np_sed,)) + self.Vp_sed
-#             self.qs.flat[these_indices] += self.Vp_res[path_number]/2./self.dt/self.dx
-# 
-#             sed_continue = True
-#             it = 0
-# 
-#             while sed_continue:
-# 
-#                 weight = self.get_sed_weight()
-# 
-#                 ngh = map(self.random_pick_flat, weight[these_indices])
-#                 new_indices = these_indices + self.walk_flat[ngh]
-#                 new_ind_type = self.cell_type.flat[new_indices]
-# 
-#                 Vp_res_update = self.Vp_res[path_number]/2./self.dt/self.dx
-#                 self.qs.flat[these_indices] += Vp_res_update
-#                 self.qs.flat[new_indices] += Vp_res_update
-# 
-# 
-#                 these_indices = new_indices[new_ind_type >= 0]
-#                 path_number = path_number[new_ind_type >= 0]
-# 
-#                 if len(path_number)>0:
-#                     # check for looping
-#                     keeper = np.ones((len(these_indices),), dtype=np.int)
-#                     for i in range(len(these_indices)):
-#                         if np.in1d(self.indices[path_number[i],:], these_indices[i]).any():
-#                             keeper[i] = 0
-#                         if these_indices[i]<0:
-#                             keeper[i] = 0
-#                     if np.min(keeper)==0:
-#                         these_indices = these_indices[keeper == 1]
-#                         path_number = path_number[keeper == 1]
-# 
-#                 # save to the master indices
-#                 it += 1
-#                 self.indices[path_number,it] = these_indices
-# 
-#                 UW_loc = self.uw.flat[these_indices]
-#                 if (UW_loc < self.U_dep_mud).any():
-# 
-#                     update_ind = these_indices[UW_loc < self.U_dep_mud]
-#                     update_path = path_number[UW_loc < self.U_dep_mud]
-# 
-#                     Vp_res_ = (self.sed_lag * self.Vp_res[update_path] *
-#                     (self.U_dep_mud**self.beta - self.uw.flat[update_ind]**self.beta) /
-#                     (self.U_dep_mud**self.beta))
-# 
-#                     self.Vp_dep = (self.stage.flat[update_ind] - self.eta.flat[update_ind])/4. * self.dx**2
-#                     self.Vp_dep = np.array([min((Vp_res_[i],self.Vp_dep[i])) for i in range(len(self.Vp_dep))])
-#                     
-#                     self.Vp_dep_mud.flat[update_ind] += self.Vp_dep
-# 
-#                     self.Vp_res[update_path] -= self.Vp_dep
-# 
-#                     self.eta.flat[update_ind] += self.Vp_dep / self.dx**2
-#                     
-#                     self.depth.flat[update_ind] = self.stage.flat[update_ind] - self.eta.flat[update_ind]
-#                     
-#                     update_uw = [min(self.u_max, self.qw.flat[i]/self.depth.flat[i]) for i in update_ind]
-#                     self.uw.flat[update_ind] = update_uw
-# 
-#                     update_uwqw = [self.uw.flat[i]/self.qw.flat[i] if self.qw.flat[i]>0 else 0 for i in update_ind]
-#                     
-#                     self.ux.flat[update_ind] = self.qx.flat[update_ind] * update_uwqw
-#                     self.uy.flat[update_ind] = self.qy.flat[update_ind] * update_uwqw
-# 
-# 
-# 
-#                 if (UW_loc > self.U_ero_mud).any():
-# 
-#                     update_ind = these_indices[UW_loc > self.U_ero_mud]
-#                     update_path = path_number[UW_loc > self.U_ero_mud]
-# 
-#                     Vp_res_ = self.Vp_sed * (self.uw.flat[update_ind]**self.beta - self.U_ero_mud**self.beta) / (self.U_ero_mud**self.beta)
-#                     self.Vp_ero = (self.stage.flat[update_ind] - self.eta.flat[update_ind])/4. * self.dx**2
-#                     self.Vp_ero = np.array([min((Vp_res_[i],self.Vp_ero[i])) for i in range(len(self.Vp_ero))])
-# 
-#                     self.eta.flat[update_ind] -= self.Vp_ero / self.dx**2
-# 
-#                     self.depth.flat[update_ind] = self.stage.flat[update_ind] - self.eta.flat[update_ind]
-#                     update_uw = [min(self.u_max, self.qw.flat[i]/self.depth.flat[i]) for i in update_ind]
-#                     self.uw.flat[update_ind] = update_uw
-# 
-#                     update_uwqw = [self.uw.flat[i]/self.qw.flat[i] if self.qw.flat[i]>0 else 0 for i in update_ind]
-#                     self.ux.flat[update_ind] = self.qx.flat[update_ind] * update_uwqw
-#                     self.uy.flat[update_ind] = self.qy.flat[update_ind] * update_uwqw
-# 
-#                     self.Vp_res[update_path] += self.Vp_ero
-# 
-# 
-#                 if it == self.itmax-1 or len(these_indices)==0:
-#                     sed_continue = False
-# 
-# 
-# 
-#     def one_coarse_timestep(self):
-#         '''
-#         Route all parcels of coarse sediment
-#         '''
-# 
-#         self.num_coarse = int(round(self.Np_sed*self.f_bedload))
-# 
-#         if self.num_coarse>0:
-# 
-#             these_indices = map(lambda x: self.random_pick_inlet(self.inlet),range(self.num_coarse))
-# 
-#             self.indices = np.zeros((self.num_coarse,self.itmax), dtype=np.int)
-#             self.indices[:,0] = these_indices
-# 
-#             path_number = np.arange(self.num_coarse)
-#             self.Vp_res = np.zeros((self.Np_sed,)) + self.Vp_sed
-#             self.qs.flat[these_indices] += self.Vp_res[path_number]/2./self.dt/self.dx
-# 
-#             sed_continue = True
-#             it = 0
-# 
-#             while sed_continue:
-# 
-#                 weight = self.get_sed_weight()
-# 
-#                 ngh = map(self.random_pick_flat, weight[these_indices])
-#                 new_indices = these_indices + self.walk_flat[ngh]
-#                 new_ind_type = self.cell_type.flat[new_indices]
-# 
-#                 self.qs.flat[these_indices] += self.Vp_res[path_number]/2./self.dt/self.dx
-#                 self.qs.flat[new_indices] += self.Vp_res[path_number]/2./self.dt/self.dx
-# 
-#                 these_indices = new_indices[new_ind_type >= 0]
-#                 path_number = path_number[new_ind_type >= 0]
-# 
-#                 if len(path_number)>0:
-#                     # check for looping
-#                     keeper = np.ones((len(these_indices),), dtype=np.int)
-#                     for i in range(len(these_indices)):
-#                         if np.in1d(self.indices[path_number[i],:], these_indices[i]).any():
-#                             keeper[i] = 0
-#                         if these_indices[i]<0:
-#                             keeper[i] = 0
-#                     if np.min(keeper)==0:
-#                         these_indices = these_indices[keeper == 1]
-#                         path_number = path_number[keeper == 1]
-# 
-#                 it += 1
-#                 self.indices[path_number,it] = these_indices
-# 
-#                 qs_cap = self.qs0 * self.f_bedload/self.u0**self.beta * self.uw.flat[these_indices]**self.beta
-# 
-#                 qs_loc = self.qs.flat[these_indices]
-# 
-#                 if (qs_loc > qs_cap).any():
-#                 
-# 
-#                     update_ind = these_indices[qs_loc > qs_cap]
-#                     update_path = path_number[qs_loc > qs_cap]
-#                     Vp_res_ = self.Vp_res[update_path]
-# 
-#                     self.Vp_dep = self.depth.flat[update_ind]/4.* self.dx**2
-#                     self.Vp_dep = np.minimum(Vp_res_, self.Vp_dep)
-#              
-#                     self.Vp_res[update_path] -= self.Vp_dep
-# 
-#                     eta_change = self.Vp_dep / self.dx**2
-#                     self.eta.flat[update_ind] += eta_change
-#                     
-#                     self.depth.flat[update_ind] = self.stage.flat[update_ind] - self.eta.flat[update_ind]
-# 
-#                     update_uw = [min(self.u_max, self.qw.flat[i]/self.depth.flat[i]) for i in update_ind]
-#                     self.uw.flat[update_ind] = update_uw
-# 
-#                     update_uwqw = [self.uw.flat[i]/self.qw.flat[i] if self.qw.flat[i]>0 else 0 for i in update_ind]
-#                     self.ux.flat[update_ind] = self.qx.flat[update_ind] * update_uwqw
-#                     self.uy.flat[update_ind] = self.qy.flat[update_ind] * update_uwqw
-#                     
-# 
-# 
-#                 if ((qs_loc < qs_cap) * (self.uw.flat[these_indices] > self.U_ero_sand)).any():
-#                 
-# 
-#                     update_ind = these_indices[(qs_loc < qs_cap) * (self.uw.flat[these_indices] > self.U_ero_sand)]
-#                     update_path = path_number[(qs_loc < qs_cap) * (self.uw.flat[these_indices] > self.U_ero_sand)]
-# 
-#                     Vp_res_ = self.Vp_sed * (self.uw.flat[update_ind]**self.beta - self.U_ero_sand**self.beta) / (self.U_ero_sand**self.beta)
-#                     
-#                     
-#                     Vp_ero_ = self.depth.flat[update_ind]/4. * self.dx**2
-#                     self.Vp_ero = np.minimum(Vp_res_,Vp_ero_)
-#                     
-# 
-#                     eta_change = self.Vp_ero / self.dx**2
-#                     self.eta.flat[update_ind] -= eta_change
-#                     self.depth.flat[update_ind] = self.stage.flat[update_ind] - self.eta.flat[update_ind]
-# 
-# 
-#                     update_uw = [min(self.u_max, self.qw.flat[i]/self.depth.flat[i]) for i in update_ind]
-#                     self.uw.flat[update_ind] = update_uw
-# 
-#                     update_uwqw = [self.uw.flat[i]/self.qw.flat[i] if self.qw.flat[i]>0 else 0 for i in update_ind]
-#                     self.ux.flat[update_ind] = self.qx.flat[update_ind] * update_uwqw
-#                     self.uy.flat[update_ind] = self.qy.flat[update_ind] * update_uwqw
-# 
-#                     self.Vp_res[update_path] += self.Vp_ero
-#                     
-# 
-# 
-#                 if it == self.itmax-1 or len(these_indices)==0:
-#                     sed_continue = False
-# 
-#         self.topo_diffusion()
-# 
-# 
-#     def get_sed_weight(self):
-#         '''
-#         Get np.array((8,L,W)) of probability field of routing to neighbors
-#         for sediment parcels
-#         '''
-# 
-#         wet_mask_nh = self.get_wet_mask_nh()
-# 
-#         weight = self.get_wgt_int(wet_mask_nh) * \
-#             self.depth**self.theta_sand * wet_mask_nh
-# 
-#         weight[weight<0] = 0.
-#         weight_sum = np.sum(weight,axis=0)
-#         weight[:,weight_sum>0] = weight[:,weight_sum>0] / weight_sum[weight_sum>0]
-# 
-#         weight_f = np.zeros((self.L*self.W, 8))
-# 
-#         for i in range(8):
-#             weight_f[:,i] = weight[i,:,:].flatten()
-# 
-#         return weight_f
-#     
-#     
-#     
-#     
-#     
-#     def get_wgt_int(self, wet_mask_nh):
-#         '''
-#         Returns np.array((8,L,W)) (qx*dxn_ivec + qy*dxn_jvec)/dist
-#         for each neighbor around a cell
-# 
-#         Takes an array of the same size with 1 if wet and 0 if dry
-#         '''
-# 
-#         wgt_int = (self.qx * np.array(self.dxn_ivec)[:,np.newaxis,np.newaxis] + \
-#             self.qy * np.array(self.dxn_jvec)[:,np.newaxis,np.newaxis]) / \
-#             np.array(self.dxn_dist)[:,np.newaxis,np.newaxis]
-# 
-#         wgt_int[1:4,0,:] = 0
-# 
-#         wgt_int = wgt_int * wet_mask_nh
-#         wgt_int[wgt_int<0] = 0
-#         wgt_int_sum = np.sum(wgt_int, axis=0)
-# 
-#         wgt_int[:,wgt_int_sum>0] = wgt_int[:,wgt_int_sum>0]/wgt_int_sum[wgt_int_sum>0]
-# 
-#         return wgt_int       
+
 
     #############################################
     ############### randomization ###############
@@ -1271,37 +876,6 @@ class Tools(object):
 
 
 
-# 
-# 
-#     #############################################
-#     ################# smoothing #################
-#     #############################################
-# 
-#     def smoothing_filter(self, stageTemp):
-#         '''
-#         Smooth water surface
-# 
-#         If any of the cells in a 9-cell window are wet, apply this filter
-# 
-#         stageTemp : water surface
-#         stageT : smoothed water surface
-#         '''
-# 
-#         stageT = stageTemp.copy()
-#         wet_mask = self.depth > self.dry_depth
-# 
-#         for t in range(self.Nsmooth):
-# 
-#             local_mean = ndimage.uniform_filter(stageT)
-# 
-#             stageT[wet_mask] = self.Csmooth * stageT[wet_mask] + \
-#                 (1-self.Csmooth) * local_mean[wet_mask]
-# 
-#         returnval = (1-self.omega_sfc) * self.stage + self.omega_sfc * stageT
-#         
-# 
-#         return returnval
-
 
 
     def flooding_correction(self):
@@ -1337,29 +911,6 @@ class Tools(object):
 
             if (stage_nh > eta_shore[i]).any():
                 self.stage[shore_ind[0][i],shore_ind[1][i]] = max(stage_nh)
-
-
-
-#     def topo_diffusion(self):
-#         '''
-#         Diffuse topography after routing all coarse sediment parcels
-#         '''
-# 
-#         wgt_cell_type = self.build_weight_array(self.cell_type > -2)
-#         wgt_qs = self.build_weight_array(self.qs) + self.qs
-#         wet_mask_nh = self.get_wet_mask_nh()
-# 
-#         multiplier = self.dt/self.N_crossdiff * self.alpha * 0.5 / self.dx**2
-# 
-#         for n in range(self.N_crossdiff):
-# 
-#             wgt_eta = self.build_weight_array(self.eta) - self.eta
-# 
-#             crossflux_nb = multiplier * wgt_qs * wgt_eta * wet_mask_nh
-#             
-#             crossflux = np.sum(crossflux_nb, axis=0)
-#             
-#             self.eta[:] = self.eta + crossflux
 
 
 
@@ -1536,9 +1087,7 @@ class Tools(object):
         self.dxn_dist = \
         [sqrt(self.dxn_iwalk[i]**2 + self.dxn_jwalk[i]**2) for i in range(8)]
     
-#         SQ05 = sqrt(0.5)
-#         self.dxn_ivec = [0,-SQ05,-1,-SQ05,0,SQ05,1,SQ05]
-#         self.dxn_jvec = [1,SQ05,0,-SQ05,-1,-SQ05,0,SQ05]
+
 
         self.walk_flat = np.array([1, -self.W+1, -self.W, -self.W-1,
                                     -1, self.W-1, self.W, self.W+1])
@@ -2225,16 +1774,18 @@ class Tools(object):
         
     def init_logger(self):
     
-        self.logger = logging.getLogger("driver")
-        self.logger.setLevel(logging.INFO)
+        if self.verbose:
+    
+            self.logger = logging.getLogger("driver")
+            self.logger.setLevel(logging.INFO)
 
-        # create the logging file handler
-        st = timestr = time.strftime("%Y%m%d-%H%M%S")
-        fh = logging.FileHandler("pyDeltaRCM_" + st + ".log")
+            # create the logging file handler
+            st = timestr = time.strftime("%Y%m%d-%H%M%S")
+            fh = logging.FileHandler("pyDeltaRCM_" + st + ".log")
 
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            fh.setFormatter(formatter)
 
-        # add handler to logger object
-        self.logger.addHandler(fh)        
+            # add handler to logger object
+            self.logger.addHandler(fh)        
         
