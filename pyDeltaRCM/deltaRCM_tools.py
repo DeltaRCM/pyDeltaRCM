@@ -44,7 +44,7 @@ class Tools(object):
             self.free_surf(iteration)            
             self.finalize_water_iteration(timestep,iteration)
             
-#         self.sed_route()
+        self.sed_route()
 
 
 
