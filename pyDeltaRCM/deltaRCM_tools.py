@@ -12,6 +12,8 @@ from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
 import time
 
+np.random.seed(0)
+
 class Tools(object):
 
 
@@ -42,7 +44,7 @@ class Tools(object):
             self.free_surf(iteration)            
             self.finalize_water_iteration(timestep,iteration)
             
-        self.sed_route()
+#         self.sed_route()
 
 
 
@@ -74,8 +76,7 @@ class Tools(object):
     def sed_route(self):
         '''route all sediment'''
         
-        self.pad_depth = np.pad(self.depth, 1, 'constant',
-                                constant_values=(0))
+        self.pad_depth = np.pad(self.depth, 1, 'edge')
         
         self.qs[:] = 0
         self.Vp_dep_sand[:] = 0
@@ -492,8 +493,7 @@ class Tools(object):
                                     self.sfc_visit[self.sfc_visit > 0])
         #find average water surface elevation for a cell
         
-        Hnew_pad = np.pad(Hnew, 1, 'constant',
-                                constant_values=(0))
+        Hnew_pad = np.pad(Hnew, 1, 'edge')
         
         #smooth newly calculated free surface
         Htemp = Hnew
@@ -555,14 +555,11 @@ class Tools(object):
         self.sfc_sum[:] = 0
         
 
-        self.pad_stage = np.pad(self.stage, 1, 'constant',               
-                                constant_values=(0))
+        self.pad_stage = np.pad(self.stage, 1, 'edge')
 
-        self.pad_depth = np.pad(self.depth, 1, 'constant',
-                                constant_values=(0))
+        self.pad_depth = np.pad(self.depth, 1, 'edge')
 
-        self.pad_cell_type = np.pad(self.cell_type, 1, 'constant',
-                                constant_values=(-2))
+        self.pad_cell_type = np.pad(self.cell_type, 1, 'edge')
         
 
 
@@ -586,7 +583,7 @@ class Tools(object):
         
             iter += 1
             
-            self.check_size_of_indices_matrix(iter)
+#             self.check_size_of_indices_matrix(iter)
         
             inds = np.unravel_index(current_inds, self.depth.shape)
             inds_tuple = [(inds[0][i], inds[1][i]) for i in range(len(inds[0]))]
@@ -1156,7 +1153,7 @@ class Tools(object):
         self.Vp_sed = self.dVs / self.Np_sed    # volume of each sediment parcel
     
         self.itmax = 2 * (self.L + self.W)      # max number of jumps for parcel
-        self.size_indices = int(self.itmax/2)   # initial width of self.indices
+        self.size_indices = int(self.itmax)   # initial width of self.indices
         
         self.dt = self.dVs / self.Qs0           # time step size
 
@@ -1191,8 +1188,6 @@ class Tools(object):
         '''
         Creates the model domain
         '''
-
-#         self.direction_setup()
 
         ##### empty arrays #####
 
@@ -1258,7 +1253,7 @@ class Tools(object):
         self.cell_type[:,0] = cell_edge
         self.cell_type[:,-1] = cell_edge
         
-        bounds = [(np.sqrt((i-3)**2 + (j-self.CTR)**2))
+        bounds = [(np.sqrt((i-3 - self.L0)**2 + (j-self.CTR - 2)**2))
             for i in range(self.L)
             for j in range(self.W)]
         bounds =  np.reshape(bounds,(self.L, self.W))
