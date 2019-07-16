@@ -26,7 +26,7 @@ from distutils import log
 try:
     from urllib.request import urlopen
 except ImportError:
-    from urllib2 import urlopen
+    from urllib.request import urlopen
 
 try:
     from site import USER_SITE
@@ -135,44 +135,44 @@ def _do_download(version, download_base, to_dir, download_delay):
     setuptools.bootstrap_install_from = egg
 
 
-def use_setuptools(
-        version=DEFAULT_VERSION, download_base=DEFAULT_URL,
-        to_dir=DEFAULT_SAVE_DIR, download_delay=15):
-    """
-    Ensure that a setuptools version is installed.
-
-    Return None. Raise SystemExit if the requested version
-    or later cannot be installed.
-    """
-    version = _resolve_version(version)
-    to_dir = os.path.abspath(to_dir)
-
-    # prior to importing, capture the module state for
-    # representative modules.
-    rep_modules = 'pkg_resources', 'setuptools'
-    imported = set(sys.modules).intersection(rep_modules)
-
-    try:
-        import pkg_resources
-        pkg_resources.require("setuptools>=" + version)
-        # a suitable version is already installed
-        return
-    except ImportError:
-        # pkg_resources not available; setuptools is not installed; download
-        pass
-    except pkg_resources.DistributionNotFound:
-        # no version of setuptools was found; allow download
-        pass
-    except pkg_resources.VersionConflict as VC_err:
-        if imported:
-            _conflict_bail(VC_err, version)
-
-        # otherwise, unload pkg_resources to allow the downloaded version to
-        #  take precedence.
-        del pkg_resources
-        _unload_pkg_resources()
-
-    return _do_download(version, download_base, to_dir, download_delay)
+# def use_setuptools(
+#         version=DEFAULT_VERSION, download_base=DEFAULT_URL,
+#         to_dir=DEFAULT_SAVE_DIR, download_delay=15):
+#     """
+#     Ensure that a setuptools version is installed.
+#
+#     Return None. Raise SystemExit if the requested version
+#     or later cannot be installed.
+#     """
+#     version = _resolve_version(version)
+#     to_dir = os.path.abspath(to_dir)
+#
+#     # prior to importing, capture the module state for
+#     # representative modules.
+#     rep_modules = 'pkg_resources', 'setuptools'
+#     imported = set(sys.modules).intersection(rep_modules)
+#
+#     try:
+#         import pkg_resources
+#         pkg_resources.require("setuptools>=" + version)
+#         # a suitable version is already installed
+#         return
+#     except ImportError:
+#         # pkg_resources not available; setuptools is not installed; download
+#         pass
+#     except pkg_resources.DistributionNotFound:
+#         # no version of setuptools was found; allow download
+#         pass
+#     except pkg_resources.VersionConflict as VC_err:
+#         if imported:
+#             _conflict_bail(VC_err, version)
+#
+#         # otherwise, unload pkg_resources to allow the downloaded version to
+#         #  take precedence.
+#         del pkg_resources
+#         _unload_pkg_resources()
+#
+#     return _do_download(version, download_base, to_dir, download_delay)
 
 
 def _conflict_bail(VC_err, version):
@@ -412,11 +412,11 @@ def _download_args(options):
     )
 
 
-def main():
-    """Install or upgrade setuptools and EasyInstall."""
-    options = _parse_args()
-    archive = download_setuptools(**_download_args(options))
-    return _install(archive, _build_install_args(options))
-
-if __name__ == '__main__':
-    sys.exit(main())
+# def main():
+#     """Install or upgrade setuptools and EasyInstall."""
+#     options = _parse_args()
+#     archive = download_setuptools(**_download_args(options))
+#     return _install(archive, _build_install_args(options))
+#
+# if __name__ == '__main__':
+#     sys.exit(main())

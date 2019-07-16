@@ -31,12 +31,12 @@ if __name__ == '__main__':
 
     for time in range(0,50):
         
-        print 'Time:', delta.get_current_time()
+        print('Time:', delta.get_current_time())
         delta.update()
         
         if (time%saving_dt == 0) & save_data:
             
-            print 'Overwriting data'
+            print('Overwriting data')
             
             np.save('deltaRCM_Output/uw.npy', delta._delta.uw)
             np.save('deltaRCM_Output/ux.npy', delta._delta.ux)

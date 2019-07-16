@@ -39,7 +39,7 @@ for j in range(dx):
         sf = strata_sf[i,j,:]
         sf[sf<0] = 0
 
-        poly = zip(np.arange(ny), seds / vertical_spacing) + zip(np.arange(ny)*2, np.arange(ny)*0)
+        poly = list(zip(np.arange(ny), seds / vertical_spacing)) + list(zip(np.arange(ny)*2, np.arange(ny)*0))
 
         img = Image.new("L", [ny, nz], 0)
         ImageDraw.Draw(img).polygon(poly, outline=1, fill=1)
@@ -50,6 +50,6 @@ for j in range(dx):
         
     stratigraphy[:,j,:] = mask
     
-print 'Saving stratigraphy...'  
+print('Saving stratigraphy...')  
 np.save('deltaRCM_Output/stratigraphy.npy', stratigraphy)
-print 'Done'
+print('Done')
