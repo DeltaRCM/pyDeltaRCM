@@ -21,7 +21,7 @@ class pyDeltaRCM(Tools):
         'model_grid__cell_size': {'name':'dx',
             'type': 'float', 'default': 100.},
         'land_surface__width': {'name':'L0_meters',
-            'type': 'float', 'default': 300.}, 
+            'type': 'float', 'default': 300.},
         'land_surface__slope': {'name':'S0',
             'type': 'float', 'default': 0.00015},
         'model__max_iteration': {'name':'itermax',
@@ -41,9 +41,9 @@ class pyDeltaRCM(Tools):
         'sediment__number_parcels': {'name':'Np_sed',
             'type': 'long', 'default': 1000},
         'sediment__bedload_fraction': {'name':'f_bedload',
-            'type': 'float', 'default': 0.25}, 
+            'type': 'float', 'default': 0.25},
         'sediment__influx_concentration': {'name':'C0_percent',
-            'type': 'float', 'default': 0.1},                   
+            'type': 'float', 'default': 0.1},
         'model_output__opt_eta_figs': {'name':'save_eta_figs',
             'type': 'choice', 'default': True},
         'model_output__opt_stage_figs': {'name':'save_stage_figs',
@@ -101,8 +101,8 @@ class pyDeltaRCM(Tools):
         'basin__opt_stratigraphy': {'name': 'save_strata',
             'type': 'choice', 'default': False}
         }
-        
-        
+
+
     #############################################
     ################## __init__ #################
     #############################################
@@ -114,23 +114,23 @@ class pyDeltaRCM(Tools):
         Sets the most commonly changed variables here
         Calls functions to set the rest and create the domain (for cleanliness)
         '''
-        
+
         self._time = 0.
         self._time_step = 1.
-        
+
         self.verbose = False
         self.input_file = input_file
-        
+
         self.create_dicts()
         self.set_defaults()
         self.import_file()
-        
+
         self.create_other_variables()
-        
+
         self.init_logger()
-        
+
         self.create_domain()
-        
+
         self.init_subsidence()
         self.init_stratigraphy()
         self.init_output_grids()
@@ -145,36 +145,36 @@ class pyDeltaRCM(Tools):
         '''
         Run the model for one full instance
         '''
-        
+
         self.run_one_timestep()
-        
+
         self.apply_subsidence()
-        
+
         self.finalize_timestep()
         self.record_stratigraphy()
-        
+
         self.output_data()
-        
+
         self._time += self.time_step
 
 
 
     #############################################
     ################## finalize #################
-    #############################################        
-        
+    #############################################
+
     def finalize(self):
-    
+
         self.output_strata()
-        
+
         try:
             self.output_netcdf.close()
             if self.verbose:
-                print 'Closed output netcdf file.'
+                print('Closed output netcdf file.')
         except:
             pass
-            
-            
+
+
 
 
     @property
@@ -187,20 +187,20 @@ class pyDeltaRCM(Tools):
         if new_dt * self.init_Np_sed < 100:
             warnings.warn('Using a very small timestep.')
             warnings.warn('Delta might evolve very slowly.')
-            
+
         self.Np_sed = int(new_dt * self.init_Np_sed)
         self.Np_water = int(new_dt * self.init_Np_water)
-        
+
         if self.toggle_subsidence:
             self.sigma = self.subsidence_mask * self.sigma_max * new_dt
-        
+
         self._time_step = new_dt
 
     @property
     def channel_flow_velocity(self):
         ''' Get channel flow velocity '''
         return self.u0
-        
+
     @channel_flow_velocity.setter
     def channel_flow_velocity(self, new_u0):
         self.u0 = new_u0
@@ -210,46 +210,46 @@ class pyDeltaRCM(Tools):
     def channel_width(self):
         ''' Get channel width '''
         return self.N0_meters
-        
+
     @channel_width.setter
     def channel_width(self, new_N0):
         self.N0_meters = new_N0
         self.create_other_variables()
-        
+
     @property
     def channel_flow_depth(self):
         ''' Get channel flow depth '''
         return self.h0
-        
+
     @channel_flow_depth.setter
     def channel_flow_depth(self, new_d):
         self.h0 = new_d
-        self.create_other_variables()        
+        self.create_other_variables()
 
     @property
     def sea_surface_mean_elevation(self):
         ''' Get sea surface mean elevation '''
         return self.H_SL
-        
+
     @sea_surface_mean_elevation.setter
     def sea_surface_mean_elevation(self, new_se):
         self.H_SL = new_se
-        
+
     @property
     def sea_surface_elevation_change(self):
         ''' Get rate of change of sea surface elevation, per timestep'''
         return self.SLR
-        
+
     @sea_surface_elevation_change.setter
     def sea_surface_elevation_change(self, new_SLR):
         ''' Set rate of change of sea surface elevation, per timestep'''
         self.SLR = new_SLR
-        
+
     @property
     def bedload_fraction(self):
         ''' Get bedload fraction '''
         return self.f_bedload
-        
+
     @bedload_fraction.setter
     def bedload_fraction(self, new_u0):
         self.f_bedload = new_u0
@@ -258,34 +258,23 @@ class pyDeltaRCM(Tools):
     def influx_sediment_concentration(self):
         ''' Get influx sediment concentration '''
         return self.C0_percent
-        
+
     @influx_sediment_concentration.setter
     def influx_sediment_concentration(self, new_u0):
         self.C0_percent = new_u0
         self.create_other_variables()
-        
+
     @property
     def sea_surface_elevation(self):
         ''' Get stage '''
         return self.stage
-        
+
     @property
     def water_depth(self):
         ''' Get depth '''
         return self.depth
-        
+
     @property
     def bed_elevation(self):
         ''' Get bed elevation '''
         return self.eta
-
-
-
-
-            
-            
-        
-
-
-
-
