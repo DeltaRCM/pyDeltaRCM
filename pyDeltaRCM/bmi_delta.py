@@ -12,7 +12,7 @@ from .deltaRCM_driver import pyDeltaRCM
 class BmiDelta(Bmi):
 
     _name = 'pyDeltaRCM'
-    
+
     _input_var_names = (
         'channel_exit_water_flow__speed',
         'channel_exit_water_x-section__depth',
@@ -61,7 +61,7 @@ class BmiDelta(Bmi):
             'sea_water__depth': self._delta.depth,
             'sea_bottom_surface__elevation': self._delta.eta,
             }
-            
+
         self._var_units = {
             'channel_exit_water_flow__speed': 'm s-1',
             'channel_exit_water_x-section__width': 'm',
@@ -74,7 +74,7 @@ class BmiDelta(Bmi):
             'sea_water__depth': 'm',
             'sea_bottom_surface__elevation': 'm',
             }
-            
+
         self._grids = {
             0: ['sea_water_surface__elevation'],
             1: ['sea_water__depth'],
@@ -88,7 +88,7 @@ class BmiDelta(Bmi):
 
     def update(self):
         """Advance model by one time step."""
-        
+
         self._delta.update()
         self._time += self.get_time_step()
 
@@ -102,10 +102,10 @@ class BmiDelta(Bmi):
             Fraction fo a time step.
         """
         time_step = self.get_time_step()
-        
+
         self._delta.time_step = time_frac * time_step
         self.update()
-        
+
         self._delta.time_step = time_step
 
 
@@ -117,18 +117,18 @@ class BmiDelta(Bmi):
         then : float
             Time to run model until.
         """
-        
+
         if self.get_current_time() != int(self.get_current_time()):
-        
+
             remainder = self.get_current_time() - int(self.get_current_time())
             self.update_frac(remainder)
-            
-            
+
+
         n_steps = (then - self.get_current_time()) / self.get_time_step()
 
         for _ in range(int(n_steps)):
             self.update()
-            
+
         remainder = n_steps - int(n_steps)
         if remainder > 0:
             self.update_frac(remainder)
@@ -198,7 +198,7 @@ class BmiDelta(Bmi):
         int
             Grid id.
         """
-        for grid_id, var_name_list in self._grids.items():
+        for grid_id, var_name_list in list(self._grids.items()):
             if var_name in var_name_list:
                 return grid_id
 
