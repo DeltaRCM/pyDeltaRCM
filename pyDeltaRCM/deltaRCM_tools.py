@@ -575,12 +575,12 @@ class Tools(object):
 
         self.looped[:] = 0
 
-
         while (sum(current_inds) > 0) & (iter < self.itmax):
+
 
             iter += 1
 
-#             self.check_size_of_indices_matrix(iter)
+            self.check_size_of_indices_matrix(iter)
 
             inds = np.unravel_index(current_inds, self.depth.shape)
             inds_tuple = [(inds[0][i], inds[1][i]) for i in range(len(inds[0]))]
@@ -701,7 +701,7 @@ class Tools(object):
         new_ind = (ind[0] + self.jwalk.flat[new_cell], ind[1] +
                    self.iwalk.flat[new_cell])
 
-        new_ind_flat = np.ravel_multi_index(new_ind, self.depth.shape)
+        new_ind_flat = np.ravel_multi_index(new_ind, self.depth.shape,mode='wrap') # added wrap mode to fct to resolve ValueError due to negative numbers
 
         return new_ind_flat
 
@@ -1150,7 +1150,7 @@ class Tools(object):
         self.Vp_sed = self.dVs / self.Np_sed    # volume of each sediment parcel
 
         self.itmax = 2 * (self.L + self.W)      # max number of jumps for parcel
-        self.size_indices = int(self.itmax)   # initial width of self.indices
+        self.size_indices = int(self.itmax/2)   # initial width of self.indices
 
         self.dt = self.dVs / self.Qs0           # time step size
 
@@ -1250,7 +1250,7 @@ class Tools(object):
         self.cell_type[:,0] = cell_edge
         self.cell_type[:,-1] = cell_edge
 
-        bounds = [(np.sqrt((i-3 - self.L0)**2 + (j-self.CTR - 2)**2))
+        bounds = [(np.sqrt((i-3)**2 + (j-self.CTR)**2))
             for i in range(self.L)
             for j in range(self.W)]
         bounds =  np.reshape(bounds,(self.L, self.W))
@@ -1756,8 +1756,8 @@ class Tools(object):
                 if self.verbose:
                     self.logger.info('Increasing size of self.indices')
 
-                indices_blank = np.zeros((self.Np_water, self.itmax/4),
-                                          dtype = np.int)
+                indices_blank = np.zeros((np.int(self.Np_water), np.int(self.itmax/4)), dtype=np.int)
+
                 self.indices = np.hstack((self.indices, indices_blank))
 
 
