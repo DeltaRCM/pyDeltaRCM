@@ -11,11 +11,12 @@ import time as time_lib
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
 import time
-import sed_tools, water_tools
-
+from .sed_tools import sed_tools
+from .water_tools import water_tools
+from .init_tools import init_tools
 np.random.seed(0)
 
-class Tools(sed_tools, water_tools, object):
+class Tools(sed_tools, water_tools, init_tools, object):
     
     #############################################
     ############# run_one_timestep ##############
@@ -59,161 +60,13 @@ class Tools(sed_tools, water_tools, object):
         
         self.H_SL = self.H_SL + self.SLR * self.dt
     
-    #################################
-    
-    def step_update(self, ind, new_ind, new_cell):
-        
-        istep = self.iwalk.flat[new_cell]
-        jstep = self.jwalk.flat[new_cell]
-        dist = np.sqrt(istep**2 + jstep**2)
-        
-        if dist > 0:
-            
-            self.qxn.flat[ind] += jstep / dist
-            self.qyn.flat[ind] += istep / dist
-            self.qwn.flat[ind] += self.Qp_water / self.dx / 2.
-            
-            self.qxn.flat[new_ind] += jstep / dist
-            self.qyn.flat[new_ind] += istep / dist
-            self.qwn.flat[new_ind] += self.Qp_water / self.dx / 2.
-        
-        return dist
-    
-    def calculate_new_ind(self, ind, new_cell):
-        
-        new_ind = (ind[0] + self.jwalk.flat[new_cell], ind[1] +
-                   self.iwalk.flat[new_cell])
-                   
-        new_ind_flat = np.ravel_multi_index(new_ind, self.depth.shape,mode='wrap') # added wrap mode to fct to resolve ValueError due to negative numbers
-        
-        return new_ind_flat
-    
-    def get_weight(self, ind):
-        
-        stage_ind = self.pad_stage[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
-        
-        weight_sfc = np.maximum(0,
-                     (self.stage[ind] - stage_ind) / self.distances)
-                     
-        weight_int = np.maximum(0, (self.qx[ind] * self.jvec +
-                                    self.qy[ind] * self.ivec) / self.distances)
-        
-        if ind[0] == 0:
-            weight_sfc[0,:] = 0
-            weight_int[0,:] = 0
-        
-        depth_ind = self.pad_depth[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
-        ct_ind = self.pad_cell_type[ind[0]-1+1:ind[0]+2+1, ind[1]-1+1:ind[1]+2+1]
-        
-        weight_sfc[(depth_ind <= self.dry_depth) | (ct_ind == -2)] = 0
-        weight_int[(depth_ind <= self.dry_depth) | (ct_ind == -2)] = 0
-        
-        if np.nansum(weight_sfc) > 0:
-            weight_sfc = weight_sfc / np.nansum(weight_sfc)
-        
-        if np.nansum(weight_int) > 0:
-            weight_int = weight_int / np.nansum(weight_int)
-        
-        self.weight = self.gamma * weight_sfc + (1 - self.gamma) * weight_int
-        self.weight = depth_ind ** self.theta_water * self.weight
-        self.weight[depth_ind <= self.dry_depth] = np.nan
-        
-        new_cell = self.random_pick(self.weight)
-        
-        return new_cell
-    
     #############################################
     ############### randomization ###############
     #############################################
-    
-    def random_pick(self, probs):
-        '''
-        Randomly pick a number weighted by array probs (len 8)
-        Return the index of the selected weight in array probs
-        '''
-        
-        num_nans = sum(np.isnan(probs))
-        
-        if np.nansum(probs) == 0:
-            probs[~np.isnan(probs)] = 1
-            probs[1,1] = 0
-            
-        probs[np.isnan(probs)] = 0
-        cutoffs = np.cumsum(probs)
-        idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
-        
-        return idx
-    
-    def random_pick_inlet(self, choices, probs = None):
-        '''
-        Randomly pick a number from array choices weighted by array probs
-        Values in choices are column indices
-        
-        Return a tuple of the randomly picked index for row 0
-        '''
-        
-        if not probs:
-            probs = np.array([1 for i in range(len(choices))])
-            
-        cutoffs = np.cumsum(probs)
-        idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
-        
-        return choices[idx]
-    
+
     #############################################
     ############### weight arrays ###############
     #############################################
-    
-    def build_weight_array(self, array, fix_edges = False, normalize = False):
-        '''
-        Create np.array((8,L,W)) of quantity a
-        in each of the neighbors to a cell
-        '''
-        
-        a_shape = array.shape
-        
-        wgt_array = np.zeros((8, a_shape[0], a_shape[1]))
-        nums = list(range(8))
-        
-        wgt_array[nums[0],:,:-1] = array[:,1:] # E
-        wgt_array[nums[1],1:,:-1] = array[:-1,1:] # NE
-        wgt_array[nums[2],1:,:] = array[:-1,:] # N
-        wgt_array[nums[3],1:,1:] = array[:-1,:-1] # NW
-        wgt_array[nums[4],:,1:] = array[:,:-1] # W
-        wgt_array[nums[5],:-1,1:] = array[1:,:-1] # SW
-        wgt_array[nums[6],:-1,:] = array[1:,:] # S
-        wgt_array[nums[7],:-1,:-1] = array[1:,1:] # SE
-        
-        if fix_edges:
-            wgt_array[nums[0],:,-1] = wgt_array[nums[0],:,-2]
-            wgt_array[nums[1],:,-1] = wgt_array[nums[1],:,-2]
-            wgt_array[nums[7],:,-1] = wgt_array[nums[7],:,-2]
-            wgt_array[nums[1],0,:] = wgt_array[nums[1],1,:]
-            wgt_array[nums[2],0,:] = wgt_array[nums[2],1,:]
-            wgt_array[nums[3],0,:] = wgt_array[nums[3],1,:]
-            wgt_array[nums[3],:,0] = wgt_array[nums[3],:,1]
-            wgt_array[nums[4],:,0] = wgt_array[nums[4],:,1]
-            wgt_array[nums[5],:,0] = wgt_array[nums[5],:,1]
-            wgt_array[nums[5],-1,:] = wgt_array[nums[5],-2,:]
-            wgt_array[nums[6],-1,:] = wgt_array[nums[6],-2,:]
-            wgt_array[nums[7],-1,:] = wgt_array[nums[7],-2,:]
-        
-        if normalize:
-            a_sum = np.sum(wgt_array, axis=0)
-            wgt_array[:,a_sum!=0] = wgt_array[:,a_sum!=0] / a_sum[a_sum!=0]
-        
-        return wgt_array
-    
-    def get_wet_mask_nh(self):
-        '''
-        Returns np.array((8,L,W)), for each neighbor around a cell
-        with 1 if the neighbor is wet and 0 if dry
-        '''
-        
-        wet_mask = (self.depth > self.dry_depth) * 1
-        wet_mask_nh = self.build_weight_array(wet_mask, fix_edges = True)
-        
-        return wet_mask_nh
     
     #############################################
     ################# updaters ##################
@@ -549,22 +402,4 @@ class Tools(sed_tools, water_tools, object):
             
         except:
             self.logger.info('Error: Cannot save grid to netCDF file.')
-    
-    def check_size_of_indices_matrix(self, it):
-        if it >= self.indices.shape[1]:
-            '''
-            Initial size of self.indices is half of self.itmax
-            because the number of iterations doesn't go beyond
-            that for many timesteps.
-
-            Once it reaches it > self.itmax/2 once, make the size
-            self.iter for all further timesteps
-            '''
-
-            if self.verbose:
-                self.logger.info('Increasing size of self.indices')
-
-            indices_blank = np.zeros((np.int(self.Np_water), np.int(self.itmax/4)), dtype=np.int)
-
-            self.indices = np.hstack((self.indices, indices_blank))
     
