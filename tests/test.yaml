@@ -1,0 +1,33 @@
+model_output__site_prefix:
+model_output__case_prefix:
+model_output__out_dir: test
+model_grid__length: 10
+model_grid__width: 10
+model_grid__cell_size: 1
+land_surface__width: 1.0
+land_surface__slope: 0.0002
+model__max_iteration: 1
+water__number_parcels: 10
+channel__flow_velocity: 1.0
+channel__width: 2.0
+channel__flow_depth: 1.0
+sea_water_surface__mean_elevation: 0.0
+sea_water_surface__rate_change_elevation: 0.0
+sediment__number_parcels: 10
+sediment__bedload_fraction: 0.5
+sediment__influx_concentration: 0.1
+basin__opt_subsidence: False
+basin__maximum_subsidence_rate: 0.0
+basin__subsidence_start_timestep: 50
+model_output__opt_eta_figs: False
+model_output__opt_stage_figs: False
+model_output__opt_depth_figs: False
+model_output__opt_discharge_figs: False
+model_output__opt_velocity_figs: False
+model_output__opt_eta_grids: False
+model_output__opt_stage_grids: False
+model_output__opt_depth_grids: False
+model_output__opt_discharge_grids: False
+model_output__opt_velocity_grids: False
+model_output__opt_time_interval: 50
+basin__opt_stratigraphy: False
