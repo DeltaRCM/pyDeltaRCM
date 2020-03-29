@@ -1,0 +1,15 @@
+language: python
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+
+# command to run tests
+script:
+  - python setup.py install
+  - pytest
+  - coverage run -m pytest
+
+after_success:
+  - coverage report
+  - coveralls
