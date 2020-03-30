@@ -12,7 +12,7 @@ install:
 script:
   - python setup.py install
   - pytest
-  - coverage run pytest --cov=pyDeltaRCM test/
+  - coverage run pytest --cov=pyDeltaRCM tests/
 
 after_success:
   - coveralls
