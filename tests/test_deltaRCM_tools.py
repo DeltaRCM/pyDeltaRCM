@@ -23,3 +23,13 @@ def test_get_var_name_depth():
     test get_var_name function from deltaRCM_tools
     '''
     assert delta._delta.get_var_name('channel__width') == 'N0_meters'
+
+def test_run_one_timestep():
+    delta._delta.run_one_timestep()
+    # basically assume sediment has been added at inlet
+    assert delta._delta.qs[0,4] != 0.
+
+def test_finalize_timestep():
+    delta._delta.finalize_timestep()
+    # check that sea level rose as expected
+    assert delta._delta.H_SL == 0.3

@@ -15,8 +15,12 @@ np.random.seed(0)
 delta = BmiDelta()
 delta.initialize(os.getcwd() + '/tests/test.yaml')
 
-def test_init_tools():
+def test_init():
     '''
     test the deltaRCM_driver init (happened when delta.initialize was run)
     '''
     assert delta._delta._time == 0.
+
+def test_update():
+    delta._delta.update()
+    assert delta._delta._time == 1.0

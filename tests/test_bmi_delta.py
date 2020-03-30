@@ -19,3 +19,11 @@ def test_initialize():
     '''
     delta.initialize(os.getcwd() + '/tests/test.yaml')
     assert delta._delta.f_bedload == 0.5
+
+def test_update():
+    delta.update()
+    assert delta._delta._time == 1.0
+
+def test_update_frac():
+    delta.update_frac(1)
+    assert delta._delta.time_step == 1.0
