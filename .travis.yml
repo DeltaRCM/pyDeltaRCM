@@ -13,6 +13,7 @@ script:
   - python setup.py install
   - pytest
   - coverage run -m pytest --cov=pyDeltaRCM tests/
+  - coverage report -m
 
 after_success:
   - coveralls
