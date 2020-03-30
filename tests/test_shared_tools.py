@@ -27,3 +27,11 @@ def test_random_pick():
     probs[0] = 1
     # should return first index
     assert delta._delta.random_pick(probs) == 0
+
+def test_random_pick_inlet():
+    '''
+    Test for function shared_tools.random_pick_inlet
+    '''
+    choices = [0]
+    probs = np.ones((1,))
+    assert delta._delta.random_pick_inlet(choices,probs) == 0

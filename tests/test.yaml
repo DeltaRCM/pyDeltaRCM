@@ -12,7 +12,7 @@ channel__flow_velocity: 1.0
 channel__width: 2.0
 channel__flow_depth: 1.0
 sea_water_surface__mean_elevation: 0.0
-sea_water_surface__rate_change_elevation: 0.0
+sea_water_surface__rate_change_elevation: 0.001
 sediment__number_parcels: 10
 sediment__bedload_fraction: 0.5
 sediment__influx_concentration: 0.1
