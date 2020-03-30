@@ -11,9 +11,7 @@ install:
 # command to run tests
 script:
   - python setup.py install
-  - pytest
-  - coverage run -m pytest --cov=pyDeltaRCM tests/
-  - coverage report -m
+  - pytest --cov=pyDeltaRCM/
 
 after_success:
   - coveralls
