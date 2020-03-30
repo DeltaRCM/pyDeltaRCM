@@ -1,5 +1,9 @@
 # pyDeltaRCM_WMT
 
+[![Build Status](https://travis-ci.org/elbeejay/pyDeltaRCM_WMT.svg?branch=develop)](https://travis-ci.org/elbeejay/pyDeltaRCM_WMT)
+
+[![Coverage Status](https://coveralls.io/repos/github/elbeejay/pyDeltaRCM_WMT/badge.svg?branch=develop)](https://coveralls.io/github/elbeejay/pyDeltaRCM_WMT?branch=develop)
+
 pyDeltaRCM is the Python version of the [Matlab deltaRCM](http://csdms.colorado.edu/wiki/Model:DeltaRCM) model by Man Liang. This model has been turned into a component for WMT, the [Community Surface Dynamics Modeling System (CSDMS)](http://csdms.colorado.edu/wiki/Main_Page) Web Modeling Interface.
 
 The pyDeltaRCM scripts in this repository can be run as a stand-alone model following the instructions below.
