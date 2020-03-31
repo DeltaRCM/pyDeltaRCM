@@ -16,9 +16,7 @@ jobs:
       python: "3.8"
       install: 
         - pip install -r requirements.txt 
-        - pip install pytest
-        - pip install pytest-cov
-        - pip install coveralls
+        - pip install pytest pytest-cov coveralls
       script: pytest --cov=pyDeltaRCM_WMT/
       after_success: 
         - coveralls
