@@ -2,9 +2,11 @@
 
 import pytest
 
-import os
+import sys, os
 import numpy as np
-import pyDeltaRCM
+sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+
+# import pyDeltaRCM
 from pyDeltaRCM import BmiDelta
 
 # need to create a simple case of pydeltarcm object to test these functions
