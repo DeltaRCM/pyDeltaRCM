@@ -199,21 +199,21 @@ class water_tools(shared_tools):
             current_inds[self.free_surf_flag > 0] = 0
 
     def check_for_boundary(self, inds):
-    '''
-    Check if parcel is routing out of the domain boundary.
+        '''
+        Check if parcel is routing out of the domain boundary.
 
-    Parameters
-    ----------
+        Parameters
+        ----------
 
-    inds : `list`
-        List of indices associated with water parcel locations
+        inds : `list`
+            List of indices associated with water parcel locations
 
-    Returns
-    -------
+        Returns
+        -------
 
-    inds : `list`
-        Updated indices associated with water parcel locations corrected for parcels trying to exit the domain
-    '''
+        inds : `list`
+            Updated indices associated with water parcel locations corrected for parcels trying to exit the domain
+        '''
 
         self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == 0)] = 1
 
@@ -263,7 +263,8 @@ class water_tools(shared_tools):
         return inds
 
     def free_surf(self, it):
-        '''Update the free surface after routing one water parcel.
+        '''
+        Update the free surface after routing one water parcel.
         '''
 
 
