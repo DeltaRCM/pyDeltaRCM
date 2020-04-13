@@ -17,7 +17,7 @@ from .init_tools import init_tools
 np.random.seed(0)
 
 class Tools(sed_tools, water_tools, init_tools, object):
-    
+
     #############################################
     ############# run_one_timestep ##############
     #############################################
@@ -59,7 +59,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
         self.depth[0,self.inlet] = self.h0
 
         self.H_SL = self.H_SL + self.SLR * self.dt
-    
+
     #############################################
     ############### randomization ###############
     #############################################
@@ -67,7 +67,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
     #############################################
     ############### weight arrays ###############
     #############################################
-    
+
     #############################################
     ################# updaters ##################
     #############################################
@@ -361,10 +361,12 @@ class Tools(sed_tools, water_tools, init_tools, object):
         '''
         Save a figure.
 
-        path : string
+        Parameters
+        ----------
+        path : `str`
             The path (and filename without extension) to save the figure to.
-        ext : string (default='png')
-            The file extension. This must be supported by the active
+        ext : `str`, optional
+            The file extension; default is ``png``. This must be supported by the active
             matplotlib backend (see matplotlib.backends module).  Most
             backends support 'png', 'pdf', 'ps', 'eps', and 'svg'.
         '''
@@ -386,20 +388,23 @@ class Tools(sed_tools, water_tools, init_tools, object):
     def save_grids(self, var_name, var, ts):
         '''
         Save a grid into an existing netCDF file.
-        File should already be open (by init_output_grid) as self.output_netcdf
 
-        var_name : string
+        Parameters
+        ----------
+        var_name : `str`
                 The name of the variable to be saved
-        var : object
+        var : `obj`
                 The numpy array to be saved
-        timestep : int
+        timestep : `int`
                 The current timestep (+1, so human readable)
+
+        .. note::
+
+            File should already be open (by `init_output_grid`) as `self.output_netcdf`
         '''
 
         try:
-
             self.output_netcdf.variables[var_name][ts,:,:] = var
 
         except:
             self.logger.info('Error: Cannot save grid to netCDF file.')
-    
