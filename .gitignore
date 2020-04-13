@@ -44,6 +44,7 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
+.pytest_cache
 
 # Translations
 *.mo
@@ -60,3 +61,6 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# SublimeText docs
+*.sublime-*
