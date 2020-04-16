@@ -72,7 +72,6 @@ class BmiDelta(Bmi):
         """Advance model by one time step."""
 
         self._delta.update()
-        self._delta._time += self.get_time_step()
 
     def update_frac(self, time_frac):
         """Update model by a fraction of a time step.
