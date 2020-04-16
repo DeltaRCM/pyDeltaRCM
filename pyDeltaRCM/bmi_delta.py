@@ -4,7 +4,7 @@
 import types
 
 import numpy as np
-from basic_modeling_interface import Bmi
+from bmipy import Bmi
 
 from .deltaRCM_driver import pyDeltaRCM
 
