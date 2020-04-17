@@ -1,0 +1,70 @@
+@import url("default.css"); /* make sure to sync this with the base theme's css filename */
+
+body {
+    background-color: DarkGreen;
+}
+
+a {
+    color: DarkCoral;
+    text-decoration: none;
+}
+
+a:hover {
+    color: Coral;
+}
+
+a code {
+    border: 0;
+    color: DarkCoral;
+}
+
+a code:hover {
+    color: Coral;
+}
+
+a.headerlink {
+    color: PeachPuff!important;
+    font-size: 1em;
+    margin-left: 6px;
+    padding: 0 4px 0 4px;
+    text-decoration: none!important;
+}
+
+div.related ul li a {
+    margin: 0;
+    padding: 0 5px 0 5px;
+    line-height: 1.75em;
+    color: DarkCoral;
+}
+
+div.related ul li a:hover {
+    color: Coral;
+}
+
+div.sphinxsidebar h3, div.sphinxsidebar h4 {
+    margin: 1em 0 0.5em 0;
+    font-size: 1em;
+    padding: 0.1em 0 0.1em 0.5em;
+    color: white;
+    border: 1px solid Black;
+    background-color: DarkOrange;
+}
+
+div.sphinxsidebar input {
+    border: 1px solid Black;
+}
+
+pre {
+    font-family: 'Consolas', 'Deja Vu Sans Mono',
+                 'Bitstream Vera Sans Mono', monospace;
+    font-size: 0.95em;
+    letter-spacing: 0.015em;
+    line-height: 120%;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    background-color: #eaece5;
+}
+
+pre span gp { 
+    color: red;
+ }

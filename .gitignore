@@ -64,3 +64,6 @@ target/
 
 # SublimeText docs
 *.sublime-*
+
+# temp folder
+temp/
