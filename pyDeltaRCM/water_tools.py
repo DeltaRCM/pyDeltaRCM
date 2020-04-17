@@ -26,9 +26,9 @@ from .shared_tools import shared_tools
 class water_tools(shared_tools):
 
     def update_flow_field(self, iteration):
-        '''
+        """
         Update water discharge after one water iteration
-        '''
+        """
 
         timestep = self._time
 
@@ -61,9 +61,9 @@ class water_tools(shared_tools):
         self.qw[0, self.inlet] = self.qw0
 
     def update_velocity_field(self):
-        '''
+        """
         Update the flow velocity field after one water iteration
-        '''
+        """
 
         mask = (self.depth > self.dry_depth) * (self.qw > 0)
 
@@ -76,14 +76,14 @@ class water_tools(shared_tools):
         self.uy[~mask] = 0
 
     def flooding_correction(self):
-        '''
+        """
         Flood dry cells along the shore if necessary
 
         Check the neighbors of all dry cells. If any dry cells have wet
         neighbors, check that their stage is not higher than the bed elevation
         of the center cell.
         If it is, flood the dry cell.
-        '''
+        """
 
         wet_mask = self.depth > self.dry_depth
         wet_mask_nh = self.get_wet_mask_nh()
@@ -110,10 +110,10 @@ class water_tools(shared_tools):
                 self.stage[shore_ind[0][i], shore_ind[1][i]] = max(stage_nh)
 
     def finalize_water_iteration(self, timestep, iteration):
-        '''
+        """
         Finish updating flow fields
         Clean up at end of water iteration
-        '''
+        """
 
         self.update_water(timestep, iteration)
 
@@ -242,7 +242,7 @@ class water_tools(shared_tools):
         return inds
 
     def free_surf(self, it):
-        '''calculate free surface after routing one water parcel'''
+        """calculate free surface after routing one water parcel"""
 
         Hnew = np.zeros((self.L, self.W))
 
@@ -310,8 +310,8 @@ class water_tools(shared_tools):
                     # sum of all water surface elevations
 
     def update_water(self, timestep, itr):
-        '''update surface after routing all parcels
-        could divide into 3 functions for cleanliness'''
+        """update surface after routing all parcels
+        could divide into 3 functions for cleanliness"""
 
         #####################################################################
         # update free surface
@@ -436,10 +436,10 @@ class water_tools(shared_tools):
         return new_cell
 
     def build_weight_array(self, array, fix_edges=False, normalize=False):
-        '''
+        """
         Create np.array((8,L,W)) of quantity a
         in each of the neighbors to a cell
-        '''
+        """
 
         a_shape = array.shape
 
@@ -477,10 +477,10 @@ class water_tools(shared_tools):
         return wgt_array
 
     def get_wet_mask_nh(self):
-        '''
+        """
         Returns np.array((8,L,W)), for each neighbor around a cell
         with 1 if the neighbor is wet and 0 if dry
-        '''
+        """
 
         wet_mask = (self.depth > self.dry_depth) * 1
         wet_mask_nh = self.build_weight_array(wet_mask, fix_edges=True)
@@ -489,14 +489,14 @@ class water_tools(shared_tools):
 
     def check_size_of_indices_matrix(self, it):
         if it >= self.indices.shape[1]:
-            '''
+            """
             Initial size of self.indices is half of self.itmax
             because the number of iterations doesn't go beyond
             that for many timesteps.
 
             Once it reaches it > self.itmax/2 once, make the size
             self.iter for all further timesteps
-            '''
+            """
 
             if self.verbose:
                 self.logger.info('Increasing size of self.indices')

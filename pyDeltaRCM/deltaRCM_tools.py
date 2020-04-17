@@ -32,9 +32,9 @@ class Tools(sed_tools, water_tools, init_tools, object):
     #############################################
 
     def run_one_timestep(self):
-        '''
+        """
         Run the time loop once
-        '''
+        """
 
         timestep = self._time
 
@@ -55,10 +55,10 @@ class Tools(sed_tools, water_tools, init_tools, object):
         self.sed_route()
 
     def finalize_timestep(self):
-        '''
+        """
         Clean up after sediment routing
         Update sea level if baselevel changes
-        '''
+        """
 
         self.flooding_correction()
         self.stage[:] = np.maximum(self.stage, self.H_SL)
@@ -68,22 +68,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         self.depth[0, self.inlet] = self.h0
 
         self.H_SL = self.H_SL + self.SLR * self.dt
-
-    #############################################
-    ############### randomization ###############
-    #############################################
-
-    #############################################
-    ############### weight arrays ###############
-    #############################################
-
-    #############################################
-    ################# updaters ##################
-    #############################################
-
-    #############################################
-    ############## initialization ###############
-    #############################################
 
     def get_var_name(self, long_var_name):
         return self._var_name_map[long_var_name]
@@ -139,9 +123,9 @@ class Tools(sed_tools, water_tools, init_tools, object):
             setattr(self, self.get_var_name(k), v)
 
     def expand_stratigraphy(self):
-        '''
+        """
         Expand the size of arrays that store stratigraphy data
-        '''
+        """
 
         if self.verbose:
             self.logger.info('Expanding stratigraphy arrays')
@@ -154,12 +138,12 @@ class Tools(sed_tools, water_tools, init_tools, object):
                                        format='lil')
 
     def record_stratigraphy(self):
-        '''
+        """
         Saves the sand fraction of deposited sediment
         into a sparse array created by init_stratigraphy().
 
         Only runs if save_strata is True
-        '''
+        """
 
         timestep = self._time
 
@@ -219,11 +203,11 @@ class Tools(sed_tools, water_tools, init_tools, object):
             self.strata_counter += 1
 
     def apply_subsidence(self):
-        '''
+        """
         Apply subsidence to domain if
         toggle_subsidence is True and
         start_subsidence is <= timestep
-        '''
+        """
 
         if self.toggle_subsidence:
 
@@ -235,9 +219,9 @@ class Tools(sed_tools, water_tools, init_tools, object):
                 self.eta[:] = self.eta - self.sigma
 
     def output_data(self):
-        '''
+        """
         Plots and saves figures of eta, depth, and stage
-        '''
+        """
 
         timestep = self._time
 
@@ -317,9 +301,9 @@ class Tools(sed_tools, water_tools, init_tools, object):
                 self.save_grids('velocity', self.uw, shape[0])
 
     def output_strata(self):
-        '''
+        """
         Saves the stratigraphy sparse matrices into output netcdf file
-        '''
+        """
 
         if self.save_strata:
 
@@ -372,7 +356,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
     #############################################
 
     def save_figure(self, path, ext='png', close=True):
-        '''
+        """
         Save a figure.
 
         path : string
@@ -381,7 +365,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
             The file extension. This must be supported by the active
             matplotlib backend (see matplotlib.backends module).  Most
             backends support 'png', 'pdf', 'ps', 'eps', and 'svg'.
-        '''
+        """
 
         directory = os.path.split(path)[0]
         filename = "%s.%s" % (os.path.split(path)[1], ext)
@@ -400,7 +384,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
             plt.close()
 
     def save_grids(self, var_name, var, ts):
-        '''
+        """
         Save a grid into an existing netCDF file.
         File should already be open (by init_output_grid) as self.output_netcdf
 
@@ -410,7 +394,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
                 The numpy array to be saved
         timestep : int
                 The current timestep (+1, so human readable)
-        '''
+        """
 
         try:
 

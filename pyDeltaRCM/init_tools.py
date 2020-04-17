@@ -137,8 +137,7 @@ class init_tools(object):
         self.V0 = self.h0 * (self.dx**2)    # (m^3) reference volume (volume to
         # fill cell to characteristic depth)
 
-        self.Qw0 = self.u0 * self.h0 * self.N0 * self.dx    # const discharge
-        # at inlet
+        self.Qw0 = self.u0 * self.h0 * self.N0 * self.dx    # const discharge at inlet
 
         self.qw0 = self.u0 * self.h0                # water unit input discharge
         self.Qp_water = self.Qw0 / self.Np_water    # volume each water parcel
@@ -180,12 +179,11 @@ class init_tools(object):
             self.prefix += self.case_prefix + '_'
 
     def create_domain(self):
-        '''
+        """
         Creates the model domain
-        '''
+        """
 
         ##### empty arrays #####
-
         self.x, self.y = np.meshgrid(
             np.arange(0, self.W), np.arange(0, self.L))
 
@@ -267,9 +265,9 @@ class init_tools(object):
         self.clim_eta = (-self.h0 - 1, 0.05)
 
     def init_stratigraphy(self):
-        '''
+        """
         Creates sparse array to store stratigraphy data
-        '''
+        """
 
         if self.save_strata:
 
@@ -285,12 +283,12 @@ class init_tools(object):
                                          dtype=np.float32)
 
     def init_output_grids(self):
-        '''
+        """
         Creates a netCDF file to store output grids
         Fills with default variables
 
         Overwrites an existing netcdf file with the same name
-        '''
+        """
 
         if (self.save_eta_grids or
                 self.save_depth_grids or
@@ -376,12 +374,12 @@ class init_tools(object):
                 self.logger.info('Output netCDF file created.')
 
     def init_subsidence(self):
-        '''
+        """
         Initializes patterns of subsidence if
         toggle_subsidence is True (default False)
 
         Modify the equations for self.subsidence_mask and self.sigma as desired
-        '''
+        """
 
         if self.toggle_subsidence:
 
