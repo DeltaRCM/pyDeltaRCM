@@ -18,9 +18,9 @@ delta = BmiDelta()
 
 
 def test_initialize():
-    '''
+    """
     test function BmiDelta.initialize
-    '''
+    """
     delta.initialize(os.getcwd() + '/tests/test.yaml')
     assert delta._delta.f_bedload == 0.5
 

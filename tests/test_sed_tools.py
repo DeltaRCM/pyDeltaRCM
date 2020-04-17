@@ -23,9 +23,9 @@ delta.initialize(os.getcwd() + '/tests/test.yaml')
 
 
 def test_sed_route():
-    '''
+    """
     test the function sed_tools.sed_route
-    '''
+    """
     delta._delta.pad_cell_type = np.pad(delta._delta.cell_type, 1, 'edge')
     delta._delta.sed_route()
     [a, b] = np.shape(delta._delta.pad_depth)

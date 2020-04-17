@@ -23,9 +23,9 @@ delta.initialize(os.getcwd() + '/tests/test.yaml')
 
 
 def test_get_var_name_depth():
-    '''
+    """
     test get_var_name function from deltaRCM_tools
-    '''
+    """
     assert delta._delta.get_var_name('channel__width') == 'N0_meters'
 
 

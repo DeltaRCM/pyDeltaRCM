@@ -20,9 +20,9 @@ delta.initialize(os.getcwd() + '/tests/test.yaml')
 
 
 def test_init():
-    '''
+    """
     test the deltaRCM_driver init (happened when delta.initialize was run)
-    '''
+    """
     assert delta._delta._time == 0.
 
 

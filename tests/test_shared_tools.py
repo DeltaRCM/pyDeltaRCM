@@ -23,9 +23,9 @@ delta.initialize(os.getcwd() + '/tests/test.yaml')
 
 
 def test_random_pick():
-    '''
+    """
     Test for function shared_tools.random_pick
-    '''
+    """
     # define probs array of zeros with a single 1 value
     probs = np.zeros((8,))
     probs[0] = 1
@@ -34,9 +34,9 @@ def test_random_pick():
 
 
 def test_random_pick_inlet():
-    '''
+    """
     Test for function shared_tools.random_pick_inlet
-    '''
+    """
     choices = [0]
     probs = np.ones((1,))
     assert delta._delta.random_pick_inlet(choices, probs) == 0
