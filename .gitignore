@@ -55,6 +55,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+docs/source/_autosummary/
 
 # PyBuilder
 target/
@@ -64,3 +65,6 @@ target/
 
 # SublimeText docs
 *.sublime-*
+
+# temp folder
+temp/
