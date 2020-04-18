@@ -1,9 +1,5 @@
 .. pyDeltaRCM documentation master file
 
-.. image:: https://travis-ci.com/DeltaRCM/pyDeltaRCM_WMT.svg?branch=develop
-    :target: https://travis-ci.com/DeltaRCM/pyDeltaRCM_WMT
-
-
 Welcome to the PyDeltaRCM documentation
 #########################################
 
