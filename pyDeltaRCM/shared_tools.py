@@ -42,3 +42,11 @@ class shared_tools(object):
         idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
 
         return choices[idx]
+
+
+def _get_version():
+    """
+    Extract version number from single file, and make it availabe everywhere.
+    """
+    from . import _version
+    return _version.__version__()
