@@ -1,10 +1,11 @@
-## unit tests for bmi_delta.py
+# unit tests for bmi_delta.py
 
 import pytest
 
-import sys, os
+import sys
+import os
 import numpy as np
-sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 
 from pyDeltaRCM import BmiDelta
 
@@ -15,16 +16,19 @@ np.random.seed(0)
 # use test.yaml
 delta = BmiDelta()
 
+
 def test_initialize():
-    '''
+    """
     test function BmiDelta.initialize
-    '''
+    """
     delta.initialize(os.getcwd() + '/tests/test.yaml')
     assert delta._delta.f_bedload == 0.5
+
 
 def test_update():
     delta.update()
     assert delta._delta._time == 1.0
+
 
 def test_update_frac():
     delta.update_frac(1)

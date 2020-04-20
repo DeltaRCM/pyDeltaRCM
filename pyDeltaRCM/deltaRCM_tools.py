@@ -1,36 +1,42 @@
 #! /usr/bin/env python
+
+import sys
+import os
+import re
+import string
+import logging
+import time
+
 from math import floor, sqrt, pi
 import numpy as np
 from random import shuffle
+
 import matplotlib
 from matplotlib import pyplot as plt
-from scipy import ndimage
-import sys, os, re, string
-from netCDF4 import Dataset
-import time as time_lib
+
 from scipy.sparse import lil_matrix, csc_matrix, hstack
-import logging
-import time
+from scipy import ndimage
+
+from netCDF4 import Dataset
+
 from .sed_tools import sed_tools
 from .water_tools import water_tools
 from .init_tools import init_tools
+
 np.random.seed(0)
 
+
 class Tools(sed_tools, water_tools, init_tools, object):
-    
-    #############################################
-    ############# run_one_timestep ##############
-    #############################################
 
     def run_one_timestep(self):
-        '''
+        """
         Run the time loop once
-        '''
+        """
 
         timestep = self._time
 
         if self.verbose:
-            print('-'*20)
+            print('-' * 20)
             print('Time = ' + str(self._time))
 
         for iteration in range(self.itermax):
@@ -41,57 +47,41 @@ class Tools(sed_tools, water_tools, init_tools, object):
             self.run_water_iteration()
 
             self.free_surf(iteration)
-            self.finalize_water_iteration(timestep,iteration)
+            self.finalize_water_iteration(timestep, iteration)
 
         self.sed_route()
 
     def finalize_timestep(self):
-        '''
+        """
         Clean up after sediment routing
         Update sea level if baselevel changes
-        '''
+        """
 
         self.flooding_correction()
         self.stage[:] = np.maximum(self.stage, self.H_SL)
         self.depth[:] = np.maximum(self.stage - self.eta, 0)
 
-        self.eta[0,self.inlet] = self.stage[0, self.inlet] - self.h0
-        self.depth[0,self.inlet] = self.h0
+        self.eta[0, self.inlet] = self.stage[0, self.inlet] - self.h0
+        self.depth[0, self.inlet] = self.h0
 
         self.H_SL = self.H_SL + self.SLR * self.dt
-    
-    #############################################
-    ############### randomization ###############
-    #############################################
-
-    #############################################
-    ############### weight arrays ###############
-    #############################################
-    
-    #############################################
-    ################# updaters ##################
-    #############################################
-
-    #############################################
-    ############## initialization ###############
-    #############################################
 
     def get_var_name(self, long_var_name):
-        return self._var_name_map[ long_var_name ]
+        return self._var_name_map[long_var_name]
 
     def import_file(self):
 
         self.input_file_vars = dict()
         numvars = 0
 
-        o = open(self.input_file, mode = 'r')
+        o = open(self.input_file, mode='r')
 
         for line in o:
-            line = re.sub('\s$','',line)
-            line = re.sub('\A[: :]*','',line)
+            line = re.sub('\s$', '', line)
+            line = re.sub('\A[: :]*', '', line)
             ln = re.split('\s*[\:\=]\s*', line)
 
-            if len(ln)>1:
+            if len(ln) > 1:
 
                 ln[0] = str.lower(ln[0])
 
@@ -101,7 +91,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
                     var_type = self._var_type_map[ln[0]]
 
-                    ln[1] = re.sub('[: :]+$','',ln[1])
+                    ln[1] = re.sub('[: :]+$', '', ln[1])
 
                     if var_type == 'string':
                         self.input_file_vars[str(ln[0])] = str(ln[1])
@@ -118,7 +108,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
                         elif ln[1] == 'no' or ln[1] == 'false':
                             self.input_file_vars[str(ln[0])] = False
                         else:
-                            print("Alert! Options for 'choice' type variables "\
+                            print("Alert! Options for 'choice' type variables "
                                   "are only Yes/No or True/False.\n")
 
                 else:
@@ -126,32 +116,31 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         o.close()
 
-        for k,v in list(self.input_file_vars.items()):
+        for k, v in list(self.input_file_vars.items()):
             setattr(self, self.get_var_name(k), v)
 
-
     def expand_stratigraphy(self):
-        '''
+        """
         Expand the size of arrays that store stratigraphy data
-        '''
+        """
 
-        if self.verbose: self.logger.info('Expanding stratigraphy arrays')
+        if self.verbose:
+            self.logger.info('Expanding stratigraphy arrays')
 
         lil_blank = lil_matrix((self.L * self.W, self.n_steps),
-                                dtype=np.float32)
+                               dtype=np.float32)
 
         self.strata_eta = hstack([self.strata_eta, lil_blank], format='lil')
         self.strata_sand_frac = hstack([self.strata_sand_frac, lil_blank],
-                                        format='lil')
-
+                                       format='lil')
 
     def record_stratigraphy(self):
-        '''
+        """
         Saves the sand fraction of deposited sediment
         into a sparse array created by init_stratigraphy().
 
         Only runs if save_strata is True
-        '''
+        """
 
         timestep = self._time
 
@@ -165,32 +154,32 @@ class Tools(sed_tools, water_tools, init_tools, object):
             if self.verbose:
                 self.logger.info('Storing stratigraphy data')
 
-            ################### sand frac ###################
+            # ------------------ sand frac ------------------
             # -1 for cells with deposition volumes < vol_limit
-            # vol_limit for any mud (to diff from no deposition in sparse array)
+            # vol_limit for any mud (to diff from no deposition in sparse
+            #   array)
             # (overwritten if any sand deposited)
 
             sand_frac = -1 * np.ones((self.L, self.W))
 
-            vol_limit = 0.000001 # threshold deposition volume
+            vol_limit = 0.000001  # threshold deposition volume
             sand_frac[self.Vp_dep_mud > vol_limit] = vol_limit
 
             sand_loc = self.Vp_dep_sand > 0
             sand_frac[sand_loc] = (self.Vp_dep_sand[sand_loc] /
-                                  (self.Vp_dep_mud[sand_loc] +
-                                  self.Vp_dep_sand[sand_loc]))
+                                   (self.Vp_dep_mud[sand_loc] +
+                                    self.Vp_dep_sand[sand_loc]))
             # store indices and sand_frac into a sparse array
             row_s = np.where(sand_frac.flatten() >= 0)[0]
             col_s = np.zeros((len(row_s),))
             data_s = sand_frac[sand_frac >= 0]
 
             sand_sparse = csc_matrix((data_s, (row_s, col_s)),
-                                      shape=(self.L * self.W, 1))
+                                     shape=(self.L * self.W, 1))
             # store sand_sparse into strata_sand_frac
-            self.strata_sand_frac[:,self.strata_counter] = sand_sparse
+            self.strata_sand_frac[:, self.strata_counter] = sand_sparse
 
-            ################### eta ###################
-
+            # ------------------ eta ------------------
             diff_eta = self.eta - self.init_eta
 
             row_s = np.where(diff_eta.flatten() != 0)[0]
@@ -199,22 +188,23 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
             eta_sparse = csc_matrix((data_s, (row_s, col_s)),
                                     shape=(self.L * self.W, 1))
-            self.strata_eta[:,self.strata_counter] = eta_sparse
+            self.strata_eta[:, self.strata_counter] = eta_sparse
 
             if self.toggle_subsidence and self.start_subsidence <= timestep:
 
-                sigma_change = (self.strata_eta[:,:self.strata_counter] -
-                                self.sigma.flatten()[:,np.newaxis])
-                self.strata_eta[:,:self.strata_counter] = lil_matrix(sigma_change)
+                sigma_change = (self.strata_eta[:, :self.strata_counter] -
+                                self.sigma.flatten()[:, np.newaxis])
+                self.strata_eta[:, :self.strata_counter] = lil_matrix(
+                    sigma_change)
 
             self.strata_counter += 1
 
     def apply_subsidence(self):
-        '''
-        Apply subsidence to domain if
-        toggle_subsidence is True and
+        """Apply subsidence.
+
+        Apply subsidence to domain if toggle_subsidence is True and
         start_subsidence is <= timestep
-        '''
+        """
 
         if self.toggle_subsidence:
 
@@ -226,26 +216,26 @@ class Tools(sed_tools, water_tools, init_tools, object):
                 self.eta[:] = self.eta - self.sigma
 
     def output_data(self):
-        '''
+        """
         Plots and saves figures of eta, depth, and stage
-        '''
+        """
 
         timestep = self._time
 
         if timestep % self.save_dt == 0:
 
             if (self.save_eta_grids or
-            self.save_depth_grids or
-            self.save_stage_grids or
-            self.save_discharge_grids or
-            self.save_velocity_grids or
-            self.save_strata):
+                    self.save_depth_grids or
+                    self.save_stage_grids or
+                    self.save_discharge_grids or
+                    self.save_velocity_grids or
+                    self.save_strata):
 
                 timestep = self._time
                 shape = self.output_netcdf.variables['time'].shape
                 self.output_netcdf.variables['time'][shape[0]] = timestep
 
-            ############ FIGURES #############
+            # ------------------ Figures ------------------
             if self.save_eta_figs:
 
                 plt.pcolor(self.eta)
@@ -281,31 +271,36 @@ class Tools(sed_tools, water_tools, init_tools, object):
                 plt.axis('equal')
                 self.save_figure(self.prefix + "velocity_" + str(timestep))
 
-            ############ GRIDS #############
+            # ------------------ grids ------------------
             if self.save_eta_grids:
-                if self.verbose: self.logger.info('Saving grid: eta')
+                if self.verbose:
+                    self.logger.info('Saving grid: eta')
                 self.save_grids('eta', self.eta, shape[0])
 
             if self.save_depth_grids:
-                if self.verbose: self.logger.info('Saving grid: depth')
+                if self.verbose:
+                    self.logger.info('Saving grid: depth')
                 self.save_grids('depth', self.depth, shape[0])
 
             if self.save_stage_grids:
-                if self.verbose: self.logger.info('Saving grid: stage')
+                if self.verbose:
+                    self.logger.info('Saving grid: stage')
                 self.save_grids('stage', self.stage, shape[0])
 
             if self.save_discharge_grids:
-                if self.verbose: self.logger.info('Saving grid: discharge')
+                if self.verbose:
+                    self.logger.info('Saving grid: discharge')
                 self.save_grids('discharge', self.qw, shape[0])
 
             if self.save_velocity_grids:
-                if self.verbose: self.logger.info('Saving grid: velocity')
+                if self.verbose:
+                    self.logger.info('Saving grid: velocity')
                 self.save_grids('velocity', self.uw, shape[0])
 
     def output_strata(self):
-        '''
+        """
         Saves the stratigraphy sparse matrices into output netcdf file
-        '''
+        """
 
         if self.save_strata:
 
@@ -317,61 +312,60 @@ class Tools(sed_tools, water_tools, init_tools, object):
             shape = self.strata_eta.shape
 
             total_strata_age = self.output_netcdf.createDimension(
-                                                            'total_strata_age',
-                                                             shape[1])
+                'total_strata_age',
+                shape[1])
 
             strata_age = self.output_netcdf.createVariable('strata_age',
-                                                        np.int32,
-                                                        ('total_strata_age'))
+                                                           np.int32,
+                                                           ('total_strata_age'))
             strata_age.units = 'timesteps'
-            self.output_netcdf.variables['strata_age'][:] = list(range(shape[1]-1,-1, -1))
+            self.output_netcdf.variables['strata_age'][
+                :] = list(range(shape[1] - 1, -1, -1))
 
             sand_frac = self.output_netcdf.createVariable('strata_sand_frac',
-                                         np.float32,
-                                        ('total_strata_age','length','width'))
+                                                          np.float32,
+                                                          ('total_strata_age', 'length', 'width'))
             sand_frac.units = 'fraction'
 
             strata_elev = self.output_netcdf.createVariable('strata_depth',
-                                           np.float32,
-                                          ('total_strata_age','length','width'))
+                                                            np.float32,
+                                                            ('total_strata_age', 'length', 'width'))
             strata_elev.units = 'meters'
 
             for i in range(shape[1]):
 
-                sf = self.strata_sand_frac[:,i].toarray()
+                sf = self.strata_sand_frac[:, i].toarray()
                 sf = sf.reshape(self.eta.shape)
                 sf[sf == 0] = -1
 
-                self.output_netcdf.variables['strata_sand_frac'][i,:,:] = sf
+                self.output_netcdf.variables['strata_sand_frac'][i, :, :] = sf
 
-                sz = self.strata_eta[:,i].toarray().reshape(self.eta.shape)
+                sz = self.strata_eta[:, i].toarray().reshape(self.eta.shape)
                 sz[sz == 0] = self.init_eta[sz == 0]
 
-                self.output_netcdf.variables['strata_depth'][i,:,:] = sz
-
+                self.output_netcdf.variables['strata_depth'][i, :, :] = sz
 
             if self.verbose:
                 self.logger.info('Stratigraphy data saved.')
 
-    #############################################
-    ################## output ###################
-    #############################################
-
     def save_figure(self, path, ext='png', close=True):
-        '''
-        Save a figure.
+        """Save a figure.
 
-        path : string
+        Parameters
+        ----------
+        path : `str`
             The path (and filename without extension) to save the figure to.
-        ext : string (default='png')
-            The file extension. This must be supported by the active
-            matplotlib backend (see matplotlib.backends module).  Most
+
+        ext : `str`, optional
+            The file extension (default='png'). This must be supported by the
+            active matplotlib backend (see matplotlib.backends module). Most
             backends support 'png', 'pdf', 'ps', 'eps', and 'svg'.
-        '''
+        """
 
         directory = os.path.split(path)[0]
         filename = "%s.%s" % (os.path.split(path)[1], ext)
-        if directory == '': directory = '.'
+        if directory == '':
+            directory = '.'
 
         if not os.path.exists(directory):
             if self.verbose:
@@ -381,25 +375,27 @@ class Tools(sed_tools, water_tools, init_tools, object):
         savepath = os.path.join(directory, filename)
         plt.savefig(savepath)
 
-        if close: plt.close()
+        if close:
+            plt.close()
 
     def save_grids(self, var_name, var, ts):
-        '''
-        Save a grid into an existing netCDF file.
+        """Save a grid into an existing netCDF file.
+
         File should already be open (by init_output_grid) as self.output_netcdf
 
-        var_name : string
-                The name of the variable to be saved
-        var : object
-                The numpy array to be saved
-        timestep : int
-                The current timestep (+1, so human readable)
-        '''
+        Parameters
+        ----------
+        var_name : `str`
+            The name of the variable to be saved
+
+        var : `ndarray`
+            The numpy array to be saved.
+
+        ts : `int`
+            The current timestep (+1, so human readable)
+        """
 
         try:
-
-            self.output_netcdf.variables[var_name][ts,:,:] = var
-
+            self.output_netcdf.variables[var_name][ts, :, :] = var
         except:
             self.logger.info('Error: Cannot save grid to netCDF file.')
-    
