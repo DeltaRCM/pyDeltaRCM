@@ -1,10 +1,11 @@
-## unit tests for shared_tools.py
+# unit tests for shared_tools.py
 
 import pytest
 
-import sys, os
+import sys
+import os
 import numpy as np
-sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 
 from pyDeltaRCM import BmiDelta
 from pyDeltaRCM import shared_tools
@@ -20,20 +21,22 @@ delta.initialize(os.getcwd() + '/tests/test.yaml')
 # now that it is initiated can access the shared_tools via the inherited object
 # delta._delta.**shared_tools_function**
 
+
 def test_random_pick():
-    '''
+    """
     Test for function shared_tools.random_pick
-    '''
+    """
     # define probs array of zeros with a single 1 value
     probs = np.zeros((8,))
     probs[0] = 1
     # should return first index
     assert delta._delta.random_pick(probs) == 0
 
+
 def test_random_pick_inlet():
-    '''
+    """
     Test for function shared_tools.random_pick_inlet
-    '''
+    """
     choices = [0]
     probs = np.ones((1,))
-    assert delta._delta.random_pick_inlet(choices,probs) == 0
+    assert delta._delta.random_pick_inlet(choices, probs) == 0
