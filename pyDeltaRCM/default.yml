@@ -1,11 +1,11 @@
 site_prefix:
-  type: 'string'
+  type: 'str'
   default: ''
 case_prefix:
-  type: 'string'
+  type: 'str'
   default: ''
 out_dir:
-  type: 'string'
+  type: 'str'
   default: 'deltaRCM_Output'
 Length:
   type: 'float'
