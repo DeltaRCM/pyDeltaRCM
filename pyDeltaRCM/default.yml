@@ -1,0 +1,138 @@
+site_prefix:
+  type: 'string'
+  default: ''
+case_prefix:
+  type: 'string'
+  default: ''
+out_dir:
+  type: 'string'
+  default: 'deltaRCM_Output'
+Length:
+  type: 'float'
+  default: 1000.
+Width:
+  type: 'float'
+  default: 2000.
+dx:
+  type: 'float'
+  default: 50.
+L0_meters:
+  type: 'float'
+  default: 150.0
+S0:
+  type: 'float'
+  default: 0.0002
+itermax:
+  type: 'int'
+  default: 1
+Np_water:
+  type: 'int'
+  default: 2000
+u0:
+  type: 'float'
+  default: 1.0
+N0_meters:
+  type: 'float'
+  default: 200.0
+h0:
+  type: 'float'
+  default: 5.0
+H_SL:
+  type: 'float'
+  default: 0.0
+SLR:
+  type: 'float'
+  default: 0.0
+Np_sed:
+  type: 'int'
+  default: 1000
+f_bedload:
+  type: 'float'
+  default: 0.5
+C0_percent:
+  type: 'float'
+  default: 0.1
+Csmooth:
+  type: 'float'
+  default: 0.9
+toggle_subsidence:
+  type: 'bool'
+  default: False
+sigma_max:
+  type: 'float'
+  default: 0.000825
+start_subsidence:
+  type: 'float'
+  default: 2.5
+save_eta_figs:
+  type: 'bool'
+  default: False
+save_stage_figs:
+  type: 'bool'
+  default: False
+save_depth_figs:
+  type: 'bool'
+  default: False
+save_discharge_figs:
+  type: 'bool'
+  default: True
+save_velocity_figs:
+  type: 'bool'
+  default: True
+save_eta_grids:
+  type: 'bool'
+  default: False
+save_stage_grids:
+  type: 'bool'
+  default: False
+save_depth_grids:
+  type: 'bool'
+  default: False
+save_discharge_grids:
+  type: 'bool'
+  default: True
+save_velocity_grids:
+  type: 'bool'
+  default: True
+save_dt:
+  type: 'float'
+  default: 50
+save_strata:
+  type: 'bool'
+  default: True
+omega_sfc:
+  type: 'float'
+  default: 0.1
+omega_flow:
+  type: 'float'
+  default: 0.9
+Nsmooth:
+  type: 'float'
+  default: 5
+theta_water:
+  type: 'float'
+  default: 1.0
+coeff_theta_sand:
+  type: 'float'
+  default: 2.0
+coeff_theta_mud:
+  type: 'float'
+  default: 1.0
+beta:
+  type: 'float'
+  default: 3.0
+sed_lag:
+  type: 'float'
+  default: 1.0
+coeff_U_dep_mud:
+  type: 'float'
+  default: 0.3
+coeff_U_ero_mud:
+  type: 'float'
+  default: 1.5
+coeff_U_ero_sand:
+  type: 'float'
+  default: 1.05
+alpha:
+  type: 'float'
+  default: 0.1
