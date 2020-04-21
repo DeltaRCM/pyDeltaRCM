@@ -3,6 +3,7 @@ import warnings
 import logging
 from .deltaRCM_tools import Tools
 import datetime
+import os
 
 class pyDeltaRCM(Tools):
 
@@ -10,7 +11,7 @@ class pyDeltaRCM(Tools):
     ################## __init__ #################
     #############################################
 
-    def __init__(self, input_file):
+    def __init__(self, **kwargs):
         '''
         Creates an instance of the model
 
@@ -22,11 +23,11 @@ class pyDeltaRCM(Tools):
         self._time_step = 1.
 
         self.verbose = False
-        self.input_file = input_file
+        if 'input_file' in kwargs:
+            self.input_file = kwargs.pop('input_file')
+        self.default_file = os.path.join(os.getcwd(), 'pyDeltaRCM', 'default.yml')
 
-        self.create_dicts()
-        self.set_defaults()
-        self.import_file()
+        self.import_files()
 
         self.create_other_variables()
 
