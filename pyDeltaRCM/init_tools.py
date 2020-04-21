@@ -14,6 +14,7 @@ import time as time_lib
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
 import time
+import yaml
 
 class init_tools(object):
 
@@ -38,18 +39,30 @@ class init_tools(object):
 
         for k,v in list(self._var_default_map.items()):
             setattr(self, self._var_name_map[k], v)
+    def import_files(self):
 
-    def import_file(self):
 
         self.input_file_vars = dict()
         numvars = 0
 
         o = open(self.input_file, mode = 'r')
+        # Open and access both yaml files --> put in dictionaries
+        # only access the user input file if provided.
 
         for line in o:
             line = re.sub('\s$','',line)
             line = re.sub('\A[: :]*','',line)
             ln = re.split('\s*[\:\=]\s*', line)
+        default_file = open(self.default_file, mode = 'r')
+        default_dict = yaml.load(default_file, Loader = yaml.FullLoader)
+        default_file.close()
+        if hasattr(self, 'input_file') and os.path.exists(self.input_file):
+            user_file = open(self.input_file, mode = 'r')
+            user_dict = yaml.load(user_file, Loader = yaml.FullLoader)
+            user_file.close()
+        else:
+            print('The specified input file could not be found. Using default values...')
+            user_dict = dict()
 
             if len(ln)>1:
 
