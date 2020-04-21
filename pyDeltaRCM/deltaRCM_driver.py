@@ -74,6 +74,10 @@ class pyDeltaRCM(Tools):
         except:
             pass
 
+    #############################################
+    ############# define properties #############
+    #############################################
+
     @property
     def time_step(self):
         """The time step."""
