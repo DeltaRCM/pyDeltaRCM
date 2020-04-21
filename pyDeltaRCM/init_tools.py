@@ -35,24 +35,17 @@ class init_tools(object):
             # add handler to logger object
             self.logger.addHandler(fh)
 
-    def set_defaults(self):
 
-        for k,v in list(self._var_default_map.items()):
-            setattr(self, self._var_name_map[k], v)
     def import_files(self):
 
+        # This dictionary serves as a container to hold values for both the
+        # user-specified file and the internal defaults.
 
-        self.input_file_vars = dict()
-        numvars = 0
+        input_file_vars = dict()
 
-        o = open(self.input_file, mode = 'r')
         # Open and access both yaml files --> put in dictionaries
         # only access the user input file if provided.
 
-        for line in o:
-            line = re.sub('\s$','',line)
-            line = re.sub('\A[: :]*','',line)
-            ln = re.split('\s*[\:\=]\s*', line)
         default_file = open(self.default_file, mode = 'r')
         default_dict = yaml.load(default_file, Loader = yaml.FullLoader)
         default_file.close()
@@ -64,56 +57,20 @@ class init_tools(object):
             print('The specified input file could not be found. Using default values...')
             user_dict = dict()
 
-            if len(ln)>1:
+        # go through and populate input vars with user and default values,
+        # checking user values for correct type.
 
-                ln[0] = str.lower(ln[0])
+        for oo in default_dict.keys():
+            the_type = eval(default_dict[oo]['type'])
+            if oo in user_dict and isinstance(user_dict[oo], the_type):
+                input_file_vars[oo] = user_dict[oo]
+            else:
+                input_file_vars[oo] = default_dict[oo]['default']
 
-                if ln[0] in self._input_var_names:
+        # now make each one an attribute of the model object.
 
-                    numvars += 1
-
-                    var_type = self._var_type_map[ln[0]]
-
-                    ln[1] = re.sub('[: :]+$','',ln[1])
-
-                    if var_type == 'string':
-                        self.input_file_vars[str(ln[0])] = str(ln[1])
-                    if var_type == 'float':
-                        self.input_file_vars[str(ln[0])] = float(ln[1])
-                    if var_type == 'long':
-                        self.input_file_vars[str(ln[0])] = int(ln[1])
-                    if var_type == 'choice':
-
-                        ln[1] = str.lower(ln[1])
-
-                        if ln[1] == 'yes' or ln[1] == 'true':
-                            self.input_file_vars[str(ln[0])] = True
-                        elif ln[1] == 'no' or ln[1] == 'false':
-                            self.input_file_vars[str(ln[0])] = False
-                        else:
-                            print("Alert! Options for 'choice' type variables "\
-                                  "are only Yes/No or True/False.\n")
-
-                else:
-                    print("Alert! The input file contains an unknown entry.")
-
-        o.close()
-
-        for k,v in list(self.input_file_vars.items()):
-            setattr(self, self.get_var_name(k), v)
-
-    def create_dicts(self):
-
-        self._input_var_names = list(self._input_vars.keys())
-
-        self._var_type_map = dict()
-        self._var_name_map = dict()
-        self._var_default_map = dict()
-
-        for k in list(self._input_vars.keys()):
-            self._var_type_map[k] = self._input_vars[k]['type']
-            self._var_name_map[k] = self._input_vars[k]['name']
-            self._var_default_map[k] = self._input_vars[k]['default']
+        for k, v in list(input_file_vars.items()):
+            setattr(self, k, v)
 
     def set_constants(self):
 
