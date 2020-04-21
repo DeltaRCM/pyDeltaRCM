@@ -64,6 +64,10 @@ class init_tools(object):
             the_type = eval(default_dict[oo]['type'])
             if oo in user_dict and isinstance(user_dict[oo], the_type):
                 input_file_vars[oo] = user_dict[oo]
+            elif oo in user_dict and not isinstance(user_dict[oo], the_type):
+                print('Input for ' + oo + ' not of the right type. ' + \
+                oo + ' needs to be of type ' + str(the_type))
+                input_file_vars[oo] = default_dict[oo]['default']
             else:
                 input_file_vars[oo] = default_dict[oo]['default']
 
