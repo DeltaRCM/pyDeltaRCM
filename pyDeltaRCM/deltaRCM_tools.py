@@ -76,9 +76,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
     ############## initialization ###############
     #############################################
 
-    def get_var_name(self, long_var_name):
-        return self._var_name_map[ long_var_name ]
-
     def expand_stratigraphy(self):
         '''
         Expand the size of arrays that store stratigraphy data
