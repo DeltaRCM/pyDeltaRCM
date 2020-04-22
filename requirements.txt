@@ -3,4 +3,4 @@ matplotlib
 scipy
 netCDF4
 basic_modeling_interface
-yaml
+pyyaml
