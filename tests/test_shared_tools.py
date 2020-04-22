@@ -14,7 +14,7 @@ from pyDeltaRCM import shared_tools
 np.random.seed(0)
 
 # use test.yaml to create a small test case
-delta = pyDeltaRCM(input_file = os.path.join(os.getcwd(), 'tests', 'test_separated.yaml'))
+delta = pyDeltaRCM(input_file = os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 
 # now that it is initiated can access the shared_tools via the inherited object
 # delta._delta.**shared_tools_function**
