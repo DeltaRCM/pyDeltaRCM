@@ -12,22 +12,31 @@ class pyDeltaRCM(Tools):
     ################## __init__ #################
     #############################################
 
-    def __init__(self, **kwargs):
+    def __init__(self, input_file=None):
         """Creates an instance of the pyDeltaRCM model.
 
         This method handles setting up the run, including parsing input files,
         initializing arrays, and initializing output routines.
 
+        Parameters
+        ----------
+        input_file : `str`, `os.PathLike`, optional
+            User model run configuration file.
+
+        Notes
+        -----
         For more information regarding input configuration files, see the
-        :doc:`../../guides/userguide`. """
+        :doc:`../../guides/userguide`. 
+
+        """
 
         self._time = 0.
         self._time_step = 1.
 
         self.verbose = False
-        if 'input_file' in kwargs:
-            self.input_file = kwargs.pop('input_file')
-        self.default_file = os.path.join(os.getcwd(), 'pyDeltaRCM', 'default.yml')
+        self.input_file = input_file
+        self.default_file = os.path.join(
+            os.getcwd(), 'pyDeltaRCM', 'default.yml')
 
         self.import_files()
 

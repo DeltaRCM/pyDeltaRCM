@@ -55,7 +55,7 @@ class init_tools(object):
         default_file = open(self.default_file, mode='r')
         default_dict = yaml.load(default_file, Loader=yaml.FullLoader)
         default_file.close()
-        if hasattr(self, 'input_file'): # and os.path.exists(self.input_file):
+        if self.input_file: # and os.path.exists(self.input_file):
             try:
                 user_file = open(self.input_file, mode='r')
                 user_dict = yaml.load(user_file, Loader=yaml.FullLoader)
