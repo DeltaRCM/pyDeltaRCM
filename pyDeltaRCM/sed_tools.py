@@ -25,7 +25,7 @@ from .shared_tools import shared_tools
 class sed_tools(shared_tools):
 
     def sed_route(self):
-        '''route all sediment'''
+        """route all sediment"""
 
         self.pad_depth = np.pad(self.depth, 1, 'edge')
 
@@ -39,7 +39,7 @@ class sed_tools(shared_tools):
         self.topo_diffusion()
 
     def deposit(self, Vp_dep, px, py):
-        '''deposit sand or mud'''
+        """deposit sand or mud"""
 
         eta_change_loc = Vp_dep / self.dx**2
 
@@ -61,9 +61,9 @@ class sed_tools(shared_tools):
         # update amount of sediment left in parcel
 
     def erode(self, Vp_ero, px, py):
-        '''erode sand or mud
+        """erode sand or mud
         total sediment mass is preserved but individual categories
-        of sand and mud are not'''
+        of sand and mud are not"""
 
         eta_change_loc = -Vp_ero / (self.dx**2)
 
@@ -84,7 +84,7 @@ class sed_tools(shared_tools):
         self.Vp_res = self.Vp_res + Vp_ero
 
     def update_u(self, px, py):
-        '''update velocities after erosion or deposition'''
+        """update velocities after erosion or deposition"""
 
         if self.qw[px, py] > 0:
 
@@ -98,7 +98,7 @@ class sed_tools(shared_tools):
             self.uy[px, py] = 0
 
     def sand_dep_ero(self, px, py):
-        '''decide if erode or deposit sand'''
+        """decide if erode or deposit sand"""
 
         U_loc = self.uw[px, py]
 
@@ -136,7 +136,7 @@ class sed_tools(shared_tools):
         self.Vp_dep_sand[px, py] = self.Vp_dep_sand[px, py] + Vp_dep
 
     def mud_dep_ero(self, px, py):
-        '''decide if deposit or erode mud'''
+        """decide if deposit or erode mud"""
 
         U_loc = self.uw[px, py]
 
@@ -172,7 +172,7 @@ class sed_tools(shared_tools):
         self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_dep
 
     def sed_parcel(self, theta_sed, sed, px, py):
-        '''route one sediment parcel'''
+        """route one sediment parcel"""
 
         it = 0
         sed_continue = 1
@@ -235,7 +235,7 @@ class sed_tools(shared_tools):
                 sed_continue = 0
 
     def sand_route(self):
-        '''route sand parcels; topo diffusion'''
+        """route sand parcels; topo diffusion"""
 
         theta_sed = self.theta_sand
 
@@ -257,9 +257,9 @@ class sed_tools(shared_tools):
 
 #         self.topo_diffusion()
     def topo_diffusion(self):
-        '''
+        """
         Diffuse topography after routing all coarse sediment parcels
-        '''
+        """
 
         for crossdiff in range(self.N_crossdiff):
 
@@ -277,7 +277,7 @@ class sed_tools(shared_tools):
             self.eta += self.cf
 
     def mud_route(self):
-        '''route mud parcels'''
+        """route mud parcels"""
 
         theta_sed = self.theta_mud
 
