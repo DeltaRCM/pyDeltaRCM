@@ -8,10 +8,6 @@ import os
 
 class pyDeltaRCM(Tools):
 
-    #############################################
-    ################## __init__ #################
-    #############################################
-
     def __init__(self, **kwargs):
         """
         Creates an instance of the model
@@ -41,10 +37,6 @@ class pyDeltaRCM(Tools):
         self.init_stratigraphy()
         self.init_output_grids()
 
-    #############################################
-    ################### update ##################
-    #############################################
-
     def update(self):
         """
         Run the model for one full instance
@@ -60,10 +52,6 @@ class pyDeltaRCM(Tools):
 
         self._time += self.time_step
 
-    #############################################
-    ################## finalize #################
-    #############################################
-
     def finalize(self):
 
         self.output_strata()
@@ -72,12 +60,10 @@ class pyDeltaRCM(Tools):
             self.output_netcdf.close()
             if self.verbose:
                 print('Closed output netcdf file.')
-        except:
+        except Exception:
             pass
 
-    #############################################
-    ############# define properties #############
-    #############################################
+    # define properties
 
     @property
     def time_step(self):
