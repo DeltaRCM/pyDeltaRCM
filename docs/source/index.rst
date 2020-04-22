@@ -18,8 +18,8 @@ User documentation
 .. toctree::
    :maxdepth: 2
 
-   reference/getting_started
-   reference/userguide
+   guides/getting_started
+   guides/userguide
    
 
 Developer documentation
@@ -28,5 +28,5 @@ Developer documentation
 .. toctree::
    :maxdepth: 2
    
-   reference/devguide
+   guides/devguide
    reference/index

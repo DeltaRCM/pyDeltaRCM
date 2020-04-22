@@ -18,7 +18,7 @@ f_bedload: 0.5
 C0_percent: 0.1
 toggle_subsidence: False
 sigma_max: 0.0
-start_subsidence: 50
+start_subsidence: 50.
 save_eta_figs: False
 save_stage_figs: False
 save_depth_figs: False
@@ -29,5 +29,5 @@ save_stage_grids: False
 save_depth_grids: False
 save_discharge_grids: False
 save_velocity_grids: False
-save_dt: 50
+save_dt: 50.
 save_strata: False
