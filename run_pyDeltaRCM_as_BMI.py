@@ -4,7 +4,7 @@ if __name__ == '__main__':
 
     delta = BmiDelta()
 
-    delta.initialize('deltaRCM.yaml')
+    delta.initialize('tests/test_bmi.yaml')
 
     delta.update_until(1000)
 
