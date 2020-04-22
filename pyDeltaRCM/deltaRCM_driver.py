@@ -13,13 +13,13 @@ class pyDeltaRCM(Tools):
     #############################################
 
     def __init__(self, **kwargs):
-        """
-        Creates an instance of the model
+        """Creates an instance of the pyDeltaRCM model.
 
-        Sets the most commonly changed variables here
-        Calls functions to set the rest and create the domain (for cleanliness)
-        See the :doc:`../userguide` guide for help on how to set up your `yaml` file correctly.
-        """
+        This method handles setting up the run, including parsing input files,
+        initializing arrays, and initializing output routines.
+
+        For more information regarding input configuration files, see the
+        :doc:`../../guides/userguide`. """
 
         self._time = 0.
         self._time_step = 1.
