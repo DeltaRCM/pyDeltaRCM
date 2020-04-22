@@ -1,6 +1,4 @@
 #! /usr/bin/env python
-"""Basic Model Interface implementation for pyDeltaRCM."""
-
 import yaml
 
 import numpy as np
@@ -8,6 +6,9 @@ import os
 from basic_modeling_interface import Bmi
 
 from .deltaRCM_driver import pyDeltaRCM
+
+"""Basic Model Interface implementation for pyDeltaRCM."""
+
 
 class BmiDelta(Bmi):
 
@@ -21,13 +22,13 @@ class BmiDelta(Bmi):
         'channel_exit_water_sediment~suspended__mass_concentration',
         'sea_water_surface__rate_change_elevation',
         'sea_water_surface__mean_elevation',
-         )
-
+    )
+    
     _output_var_names = (
         'sea_water_surface__elevation',
         'sea_water__depth',
         'sea_bottom_surface__elevation',
-        )
+    )
 
     _input_vars = {
         'model_output__site_prefix': {'name':'site_prefix',
@@ -124,6 +125,7 @@ class BmiDelta(Bmi):
             'type': 'bool', 'default': False}
         }
 
+
     def __init__(self):
         """Create a BmiDelta model that is ready for initialization."""
         self._delta = None
@@ -133,6 +135,7 @@ class BmiDelta(Bmi):
         self._grid_type = {}
 
     def initialize(self, filename = 'deltaRCM.yaml'):
+    
         """Initialize the model.
 
         Parameters
@@ -187,7 +190,7 @@ class BmiDelta(Bmi):
             'sea_water_surface__elevation': self._delta.stage,
             'sea_water__depth': self._delta.depth,
             'sea_bottom_surface__elevation': self._delta.eta,
-            }
+        }
 
         self._var_units = {
             'channel_exit_water_flow__speed': 'm s-1',
@@ -200,7 +203,7 @@ class BmiDelta(Bmi):
             'sea_water_surface__elevation': 'm',
             'sea_water__depth': 'm',
             'sea_bottom_surface__elevation': 'm',
-            }
+        }
 
         self._grids = {
             0: ['sea_water_surface__elevation'],

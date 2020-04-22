@@ -1,10 +1,11 @@
-## unit tests for sed_tools.py
+# unit tests for sed_tools.py
 
 import pytest
 
-import sys, os
+import sys
+import os
 import numpy as np
-sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 
 from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 from pyDeltaRCM import sed_tools
@@ -19,11 +20,13 @@ delta = pyDeltaRCM(input_file = os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 # now that it is initiated can access the shared_tools via the inherited object
 # delta._delta.**sed_tools_function**
 
+
 def test_sed_route():
-    '''
+    """
     test the function sed_tools.sed_route
-    '''
+    """
     delta.pad_cell_type = np.pad(delta.cell_type, 1, 'edge')
     delta.sed_route()
     [a,b] = np.shape(delta.pad_depth)
+
     assert a == 12
