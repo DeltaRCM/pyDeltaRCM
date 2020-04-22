@@ -27,6 +27,7 @@ def test_with_no_argument():
     assert delta.out_dir == 'deltaRCM_Output'
     assert delta.Length == 1000
 
+
 def test_override_from_testfile():
     delta = pyDeltaRCM(input_file=os.path.join(
         os.getcwd(), 'tests', 'test.yaml'))
