@@ -48,39 +48,40 @@ class init_tools(object):
 
         # This dictionary serves as a container to hold values for both the
         # user-specified file and the internal defaults.
-
         input_file_vars = dict()
 
         # Open and access both yaml files --> put in dictionaries
         # only access the user input file if provided.
-
-        default_file = open(self.default_file, mode = 'r')
-        default_dict = yaml.load(default_file, Loader = yaml.FullLoader)
+        default_file = open(self.default_file, mode='r')
+        default_dict = yaml.load(default_file, Loader=yaml.FullLoader)
         default_file.close()
-        if hasattr(self, 'input_file') and os.path.exists(self.input_file):
-            user_file = open(self.input_file, mode = 'r')
-            user_dict = yaml.load(user_file, Loader = yaml.FullLoader)
-            user_file.close()
+        if self.input_file: # and os.path.exists(self.input_file):
+            try:
+                user_file = open(self.input_file, mode='r')
+                user_dict = yaml.load(user_file, Loader=yaml.FullLoader)
+                user_file.close()
+            except ValueError as e:
+                raise e
         else:
-            print('The specified input file could not be found. Using default values...')
             user_dict = dict()
 
         # go through and populate input vars with user and default values,
         # checking user values for correct type.
-
         for oo in default_dict.keys():
-            the_type = eval(default_dict[oo]['type'])
-            if oo in user_dict and isinstance(user_dict[oo], the_type):
-                input_file_vars[oo] = user_dict[oo]
-            elif oo in user_dict and not isinstance(user_dict[oo], the_type):
-                print('Input for ' + oo + ' not of the right type. '
-                      + oo + ' needs to be of type ' + str(the_type))
-                input_file_vars[oo] = default_dict[oo]['default']
+            if oo in user_dict:
+                expected_type = eval(default_dict[oo]['type'])
+                if type(user_dict[oo]) is expected_type:
+                    input_file_vars[oo] = user_dict[oo]
+                else:
+                    raise TypeError('Input for "{_oo}" not of the right type. '
+                                    'Input type was {_wastype}, '
+                                    'but needs to be {_exptype}.'
+                                    .format(_oo=str(oo), _wastype=type(oo),
+                                            _exptype=expected_type))
             else:
                 input_file_vars[oo] = default_dict[oo]['default']
 
         # now make each one an attribute of the model object.
-
         for k, v in list(input_file_vars.items()):
             setattr(self, k, v)
 
