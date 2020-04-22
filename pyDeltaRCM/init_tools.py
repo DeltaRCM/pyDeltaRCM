@@ -62,13 +62,14 @@ class init_tools(object):
                 user_file.close()
             except ValueError as e:
                 raise e
+        else:
+            user_dict = dict()
 
         # go through and populate input vars with user and default values,
         # checking user values for correct type.
         for oo in default_dict.keys():
             if oo in user_dict:
                 expected_type = eval(default_dict[oo]['type'])
-                print(oo, expected_type)
                 if type(user_dict[oo]) is expected_type:
                     input_file_vars[oo] = user_dict[oo]
                 else:
