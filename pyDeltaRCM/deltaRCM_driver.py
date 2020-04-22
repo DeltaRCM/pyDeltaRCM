@@ -12,22 +12,31 @@ class pyDeltaRCM(Tools):
     ################## __init__ #################
     #############################################
 
-    def __init__(self, **kwargs):
-        """
-        Creates an instance of the model
+    def __init__(self, input_file=None):
+        """Creates an instance of the pyDeltaRCM model.
 
-        Sets the most commonly changed variables here
-        Calls functions to set the rest and create the domain (for cleanliness)
-        See the :doc:`../userguide` guide for help on how to set up your `yaml` file correctly.
+        This method handles setting up the run, including parsing input files,
+        initializing arrays, and initializing output routines.
+
+        Parameters
+        ----------
+        input_file : `str`, `os.PathLike`, optional
+            User model run configuration file.
+
+        Notes
+        -----
+        For more information regarding input configuration files, see the
+        :doc:`../../guides/userguide`. 
+
         """
 
         self._time = 0.
         self._time_step = 1.
 
         self.verbose = False
-        if 'input_file' in kwargs:
-            self.input_file = kwargs.pop('input_file')
-        self.default_file = os.path.join(os.getcwd(), 'pyDeltaRCM', 'default.yml')
+        self.input_file = input_file
+        self.default_file = os.path.join(
+            os.getcwd(), 'pyDeltaRCM', 'default.yml')
 
         self.import_files()
 
@@ -87,8 +96,8 @@ class pyDeltaRCM(Tools):
     @time_step.setter
     def time_step(self, new_dt):
         if new_dt * self.init_Np_sed < 100:
-            warnings.warn('Using a very small timestep.')
-            warnings.warn('Delta might evolve very slowly.')
+            warnings.warn(UserWarning('Using a very small timestep, '
+                                      'Delta might evolve very slowly.'))
 
         self.Np_sed = int(new_dt * self.init_Np_sed)
         self.Np_water = int(new_dt * self.init_Np_water)
