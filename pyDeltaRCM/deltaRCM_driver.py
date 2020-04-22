@@ -87,8 +87,8 @@ class pyDeltaRCM(Tools):
     @time_step.setter
     def time_step(self, new_dt):
         if new_dt * self.init_Np_sed < 100:
-            warnings.warn('Using a very small timestep.')
-            warnings.warn('Delta might evolve very slowly.')
+            warnings.warn(UserWarning('Using a very small timestep, '
+                                      'Delta might evolve very slowly.'))
 
         self.Np_sed = int(new_dt * self.init_Np_sed)
         self.Np_water = int(new_dt * self.init_Np_water)
