@@ -11,11 +11,8 @@ from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 from pyDeltaRCM import shared_tools
 
 # need to create a simple case of pydeltarcm object to test these functions
-# will fix the random seed
-np.random.seed(0)
-
-# use test.yaml to create a small test case
-delta = pyDeltaRCM(input_file = os.path.join(os.getcwd(), 'tests', 'test.yaml'))
+np.random.seed(0)  # fix the random seed
+delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 
 # now that it is initiated can access the shared_tools via the inherited object
 # delta._delta.**shared_tools_function**
@@ -38,5 +35,4 @@ def test_random_pick_inlet():
     """
     choices = [0]
     probs = np.ones((1,))
-    assert delta.random_pick_inlet(choices,probs) == 0
-
+    assert delta.random_pick_inlet(choices, probs) == 0
