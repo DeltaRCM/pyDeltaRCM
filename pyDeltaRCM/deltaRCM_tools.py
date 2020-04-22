@@ -89,7 +89,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         self.strata_sand_frac = hstack([self.strata_sand_frac, lil_blank],
                                        format='lil')
 
-
     def record_stratigraphy(self):
         """
         Saves the sand fraction of deposited sediment
@@ -122,9 +121,10 @@ class Tools(sed_tools, water_tools, init_tools, object):
             sand_frac[self.Vp_dep_mud > vol_limit] = vol_limit
 
             sand_loc = self.Vp_dep_sand > 0
-            sand_frac[sand_loc] = (self.Vp_dep_sand[sand_loc] /
-                                   (self.Vp_dep_mud[sand_loc] +
-                                    self.Vp_dep_sand[sand_loc]))
+            sand_frac[sand_loc] = (self.Vp_dep_sand[sand_loc]
+                                   / (self.Vp_dep_mud[sand_loc]
+                                   + self.Vp_dep_sand[sand_loc])
+                                   )
             # store indices and sand_frac into a sparse array
             row_s = np.where(sand_frac.flatten() >= 0)[0]
             col_s = np.zeros((len(row_s),))
@@ -148,8 +148,8 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
             if self.toggle_subsidence and self.start_subsidence <= timestep:
 
-                sigma_change = (self.strata_eta[:, :self.strata_counter] -
-                                self.sigma.flatten()[:, np.newaxis])
+                sigma_change = (self.strata_eta[:, :self.strata_counter]
+                                - self.sigma.flatten()[:, np.newaxis])
                 self.strata_eta[:, :self.strata_counter] = lil_matrix(
                     sigma_change)
 

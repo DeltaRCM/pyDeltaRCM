@@ -24,6 +24,7 @@ import time
 import yaml
 # tools for initiating deltaRCM model domain
 
+
 class init_tools(object):
 
     def init_logger(self):
@@ -72,8 +73,8 @@ class init_tools(object):
             if oo in user_dict and isinstance(user_dict[oo], the_type):
                 input_file_vars[oo] = user_dict[oo]
             elif oo in user_dict and not isinstance(user_dict[oo], the_type):
-                print('Input for ' + oo + ' not of the right type. ' + \
-                oo + ' needs to be of type ' + str(the_type))
+                print('Input for ' + oo + ' not of the right type. '
+                      + oo + ' needs to be of type ' + str(the_type))
                 input_file_vars[oo] = default_dict[oo]['default']
             else:
                 input_file_vars[oo] = default_dict[oo]['default']
@@ -191,8 +192,8 @@ class init_tools(object):
 
         self._lambda = 1.                       # sedimentation lag
 
-        self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha *
-                                     0.5 / self.dx**2)
+        self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha
+                                     * 0.5 / self.dx**2)
         # self.prefix
         self.prefix = self.out_dir
 
@@ -246,7 +247,7 @@ class init_tools(object):
         cell_edge = -1
 
         self.cell_type[:self.L0, :] = cell_land
-        
+
         channel_inds = int(self.CTR - round(self.N0 / 2)) + 1
         y_channel_max = channel_inds + self.N0
         self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
@@ -343,8 +344,8 @@ class init_tools(object):
                                          format='NETCDF4_CLASSIC')
 
             self.output_netcdf.description = 'Output grids from pyDeltaRCM'
-            self.output_netcdf.history = ('Created ' +
-                                          time_lib.ctime(time_lib.time()))
+            self.output_netcdf.history = ('Created '
+                                          + time_lib.ctime(time_lib.time()))
             self.output_netcdf.source = 'pyDeltaRCM / CSDMS'
 
             length = self.output_netcdf.createDimension('length', self.L)
@@ -416,8 +417,8 @@ class init_tools(object):
 
             thetaloc = np.zeros((self.L, self.W))
             thetaloc[self.y > self.L0 - 1] = np.arctan(
-                (self.x[self.y > self.L0 - 1] - self.W / 2.) /
-                (self.y[self.y > self.L0 - 1] - self.L0 + 1))
+                (self.x[self.y > self.L0 - 1] - self.W / 2.)
+                / (self.y[self.y > self.L0 - 1] - self.L0 + 1))
             self.subsidence_mask = ((R1 <= Rloc) & (Rloc <= R2) &
                                     (theta1 <= thetaloc) & (thetaloc <= theta2))
             self.subsidence_mask[:self.L0, :] = False
