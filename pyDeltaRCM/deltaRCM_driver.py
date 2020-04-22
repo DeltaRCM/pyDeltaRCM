@@ -18,6 +18,7 @@ class pyDeltaRCM(Tools):
 
         Sets the most commonly changed variables here
         Calls functions to set the rest and create the domain (for cleanliness)
+        See the :doc:`../userguide` guide for help on how to set up your `yaml` file correctly.
         """
 
         self._time = 0.
