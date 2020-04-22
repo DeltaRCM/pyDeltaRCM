@@ -23,7 +23,7 @@ class BmiDelta(Bmi):
         'sea_water_surface__rate_change_elevation',
         'sea_water_surface__mean_elevation',
     )
-    
+
     _output_var_names = (
         'sea_water_surface__elevation',
         'sea_water__depth',
@@ -31,63 +31,63 @@ class BmiDelta(Bmi):
     )
 
     _input_vars = {
-        'model_output__site_prefix': {'name':'site_prefix',
+        'model_output__site_prefix': {'name': 'site_prefix',
             'type': 'str', 'default': ''},
-        'model_output__case_prefix': {'name':'case_prefix',
+        'model_output__case_prefix': {'name': 'case_prefix',
             'type': 'str', 'default': ''},
-        'model_output__out_dir': {'name':'out_dir',
+        'model_output__out_dir': {'name': 'out_dir',
             'type': 'str', 'default': 'deltaRCM_Output/'},
-        'model_grid__length': {'name':'Length',
+        'model_grid__length': {'name': 'Length',
             'type': 'float', 'default': 5000.},
-        'model_grid__width': {'name':'Width',
+        'model_grid__width': {'name': 'Width',
             'type': 'float', 'default': 10000.},
-        'model_grid__cell_size': {'name':'dx',
+        'model_grid__cell_size': {'name': 'dx',
             'type': 'float', 'default': 100.},
-        'land_surface__width': {'name':'L0_meters',
+        'land_surface__width': {'name': 'L0_meters',
             'type': 'float', 'default': 300.},
-        'land_surface__slope': {'name':'S0',
+        'land_surface__slope': {'name': 'S0',
             'type': 'float', 'default': 0.00015},
-        'model__max_iteration': {'name':'itermax',
+        'model__max_iteration': {'name': 'itermax',
             'type': 'int', 'default': 1},
-        'water__number_parcels': {'name':'Np_water',
+        'water__number_parcels': {'name': 'Np_water',
             'type': 'int', 'default': 1000},
-        'channel__flow_velocity': {'name':'u0',
+        'channel__flow_velocity': {'name': 'u0',
             'type': 'float', 'default': 1.},
-        'channel__width': {'name':'N0_meters',
+        'channel__width': {'name': 'N0_meters',
             'type': 'float', 'default': 300.},
-        'channel__flow_depth': {'name':'h0',
+        'channel__flow_depth': {'name': 'h0',
             'type': 'float', 'default': 5.},
-        'sea_water_surface__mean_elevation': {'name':'H_SL',
+        'sea_water_surface__mean_elevation': {'name': 'H_SL',
             'type': 'float', 'default': 0.},
-        'sea_water_surface__rate_change_elevation': {'name':'SLR',
+        'sea_water_surface__rate_change_elevation': {'name': 'SLR',
             'type': 'float', 'default': 0.},
-        'sediment__number_parcels': {'name':'Np_sed',
+        'sediment__number_parcels': {'name': 'Np_sed',
             'type': 'int', 'default': 1000},
-        'sediment__bedload_fraction': {'name':'f_bedload',
+        'sediment__bedload_fraction': {'name': 'f_bedload',
             'type': 'float', 'default': 0.25},
-        'sediment__influx_concentration': {'name':'C0_percent',
+        'sediment__influx_concentration': {'name': 'C0_percent',
             'type': 'float', 'default': 0.1},
-        'model_output__opt_eta_figs': {'name':'save_eta_figs',
+        'model_output__opt_eta_figs': {'name': 'save_eta_figs',
             'type': 'bool', 'default': True},
-        'model_output__opt_stage_figs': {'name':'save_stage_figs',
+        'model_output__opt_stage_figs': {'name': 'save_stage_figs',
             'type': 'bool', 'default': False},
-        'model_output__opt_depth_figs': {'name':'save_depth_figs',
+        'model_output__opt_depth_figs': {'name': 'save_depth_figs',
             'type': 'bool', 'default': False},
-        'model_output__opt_discharge_figs': {'name':'save_discharge_figs',
+        'model_output__opt_discharge_figs': {'name': 'save_discharge_figs',
             'type': 'bool', 'default': False},
-        'model_output__opt_velocity_figs': {'name':'save_velocity_figs',
+        'model_output__opt_velocity_figs': {'name': 'save_velocity_figs',
             'type': 'bool', 'default': False},
-        'model_output__opt_eta_grids': {'name':'save_eta_grids',
+        'model_output__opt_eta_grids': {'name': 'save_eta_grids',
             'type': 'bool', 'default': False},
-        'model_output__opt_stage_grids': {'name':'save_stage_grids',
+        'model_output__opt_stage_grids': {'name': 'save_stage_grids',
             'type': 'bool', 'default': False},
-        'model_output__opt_depth_grids': {'name':'save_depth_grids',
+        'model_output__opt_depth_grids': {'name': 'save_depth_grids',
             'type': 'bool', 'default': False},
-        'model_output__opt_discharge_grids': {'name':'save_discharge_grids',
+        'model_output__opt_discharge_grids': {'name': 'save_discharge_grids',
             'type': 'bool', 'default': False},
-        'model_output__opt_velocity_grids': {'name':'save_velocity_grids',
+        'model_output__opt_velocity_grids': {'name': 'save_velocity_grids',
             'type': 'bool', 'default': False},
-        'model_output__opt_time_interval': {'name':'save_dt',
+        'model_output__opt_time_interval': {'name': 'save_dt',
             'type': 'float', 'default': 50.0},
         'coeff__surface_smoothing': {'name': 'Csmooth',
             'type': 'float', 'default': 0.9},
@@ -115,7 +115,7 @@ class BmiDelta(Bmi):
             'type': 'float', 'default': 1.05},
         'coeff__topographic_diffusion': {'name': 'alpha',
             'type': 'float', 'default': 0.1},
-        'basin__opt_subsidence': {'name':'toggle_subsidence',
+        'basin__opt_subsidence': {'name': 'toggle_subsidence',
             'type': 'bool', 'default': False},
         'basin__maximum_subsidence_rate': {'name': 'sigma_max',
             'type': 'float', 'default': 0.000825},
@@ -123,8 +123,7 @@ class BmiDelta(Bmi):
             'type': 'float', 'default': 0},
         'basin__opt_stratigraphy': {'name': 'save_strata',
             'type': 'bool', 'default': False}
-        }
-
+    }
 
     def __init__(self):
         """Create a BmiDelta model that is ready for initialization."""
@@ -135,7 +134,7 @@ class BmiDelta(Bmi):
         self._grid_type = {}
 
     def initialize(self, filename = 'deltaRCM.yaml'):
-    
+
         """Initialize the model.
 
         Parameters
@@ -166,8 +165,8 @@ class BmiDelta(Bmi):
             if oo in user_dict and isinstance(user_dict[oo], the_type):
                 input_file_vars[model_name] = user_dict[oo]
             elif oo in user_dict and not isinstance(user_dict[oo], the_type):
-                print('Input for ' + oo + ' not of the right type. ' + \
-                oo + ' needs to be of type ' + str(the_type))
+                print('Input for ' + oo + ' not of the right type. '
+                      + oo + ' needs to be of type ' + str(the_type))
                 input_file_vars[model_name] = self._input_vars[oo]['default']
             else:
                 input_file_vars[model_name] = self._input_vars[oo]['default']

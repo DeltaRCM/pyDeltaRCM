@@ -19,7 +19,7 @@ class pyDeltaRCM(Tools):
         Sets the most commonly changed variables here
         Calls functions to set the rest and create the domain (for cleanliness)
         """
-        
+
         self._time = 0.
         self._time_step = 1.
 
