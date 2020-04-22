@@ -35,7 +35,6 @@ version = pyDeltaRCM.__version__
 # ones.
 extensions = ['sphinx.ext.autodoc', 
               'sphinx.ext.autosummary',
-              'sphinx_automodapi.automodapi',
               'sphinx.ext.napoleon',
               'sphinx.ext.graphviz',
               'sphinx.ext.imgmath',
