@@ -19,7 +19,7 @@ def test_initialize():
     '''
     test function BmiDelta.initialize
     '''
-    delta.initialize(os.getcwd() + '/tests/test.yaml')
+    delta.initialize(filename = os.getcwd() + '/tests/test_bmi.yaml')
     assert delta._delta.f_bedload == 0.5
 
 def test_update():

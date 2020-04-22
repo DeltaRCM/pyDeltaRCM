@@ -1,10 +1,11 @@
 #! /usr/bin/env python
 """Basic Model Interface implementation for pyDeltaRCM."""
 
-import types
+import yaml
 
 import numpy as np
-from bmipy import Bmi
+import os
+from basic_modeling_interface import Bmi
 
 from .deltaRCM_driver import pyDeltaRCM
 
@@ -30,11 +31,11 @@ class BmiDelta(Bmi):
 
     _input_vars = {
         'model_output__site_prefix': {'name':'site_prefix',
-            'type': 'string', 'default': ''},
+            'type': 'str', 'default': ''},
         'model_output__case_prefix': {'name':'case_prefix',
-            'type': 'string', 'default': ''},
+            'type': 'str', 'default': ''},
         'model_output__out_dir': {'name':'out_dir',
-            'type': 'string', 'default': 'deltaRCM_Output/'},
+            'type': 'str', 'default': 'deltaRCM_Output/'},
         'model_grid__length': {'name':'Length',
             'type': 'float', 'default': 5000.},
         'model_grid__width': {'name':'Width',
@@ -46,9 +47,9 @@ class BmiDelta(Bmi):
         'land_surface__slope': {'name':'S0',
             'type': 'float', 'default': 0.00015},
         'model__max_iteration': {'name':'itermax',
-            'type': 'long', 'default': 1},
+            'type': 'int', 'default': 1},
         'water__number_parcels': {'name':'Np_water',
-            'type': 'long', 'default': 1000},
+            'type': 'int', 'default': 1000},
         'channel__flow_velocity': {'name':'u0',
             'type': 'float', 'default': 1.},
         'channel__width': {'name':'N0_meters',
@@ -60,33 +61,33 @@ class BmiDelta(Bmi):
         'sea_water_surface__rate_change_elevation': {'name':'SLR',
             'type': 'float', 'default': 0.},
         'sediment__number_parcels': {'name':'Np_sed',
-            'type': 'long', 'default': 1000},
+            'type': 'int', 'default': 1000},
         'sediment__bedload_fraction': {'name':'f_bedload',
             'type': 'float', 'default': 0.25},
         'sediment__influx_concentration': {'name':'C0_percent',
             'type': 'float', 'default': 0.1},
         'model_output__opt_eta_figs': {'name':'save_eta_figs',
-            'type': 'choice', 'default': True},
+            'type': 'bool', 'default': True},
         'model_output__opt_stage_figs': {'name':'save_stage_figs',
-            'type': 'choice', 'default': False},
+            'type': 'bool', 'default': False},
         'model_output__opt_depth_figs': {'name':'save_depth_figs',
-            'type': 'choice', 'default': False},
+            'type': 'bool', 'default': False},
         'model_output__opt_discharge_figs': {'name':'save_discharge_figs',
-            'type': 'choice', 'default': False},
+            'type': 'bool', 'default': False},
         'model_output__opt_velocity_figs': {'name':'save_velocity_figs',
-            'type': 'choice', 'default': False},
+            'type': 'bool', 'default': False},
         'model_output__opt_eta_grids': {'name':'save_eta_grids',
-            'type': 'choice', 'default': False},
+            'type': 'bool', 'default': False},
         'model_output__opt_stage_grids': {'name':'save_stage_grids',
-            'type': 'choice', 'default': False},
+            'type': 'bool', 'default': False},
         'model_output__opt_depth_grids': {'name':'save_depth_grids',
-            'type': 'choice', 'default': False},
+            'type': 'bool', 'default': False},
         'model_output__opt_discharge_grids': {'name':'save_discharge_grids',
-            'type': 'choice', 'default': False},
+            'type': 'bool', 'default': False},
         'model_output__opt_velocity_grids': {'name':'save_velocity_grids',
-            'type': 'choice', 'default': False},
+            'type': 'bool', 'default': False},
         'model_output__opt_time_interval': {'name':'save_dt',
-            'type': 'long', 'default': 50},
+            'type': 'float', 'default': 50.0},
         'coeff__surface_smoothing': {'name': 'Csmooth',
             'type': 'float', 'default': 0.9},
         'coeff__under_relaxation__water_surface': {'name': 'omega_sfc',
@@ -94,7 +95,7 @@ class BmiDelta(Bmi):
         'coeff__under_relaxation__water_flow': {'name': 'omega_flow',
             'type': 'float', 'default': 0.9},
         'coeff__iterations_smoothing_algorithm': {'name': 'Nsmooth',
-            'type': 'long', 'default': 5},
+            'type': 'int', 'default': 5},
         'coeff__depth_dependence__water': {'name': 'theta_water',
             'type': 'float', 'default': 1.0},
         'coeff__depth_dependence__sand': {'name': 'coeff_theta_sand',
@@ -102,7 +103,7 @@ class BmiDelta(Bmi):
         'coeff__depth_dependence__mud': {'name': 'coeff_theta_mud',
             'type': 'float', 'default': 1.0},
         'coeff__non_linear_exp_sed_flux_flow_velocity': {'name': 'beta',
-            'type': 'long', 'default': 3},
+            'type': 'int', 'default': 3},
         'coeff__sedimentation_lag': {'name': 'sed_lag',
             'type': 'float', 'default': 1.0},
         'coeff__velocity_deposition_mud': {'name': 'coeff_U_dep_mud',
@@ -114,13 +115,13 @@ class BmiDelta(Bmi):
         'coeff__topographic_diffusion': {'name': 'alpha',
             'type': 'float', 'default': 0.1},
         'basin__opt_subsidence': {'name':'toggle_subsidence',
-            'type': 'choice', 'default': False},
+            'type': 'bool', 'default': False},
         'basin__maximum_subsidence_rate': {'name': 'sigma_max',
             'type': 'float', 'default': 0.000825},
         'basin__subsidence_start_timestep': {'name': 'start_subsidence',
             'type': 'float', 'default': 0},
         'basin__opt_stratigraphy': {'name': 'save_strata',
-            'type': 'choice', 'default': False}
+            'type': 'bool', 'default': False}
         }
 
     def __init__(self):
@@ -131,7 +132,7 @@ class BmiDelta(Bmi):
         self._grids = {}
         self._grid_type = {}
 
-    def initialize(self, filename='deltaRCM.yaml'):
+    def initialize(self, filename = 'deltaRCM.yaml'):
         """Initialize the model.
 
         Parameters
@@ -140,7 +141,40 @@ class BmiDelta(Bmi):
             Path to name of input file.
         """
 
-        self._delta = pyDeltaRCM(filename)
+        input_file_vars = dict()
+
+        # Open and access yaml file --> put in dictionaries
+        # only access the user input file if provided.
+
+        if filename != 'deltaRCM.yaml' and os.path.exists(filename):
+            user_file = open(filename, mode = 'r')
+            user_dict = yaml.load(user_file, Loader = yaml.FullLoader)
+            user_file.close()
+        else:
+            print('The specified input file could not be found. Using default values...')
+            user_dict = dict()
+
+        # go through and populate input vars with user and default values from
+        # default dictionary self._input_vars checking user values for correct type.
+
+        for oo in self._input_vars.keys():
+            model_name = self._input_vars[oo]['name']
+            the_type = eval(self._input_vars[oo]['type'])
+            if oo in user_dict and isinstance(user_dict[oo], the_type):
+                input_file_vars[model_name] = user_dict[oo]
+            elif oo in user_dict and not isinstance(user_dict[oo], the_type):
+                print('Input for ' + oo + ' not of the right type. ' + \
+                oo + ' needs to be of type ' + str(the_type))
+                input_file_vars[model_name] = self._input_vars[oo]['default']
+            else:
+                input_file_vars[model_name] = self._input_vars[oo]['default']
+
+        tmpFile = os.path.join(os.getcwd(), '_tmp.yml')
+        inbetweenYAML = open(tmpFile, 'w')
+        yaml.dump(input_file_vars, inbetweenYAML)
+        inbetweenYAML.close()
+
+        self._delta = pyDeltaRCM(input_file = tmpFile)
 
         self._values = {
             'channel_exit_water_flow__speed': self._delta.u0,
@@ -178,6 +212,8 @@ class BmiDelta(Bmi):
             1: 'uniform_rectilinear_grid',
             2: 'uniform_rectilinear_grid',
         }
+
+        os.remove(tmpFile)
 
     def update(self):
         """Advance model by one time step."""
@@ -400,11 +436,11 @@ class BmiDelta(Bmi):
 
     def get_input_var_names(self):
         """Get names of input variables."""
-        return self._delta._input_var_names
+        return self._input_var_names
 
     def get_output_var_names(self):
         """Get names of output variables."""
-        return self._delta._output_var_names
+        return self._output_var_names
 
     def get_grid_shape(self, grid_id):
         """Number of rows and columns of uniform rectilinear grid."""
