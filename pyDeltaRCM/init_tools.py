@@ -1,20 +1,28 @@
-##  tools for initiating deltaRCM model domain
-##  refactored by eab
-##  sep 2019
+
+import sys
+import os
+import re
+import string
+import logging
+import time
 
 from math import floor, sqrt, pi
 import numpy as np
 from random import shuffle
+
 import matplotlib
 from matplotlib import pyplot as plt
+
+from scipy.sparse import lil_matrix, csc_matrix, hstack
 from scipy import ndimage
-import sys, os, re, string
+
 from netCDF4 import Dataset
 import time as time_lib
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
 import time
 import yaml
+# tools for initiating deltaRCM model domain
 
 class init_tools(object):
 
@@ -28,13 +36,12 @@ class init_tools(object):
             # create the logging file handler
             st = timestr = time.strftime("%Y%m%d-%H%M%S")
             fh = logging.FileHandler("pyDeltaRCM_" + st + ".log")
-
-            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            formatter = logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
             fh.setFormatter(formatter)
 
             # add handler to logger object
             self.logger.addHandler(fh)
-
 
     def import_files(self):
 
@@ -101,14 +108,14 @@ class init_tools(object):
         self.jwalk = np.array([[-1, -1, -1],
                                [0, 0, 0],
                                [1, 1, 1]])
-
-        self.dxn_iwalk = [1,1,0,-1,-1,-1,0,1]
-        self.dxn_jwalk = [0,1,1,1,0,-1,-1,-1]
+        self.dxn_iwalk = [1, 1, 0, -1, -1, -1, 0, 1]
+        self.dxn_jwalk = [0, 1, 1, 1, 0, -1, -1, -1]
         self.dxn_dist = \
-        [sqrt(self.dxn_iwalk[i]**2 + self.dxn_jwalk[i]**2) for i in range(8)]
+            [sqrt(self.dxn_iwalk[i]**2 + self.dxn_jwalk[i]**2)
+             for i in range(8)]
 
-        self.walk_flat = np.array([1, -self.W+1, -self.W, -self.W-1,
-                                    -1, self.W-1, self.W, self.W+1])
+        self.walk_flat = np.array([1, -self.W + 1, -self.W, -self.W - 1,
+                                   -1, self.W - 1, self.W, self.W + 1])
 
         self.kernel1 = np.array([[1, 1, 1],
                                  [1, -8, 1],
@@ -136,26 +143,27 @@ class init_tools(object):
         self.L0 = max(1, int(round(self.L0_meters / self.dx)))
         self.N0 = max(3, int(round(self.N0_meters / self.dx)))
 
-        self.L = int(round(self.Length/self.dx))        # num cells in x
-        self.W = int(round(self.Width/self.dx))         # num cells in y
+        self.L = int(round(self.Length / self.dx))        # num cells in x
+        self.W = int(round(self.Width / self.dx))         # num cells in y
 
         self.set_constants()
 
         self.u_max = 2.0 * self.u0              # maximum allowed flow velocity
 
-        self.C0 = self.C0_percent * 1/100.      # sediment concentration
+        self.C0 = self.C0_percent * 1 / 100.      # sediment concentration
 
         # (m) critial depth to switch to "dry" node
-        self.dry_depth = min(0.1, 0.1*self.h0)
+        self.dry_depth = min(0.1, 0.1 * self.h0)
         self.CTR = floor(self.W / 2.) - 1
 
         self.gamma = self.g * self.S0 * self.dx / (self.u0**2)
 
         self.V0 = self.h0 * (self.dx**2)    # (m^3) reference volume (volume to
-                                            # fill cell to characteristic depth)
+
+        # fill cell to characteristic depth)
 
         self.Qw0 = self.u0 * self.h0 * self.N0 * self.dx    # const discharge
-                                                            # at inlet
+        # at inlet
 
         self.qw0 = self.u0 * self.h0                # water unit input discharge
         self.Qp_water = self.Qw0 / self.Np_water    # volume each water parcel
@@ -163,13 +171,15 @@ class init_tools(object):
         self.qs0 = self.qw0 * self.C0               # sed unit discharge
 
         self.dVs = 0.1 * self.N0**2 * self.V0       # total amount of sed added
-                                                    # to domain per timestep
+        # to domain per timestep
 
         self.Qs0 = self.Qw0 * self.C0           # sediment total input discharge
         self.Vp_sed = self.dVs / self.Np_sed    # volume of each sediment parcel
 
-        self.itmax = 2 * (self.L + self.W)      # max number of jumps for parcel
-        self.size_indices = int(self.itmax/2)   # initial width of self.indices
+        # max number of jumps for parcel
+        self.itmax = 2 * (self.L + self.W)
+        # initial width of self.indices
+        self.size_indices = int(self.itmax / 2)
 
         self.dt = self.dVs / self.Qs0           # time step size
 
@@ -181,9 +191,8 @@ class init_tools(object):
 
         self._lambda = 1.                       # sedimentation lag
 
-        self.diffusion_multiplier = (self.dt/self.N_crossdiff * self.alpha *
-                                    0.5 / self.dx**2)
-
+        self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha *
+                                     0.5 / self.dx**2)
         # self.prefix
         self.prefix = self.out_dir
 
@@ -195,49 +204,49 @@ class init_tools(object):
             self.prefix += self.case_prefix + '_'
 
     def create_domain(self):
-        '''
+        """
         Creates the model domain
-        '''
+        """
 
-        ##### empty arrays #####
+        # ---- empty arrays ----
 
-        self.x, self.y = np.meshgrid(np.arange(0,self.W), np.arange(0,self.L))
+        self.x, self.y = np.meshgrid(
+            np.arange(0, self.W), np.arange(0, self.L))
 
-        self.cell_type = np.zeros((self.L,self.W), dtype=np.int)
+        self.cell_type = np.zeros((self.L, self.W), dtype=np.int)
 
-        self.eta = np.zeros((self.L,self.W)).astype(np.float32)
-        self.stage = np.zeros((self.L,self.W)).astype(np.float32)
-        self.depth = np.zeros((self.L,self.W)).astype(np.float32)
+        self.eta = np.zeros((self.L, self.W)).astype(np.float32)
+        self.stage = np.zeros((self.L, self.W)).astype(np.float32)
+        self.depth = np.zeros((self.L, self.W)).astype(np.float32)
 
-        self.qx = np.zeros((self.L,self.W))
-        self.qy = np.zeros((self.L,self.W))
-        self.qxn = np.zeros((self.L,self.W))
-        self.qyn = np.zeros((self.L,self.W))
-        self.qwn = np.zeros((self.L,self.W))
-        self.ux = np.zeros((self.L,self.W))
-        self.uy = np.zeros((self.L,self.W))
-        self.uw = np.zeros((self.L,self.W))
+        self.qx = np.zeros((self.L, self.W))
+        self.qy = np.zeros((self.L, self.W))
+        self.qxn = np.zeros((self.L, self.W))
+        self.qyn = np.zeros((self.L, self.W))
+        self.qwn = np.zeros((self.L, self.W))
+        self.ux = np.zeros((self.L, self.W))
+        self.uy = np.zeros((self.L, self.W))
+        self.uw = np.zeros((self.L, self.W))
 
-        self.qs = np.zeros((self.L,self.W))
-        self.Vp_dep_sand = np.zeros((self.L,self.W))
-        self.Vp_dep_mud = np.zeros((self.L,self.W))
+        self.qs = np.zeros((self.L, self.W))
+        self.Vp_dep_sand = np.zeros((self.L, self.W))
+        self.Vp_dep_mud = np.zeros((self.L, self.W))
 
         self.free_surf_flag = np.zeros((self.Np_water,), dtype=np.int)
         self.looped = np.zeros((self.Np_water,))
         self.indices = np.zeros((self.Np_water, self.size_indices),
-            dtype = np.int)
-
+                                dtype=np.int)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
 
-        #####domain #####
+        # ---- domain ----
         cell_land = 2
         cell_channel = 1
         cell_ocean = 0
         cell_edge = -1
 
-        self.cell_type[:self.L0,:] = cell_land
-
+        self.cell_type[:self.L0, :] = cell_land
+        
         channel_inds = int(self.CTR - round(self.N0 / 2)) + 1
         y_channel_max = channel_inds + self.N0
         self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
@@ -252,24 +261,27 @@ class init_tools(object):
         self.qx[self.cell_type == cell_ocean] = self.qw0 / 5.
         self.qw = (self.qx**2 + self.qy**2)**(0.5)
 
-        self.ux[self.depth>0] = self.qx[self.depth>0] / self.depth[self.depth>0]
-        self.uy[self.depth>0] = self.qy[self.depth>0] / self.depth[self.depth>0]
-        self.uw[self.depth>0] = self.qw[self.depth>0] / self.depth[self.depth>0]
+        self.ux[self.depth > 0] = self.qx[
+            self.depth > 0] / self.depth[self.depth > 0]
+        self.uy[self.depth > 0] = self.qy[
+            self.depth > 0] / self.depth[self.depth > 0]
+        self.uw[self.depth > 0] = self.qw[
+            self.depth > 0] / self.depth[self.depth > 0]
 
         # reset the land cell_type to -2
         self.cell_type[self.cell_type == cell_land] = -2
-        self.cell_type[-1,:] = cell_edge
-        self.cell_type[:,0] = cell_edge
-        self.cell_type[:,-1] = cell_edge
+        self.cell_type[-1, :] = cell_edge
+        self.cell_type[:, 0] = cell_edge
+        self.cell_type[:, -1] = cell_edge
 
-        bounds = [(np.sqrt((i-3)**2 + (j-self.CTR)**2))
-            for i in range(self.L)
-            for j in range(self.W)]
-        bounds =  np.reshape(bounds,(self.L, self.W))
+        bounds = [(np.sqrt((i - 3)**2 + (j - self.CTR)**2))
+                  for i in range(self.L)
+                  for j in range(self.W)]
+        bounds = np.reshape(bounds, (self.L, self.W))
 
-        self.cell_type[bounds >= min(self.L - 5, self.W/2 - 5)] = cell_edge
+        self.cell_type[bounds >= min(self.L - 5, self.W / 2 - 5)] = cell_edge
 
-        self.cell_type[:self.L0,:] = -cell_land
+        self.cell_type[:self.L0, :] = -cell_land
         self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
 
         self.inlet = list(np.unique(np.where(self.cell_type == 1)[1]))
@@ -278,10 +290,8 @@ class init_tools(object):
         self.clim_eta = (-self.h0 - 1, 0.05)
 
     def init_stratigraphy(self):
-        '''
-        Creates sparse array to store stratigraphy data
-        '''
-
+        """Creates sparse array to store stratigraphy data.
+        """
         if self.save_strata:
 
             self.strata_counter = 0
@@ -289,26 +299,27 @@ class init_tools(object):
             self.n_steps = 5 * self.save_dt
 
             self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps),
-                                                dtype=np.float32)
+                                               dtype=np.float32)
 
             self.init_eta = self.eta.copy()
             self.strata_eta = lil_matrix((self.L * self.W, self.n_steps),
-                                          dtype=np.float32)
+                                         dtype=np.float32)
 
     def init_output_grids(self):
-        '''
-        Creates a netCDF file to store output grids
-        Fills with default variables
+        """Creates a netCDF file to store output grids.
 
-        Overwrites an existing netcdf file with the same name
-        '''
+        Fills with default variables.
+
+        .. warning:: Overwrites an existing netcdf file with the same name.
+
+        """
 
         if (self.save_eta_grids or
-            self.save_depth_grids or
-            self.save_stage_grids or
-            self.save_discharge_grids or
-            self.save_velocity_grids or
-            self.save_strata):
+                self.save_depth_grids or
+                self.save_stage_grids or
+                self.save_discharge_grids or
+                self.save_velocity_grids or
+                self.save_strata):
 
             if self.verbose:
                 self.logger.info('Generating netCDF file for output grids...')
@@ -317,7 +328,8 @@ class init_tools(object):
             filename = 'pyDeltaRCM_output.nc'
 
             if not os.path.exists(directory):
-                if self.verbose: self.logger.info('Creating output directory')
+                if self.verbose:
+                    self.logger.info('Creating output directory')
                 os.makedirs(directory)
 
             file_path = os.path.join(directory, filename)
@@ -339,10 +351,12 @@ class init_tools(object):
             width = self.output_netcdf.createDimension('width', self.W)
             total_time = self.output_netcdf.createDimension('total_time', None)
 
-            x = self.output_netcdf.createVariable('x', 'f4', ('length','width'))
-            y = self.output_netcdf.createVariable('y', 'f4', ('length','width'))
+            x = self.output_netcdf.createVariable(
+                'x', 'f4', ('length', 'width'))
+            y = self.output_netcdf.createVariable(
+                'y', 'f4', ('length', 'width'))
             time = self.output_netcdf.createVariable('time', 'f4',
-                                                    ('total_time',))
+                                                     ('total_time',))
             x.units = 'meters'
             y.units = 'meters'
             time.units = 'timesteps'
@@ -352,57 +366,60 @@ class init_tools(object):
 
             if self.save_eta_grids:
                 eta = self.output_netcdf.createVariable('eta',
-                                             'f4',
-                                            ('total_time','length','width'))
+                                                        'f4',
+                                                        ('total_time', 'length', 'width'))
                 eta.units = 'meters'
 
             if self.save_stage_grids:
                 stage = self.output_netcdf.createVariable('stage',
-                                             'f4',
-                                            ('total_time','length','width'))
+                                                          'f4',
+                                                          ('total_time', 'length', 'width'))
                 stage.units = 'meters'
 
             if self.save_depth_grids:
                 depth = self.output_netcdf.createVariable('depth',
-                                             'f4',
-                                            ('total_time','length','width'))
+                                                          'f4',
+                                                          ('total_time', 'length', 'width'))
                 depth.units = 'meters'
 
             if self.save_discharge_grids:
                 discharge = self.output_netcdf.createVariable('discharge',
-                                             'f4',
-                                            ('total_time','length','width'))
+                                                              'f4',
+                                                              ('total_time', 'length', 'width'))
                 discharge.units = 'cubic meters per second'
 
             if self.save_velocity_grids:
                 velocity = self.output_netcdf.createVariable('velocity',
-                                             'f4',
-                                            ('total_time','length','width'))
+                                                             'f4',
+                                                             ('total_time', 'length', 'width'))
                 velocity.units = 'meters per second'
 
-            if self.verbose: self.logger.info('Output netCDF file created.')
+            if self.verbose:
+                self.logger.info('Output netCDF file created.')
 
     def init_subsidence(self):
-        '''
+        """
         Initializes patterns of subsidence if
         toggle_subsidence is True (default False)
 
         Modify the equations for self.subsidence_mask and self.sigma as desired
-        '''
+        """
 
         if self.toggle_subsidence:
 
-            R1 = 0.3 * self.L; R2 = 1. * self.L # radial limits (fractions of L)
-            theta1 = -pi/3; theta2 =  pi/3.   # angular limits
+            R1 = 0.3 * self.L
+            R2 = 1. * self.L  # radial limits (fractions of L)
+            theta1 = -pi / 3
+            theta2 = pi / 3.   # angular limits
 
             Rloc = np.sqrt((self.y - self.L0)**2 + (self.x - self.W / 2.)**2)
 
             thetaloc = np.zeros((self.L, self.W))
             thetaloc[self.y > self.L0 - 1] = np.arctan(
-                            (self.x[self.y > self.L0 - 1] - self.W / 2.) /
-                            (self.y[self.y > self.L0 - 1] - self.L0 + 1))
+                (self.x[self.y > self.L0 - 1] - self.W / 2.) /
+                (self.y[self.y > self.L0 - 1] - self.L0 + 1))
             self.subsidence_mask = ((R1 <= Rloc) & (Rloc <= R2) &
                                     (theta1 <= thetaloc) & (thetaloc <= theta2))
-            self.subsidence_mask[:self.L0,:] = False
+            self.subsidence_mask[:self.L0, :] = False
 
             self.sigma = self.subsidence_mask * self.sigma_max * self.dt

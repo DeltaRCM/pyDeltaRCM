@@ -1,17 +1,15 @@
 #! /usr/bin/env python
-# from ez_setup import use_setuptools
-# use_setuptools()
 from setuptools import setup, find_packages
 
 
 setup(name='pyDeltaRCM',
       version='0.1.0',
-      author='Mariela Perignon',
-      author_email='perignon@colorado.edu',
+      author='The DeltaRCM Team',
       license='MIT',
-      description="Python version of Man Liang's DeltaRCM, in Matlab",
+      description="Python version of original Matlab DeltaRCM",
       long_description=open('README.md').read(),
       packages=find_packages(exclude=['*.tests']),
-      url='https://github.com/mperignon/pyDeltaRCM_WMT',
-      install_requires=['matplotlib','netCDF4','bmipy','scipy','numpy'],
-)
+      url='https://github.com/DeltaRCM/pyDeltaRCM',
+      install_requires=['matplotlib', 'netCDF4',
+                        'basic-modeling-interface', 'scipy', 'numpy'],
+      )

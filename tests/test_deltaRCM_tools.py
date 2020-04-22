@@ -1,10 +1,11 @@
-## unit tests for deltaRCM_tools.py
+# unit tests for deltaRCM_tools.py
 
 import pytest
 
-import sys, os
+import sys
+import os
 import numpy as np
-sys.path.append(os.path.realpath(os.path.dirname(__file__)+"/.."))
+sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 
 from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 from pyDeltaRCM import Tools
@@ -25,6 +26,8 @@ delta = pyDeltaRCM(input_file = os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 #     test get_var_name function from deltaRCM_tools
 #     '''
 #     assert delta._delta.get_var_name('channel__width') == 'N0_meters'
+
+
 
 def test_run_one_timestep():
     delta.run_one_timestep()

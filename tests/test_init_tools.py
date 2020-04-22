@@ -24,15 +24,16 @@ delta = pyDeltaRCM(input_file = os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 delta.set_constants()
 
 def test_set_constant_g():
-    '''
+    """
     check gravity
-    '''
+    """
     assert delta.g == 9.81
 
+
 def test_set_constant_distances():
-    '''
+    """
     check distances
-    '''
+    """
     assert delta.distances[0,0] == np.sqrt(2)
 
 def test_set_ivec():
