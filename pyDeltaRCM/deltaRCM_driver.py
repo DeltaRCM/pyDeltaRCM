@@ -12,7 +12,7 @@ class pyDeltaRCM(Tools):
     ################## __init__ #################
     #############################################
 
-    def __init__(self, input_file=None):
+    def __init__(self, input_file = None):
         """Creates an instance of the pyDeltaRCM model.
 
         This method handles setting up the run, including parsing input files,
