@@ -27,7 +27,7 @@ So we loop a few times and then finalize the model:
 
 That's it! You ran the pyDeltaRCM model for one timestep. 
 
-We can visualize the delta bed elevation, thought it's not very exciting after only one timestep...
+We can visualize the delta bed elevation, though it's not very exciting after only one timestep...
 
 .. code::
 
