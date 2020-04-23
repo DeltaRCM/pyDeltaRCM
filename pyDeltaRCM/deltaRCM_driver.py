@@ -12,7 +12,7 @@ class pyDeltaRCM(Tools):
     ################## __init__ #################
     #############################################
 
-    def __init__(self, input_file=None):
+    def __init__(self, input_file = None):
         """Creates an instance of the pyDeltaRCM model.
 
         This method handles setting up the run, including parsing input files,
@@ -26,7 +26,7 @@ class pyDeltaRCM(Tools):
         Notes
         -----
         For more information regarding input configuration files, see the
-        :doc:`../../guides/userguide`. 
+        :doc:`../../guides/userguide`.
 
         """
 
@@ -35,8 +35,8 @@ class pyDeltaRCM(Tools):
 
         self.verbose = False
         self.input_file = input_file
-        self.default_file = os.path.join(
-            os.getcwd(), 'pyDeltaRCM', 'default.yml')
+        self._file_dir = os.path.realpath(os.path.dirname(__file__)) 
+        self.default_file = os.path.join(self._file_dir, 'default.yml')
 
         self.import_files()
 
@@ -49,10 +49,6 @@ class pyDeltaRCM(Tools):
         self.init_subsidence()
         self.init_stratigraphy()
         self.init_output_grids()
-
-    #############################################
-    ################### update ##################
-    #############################################
 
     def update(self):
         """
@@ -69,10 +65,6 @@ class pyDeltaRCM(Tools):
 
         self._time += self.time_step
 
-    #############################################
-    ################## finalize #################
-    #############################################
-
     def finalize(self):
 
         self.output_strata()
@@ -81,12 +73,10 @@ class pyDeltaRCM(Tools):
             self.output_netcdf.close()
             if self.verbose:
                 print('Closed output netcdf file.')
-        except:
+        except Exception:
             pass
 
-    #############################################
-    ############# define properties #############
-    #############################################
+    # define properties
 
     @property
     def time_step(self):

@@ -205,9 +205,7 @@ class sed_tools(shared_tools):
             istep = self.jwalk.flat[new_cell]
             dist = np.sqrt(istep**2 + jstep**2)
 
-            ########################################################
             # deposition and erosion
-            ########################################################
 
             if sed == 'sand':  # sand
                 if dist > 0:

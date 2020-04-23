@@ -5,7 +5,6 @@ import pytest
 import sys
 import os
 import numpy as np
-sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 
 from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 from pyDeltaRCM import water_tools

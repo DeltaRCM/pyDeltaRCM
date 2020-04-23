@@ -5,9 +5,11 @@ python:
 # command to install dependencies
 install:
   - pip install pytest
+  - pip install -r requirements.txt
 # command to run tests
 script:
   - python setup.py install
+  # - pip install -e .
   - pytest
 
 jobs:
@@ -16,6 +18,7 @@ jobs:
       python: "3.8"
       install: 
         - pip install -r requirements.txt 
+        - pip install -e .
         - pip install pytest pytest-cov coveralls
       script: pytest --cov=pyDeltaRCM/
       after_success: 
@@ -23,7 +26,8 @@ jobs:
     - stage: docs
       python: "3.8"
       install: 
-        - pip install -r requirements.txt 
+        - pip install -r requirements.txt
+        - pip install -e .
         - pip install sphinx sphinx-automodapi
         - sudo apt update -y && sudo apt install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended dvipng
       script:
