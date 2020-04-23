@@ -26,7 +26,9 @@ jobs:
         - pip install -r requirements.txt 
         - pip install sphinx sphinx-automodapi
         - sudo apt update -y && sudo apt install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended dvipng
-      script: (cd docs && make html)
+      script:
+        - (cd docs && sphinx-build -E -W -b linkcheck source build) 
+        - (cd docs && make html)
       deploy:
         provider: pages:git
         github_token: $GITHUB_TOKEN
