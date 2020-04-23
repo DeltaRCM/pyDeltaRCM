@@ -20,13 +20,19 @@ So we loop a few times and then finalize the model:
 
 .. code::
 
-    >>> for _t in range(0, 3):
+    >>> for _t in range(0, 1):
     >>>     delta.update()
 
     >>> delta.finalize()
 
-That's it! You ran the pyDeltaRCM model. 
+That's it! You ran the pyDeltaRCM model for one timestep. 
 
-We can visualize the delta bed elevation matrix, thought it's not very exciting...
+We can visualize the delta bed elevation, thought it's not very exciting after only one timestep...
+
+.. code::
+
+    >>> fig, ax = plt.subplots()
+    >>> ax.imshow(delta.bed_elevation, vmax=-4.5)
+    >>> plt.show()
 
 .. plot:: pyplots/10min/model_run_visual.py
