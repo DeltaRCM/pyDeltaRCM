@@ -1,14 +1,16 @@
 #! /usr/bin/env python
 from setuptools import setup, find_packages
 
+from pyDeltaRCM import shared_tools
 
 setup(name='pyDeltaRCM',
-      version='0.1.0',
+      version=shared_tools._get_version(),
       author='The DeltaRCM Team',
       license='MIT',
       description="Python version of original Matlab DeltaRCM",
       long_description=open('README.md').read(),
       packages=find_packages(exclude=['*.tests']),
+      include_package_data=True,
       url='https://github.com/DeltaRCM/pyDeltaRCM',
       install_requires=['matplotlib', 'netCDF4',
                         'basic-modeling-interface', 'scipy', 'numpy', 'pyyaml'],
