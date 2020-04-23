@@ -28,10 +28,6 @@ np.random.seed(0)
 
 class Tools(sed_tools, water_tools, init_tools, object):
 
-    #############################################
-    ############# run_one_timestep ##############
-    #############################################
-
     def run_one_timestep(self):
         """
         Run the time loop once
@@ -70,9 +66,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         self.H_SL = self.H_SL + self.SLR * self.dt
 
-    #############################################
-    ############## initialization ###############
-    #############################################
+    # initialization of stratigraphy
 
     def expand_stratigraphy(self):
         """

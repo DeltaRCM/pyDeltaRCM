@@ -52,13 +52,13 @@ class init_tools(object):
 
         # Open and access both yaml files --> put in dictionaries
         # only access the user input file if provided.
-        default_file = open(self.default_file, mode='r')
-        default_dict = yaml.load(default_file, Loader=yaml.FullLoader)
+        default_file = open(self.default_file, mode = 'r')
+        default_dict = yaml.load(default_file, Loader = yaml.FullLoader)
         default_file.close()
         if self.input_file: # and os.path.exists(self.input_file):
             try:
-                user_file = open(self.input_file, mode='r')
-                user_dict = yaml.load(user_file, Loader=yaml.FullLoader)
+                user_file = open(self.input_file, mode = 'r')
+                user_dict = yaml.load(user_file, Loader = yaml.FullLoader)
                 user_file.close()
             except ValueError as e:
                 raise e
@@ -76,8 +76,8 @@ class init_tools(object):
                     raise TypeError('Input for "{_oo}" not of the right type. '
                                     'Input type was {_wastype}, '
                                     'but needs to be {_exptype}.'
-                                    .format(_oo=str(oo), _wastype=type(oo),
-                                            _exptype=expected_type))
+                                    .format(_oo = str(oo), _wastype = type(oo),
+                                            _exptype = expected_type))
             else:
                 input_file_vars[oo] = default_dict[oo]['default']
 
@@ -301,11 +301,11 @@ class init_tools(object):
             self.n_steps = 5 * self.save_dt
 
             self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps),
-                                               dtype=np.float32)
+                                               dtype = np.float32)
 
             self.init_eta = self.eta.copy()
             self.strata_eta = lil_matrix((self.L * self.W, self.n_steps),
-                                         dtype=np.float32)
+                                         dtype = np.float32)
 
     def init_output_grids(self):
         """Creates a netCDF file to store output grids.
