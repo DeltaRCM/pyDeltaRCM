@@ -66,58 +66,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         self.H_SL = self.H_SL + self.SLR * self.dt
 
-    def get_var_name(self, long_var_name):
-        return self._var_name_map[long_var_name]
-
-    def import_file(self):
-
-        self.input_file_vars = dict()
-        numvars = 0
-
-        o = open(self.input_file, mode='r')
-
-        for line in o:
-            line = re.sub('\s$', '', line)
-            line = re.sub('\A[: :]*', '', line)
-            ln = re.split('\s*[\:\=]\s*', line)
-
-            if len(ln) > 1:
-
-                ln[0] = str.lower(ln[0])
-
-                if ln[0] in self._input_var_names:
-
-                    numvars += 1
-
-                    var_type = self._var_type_map[ln[0]]
-
-                    ln[1] = re.sub('[: :]+$', '', ln[1])
-
-                    if var_type == 'string':
-                        self.input_file_vars[str(ln[0])] = str(ln[1])
-                    if var_type == 'float':
-                        self.input_file_vars[str(ln[0])] = float(ln[1])
-                    if var_type == 'long':
-                        self.input_file_vars[str(ln[0])] = int(ln[1])
-                    if var_type == 'choice':
-
-                        ln[1] = str.lower(ln[1])
-
-                        if ln[1] == 'yes' or ln[1] == 'true':
-                            self.input_file_vars[str(ln[0])] = True
-                        elif ln[1] == 'no' or ln[1] == 'false':
-                            self.input_file_vars[str(ln[0])] = False
-                        else:
-                            print("Alert! Options for 'choice' type variables "
-                                  "are only Yes/No or True/False.\n")
-
-                else:
-                    print("Alert! The input file contains an unknown entry.")
-
-        o.close()
-
-        for k, v in list(self.input_file_vars.items()):
-            setattr(self, self.get_var_name(k), v)
+    # initialization of stratigraphy
 
     def expand_stratigraphy(self):
         """
@@ -166,9 +115,10 @@ class Tools(sed_tools, water_tools, init_tools, object):
             sand_frac[self.Vp_dep_mud > vol_limit] = vol_limit
 
             sand_loc = self.Vp_dep_sand > 0
-            sand_frac[sand_loc] = (self.Vp_dep_sand[sand_loc] /
-                                   (self.Vp_dep_mud[sand_loc] +
-                                    self.Vp_dep_sand[sand_loc]))
+            sand_frac[sand_loc] = (self.Vp_dep_sand[sand_loc]
+                                   / (self.Vp_dep_mud[sand_loc]
+                                   + self.Vp_dep_sand[sand_loc])
+                                   )
             # store indices and sand_frac into a sparse array
             row_s = np.where(sand_frac.flatten() >= 0)[0]
             col_s = np.zeros((len(row_s),))
@@ -192,8 +142,8 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
             if self.toggle_subsidence and self.start_subsidence <= timestep:
 
-                sigma_change = (self.strata_eta[:, :self.strata_counter] -
-                                self.sigma.flatten()[:, np.newaxis])
+                sigma_change = (self.strata_eta[:, :self.strata_counter]
+                                - self.sigma.flatten()[:, np.newaxis])
                 self.strata_eta[:, :self.strata_counter] = lil_matrix(
                     sigma_change)
 

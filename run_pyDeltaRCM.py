@@ -1,14 +1,11 @@
-from pyDeltaRCM import BmiDelta
-import numpy as np
+from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
+import os
 
 if __name__ == '__main__':
-    
-    delta = BmiDelta()
-    
-    delta.initialize('deltaRCM.yaml')
-    
-    for time in range(0,5000):
-        print('Time:', delta.get_current_time())
+
+    delta = pyDeltaRCM(input_file = os.path.join(os.getcwd(), 'tests', 'test.yaml'))
+
+    for time in range(0,1):
         delta.update()
-        
+
     delta.finalize()

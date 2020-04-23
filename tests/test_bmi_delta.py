@@ -5,7 +5,6 @@ import pytest
 import sys
 import os
 import numpy as np
-sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 
 from pyDeltaRCM import BmiDelta
 
@@ -21,7 +20,8 @@ def test_initialize():
     """
     test function BmiDelta.initialize
     """
-    delta.initialize(os.getcwd() + '/tests/test.yaml')
+    delta.initialize(filename=os.getcwd() + '/tests/test_bmi.yaml')
+
     assert delta._delta.f_bedload == 0.5
 
 
@@ -31,5 +31,6 @@ def test_update():
 
 
 def test_update_frac():
-    delta.update_frac(1)
-    assert delta._delta.time_step == 1.0
+    with pytest.warns(UserWarning):
+        delta.update_frac(1)
+        assert delta._delta.time_step == 1.0
