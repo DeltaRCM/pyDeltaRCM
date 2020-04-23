@@ -9,12 +9,12 @@ import pyDeltaRCM
 
 delta = pyDeltaRCM.pyDeltaRCM()
 
-for _t in range(0, 3):
+for _t in range(0, 1):
     delta.update()
 
 delta.finalize()
 
 
 fig, ax = plt.subplots()
-ax.imshow(delta.bed_elevation)
+ax.imshow(delta.bed_elevation, vmax=-4.5)
 plt.show()
