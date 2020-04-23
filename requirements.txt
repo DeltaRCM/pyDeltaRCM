@@ -2,4 +2,5 @@ numpy
 matplotlib
 scipy
 netCDF4
-basic-modeling-interface
+basic_modeling_interface
+pyyaml

@@ -5,18 +5,13 @@ import pytest
 import sys
 import os
 import numpy as np
-sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 
-from pyDeltaRCM import BmiDelta
+from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 from pyDeltaRCM import shared_tools
 
 # need to create a simple case of pydeltarcm object to test these functions
-# will fix the random seed
-np.random.seed(0)
-
-# use test.yaml to create a small test case
-delta = BmiDelta()
-delta.initialize(os.getcwd() + '/tests/test.yaml')
+np.random.seed(0)  # fix the random seed
+delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 
 # now that it is initiated can access the shared_tools via the inherited object
 # delta._delta.**shared_tools_function**
@@ -30,7 +25,7 @@ def test_random_pick():
     probs = np.zeros((8,))
     probs[0] = 1
     # should return first index
-    assert delta._delta.random_pick(probs) == 0
+    assert delta.random_pick(probs) == 0
 
 
 def test_random_pick_inlet():
@@ -39,4 +34,4 @@ def test_random_pick_inlet():
     """
     choices = [0]
     probs = np.ones((1,))
-    assert delta._delta.random_pick_inlet(choices, probs) == 0
+    assert delta.random_pick_inlet(choices, probs) == 0

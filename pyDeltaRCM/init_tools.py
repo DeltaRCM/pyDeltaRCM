@@ -17,7 +17,11 @@ from scipy.sparse import lil_matrix, csc_matrix, hstack
 from scipy import ndimage
 
 from netCDF4 import Dataset
-
+import time as time_lib
+from scipy.sparse import lil_matrix, csc_matrix, hstack
+import logging
+import time
+import yaml
 # tools for initiating deltaRCM model domain
 
 
@@ -33,7 +37,6 @@ class init_tools(object):
             # create the logging file handler
             st = timestr = time.strftime("%Y%m%d-%H%M%S")
             fh = logging.FileHandler("pyDeltaRCM_" + st + ".log")
-
             formatter = logging.Formatter(
                 '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
             fh.setFormatter(formatter)
@@ -41,23 +44,46 @@ class init_tools(object):
             # add handler to logger object
             self.logger.addHandler(fh)
 
-    def set_defaults(self):
+    def import_files(self):
 
-        for k, v in list(self._var_default_map.items()):
-            setattr(self, self._var_name_map[k], v)
+        # This dictionary serves as a container to hold values for both the
+        # user-specified file and the internal defaults.
+        input_file_vars = dict()
 
-    def create_dicts(self):
+        # Open and access both yaml files --> put in dictionaries
+        # only access the user input file if provided.
+        default_file = open(self.default_file, mode = 'r')
+        default_dict = yaml.load(default_file, Loader = yaml.FullLoader)
+        default_file.close()
+        if self.input_file: # and os.path.exists(self.input_file):
+            try:
+                user_file = open(self.input_file, mode = 'r')
+                user_dict = yaml.load(user_file, Loader = yaml.FullLoader)
+                user_file.close()
+            except ValueError as e:
+                raise e
+        else:
+            user_dict = dict()
 
-        self._input_var_names = list(self._input_vars.keys())
+        # go through and populate input vars with user and default values,
+        # checking user values for correct type.
+        for oo in default_dict.keys():
+            if oo in user_dict:
+                expected_type = eval(default_dict[oo]['type'])
+                if type(user_dict[oo]) is expected_type:
+                    input_file_vars[oo] = user_dict[oo]
+                else:
+                    raise TypeError('Input for "{_oo}" not of the right type. '
+                                    'Input type was {_wastype}, '
+                                    'but needs to be {_exptype}.'
+                                    .format(_oo = str(oo), _wastype = type(oo),
+                                            _exptype = expected_type))
+            else:
+                input_file_vars[oo] = default_dict[oo]['default']
 
-        self._var_type_map = dict()
-        self._var_name_map = dict()
-        self._var_default_map = dict()
-
-        for k in list(self._input_vars.keys()):
-            self._var_type_map[k] = self._input_vars[k]['type']
-            self._var_name_map[k] = self._input_vars[k]['name']
-            self._var_default_map[k] = self._input_vars[k]['default']
+        # now make each one an attribute of the model object.
+        for k, v in list(input_file_vars.items()):
+            setattr(self, k, v)
 
     def set_constants(self):
 
@@ -84,7 +110,6 @@ class init_tools(object):
         self.jwalk = np.array([[-1, -1, -1],
                                [0, 0, 0],
                                [1, 1, 1]])
-
         self.dxn_iwalk = [1, 1, 0, -1, -1, -1, 0, 1]
         self.dxn_jwalk = [0, 1, 1, 1, 0, -1, -1, -1]
         self.dxn_dist = \
@@ -136,6 +161,7 @@ class init_tools(object):
         self.gamma = self.g * self.S0 * self.dx / (self.u0**2)
 
         self.V0 = self.h0 * (self.dx**2)    # (m^3) reference volume (volume to
+
         # fill cell to characteristic depth)
 
         self.Qw0 = self.u0 * self.h0 * self.N0 * self.dx    # const discharge
@@ -167,9 +193,8 @@ class init_tools(object):
 
         self._lambda = 1.                       # sedimentation lag
 
-        self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha *
-                                     0.5 / self.dx**2)
-
+        self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha
+                                     * 0.5 / self.dx**2)
         # self.prefix
         self.prefix = self.out_dir
 
@@ -213,7 +238,6 @@ class init_tools(object):
         self.looped = np.zeros((self.Np_water,))
         self.indices = np.zeros((self.Np_water, self.size_indices),
                                 dtype=np.int)
-
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
 
@@ -270,7 +294,6 @@ class init_tools(object):
     def init_stratigraphy(self):
         """Creates sparse array to store stratigraphy data.
         """
-
         if self.save_strata:
 
             self.strata_counter = 0
@@ -278,11 +301,11 @@ class init_tools(object):
             self.n_steps = 5 * self.save_dt
 
             self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps),
-                                               dtype=np.float32)
+                                               dtype = np.float32)
 
             self.init_eta = self.eta.copy()
             self.strata_eta = lil_matrix((self.L * self.W, self.n_steps),
-                                         dtype=np.float32)
+                                         dtype = np.float32)
 
     def init_output_grids(self):
         """Creates a netCDF file to store output grids.
@@ -322,8 +345,8 @@ class init_tools(object):
                                          format='NETCDF4_CLASSIC')
 
             self.output_netcdf.description = 'Output grids from pyDeltaRCM'
-            self.output_netcdf.history = ('Created ' +
-                                          time_lib.ctime(time_lib.time()))
+            self.output_netcdf.history = ('Created '
+                                          + time_lib.ctime(time_lib.time()))
             self.output_netcdf.source = 'pyDeltaRCM / CSDMS'
 
             length = self.output_netcdf.createDimension('length', self.L)
@@ -395,8 +418,8 @@ class init_tools(object):
 
             thetaloc = np.zeros((self.L, self.W))
             thetaloc[self.y > self.L0 - 1] = np.arctan(
-                (self.x[self.y > self.L0 - 1] - self.W / 2.) /
-                (self.y[self.y > self.L0 - 1] - self.L0 + 1))
+                (self.x[self.y > self.L0 - 1] - self.W / 2.)
+                / (self.y[self.y > self.L0 - 1] - self.L0 + 1))
             self.subsidence_mask = ((R1 <= Rloc) & (Rloc <= R2) &
                                     (theta1 <= thetaloc) & (thetaloc <= theta2))
             self.subsidence_mask[:self.L0, :] = False
