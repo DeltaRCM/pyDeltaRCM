@@ -34,9 +34,8 @@ class pyDeltaRCM(Tools):
         self._time_step = 1.
 
         self.verbose = False
-        self.input_file = input_file
-        self.default_file = os.path.join(
-            os.getcwd(), 'pyDeltaRCM', 'default.yml')
+        self._file_dir = os.path.realpath(os.path.dirname(__file__))
+        self.default_file = os.path.join(self._file_dir, 'default.yml')
 
         self.import_files()
 
