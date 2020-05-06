@@ -23,8 +23,6 @@ from .sed_tools import sed_tools
 from .water_tools import water_tools
 from .init_tools import init_tools
 
-np.random.seed(0)
-
 
 class Tools(sed_tools, water_tools, init_tools, object):
 
@@ -35,9 +33,9 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         timestep = self._time
 
-        if self.verbose:
+        if self.verbose > 0:
             print('-' * 20)
-            print('Time = ' + str(self._time))
+            print('Timestep: ' + str(self._time))
 
         for iteration in range(self.itermax):
 
@@ -100,7 +98,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
             if self.strata_eta.shape[1] <= timestep:
                 self.expand_stratigraphy()
 
-            if self.verbose:
+            if self.verbose >= 2:
                 self.logger.info('Storing stratigraphy data')
 
             # ------------------ sand frac ------------------
@@ -161,7 +159,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
             timestep = self._time
 
             if self.start_subsidence <= timestep:
-                if self.verbose:
+                if self.verbose >= 2:
                     self.logger.info('Applying subsidence')
                 self.eta[:] = self.eta - self.sigma
 
@@ -223,27 +221,27 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
             # ------------------ grids ------------------
             if self.save_eta_grids:
-                if self.verbose:
+                if self.verbose >= 2:
                     self.logger.info('Saving grid: eta')
                 self.save_grids('eta', self.eta, shape[0])
 
             if self.save_depth_grids:
-                if self.verbose:
+                if self.verbose >= 2:
                     self.logger.info('Saving grid: depth')
                 self.save_grids('depth', self.depth, shape[0])
 
             if self.save_stage_grids:
-                if self.verbose:
+                if self.verbose >= 2:
                     self.logger.info('Saving grid: stage')
                 self.save_grids('stage', self.stage, shape[0])
 
             if self.save_discharge_grids:
-                if self.verbose:
+                if self.verbose >= 2:
                     self.logger.info('Saving grid: discharge')
                 self.save_grids('discharge', self.qw, shape[0])
 
             if self.save_velocity_grids:
-                if self.verbose:
+                if self.verbose >= 2:
                     self.logger.info('Saving grid: velocity')
                 self.save_grids('velocity', self.uw, shape[0])
 
@@ -254,7 +252,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         if self.save_strata:
 
-            if self.verbose:
+            if self.verbose >= 2:
                 self.logger.info('\nSaving final stratigraphy to netCDF file')
 
             self.strata_eta = self.strata_eta[:, :self.strata_counter]
@@ -295,7 +293,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
                 self.output_netcdf.variables['strata_depth'][i, :, :] = sz
 
-            if self.verbose:
+            if self.verbose >= 2:
                 self.logger.info('Stratigraphy data saved.')
 
     def save_figure(self, path, ext='png', close=True):
@@ -318,7 +316,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
             directory = '.'
 
         if not os.path.exists(directory):
-            if self.verbose:
+            if self.verbose >= 2:
                 self.logger.info('Creating output directory')
             os.makedirs(directory)
 

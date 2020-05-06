@@ -8,11 +8,7 @@ import os
 
 class pyDeltaRCM(Tools):
 
-    #############################################
-    ################## __init__ #################
-    #############################################
-
-    def __init__(self, input_file = None):
+    def __init__(self, input_file=None):
         """Creates an instance of the pyDeltaRCM model.
 
         This method handles setting up the run, including parsing input files,
@@ -33,7 +29,6 @@ class pyDeltaRCM(Tools):
         self._time = 0.
         self._time_step = 1.
 
-        self.verbose = False
         self.input_file = input_file
         self._file_dir = os.path.realpath(os.path.dirname(__file__))
         self.default_file = os.path.join(self._file_dir, 'default.yml')
@@ -71,7 +66,7 @@ class pyDeltaRCM(Tools):
 
         try:
             self.output_netcdf.close()
-            if self.verbose:
+            if self.verbose >= 1:
                 print('Closed output netcdf file.')
         except Exception:
             pass

@@ -16,6 +16,14 @@ delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 # now that it is initiated can access the init_tools via the inherited object
 # delta.**init_tools_function**
 
+# Tests for attrs set during yaml parsing
+def test_set_verbose():
+    assert delta.verbose == 0
+
+
+def test_set_seed():
+    assert delta.seed == 0
+
 
 # Tests for all of the constants
 delta.set_constants()
