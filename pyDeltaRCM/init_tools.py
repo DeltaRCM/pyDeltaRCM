@@ -29,7 +29,7 @@ class init_tools(object):
 
     def init_logger(self):
 
-        if self.verbose:
+        if self.verbose >= 1:
 
             self.logger = logging.getLogger("driver")
             self.logger.setLevel(logging.INFO)
@@ -85,6 +85,9 @@ class init_tools(object):
         for k, v in list(input_file_vars.items()):
             setattr(self, k, v)
 
+        if self.seed >= 0:
+            np.random.seed(self.seed)
+
     def set_constants(self):
 
         self.g = 9.81   # (gravitation const.)
@@ -128,6 +131,15 @@ class init_tools(object):
                                  [1, 1, 1]])
 
     def create_other_variables(self):
+        """Model implementation variables.
+
+        Creates variables for model implementation, from specified boundary
+        condition variables. This method is run during initial model
+        instantition, but it is also run any time an inlet flow condition
+        variable is changed, including ``channel_flow_velocity``,
+        ``channel_width``, ``channel_flow_depth``, and
+        ``influx_sediment_concentration``.
+        """
 
         self.init_Np_water = self.Np_water
         self.init_Np_sed = self.Np_sed
@@ -323,21 +335,21 @@ class init_tools(object):
                 self.save_velocity_grids or
                 self.save_strata):
 
-            if self.verbose:
+            if self.verbose >= 2:
                 self.logger.info('Generating netCDF file for output grids...')
 
             directory = self.prefix
             filename = 'pyDeltaRCM_output.nc'
 
             if not os.path.exists(directory):
-                if self.verbose:
+                if self.verbose >= 2:
                     self.logger.info('Creating output directory')
                 os.makedirs(directory)
 
             file_path = os.path.join(directory, filename)
 
             if os.path.exists(file_path):
-                if self.verbose:
+                if self.verbose >= 2:
                     self.logger.info('*** Replaced existing netCDF file ***')
                 os.remove(file_path)
 
@@ -396,7 +408,7 @@ class init_tools(object):
                                                              ('total_time', 'length', 'width'))
                 velocity.units = 'meters per second'
 
-            if self.verbose:
+            if self.verbose >= 2:
                 self.logger.info('Output netCDF file created.')
 
     def init_subsidence(self):

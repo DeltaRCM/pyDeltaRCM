@@ -7,6 +7,12 @@ case_prefix:
 out_dir:
   type: 'str'
   default: 'deltaRCM_Output'
+verbose:
+  type: 'int'
+  default: 0
+seed:
+  type: 'int'
+  default: -1
 Length:
   type: 'float'
   default: 1000.
