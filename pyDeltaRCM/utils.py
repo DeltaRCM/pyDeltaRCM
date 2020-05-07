@@ -30,7 +30,7 @@ def random_pick(probs):
     v = np.random.uniform(0, cutoffs[-1])
     idx = np.searchsorted(cutoffs, v)
 
-    return idx
+    return int(idx)
 
 
 @numba.njit
@@ -46,9 +46,7 @@ def random_pick_inlet(choices, probs=None):
         probs = np.array([1. for i in range(len(choices))])
 
     cutoffs = np.cumsum(probs)
-    # print(cutoffs.dtype)
     v = np.random.uniform(0, cutoffs[-1])
-    # print("TYPES:", cutoffs.dtype, type(v))
     idx = np.searchsorted(cutoffs, v)
 
     return choices[idx]

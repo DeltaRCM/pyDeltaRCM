@@ -26,6 +26,85 @@ from . import utils
 # tools for water routing algorithms
 
 
+@numba.njit
+def _index_slicer(kernel, ind):
+    """Get a slice out of a kernel for an ind.
+    """
+
+    return kernel[ind[0] - 1 + 1:ind[0] + 2 + 1, ind[1] - 1 + 1:ind[1] + 2 + 1]
+
+
+@numba.njit
+def get_weights_kernels(ind, pad_stage, stage, distances, qx, qy,
+                        ivec, jvec, pad_depth, pad_cell_type):
+    """Get weights and kernels for an ind.
+    """
+    stage_ind = _index_slicer(pad_stage, ind)
+    weight_sfc = np.maximum(0,
+                            (stage[ind] - stage_ind) / distances)
+
+    weight_int = np.maximum(0, (qx[ind] * jvec +
+                            qy[ind] * ivec) / distances)
+    depth_ind = _index_slicer(pad_depth, ind)
+    ct_ind = _index_slicer(pad_cell_type, ind)
+
+    return weight_sfc, weight_int, depth_ind, ct_ind
+
+
+@numba.njit
+def get_new_cell(ind, weight_sfc, weight_int, depth_ind, ct_ind,
+                 dry_depth, gamma, theta_water):
+    """Get new_cell based on weights and kernels for an ind.
+    """
+
+    if ind[0] == 0:
+        weight_sfc[0, :] = 0
+        weight_int[0, :] = 0
+
+    for (i, u), (j, v) in zip(np.ndenumerate(depth_ind),
+                              np.ndenumerate(ct_ind)):
+        if (u <= dry_depth) or (v == -2):
+            weight_sfc[i] = 0
+            weight_int[i] = 0
+
+    if np.nansum(weight_sfc) > 0:
+        weight_sfc = weight_sfc / np.nansum(weight_sfc)
+
+    if np.nansum(weight_int) > 0:
+        weight_int = weight_int / np.nansum(weight_int)
+
+    _weight = gamma * weight_sfc + (1 - gamma) * weight_int
+    _weight = depth_ind ** theta_water * _weight
+    for i, u in np.ndenumerate(depth_ind):
+        if u <= dry_depth:
+            _weight[i] = np.nan
+
+    new_cell = utils.random_pick(_weight)
+
+    return new_cell
+
+
+@numba.njit
+def get_new_cells(inds_tuple_typed, pad_stage, stage, distances, qx, qy,
+                  ivec, jvec, pad_depth, pad_cell_type, dry_depth, gamma,
+                  theta_water):
+    """Get new_cells based on current model state.
+    """
+    new_cells = [np.int(x) for x in range(0)]
+    for ind in inds_tuple_typed:
+        if ind != (0, 0):
+            weight_sfc, weight_int, depth_ind, ct_ind = get_weights_kernels(
+                ind, pad_stage, stage, distances, qx, qy, ivec, jvec,
+                pad_depth, pad_cell_type)
+            new_cells.append(get_new_cell(ind, weight_sfc, weight_int,
+                                          depth_ind, ct_ind, dry_depth,
+                                          gamma, theta_water))
+        else:
+            new_cells.append(int(4))
+
+    return new_cells
+
+
 class water_tools(shared_tools):
 
     def update_flow_field(self, iteration):
@@ -146,8 +225,9 @@ class water_tools(shared_tools):
     def run_water_iteration(self):
 
         _iter = 0
-        start_indices = [utils.random_pick_inlet(
-            self.inlet) for x in range(self.Np_water)]
+        typed_inlet = self.inlet_typed
+        start_indices = [utils.random_pick_inlet(typed_inlet)
+                         for x in range(self.Np_water)]
 
         self.qxn.flat[start_indices] += 1
         self.qwn.flat[start_indices] += self.Qp_water / self.dx / 2.
@@ -164,11 +244,18 @@ class water_tools(shared_tools):
             self.check_size_of_indices_matrix(_iter)
 
             inds = np.unravel_index(current_inds, self.depth.shape)
+            inds_tuple_typed = numba.typed.List()
             inds_tuple = [(inds[0][i], inds[1][i])
                           for i in range(len(inds[0]))]
+            [inds_tuple_typed.append(x) for x in inds_tuple]
 
-            new_cells = [self.get_weight(x)
-                         if x != (0, 0) else 4 for x in inds_tuple]
+            new_cells = get_new_cells(inds_tuple_typed, self.pad_stage,
+                                      self.stage, self.distances,
+                                      self.qx, self.qy,
+                                      self.ivec, self.jvec,
+                                      self.pad_depth, self.pad_cell_type,
+                                      self.dry_depth, self.gamma,
+                                      self.theta_water)
 
             new_inds = list(map(lambda x, y: self.calculate_new_ind(x, y)
                                 if y != 4 else 0, inds_tuple, new_cells))
@@ -391,43 +478,6 @@ class water_tools(shared_tools):
             new_ind, self.depth.shape, mode='wrap')
 
         return new_ind_flat
-
-    def get_weight(self, ind):
-
-        stage_ind = self.pad_stage[
-            ind[0] - 1 + 1:ind[0] + 2 + 1, ind[1] - 1 + 1:ind[1] + 2 + 1]
-
-        weight_sfc = np.maximum(0,
-                                (self.stage[ind] - stage_ind) / self.distances)
-
-        weight_int = np.maximum(0, (self.qx[ind] * self.jvec +
-                                    self.qy[ind] * self.ivec) / self.distances)
-
-        if ind[0] == 0:
-            weight_sfc[0, :] = 0
-            weight_int[0, :] = 0
-
-        depth_ind = self.pad_depth[
-            ind[0] - 1 + 1:ind[0] + 2 + 1, ind[1] - 1 + 1:ind[1] + 2 + 1]
-        ct_ind = self.pad_cell_type[
-            ind[0] - 1 + 1:ind[0] + 2 + 1, ind[1] - 1 + 1:ind[1] + 2 + 1]
-
-        weight_sfc[(depth_ind <= self.dry_depth) | (ct_ind == -2)] = 0
-        weight_int[(depth_ind <= self.dry_depth) | (ct_ind == -2)] = 0
-
-        if np.nansum(weight_sfc) > 0:
-            weight_sfc = weight_sfc / np.nansum(weight_sfc)
-
-        if np.nansum(weight_int) > 0:
-            weight_int = weight_int / np.nansum(weight_int)
-
-        self.weight = self.gamma * weight_sfc + (1 - self.gamma) * weight_int
-        self.weight = depth_ind ** self.theta_water * self.weight
-        self.weight[depth_ind <= self.dry_depth] = np.nan
-
-        new_cell = utils.random_pick(self.weight)
-
-        return new_cell
 
     def build_weight_array(self, array, fix_edges=False, normalize=False):
         """

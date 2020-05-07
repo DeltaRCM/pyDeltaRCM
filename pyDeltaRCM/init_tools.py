@@ -9,6 +9,7 @@ import time
 from math import floor, sqrt, pi
 import numpy as np
 from random import shuffle
+import numba
 
 import matplotlib
 from matplotlib import pyplot as plt
@@ -310,6 +311,8 @@ class init_tools(object):
         self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
 
         self.inlet = list(np.unique(np.where(self.cell_type == 1)[1]))
+        self.inlet_typed = numba.typed.List()
+        [self.inlet_typed.append(x) for x in self.inlet]
         self.eta[:] = self.stage - self.depth
 
         self.clim_eta = (-self.h0 - 1, 0.05)
