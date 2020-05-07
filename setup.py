@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 from setuptools import setup, find_packages
 
-from pyDeltaRCM import shared_tools
+from pyDeltaRCM import utils
 
 setup(name='pyDeltaRCM',
-      version=shared_tools._get_version(),
+      version=utils._get_version(),
       author='The DeltaRCM Team',
       license='MIT',
       description="Python version of original Matlab DeltaRCM",
