@@ -6,6 +6,8 @@ import string
 import logging
 import time
 
+import numba
+
 from math import floor, sqrt, pi
 import numpy as np
 from random import shuffle
@@ -19,6 +21,7 @@ from scipy import ndimage
 from netCDF4 import Dataset
 
 from .shared_tools import shared_tools
+from . import utils
 
 # tools for water routing algorithms
 
@@ -142,8 +145,8 @@ class water_tools(shared_tools):
 
     def run_water_iteration(self):
 
-        iter = 0
-        start_indices = [self.random_pick_inlet(
+        _iter = 0
+        start_indices = [utils.random_pick_inlet(
             self.inlet) for x in range(self.Np_water)]
 
         self.qxn.flat[start_indices] += 1
@@ -154,11 +157,11 @@ class water_tools(shared_tools):
 
         self.looped[:] = 0
 
-        while (sum(current_inds) > 0) & (iter < self.itmax):
+        while (sum(current_inds) > 0) & (_iter < self.itmax):
 
-            iter += 1
+            _iter += 1
 
-            self.check_size_of_indices_matrix(iter)
+            self.check_size_of_indices_matrix(_iter)
 
             inds = np.unravel_index(current_inds, self.depth.shape)
             inds_tuple = [(inds[0][i], inds[1][i])
@@ -176,13 +179,13 @@ class water_tools(shared_tools):
             new_inds = np.array(new_inds, dtype=np.int)
             new_inds[np.array(dist) == 0] = 0
 
-            self.indices[:, iter] = new_inds
+            self.indices[:, _iter] = new_inds
 
-            current_inds = self.check_for_loops(new_inds, iter)
+            current_inds = self.check_for_loops(new_inds, _iter)
 
             current_inds = self.check_for_boundary(current_inds)
 
-            self.indices[:, iter] = current_inds
+            self.indices[:, _iter] = current_inds
 
             current_inds[self.free_surf_flag > 0] = 0
 
@@ -422,7 +425,7 @@ class water_tools(shared_tools):
         self.weight = depth_ind ** self.theta_water * self.weight
         self.weight[depth_ind <= self.dry_depth] = np.nan
 
-        new_cell = self.random_pick(self.weight)
+        new_cell = utils.random_pick(self.weight)
 
         return new_cell
 
