@@ -10,7 +10,6 @@ from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 from pyDeltaRCM import water_tools
 
 # need to create a simple case of pydeltarcm object to test these functions
-np.random.seed(0)  # fix the random seed
 delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 
 # now that it is initiated can access the water_tools via the inherited object
