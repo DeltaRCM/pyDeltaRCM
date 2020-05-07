@@ -29,7 +29,7 @@ class init_tools(object):
 
     def init_logger(self):
 
-        if self.verbose:
+        if self.verbose >= 1:
 
             self.logger = logging.getLogger("driver")
             self.logger.setLevel(logging.INFO)
@@ -51,14 +51,21 @@ class init_tools(object):
         input_file_vars = dict()
 
         # Open and access both yaml files --> put in dictionaries
-        # only access the user input file if provided.
-        default_file = open(self.default_file, mode = 'r')
-        default_dict = yaml.load(default_file, Loader = yaml.FullLoader)
+        # parse default yaml and find expected types
+        default_file = open(self.default_file, mode='r')
+        default_dict = yaml.load(default_file, Loader=yaml.FullLoader)
         default_file.close()
-        if self.input_file: # and os.path.exists(self.input_file):
+        for k, v in default_dict.items():
+            if not type(v['type']) is list:
+                default_dict[k]['type'] = [eval(v['type'])]
+            else:
+                default_dict[k]['type'] = [eval(_v) for _v in v['type']]
+
+        # only access the user input file if provided.
+        if self.input_file:
             try:
-                user_file = open(self.input_file, mode = 'r')
-                user_dict = yaml.load(user_file, Loader = yaml.FullLoader)
+                user_file = open(self.input_file, mode='r')
+                user_dict = yaml.load(user_file, Loader=yaml.FullLoader)
                 user_file.close()
             except ValueError as e:
                 raise e
@@ -67,23 +74,30 @@ class init_tools(object):
 
         # go through and populate input vars with user and default values,
         # checking user values for correct type.
-        for oo in default_dict.keys():
-            if oo in user_dict:
-                expected_type = eval(default_dict[oo]['type'])
-                if type(user_dict[oo]) is expected_type:
-                    input_file_vars[oo] = user_dict[oo]
+        for k, v in default_dict.items():
+            if k in user_dict:
+                expected_type = v['type']
+                if type(user_dict[k]) in expected_type:
+                    input_file_vars[k] = user_dict[k]
                 else:
-                    raise TypeError('Input for "{_oo}" not of the right type. '
-                                    'Input type was {_wastype}, '
-                                    'but needs to be {_exptype}.'
-                                    .format(_oo = str(oo), _wastype = type(oo),
-                                            _exptype = expected_type))
+                    raise TypeError('Input for "{_k}" not of the right type '
+                                    'in yaml configuration file "{_file}". '
+                                    'Input type was "{_wastype}", '
+                                    'but needs to be "{_exptype}".'
+                                    .format(_k=str(k), _file=self.input_file,
+                                            _wastype=type(k).__name__,
+                                            _exptype=expected_type))
             else:
-                input_file_vars[oo] = default_dict[oo]['default']
+                input_file_vars[k] = default_dict[k]['default']
 
         # now make each one an attribute of the model object.
         for k, v in list(input_file_vars.items()):
             setattr(self, k, v)
+
+        if self.seed is not None:
+            if self.verbose >= 2:
+                print("setting random seed to %s " % str(self.seed))
+            np.random.seed(self.seed)
 
     def set_constants(self):
 
@@ -128,6 +142,15 @@ class init_tools(object):
                                  [1, 1, 1]])
 
     def create_other_variables(self):
+        """Model implementation variables.
+
+        Creates variables for model implementation, from specified boundary
+        condition variables. This method is run during initial model
+        instantition, but it is also run any time an inlet flow condition
+        variable is changed, including ``channel_flow_velocity``,
+        ``channel_width``, ``channel_flow_depth``, and
+        ``influx_sediment_concentration``.
+        """
 
         self.init_Np_water = self.Np_water
         self.init_Np_sed = self.Np_sed
@@ -323,21 +346,21 @@ class init_tools(object):
                 self.save_velocity_grids or
                 self.save_strata):
 
-            if self.verbose:
+            if self.verbose >= 2:
                 self.logger.info('Generating netCDF file for output grids...')
 
             directory = self.prefix
             filename = 'pyDeltaRCM_output.nc'
 
             if not os.path.exists(directory):
-                if self.verbose:
+                if self.verbose >= 2:
                     self.logger.info('Creating output directory')
                 os.makedirs(directory)
 
             file_path = os.path.join(directory, filename)
 
             if os.path.exists(file_path):
-                if self.verbose:
+                if self.verbose >= 2:
                     self.logger.info('*** Replaced existing netCDF file ***')
                 os.remove(file_path)
 
@@ -396,7 +419,7 @@ class init_tools(object):
                                                              ('total_time', 'length', 'width'))
                 velocity.units = 'meters per second'
 
-            if self.verbose:
+            if self.verbose >= 2:
                 self.logger.info('Output netCDF file created.')
 
     def init_subsidence(self):

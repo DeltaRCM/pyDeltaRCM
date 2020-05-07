@@ -3,6 +3,7 @@ case_prefix: ''
 out_dir: test
 Length: 10.0
 Width: 10.0
+seed: 0
 dx: 1.0
 L0_meters: 1.0
 S0: 0.0002
@@ -29,5 +30,5 @@ save_stage_grids: False
 save_depth_grids: False
 save_discharge_grids: False
 save_velocity_grids: False
-save_dt: 50.
+save_dt: 50
 save_strata: False
