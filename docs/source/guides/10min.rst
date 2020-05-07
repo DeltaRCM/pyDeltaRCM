@@ -35,4 +35,4 @@ We can visualize the delta bed elevation, though it's not very exciting after on
     >>> ax.imshow(delta.bed_elevation, vmax=-4.5)
     >>> plt.show()
 
-.. plot:: pyplots/10min/model_run_visual.py
+.. plot:: 10min/model_run_visual.py

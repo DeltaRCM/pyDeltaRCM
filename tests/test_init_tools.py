@@ -10,11 +10,18 @@ from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 from pyDeltaRCM import init_tools
 
 # need to create a simple case of pydeltarcm object to test these functions
-np.random.seed(0)  # fix the random seed
 delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 
 # now that it is initiated can access the init_tools via the inherited object
 # delta.**init_tools_function**
+
+# Tests for attrs set during yaml parsing
+def test_set_verbose():
+    assert delta.verbose == 0
+
+
+def test_set_seed_zero():
+    assert delta.seed == 0
 
 
 # Tests for all of the constants

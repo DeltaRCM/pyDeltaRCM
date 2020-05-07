@@ -10,7 +10,6 @@ from pyDeltaRCM import BmiDelta
 
 # need to create a simple case of pydeltarcm object to test these functions
 # will fix the random seed
-np.random.seed(0)
 
 # use test.yaml
 delta = BmiDelta()

@@ -34,7 +34,7 @@ def test_override_from_testfile():
     assert delta.Length == 10
 
 
-@pytest.mark.xfail(raises=FileNotFoundError)
+@pytest.mark.xfail(raises=FileNotFoundError, strict=True)
 def test_error_if_no_file_found():
     delta = pyDeltaRCM(input_file='./nonexisting_file.yaml')
 
@@ -59,7 +59,7 @@ def test_override_two_defaults(tmp_path):
     assert delta.Np_sed == 2
 
 
-@pytest.mark.xfail(raises=TypeError)
+@pytest.mark.xfail(raises=TypeError, strict=True)
 def test_override_bad_type_float_string(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = create_temporary_file(tmp_path, file_name)
@@ -68,16 +68,7 @@ def test_override_bad_type_float_string(tmp_path):
     delta = pyDeltaRCM(input_file=p)
 
 
-@pytest.mark.xfail(raises=TypeError)
-def test_override_bad_type_float_int(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = create_temporary_file(tmp_path, file_name)
-    write_parameter_to_file(f, 'S0', 2)
-    f.close()
-    delta = pyDeltaRCM(input_file=p)
-
-
-@pytest.mark.xfail(raises=TypeError)
+@pytest.mark.xfail(raises=TypeError, strict=True)
 def test_override_bad_type_int_float(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = create_temporary_file(tmp_path, file_name)
@@ -105,3 +96,30 @@ def test_not_overwriting_existing_attributes(tmp_path):
     assert delta.S0 == 0.0002  # from default.yaml
     assert hasattr(delta, 'input_file')
     assert delta.input_file == p
+
+
+# paramter specific testing
+
+def test_random_seed_settings_value(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = create_temporary_file(tmp_path, file_name)
+    write_parameter_to_file(f, 'seed', 9999)
+    f.close()
+    np.random.seed(9999)
+    _preval_same = np.random.uniform()
+    np.random.seed(5)
+    _preval_diff = np.random.uniform(1000)
+    delta = pyDeltaRCM(input_file=p)
+    assert delta.seed == 9999
+    _postval_same = np.random.uniform()
+    assert _preval_same == _postval_same
+
+
+def test_random_seed_settings_noaction_default(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = create_temporary_file(tmp_path, file_name)
+    write_parameter_to_file(f, 'S0', 0.005)
+    f.close()
+    delta = pyDeltaRCM(input_file=p)
+    assert delta.seed is None
+    assert np.random.seed is not 0

@@ -489,7 +489,7 @@ class water_tools(shared_tools):
             self.iter for all further timesteps
             """
 
-            if self.verbose:
+            if self.verbose >= 2:
                 self.logger.info('Increasing size of self.indices')
 
             indices_blank = np.zeros(
