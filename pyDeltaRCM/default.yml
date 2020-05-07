@@ -11,22 +11,22 @@ verbose:
   type: 'int'
   default: 0
 seed:
-  type: 'int'
-  default: -1
+  type: ['int', 'None']
+  default: null
 Length:
-  type: 'float'
+  type: ['float', 'int']
   default: 1000.
 Width:
-  type: 'float'
+  type: ['float', 'int']
   default: 2000.
 dx:
-  type: 'float'
+  type: ['float', 'int']
   default: 50.
 L0_meters:
-  type: 'float'
+  type: ['float', 'int']
   default: 150.0
 S0:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.0002
 itermax:
   type: 'int'
@@ -35,40 +35,40 @@ Np_water:
   type: 'int'
   default: 2000
 u0:
-  type: 'float'
+  type: ['float', 'int']
   default: 1.0
 N0_meters:
-  type: 'float'
+  type: ['float', 'int']
   default: 200.0
 h0:
-  type: 'float'
+  type: ['float', 'int']
   default: 5.0
 H_SL:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.0
 SLR:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.0
 Np_sed:
   type: 'int'
   default: 1000
 f_bedload:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.5
 C0_percent:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.1
 Csmooth:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.9
 toggle_subsidence:
   type: 'bool'
   default: False
 sigma_max:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.000825
 start_subsidence:
-  type: 'float'
+  type: ['float', 'int']
   default: 2.5
 save_eta_figs:
   type: 'bool'
@@ -101,44 +101,44 @@ save_velocity_grids:
   type: 'bool'
   default: True
 save_dt:
-  type: 'float'
+  type: 'int'
   default: 50
 save_strata:
   type: 'bool'
   default: True
 omega_sfc:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.1
 omega_flow:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.9
 Nsmooth:
   type: 'int'
   default: 5
 theta_water:
-  type: 'float'
+  type: ['float', 'int']
   default: 1.0
 coeff_theta_sand:
-  type: 'float'
+  type: ['float', 'int']
   default: 2.0
 coeff_theta_mud:
-  type: 'float'
+  type: ['float', 'int']
   default: 1.0
 beta:
   type: 'int'
   default: 3
 sed_lag:
-  type: 'float'
+  type: ['float', 'int']
   default: 1.0
 coeff_U_dep_mud:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.3
 coeff_U_ero_mud:
-  type: 'float'
+  type: ['float', 'int']
   default: 1.5
 coeff_U_ero_sand:
-  type: 'float'
+  type: ['float', 'int']
   default: 1.05
 alpha:
-  type: 'float'
+  type: ['float', 'int']
   default: 0.1
