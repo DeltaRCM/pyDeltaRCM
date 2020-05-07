@@ -30,5 +30,5 @@ save_stage_grids: False
 save_depth_grids: False
 save_discharge_grids: False
 save_velocity_grids: False
-save_dt: 50.
+save_dt: 50
 save_strata: False
