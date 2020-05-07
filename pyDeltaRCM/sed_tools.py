@@ -19,6 +19,7 @@ from scipy import ndimage
 from netCDF4 import Dataset
 
 from .shared_tools import shared_tools
+from . import utils
 
 # tools for sediment routing algorithms and deposition/erosion
 
@@ -200,7 +201,7 @@ class sed_tools(shared_tools):
             if ind[0] == 0:
                 weight[0, :] = np.nan
 
-            new_cell = self.random_pick(weight)
+            new_cell = utils.random_pick(weight)
 
             jstep = self.iwalk.flat[new_cell]
             istep = self.jwalk.flat[new_cell]
