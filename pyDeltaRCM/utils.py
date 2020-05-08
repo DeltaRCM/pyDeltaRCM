@@ -8,6 +8,16 @@ import numba
 
 
 @numba.njit
+def set_random_seed(_seed):
+    np.random.seed(_seed)
+
+
+@numba.njit
+def get_random_uniform(N):
+    return np.random.uniform(0, 1, N)
+
+
+@numba.njit
 def random_pick(probs):
     """
     Randomly pick a number weighted by array probs (len 8)

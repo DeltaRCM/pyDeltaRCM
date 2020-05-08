@@ -6,6 +6,7 @@ import numpy as np
 
 from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 
+from pyDeltaRCM.utils import set_random_seed, get_random_uniform
 
 # utilities for file writing
 def create_temporary_file(tmp_path, file_name):
@@ -105,13 +106,13 @@ def test_random_seed_settings_value(tmp_path):
     p, f = create_temporary_file(tmp_path, file_name)
     write_parameter_to_file(f, 'seed', 9999)
     f.close()
-    np.random.seed(9999)
-    _preval_same = np.random.uniform()
-    np.random.seed(5)
-    _preval_diff = np.random.uniform(1000)
+    set_random_seed(9999)
+    _preval_same = get_random_uniform(1)
+    set_random_seed(5)
+    _preval_diff = get_random_uniform(1000)
     delta = pyDeltaRCM(input_file=p)
     assert delta.seed == 9999
-    _postval_same = np.random.uniform()
+    _postval_same = get_random_uniform(1)
     assert _preval_same == _postval_same
 
 

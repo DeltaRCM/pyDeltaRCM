@@ -23,6 +23,10 @@ from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
 import time
 import yaml
+
+from . import utils
+
+
 # tools for initiating deltaRCM model domain
 
 
@@ -98,7 +102,7 @@ class init_tools(object):
         if self.seed is not None:
             if self.verbose >= 2:
                 print("setting random seed to %s " % str(self.seed))
-            np.random.seed(self.seed)
+            utils.set_random_seed(self.seed)
 
     def set_constants(self):
 

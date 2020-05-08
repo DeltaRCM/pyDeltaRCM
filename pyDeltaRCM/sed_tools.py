@@ -240,8 +240,8 @@ class sed_tools(shared_tools):
         theta_sed = self.theta_sand
 
         num_starts = int(self.Np_sed * self.f_bedload)
-        start_indices = [self.random_pick_inlet(
-            self.inlet) for x in range(num_starts)]
+        typed_inlet = self.inlet_typed
+        start_indices = [utils.random_pick_inlet(typed_inlet) for x in range(num_starts)]
 
         for np_sed in range(num_starts):
 
@@ -282,8 +282,8 @@ class sed_tools(shared_tools):
         theta_sed = self.theta_mud
 
         num_starts = int(self.Np_sed * (1 - self.f_bedload))
-        start_indices = [self.random_pick_inlet(
-            self.inlet) for x in range(num_starts)]
+        typed_inlet = self.inlet_typed
+        start_indices = [utils.random_pick_inlet(typed_inlet) for x in range(num_starts)]
 
         for np_sed in range(num_starts):
 
