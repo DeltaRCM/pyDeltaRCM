@@ -187,7 +187,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
             if self.save_eta_figs:
 
                 plt.pcolor(self.eta)
-                plt.clim(self.clim_eta[0], self.clim_eta[1])
+                # plt.clim(self.clim_eta[0], self.clim_eta[1])
                 plt.colorbar()
                 plt.axis('equal')
                 self.save_figure(self.prefix + "eta_" + str(timestep))
