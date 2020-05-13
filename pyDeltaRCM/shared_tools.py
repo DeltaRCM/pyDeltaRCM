@@ -11,19 +11,13 @@ class shared_tools(object):
 
     def random_pick(self, probs):
         """
-        Randomly pick a number weighted by array probs (len 8)
+        Randomly pick a number weighted by array probabilities (len 9)
         Return the index of the selected weight in array probs
+        Takes a numpy array that is the precalculated cumulative probability
+        around the cell flattened to 1D.
         """
 
-        num_nans = sum(np.isnan(probs))
-
-        if np.nansum(probs) == 0:
-            probs[~np.isnan(probs)] = 1
-            probs[1, 1] = 0
-
-        probs[np.isnan(probs)] = 0
-        cutoffs = np.cumsum(probs)
-        idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
+        idx = probs.searchsorted(np.random.uniform(0, probs[-1]))
 
         return idx
 
