@@ -55,6 +55,8 @@ class water_tools(shared_tools):
 
         self.looped[:] = 0
 
+        self.get_water_weight_array()
+
         while (sum(current_inds) > 0) & (iter < self.itmax):
 
             iter += 1
@@ -188,7 +190,15 @@ class water_tools(shared_tools):
 
             self.indices = np.hstack((self.indices, indices_blank))
 
-    def get_weight(self, ind):
+    def get_water_weight_array(self):
+
+        self.water_weights = np.zeros(shape = (self.L, self.W, 9))
+
+        for i in range(self.L):
+            for j in range(self.W):
+                self.water_weights[i, j] = self.get_weight_at_cell((i, j))
+
+    def get_weight_at_cell(self, ind):
 
         stage_ind = self.pad_stage[
             ind[0] - 1 + 1:ind[0] + 2 + 1, ind[1] - 1 + 1:ind[1] + 2 + 1]
@@ -217,18 +227,24 @@ class water_tools(shared_tools):
         if np.nansum(weight_int) > 0:
             weight_int = weight_int / np.nansum(weight_int)
 
-        self.weight = self.gamma * weight_sfc + (1 - self.gamma) * weight_int
-        self.weight = depth_ind ** self.theta_water * self.weight
-        self.weight[depth_ind <= self.dry_depth] = np.nan
+        weight = self.gamma * weight_sfc + (1 - self.gamma) * weight_int
+        weight = depth_ind ** self.theta_water * weight
+        weight[depth_ind <= self.dry_depth] = 0
+        if np.sum(weight) != 0:
+            weight = weight / np.sum(weight)
+        else:
+            weight = weight
 
-        new_cell = self.random_pick(self.weight)
+        return np.cumsum(weight.flatten())
 
+    def get_new_cell(self, ind):
+        weight = self.water_weights[ind[0], ind[1]]
+        new_cell = self.random_pick(weight)
         return new_cell
 
     def calculate_new_ind(self, ind, new_cell):
 
-        new_ind = (ind[0] + self.jwalk.flat[new_cell], ind[1] +
-                   self.iwalk.flat[new_cell])
+        new_ind = (ind[0] + self.jwalk.flat[new_cell],
         # added wrap mode to fct to resolve ValueError due to negative numbers
         new_ind_flat = np.ravel_multi_index(
             new_ind, self.depth.shape, mode='wrap')
