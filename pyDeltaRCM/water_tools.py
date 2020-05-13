@@ -70,15 +70,9 @@ class water_tools(shared_tools):
                          if x != (0, 0) else 4
                          for x in inds_tuple]
 
-            new_inds = list(map(lambda x, y: self.calculate_new_ind(x, y)
-                                if y != 4 else 0,
-                                inds_tuple, new_cells
-                                )
-                            )
+            new_inds = self.calculate_new_indices(inds_tuple, new_cells)
 
-            dist = list(map(lambda x, y, z: self.step_update(x, y, z)
-                            if x > 0 else 0,
-                            current_inds, new_inds, new_cells))
+            dist = self.update_steps(current_inds, new_inds, new_cells)
 
             new_inds = np.array(new_inds, dtype=np.int)
             new_inds[np.array(dist) == 0] = 0
@@ -157,8 +151,8 @@ class water_tools(shared_tools):
                     self.sfc_visit[i, j] = self.sfc_visit[i, j] + 1
                     # add up # of cell visits
 
-                    self.sfc_sum[i, j] = self.sfc_sum[i, j] + Hnew[i, j]
                     # sum of all water surface elevations
+                    self.sfc_sum[i, j] = self.sfc_sum[i, j] + Hnew[i, j]
 
     def finalize_water_iteration(self, timestep, iteration):
         """
@@ -255,23 +249,41 @@ class water_tools(shared_tools):
 
         return new_ind_flat
 
+    def calculate_new_indices(self, inds_tuple, new_cells):
+        newbies = []
+        for i, j in zip(inds_tuple, new_cells):
+            if j != 4:
+                newbies.append(self.calculate_new_ind(i, j))
+            else:
+                newbies.append(0)
+        return newbies
+
     def step_update(self, ind, new_ind, new_cell):
 
         istep = self.iwalk.flat[new_cell]
         jstep = self.jwalk.flat[new_cell]
-        dist = np.sqrt(istep**2 + jstep**2)
+        dist = np.sqrt(istep * istep + jstep * jstep)
 
         if dist > 0:
 
             self.qxn.flat[ind] += jstep / dist
             self.qyn.flat[ind] += istep / dist
-            self.qwn.flat[ind] += self.Qp_water / self.dx / 2.
+            self.qwn.flat[ind] += self.Qp_water / self.dx / 2
 
             self.qxn.flat[new_ind] += jstep / dist
             self.qyn.flat[new_ind] += istep / dist
-            self.qwn.flat[new_ind] += self.Qp_water / self.dx / 2.
+            self.qwn.flat[new_ind] += self.Qp_water / self.dx / 2
 
         return dist
+
+    def update_steps(self, current_inds, new_inds, new_cells):
+        newbies = []
+        for i, j, k in zip(current_inds, new_inds, new_cells):
+            if i > 0:
+                newbies.append(self.step_update(i, j, k))
+            else:
+                newbies.append(0)
+        return newbies
 
     def check_for_loops(self, inds, it):
 
