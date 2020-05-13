@@ -64,17 +64,21 @@ class water_tools(shared_tools):
             self.check_size_of_indices_matrix(iter)
 
             inds = np.unravel_index(current_inds, self.depth.shape)
-            inds_tuple = [(inds[0][i], inds[1][i])
-                          for i in range(len(inds[0]))]
+            inds_tuple = list(zip(*inds))
 
-            new_cells = [self.get_weight(x)
-                         if x != (0, 0) else 4 for x in inds_tuple]
+            new_cells = [self.get_new_cell(x)
+                         if x != (0, 0) else 4
+                         for x in inds_tuple]
 
             new_inds = list(map(lambda x, y: self.calculate_new_ind(x, y)
-                                if y != 4 else 0, inds_tuple, new_cells))
+                                if y != 4 else 0,
+                                inds_tuple, new_cells
+                                )
+                            )
 
-            dist = list(map(lambda x, y, z: self.step_update(x, y, z) if x > 0
-                            else 0, current_inds, new_inds, new_cells))
+            dist = list(map(lambda x, y, z: self.step_update(x, y, z)
+                            if x > 0 else 0,
+                            current_inds, new_inds, new_cells))
 
             new_inds = np.array(new_inds, dtype=np.int)
             new_inds[np.array(dist) == 0] = 0
@@ -104,7 +108,6 @@ class water_tools(shared_tools):
             if ((self.cell_type[xs[-1], ys[-1]] == -1) and
                     (self.looped[n] == 0)):
 
-                self.count += 1
                 Hnew[xs[-1], ys[-1]] = self.H_SL
                 # if cell is in ocean, H = H_SL (downstream boundary condition)
 
@@ -245,6 +248,7 @@ class water_tools(shared_tools):
     def calculate_new_ind(self, ind, new_cell):
 
         new_ind = (ind[0] + self.jwalk.flat[new_cell],
+                   ind[1] + self.iwalk.flat[new_cell])
         # added wrap mode to fct to resolve ValueError due to negative numbers
         new_ind_flat = np.ravel_multi_index(
             new_ind, self.depth.shape, mode='wrap')

@@ -30,7 +30,7 @@ class shared_tools(object):
         """
 
         if not probs:
-            probs = np.array([1 for i in range(len(choices))])
+            probs = np.ones(len(choices))
 
         cutoffs = np.cumsum(probs)
         idx = cutoffs.searchsorted(np.random.uniform(0, cutoffs[-1]))
