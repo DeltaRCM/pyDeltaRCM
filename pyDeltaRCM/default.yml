@@ -84,7 +84,7 @@ save_discharge_figs:
   default: True
 save_velocity_figs:
   type: 'bool'
-  default: True
+  default: False
 save_eta_grids:
   type: 'bool'
   default: False
@@ -96,10 +96,10 @@ save_depth_grids:
   default: False
 save_discharge_grids:
   type: 'bool'
-  default: True
+  default: False
 save_velocity_grids:
   type: 'bool'
-  default: True
+  default: False
 save_dt:
   type: 'int'
   default: 50
