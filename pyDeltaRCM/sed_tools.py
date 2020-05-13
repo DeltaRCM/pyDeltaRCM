@@ -35,9 +35,10 @@ class sed_tools(shared_tools):
         self.Vp_dep_mud[:] = 0
 
         self.sand_route()
-        self.mud_route()
 
         self.topo_diffusion()
+
+        self.mud_route()
 
     def deposit(self, Vp_dep, px, py):
         """deposit sand or mud"""
@@ -200,8 +201,6 @@ class sed_tools(shared_tools):
             if ind[0] == 0:
                 weight[0, :] = 0
 
-            # return np.cumsum(weight.flatten())
-
             new_cell = self.random_pick(np.cumsum(weight.flatten()))
 
             jstep = self.iwalk.flat[new_cell]
@@ -256,7 +255,6 @@ class sed_tools(shared_tools):
 
             self.sed_parcel(theta_sed, 'sand', px, py)
 
-#         self.topo_diffusion()
     def topo_diffusion(self):
         """
         Diffuse topography after routing all coarse sediment parcels
