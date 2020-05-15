@@ -36,9 +36,9 @@ class sed_tools(shared_tools):
 
         self.sand_route()
 
-        self.topo_diffusion()
-
         self.mud_route()
+
+        self.topo_diffusion()
 
     def deposit(self, Vp_dep, px, py):
         """deposit sand or mud"""
