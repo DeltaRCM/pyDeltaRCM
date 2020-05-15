@@ -142,3 +142,6 @@ coeff_U_ero_sand:
 alpha:
   type: ['float', 'int']
   default: 0.1
+timesteps:
+  type: ['float', 'int']
+  default: 10
