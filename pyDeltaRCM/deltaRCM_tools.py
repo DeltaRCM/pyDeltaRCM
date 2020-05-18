@@ -39,8 +39,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         for iteration in range(self.itermax):
 
-            self.count = 0
-
             self.init_water_iteration()
             self.run_water_iteration()
 

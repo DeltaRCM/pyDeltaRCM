@@ -35,6 +35,7 @@ class sed_tools(shared_tools):
         self.Vp_dep_mud[:] = 0
 
         self.sand_route()
+
         self.mud_route()
 
         self.topo_diffusion()
@@ -195,16 +196,16 @@ class sed_tools(shared_tools):
             weight = (w1 * w2 / self.distances)
 
             weight[depth_ind <= self.dry_depth] = 0.0001
-            weight[cell_type_ind == -2] = np.nan
+            weight[cell_type_ind == -2] = 0
 
             if ind[0] == 0:
-                weight[0, :] = np.nan
+                weight[0, :] = 0
 
-            new_cell = self.random_pick(weight)
+            new_cell = self.random_pick(np.cumsum(weight.flatten()))
 
             jstep = self.iwalk.flat[new_cell]
             istep = self.jwalk.flat[new_cell]
-            dist = np.sqrt(istep**2 + jstep**2)
+            dist = np.sqrt(istep * istep + jstep * jstep)
 
             # deposition and erosion
 
@@ -254,7 +255,6 @@ class sed_tools(shared_tools):
 
             self.sed_parcel(theta_sed, 'sand', px, py)
 
-#         self.topo_diffusion()
     def topo_diffusion(self):
         """
         Diffuse topography after routing all coarse sediment parcels
