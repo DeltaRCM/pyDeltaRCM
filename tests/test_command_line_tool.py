@@ -3,6 +3,7 @@ import pytest
 
 import os
 import shutil
+import locale
 import numpy as np
 import subprocess
 
@@ -23,9 +24,10 @@ def test_version_call():
     """
     test calling the command line feature to query the version.
     """
-    printed1 = subprocess.run(['run_pyDeltaRCM', '--version'], capture_output=True, text=True)
+    encoding = locale.getpreferredencoding()
+    printed1 = subprocess.run(['run_pyDeltaRCM', '--version'], stdout=subprocess.PIPE, encoding=encoding)
     assert printed1.stdout == 'pyDeltaRCM ' + deltaModule.__version__ + '\n'
-    printed2 = subprocess.run(['python', '-m', 'pyDeltaRCM', '--version'], capture_output=True, text=True)
+    printed2 = subprocess.run(['python', '-m', 'pyDeltaRCM', '--version'], stdout=subprocess.PIPE, encoding=encoding)
     assert printed2.stdout == 'pyDeltaRCM ' + deltaModule.__version__ + '\n'
 
 
