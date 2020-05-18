@@ -5,7 +5,7 @@ import pyDeltaRCM as deltaModule
 from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 
 
-def run_model(use_test_yaml=False):
+def run_model():
 
     parser = argparse.ArgumentParser(description='Options for running pyDeltaRCM from command line')
 
@@ -18,9 +18,6 @@ def run_model(use_test_yaml=False):
 
     if cmdlineargs['config'] is not None:
         delta = pyDeltaRCM(input_file=cmdlineargs['config'])
-    # elif use_test_yaml:
-    #     test_yaml = os.path.join(os.path.dirname(__file__), '..', 'tests', 'test_output.yaml')
-    #     delta = pyDeltaRCM(input_file=os.path.abspath(test_yaml))
     else:
         delta = pyDeltaRCM()
 
