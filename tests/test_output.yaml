@@ -20,7 +20,7 @@ C0_percent: 0.1
 toggle_subsidence: False
 sigma_max: 0.0
 start_subsidence: 50.
-save_eta_figs: False
+save_eta_figs: True
 save_stage_figs: False
 save_depth_figs: False
 save_discharge_figs: False
