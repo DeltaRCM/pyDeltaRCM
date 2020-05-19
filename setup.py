@@ -2,7 +2,6 @@
 from setuptools import setup, find_packages
 
 from pyDeltaRCM import shared_tools
-from pyDeltaRCM import command_line
 
 setup(name='pyDeltaRCM',
       version=shared_tools._get_version(),
@@ -16,6 +15,6 @@ setup(name='pyDeltaRCM',
       install_requires=['matplotlib', 'netCDF4',
                         'basic-modeling-interface', 'scipy', 'numpy', 'pyyaml'],
       entry_points={
-                  'console_scripts': ['run_pyDeltaRCM=command_line:run_model'],
+                  'console_scripts': ['run_pyDeltaRCM=pyDeltaRCM.command_line:run_model'],
       }
       )
