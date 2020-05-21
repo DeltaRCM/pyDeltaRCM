@@ -88,7 +88,7 @@ class BmiDelta(Bmi):
         'model_output__opt_velocity_grids': {'name': 'save_velocity_grids',
             'type': 'bool', 'default': False},
         'model_output__opt_time_interval': {'name': 'save_dt',
-            'type': 'float', 'default': 50},
+            'type': 'int', 'default': 50},
         'coeff__surface_smoothing': {'name': 'Csmooth',
             'type': 'float', 'default': 0.9},
         'coeff__under_relaxation__water_surface': {'name': 'omega_sfc',
