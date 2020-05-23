@@ -221,7 +221,7 @@ class init_tools(object):
         # self.prefix
         self.prefix = self.out_dir
 
-        if self.out_dir[-1] is not '/':
+        if self.out_dir[-1] != '/':
             self.prefix = self.out_dir + '/'
         if self.site_prefix:
             self.prefix += self.site_prefix + '_'
