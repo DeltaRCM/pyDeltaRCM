@@ -71,6 +71,8 @@ class pyDeltaRCM(Tools):
         except Exception:
             pass
 
+        self._is_finalized = True
+
     # define properties
 
     @property
