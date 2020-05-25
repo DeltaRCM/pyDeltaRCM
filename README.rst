@@ -2,7 +2,6 @@
 pyDeltaRCM_WMT
 **************
 
-
 .. image:: https://api.travis-ci.com/DeltaRCM/pyDeltaRCM_WMT.svg?branch=develop
     :target: https://travis-ci.com/DeltaRCM/pyDeltaRCM_WMT
 
@@ -10,7 +9,7 @@ pyDeltaRCM_WMT
     :target: https://coveralls.io/github/DeltaRCM/pyDeltaRCM_WMT?branch=develop
 
 
-pyDeltaRCM is the Python version of the [Matlab deltaRCM](http://csdms.colorado.edu/wiki/Model:DeltaRCM) model by Man Liang. 
+pyDeltaRCM is the Python version of the `Matlab deltaRCM <https://csdms.colorado.edu/wiki/Model:DeltaRCM>`_ model by Man Liang. 
 The pyDeltaRCM scripts in this repository can be run as a stand-alone model following the instructions below.
 
 
@@ -26,19 +25,21 @@ Installation
 
 To install this package into an existing Python 3.x environment, download or clone the repository and run:
 
-.. code::bash
+.. code:: bash
+
     $ python setup.py install
 
 Or for a developer installation run:
 
-.. code::bash
+.. code:: bash
+
     $ pip install -e .
 
 
 Executing the model
 ###################
 
-We recommend you check out our **`pyDeltaRCM in 10 minutes tutorial <https://deltarcm.org/pyDeltaRCM_WMT/guides/10min.html>`_**, which is part of our documentation.
+We recommend you check out our `pyDeltaRCM in 10 minutes tutorial <https://deltarcm.org/pyDeltaRCM_WMT/guides/10min.html>`_, which is part of our documentation.
 
 Additionally, the model can be run with example script ``run_pyDeltaRCM.py``:
 
