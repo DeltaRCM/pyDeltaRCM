@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import yaml
+import warnings
 
 import numpy as np
 import os
@@ -153,7 +154,8 @@ class BmiDelta(Bmi):
             user_dict = yaml.load(user_file, Loader = yaml.FullLoader)
             user_file.close()
         else:
-            print('The specified input file could not be found. Using default values...')
+            warnings.warn(UserWarning('The specified input file could not be found.'
+                                      ' Using default values...'))
             user_dict = dict()
 
         # go through and populate input vars with user and default values from
@@ -165,8 +167,8 @@ class BmiDelta(Bmi):
             if oo in user_dict and isinstance(user_dict[oo], the_type):
                 input_file_vars[model_name] = user_dict[oo]
             elif oo in user_dict and not isinstance(user_dict[oo], the_type):
-                print('Input for ' + oo + ' not of the right type. '
-                      + oo + ' needs to be of type ' + str(the_type))
+                warnings.warn(UserWarning('Input for ' + oo + ' not of the right type. '
+                      + oo + ' needs to be of type ' + str(the_type)))
                 input_file_vars[model_name] = self._input_vars[oo]['default']
             else:
                 input_file_vars[model_name] = self._input_vars[oo]['default']
