@@ -113,6 +113,7 @@ def test_random_seed_settings_value(tmp_path):
     assert delta.seed == 9999
     _postval_same = np.random.uniform()
     assert _preval_same == _postval_same
+    assert delta.seed == 9999
 
 
 def test_random_seed_settings_noaction_default(tmp_path):
