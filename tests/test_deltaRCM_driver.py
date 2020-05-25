@@ -9,18 +9,19 @@ import numpy as np
 from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 
 # need to create a simple case of pydeltarcm object to test these functions
-delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 
 
 def test_init():
     """
     test the deltaRCM_driver init (happened when delta.initialize was run)
     """
+    delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
     assert delta._time == 0.
     assert delta._is_finalized == False
 
 
 def test_update():
+    delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
     delta.update()
     assert delta._time == 1.0
     assert delta._is_finalized == False
