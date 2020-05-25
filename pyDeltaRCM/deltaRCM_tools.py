@@ -37,6 +37,9 @@ class Tools(sed_tools, water_tools, init_tools, object):
             print('-' * 20)
             print('Timestep: ' + str(self._time))
 
+        if self._is_finalized:
+            raise RuntimeError('Cannot update model, model already finalized!')
+
         for iteration in range(self.itermax):
 
             self.init_water_iteration()

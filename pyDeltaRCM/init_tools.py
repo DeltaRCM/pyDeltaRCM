@@ -228,6 +228,8 @@ class init_tools(object):
         if self.case_prefix:
             self.prefix += self.case_prefix + '_'
 
+        self._is_finalized = False
+
     def create_domain(self):
         """
         Creates the model domain
