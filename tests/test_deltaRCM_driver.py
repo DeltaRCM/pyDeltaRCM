@@ -28,6 +28,7 @@ def test_update():
 
 
 def test_finalize():
+    delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
     delta.finalize()
     assert delta._is_finalized == True
 
