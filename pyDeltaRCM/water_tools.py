@@ -221,8 +221,7 @@ class water_tools(object):
 
     def get_new_cell(self, ind):
         weight = self.water_weights[ind[0], ind[1]]
-        new_cell = shared_tools.random_pick(weight)
-        return new_cell
+        return shared_tools.random_pick(weight)
 
     def update_Q(self, dist, current_inds, next_index, astep, jstep, istep):
 
