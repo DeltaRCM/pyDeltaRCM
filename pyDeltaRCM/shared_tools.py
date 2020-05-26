@@ -3,7 +3,7 @@ from math import floor, sqrt, pi
 import numpy as np
 
 import time
-from numba import njit
+from numba import njit, jit, typed
 
 # tools shared between deltaRCM water and sediment routing
 
@@ -131,22 +131,18 @@ def custom_ravel(tup, shape):
 @njit
 def check_for_loops(indices, inds, it, L0, loopedout, domain_shape, CTR, free_surf_flag):
 
-    looped = [len(i[i > 0]) != len(set(i[i > 0])) for i in indices]
-
+    looped = typed.List() # numba typed list for iteration
+    for i in np.arange(len(indices)):
+        row = indices[i, :]
+        v = len(row[row > 0]) != len(set(row[row > 0]))
+        looped.append(v)
     travel = (0, it)
 
     for n in range(indices.shape[0]):
-
         ind = inds[n]
-
         if looped[n] and (ind > 0) and (max(travel) > L0):
-
             loopedout[n] += 1
-
-            it = custom_unravel(ind, domain_shape)
-
-            px, py = it
-
+            px, py = custom_unravel(ind, domain_shape)
             Fx = px - 1
             Fy = py - CTR
 
@@ -169,6 +165,7 @@ def check_for_loops(indices, inds, it, L0, loopedout, domain_shape, CTR, free_su
             free_surf_flag[n] = -1
 
     return inds, loopedout, free_surf_flag
+
 
 
 @njit
