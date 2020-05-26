@@ -20,11 +20,8 @@ def test_init():
     assert delta._is_finalized == False
 
 
-delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
-
-
 def test_update():
-    
+    delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
     delta.update()
     assert delta._time == 1.0
     assert delta._is_finalized == False
