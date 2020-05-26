@@ -32,6 +32,8 @@ def get_random_uniform(N):
 
 @njit
 def partition_sand(qs, depoPart, py, px, dist, istep, jstep):
+    '''Spread sand between two cells
+    '''
     if dist > 0:
         # deposition in current cell
         qs[px, py] += depoPart
@@ -47,7 +49,8 @@ def partition_sand(qs, depoPart, py, px, dist, istep, jstep):
 
 @njit
 def get_steps(new_cells, iwalk, jwalk):
-
+    '''find the values giving the next step
+    '''
     istep = iwalk[new_cells]
     jstep = jwalk[new_cells]
     dist = np.sqrt(istep * istep + jstep * jstep)
@@ -59,6 +62,8 @@ def get_steps(new_cells, iwalk, jwalk):
 
 @njit
 def update_dirQfield(qfield, dist, inds, astep, dirstep):
+    '''update unit vector of water flux in x or y
+    '''
     for i, ii in enumerate(inds):
         if astep[i]:
             qfield[ii] += dirstep[i] / dist[i]
@@ -67,6 +72,8 @@ def update_dirQfield(qfield, dist, inds, astep, dirstep):
 
 @njit
 def update_absQfield(qfield, dist, inds, astep, Qp_water, dx):
+    '''Update norm of water flux vector
+    '''
     for i, ii in enumerate(inds):
         if astep[i]:
             qfield[ii] += Qp_water / dx / 2
@@ -88,6 +95,8 @@ def random_pick(prob):
 
 @njit
 def custom_unravel(i, shape):
+    '''Spread sand between two cells
+    '''
     x = i // shape[1]
     y = i % shape[1]
     return x, y
