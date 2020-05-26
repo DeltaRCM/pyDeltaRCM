@@ -183,19 +183,17 @@ class sed_tools(object):
             # choose next with weights
 
             it += 1
-            depth_ind = self.pad_depth[
-                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-            cell_type_ind = self.pad_cell_type[
-                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
 
-            w1 = shared_tools.get_flux_wt(self.qx[(px, py)], self.qy[(px, py)], self.ivec, self.jvec)
-            w2 = shared_tools.get_depth_wt(depth_ind, theta_sed)
+            stage_nbrs = self.pad_stage[px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            depth_ind = self.pad_depth[px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            cell_type_ind = self.pad_cell_type[px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
 
-            w3 = shared_tools.get_combined_weight(w1, w2, self.distances)
-
-            weights = shared_tools.get_filtered_weight(
-                w3.flatten(), px, depth_ind.flatten(),
-                cell_type_ind.flatten(), self.dry_depth)
+            weights = shared_tools.get_weight_at_cell(
+                (px, py),
+                stage_nbrs.flatten(), depth_ind.flatten(), cell_type_ind.flatten(),
+                self.stage[px, py], self.qx[px, py], self.qy[px, py],
+                self.ivec.flatten(), self.jvec.flatten(), self.distances.flatten(),
+                self.dry_depth, self.gamma, theta_sed)
 
             new_cell = shared_tools.random_pick(weights)
 

@@ -31,34 +31,6 @@ def get_random_uniform(N):
 
 
 @njit
-def get_flux_wt(qx, qy, ivec, jvec):
-    return np.maximum(0, (qx * jvec + qy * ivec))
-
-
-@njit
-def get_depth_wt(depth_ind, theta):
-    return depth_ind ** theta
-
-
-@njit
-def get_combined_weight(w1, w2, distances):
-    return w1 * w2 / distances
-
-
-@njit
-def get_filtered_weight(weight, px, depth_ind, cell_type_ind, dry_depth):
-    dry = depth_ind <= dry_depth
-    weight[dry] = 0.0001
-    walls = cell_type_ind == -2
-    weight[walls] = 0
-    if px == 0:
-        weight[:3] = 0
-    # weight = np.cumsum(weight)
-    # weight.flatten()
-    return weight / np.sum(weight)
-
-
-@njit
 def partition_sand(qs, depoPart, py, px, dist, istep, jstep):
     if dist > 0:
         # deposition in current cell
@@ -185,19 +157,19 @@ def calculate_new_ind(indices, new_cells, iwalk, jwalk, domain_shape):
 
 @njit
 def get_weight_at_cell(ind, stage_nbrs, depth_nbrs, ct_nbrs, stage, qx, qy,
-                       ivec, jvec, distances, dry_depth, gamma, theta_water):
+                       ivec, jvec, distances, dry_depth, gamma, theta):
 
     weight_sfc = np.maximum(0, (stage - stage_nbrs) / distances)
 
     weight_int = np.maximum(0, (qx * jvec + qy * ivec) / distances)
 
     if ind[0] == 0:
-        weight_sfc[:3] = 0
-        weight_int[:3] = 0
+        weight_sfc[:3] = np.nan
+        weight_int[:3] = np.nan
 
     drywall = (depth_nbrs <= dry_depth) | (ct_nbrs == -2)
-    weight_sfc[drywall] = 0
-    weight_int[drywall] = 0
+    weight_sfc[drywall] = np.nan
+    weight_int[drywall] = np.nan
 
     if np.nansum(weight_sfc) > 0:
         weight_sfc = weight_sfc / np.nansum(weight_sfc)
@@ -206,14 +178,19 @@ def get_weight_at_cell(ind, stage_nbrs, depth_nbrs, ct_nbrs, stage, qx, qy,
         weight_int = weight_int / np.nansum(weight_int)
 
     weight = gamma * weight_sfc + (1 - gamma) * weight_int
-    weight = depth_nbrs ** theta_water * weight
+    weight = depth_nbrs ** theta * weight
     weight[depth_nbrs <= dry_depth] = 0
 
-    if np.sum(weight) != 0:
-        weight = weight / np.sum(weight)
+    nanWeight = np.isnan(weight)
+
+    if np.any(weight[~nanWeight] != 0):
+        weight = weight / np.nansum(weight)
+        weight[nanWeight] = 0
     else:
-        weight = weight
-    return weight / np.sum(weight)
+        weight[~nanWeight] = 1 / len(weight[~nanWeight])
+        weight[nanWeight] = 0
+    return weight
+
 
 
 def _get_version():
