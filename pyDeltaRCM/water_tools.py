@@ -1,4 +1,3 @@
-
 import sys
 import os
 import re
@@ -17,13 +16,12 @@ from scipy.sparse import lil_matrix, csc_matrix, hstack
 from scipy import ndimage
 
 from netCDF4 import Dataset
-
-from .shared_tools import shared_tools
+from . import shared_tools
 
 # tools for water routing algorithms
 
 
-class water_tools(shared_tools):
+class water_tools(object):
 
     def init_water_iteration(self):
 
@@ -45,13 +43,16 @@ class water_tools(shared_tools):
     def run_water_iteration(self):
 
         iter = 0
-        start_indices = [self.random_pick_inlet(self.inlet) for x in range(self.Np_water)]
+        inlet_weights = np.ones_like(self.inlet)
+        start_indices = [
+            self.inlet[shared_tools.random_pick(inlet_weights / sum(inlet_weights))]
+            for x in range(self.Np_water)]
 
         self.qxn.flat[start_indices] += 1
         self.qwn.flat[start_indices] += self.Qp_water / self.dx / 2
 
         self.indices[:, 0] = start_indices
-        current_inds = list(start_indices)
+        current_inds = np.array(start_indices)
 
         self.looped[:] = 0
 
@@ -70,16 +71,31 @@ class water_tools(shared_tools):
                          if x != (0, 0) else 4
                          for x in inds_tuple]
 
-            new_inds = self.calculate_new_indices(inds_tuple, new_cells)
+            new_cells = np.array(new_cells)
 
-            dist = self.update_steps(current_inds, new_inds, new_cells)
+            next_index = shared_tools.calculate_new_ind(
+                current_inds,
+                new_cells,
+                self.iwalk.flatten(),
+                self.jwalk.flatten(),
+                self.eta.shape)
 
-            new_inds = np.array(new_inds, dtype=np.int)
-            new_inds[np.array(dist) == 0] = 0
+            dist, istep, jstep, astep = shared_tools.get_steps(
+                new_cells,
+                self.iwalk.flat[:],
+                self.jwalk.flat[:])
 
-            self.indices[:, iter] = new_inds
+            self.update_Q(dist, current_inds, next_index, astep, jstep, istep)
 
-            current_inds = self.check_for_loops(new_inds, iter)
+            current_inds, self.looped, self.free_surf_flag = shared_tools.check_for_loops(
+                self.indices,
+                next_index,
+                iter,
+                self.L0,
+                self.looped,
+                self.eta.shape,
+                self.CTR,
+                self.free_surf_flag)
 
             current_inds = self.check_for_boundary(current_inds)
 
@@ -193,144 +209,41 @@ class water_tools(shared_tools):
 
         for i in range(self.L):
             for j in range(self.W):
-                self.water_weights[i, j] = self.get_weight_at_cell((i, j))
-
-    def get_weight_at_cell(self, ind):
-
-        stage_ind = self.pad_stage[
-            ind[0] - 1 + 1:ind[0] + 2 + 1, ind[1] - 1 + 1:ind[1] + 2 + 1]
-
-        weight_sfc = np.maximum(0,
-                                (self.stage[ind] - stage_ind) / self.distances)
-
-        weight_int = np.maximum(0, (self.qx[ind] * self.jvec +
-                                    self.qy[ind] * self.ivec) / self.distances)
-
-        if ind[0] == 0:
-            weight_sfc[0, :] = 0
-            weight_int[0, :] = 0
-
-        depth_ind = self.pad_depth[
-            ind[0] - 1 + 1:ind[0] + 2 + 1, ind[1] - 1 + 1:ind[1] + 2 + 1]
-        ct_ind = self.pad_cell_type[
-            ind[0] - 1 + 1:ind[0] + 2 + 1, ind[1] - 1 + 1:ind[1] + 2 + 1]
-
-        weight_sfc[(depth_ind <= self.dry_depth) | (ct_ind == -2)] = 0
-        weight_int[(depth_ind <= self.dry_depth) | (ct_ind == -2)] = 0
-
-        if np.nansum(weight_sfc) > 0:
-            weight_sfc = weight_sfc / np.nansum(weight_sfc)
-
-        if np.nansum(weight_int) > 0:
-            weight_int = weight_int / np.nansum(weight_int)
-
-        weight = self.gamma * weight_sfc + (1 - self.gamma) * weight_int
-        weight = depth_ind ** self.theta_water * weight
-        weight[depth_ind <= self.dry_depth] = 0
-        if np.sum(weight) != 0:
-            weight = weight / np.sum(weight)
-        else:
-            weight = weight
-
-        return np.cumsum(weight.flatten())
+                stage_nbrs = self.pad_stage[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+                depth_nbrs = self.pad_depth[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+                ct_nbrs = self.pad_cell_type[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+                self.water_weights[i, j] = shared_tools.get_weight_at_cell(
+                    (i, j),
+                    stage_nbrs.flatten(), depth_nbrs.flatten(), ct_nbrs.flatten(),
+                    self.stage[i, j], self.qx[i, j], self.qy[i, j],
+                    self.ivec.flatten(), self.jvec.flatten(), self.distances.flatten(),
+                    self.dry_depth, self.gamma, self.theta_water)
 
     def get_new_cell(self, ind):
         weight = self.water_weights[ind[0], ind[1]]
-        new_cell = self.random_pick(weight)
+        new_cell = shared_tools.random_pick(weight)
         return new_cell
 
-    def calculate_new_ind(self, ind, new_cell):
+    def update_Q(self, dist, current_inds, next_index, astep, jstep, istep):
 
-        new_ind = (ind[0] + self.jwalk.flat[new_cell],
-                   ind[1] + self.iwalk.flat[new_cell])
-        # added wrap mode to fct to resolve ValueError due to negative numbers
-        new_ind_flat = np.ravel_multi_index(
-            new_ind, self.depth.shape, mode='wrap')
-
-        return new_ind_flat
-
-    def calculate_new_indices(self, inds_tuple, new_cells):
-        newbies = []
-        for i, j in zip(inds_tuple, new_cells):
-            if j != 4:
-                newbies.append(self.calculate_new_ind(i, j))
-            else:
-                newbies.append(0)
-        return newbies
-
-    def step_update(self, ind, new_ind, new_cell):
-
-        istep = self.iwalk.flat[new_cell]
-        jstep = self.jwalk.flat[new_cell]
-        dist = np.sqrt(istep * istep + jstep * jstep)
-
-        if dist > 0:
-
-            self.qxn.flat[ind] += jstep / dist
-            self.qyn.flat[ind] += istep / dist
-            self.qwn.flat[ind] += self.Qp_water / self.dx / 2
-
-            self.qxn.flat[new_ind] += jstep / dist
-            self.qyn.flat[new_ind] += istep / dist
-            self.qwn.flat[new_ind] += self.Qp_water / self.dx / 2
-
-        return dist
-
-    def update_steps(self, current_inds, new_inds, new_cells):
-        newbies = []
-        for i, j, k in zip(current_inds, new_inds, new_cells):
-            if i > 0:
-                newbies.append(self.step_update(i, j, k))
-            else:
-                newbies.append(0)
-        return newbies
-
-    def check_for_loops(self, inds, it):
-
-        looped = [len(i[i > 0]) != len(set(i[i > 0])) for i in self.indices]
-
-        for n in range(self.Np_water):
-
-            ind = inds[n]
-            # revised 'it' to 'np.max(it)' to match python 2 > assessment
-            if (looped[n]) and (ind > 0) and (np.max(it) > self.L0):
-
-                self.looped[n] += 1
-
-                it = np.unravel_index(ind, self.depth.shape)
-
-                px, py = it
-
-                Fx = px - 1
-                Fy = py - self.CTR
-
-                Fw = np.sqrt(Fx**2 + Fy**2)
-
-                if Fw != 0:
-                    px = px + np.round(Fx / Fw * 5.)
-                    py = py + np.round(Fy / Fw * 5.)
-
-                px = max(px, self.L0)
-                px = int(min(self.L - 2, px))
-
-                py = max(1, py)
-                py = int(min(self.W - 2, py))
-
-                nind = np.ravel_multi_index((px, py), self.depth.shape)
-
-                inds[n] = nind
-
-                self.free_surf_flag[n] = -1
-
-        return inds
+        self.qxn = shared_tools.update_dirQfield(self.qxn.flat[:], dist, current_inds, astep, jstep
+                                          ).reshape(self.qxn.shape)
+        self.qyn = shared_tools.update_dirQfield(self.qyn.flat[:], dist, current_inds, astep, istep
+                                          ).reshape(self.qyn.shape)
+        self.qwn = shared_tools.update_absQfield(self.qwn.flat[:], dist, current_inds, astep, self.Qp_water, self.dx
+                                          ).reshape(self.qwn.shape)
+        self.qxn = shared_tools.update_dirQfield(self.qxn.flat[:], dist, next_index, astep, jstep
+                                          ).reshape(self.qxn.shape)
+        self.qyn = shared_tools.update_dirQfield(self.qyn.flat[:], dist, next_index, astep, istep
+                                          ).reshape(self.qyn.shape)
+        self.qwn = shared_tools.update_absQfield(self.qwn.flat[:], dist, next_index, astep, self.Qp_water, self.dx
+                                          ).reshape(self.qwn.shape)
 
     def check_for_boundary(self, inds):
 
-        self.free_surf_flag[(self.cell_type.flat[inds] == -1)
-                            & (self.free_surf_flag == 0)] = 1
+        self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == 0)] = 1
 
-        self.free_surf_flag[(self.cell_type.flat[inds] == -1)
-                            & (self.free_surf_flag == -1)] = 2
+        self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == -1)] = 2
 
         inds[self.free_surf_flag == 2] = 0
 
