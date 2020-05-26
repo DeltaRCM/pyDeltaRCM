@@ -24,13 +24,4 @@ def test_random_pick():
     probs = np.zeros((8,))
     probs[0] = 1
     # should return first index
-    assert delta.random_pick(probs) == 0
-
-
-def test_random_pick_inlet():
-    """
-    Test for function shared_tools.random_pick_inlet
-    """
-    choices = [0]
-    probs = np.ones((1,))
-    assert delta.random_pick_inlet(choices, probs) == 0
+    assert shared_tools.random_pick(probs) == 0
