@@ -6,14 +6,13 @@ import datetime
 import os
 
 
-class pyDeltaRCM(Tools):
-    """Main pyDeltaRCM model class.
+class DeltaModel(Tools):
+    """Main model class.
 
-    This is the main model class defined by the package. Instantiating the
-    model class is described in the :meth:`__init__` method below in detail,
-    but generally model instantiation occurs via a model run YAML
-    configuration file. These YAML configuration files define model parameters
-    which are used in the run; read more about creating input YAML
+    Instantiating the model class is described in the :meth:`__init__` method
+    below in detail, but generally model instantiation occurs via a model run
+    YAML configuration file. These YAML configuration files define model
+    parameters which are used in the run; read more about creating input YAML
     configuration files in the :doc:`../../guides/userguide`.
 
     Once the model has been instantiated, the model is updated via the

@@ -6,7 +6,7 @@ import numpy as np
 import os
 from basic_modeling_interface import Bmi
 
-from .deltaRCM_driver import pyDeltaRCM
+from .model import DeltaModel
 
 """Basic Model Interface implementation for pyDeltaRCM."""
 
@@ -178,7 +178,7 @@ class BmiDelta(Bmi):
         yaml.dump(input_file_vars, inbetweenYAML)
         inbetweenYAML.close()
 
-        self._delta = pyDeltaRCM(input_file = tmpFile)
+        self._delta = DeltaModel(input_file = tmpFile)
 
         self._values = {
             'channel_exit_water_flow__speed': self._delta.u0,

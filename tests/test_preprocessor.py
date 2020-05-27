@@ -7,8 +7,8 @@ import locale
 import numpy as np
 import subprocess
 
-import pyDeltaRCM as deltaModule
-from pyDeltaRCM import command_line
+import pyDeltaRCM as _pyimportedalias
+from pyDeltaRCM import preprocessor
 
 
 def test_call():
@@ -26,9 +26,9 @@ def test_version_call():
     """
     encoding = locale.getpreferredencoding()
     printed1 = subprocess.run(['run_pyDeltaRCM', '--version'], stdout=subprocess.PIPE, encoding=encoding)
-    assert printed1.stdout == 'pyDeltaRCM ' + deltaModule.__version__ + '\n'
+    assert printed1.stdout == _pyimportedalias.__version__ + '\n'
     printed2 = subprocess.run(['python', '-m', 'pyDeltaRCM', '--version'], stdout=subprocess.PIPE, encoding=encoding)
-    assert printed2.stdout == 'pyDeltaRCM ' + deltaModule.__version__ + '\n'
+    assert printed2.stdout == _pyimportedalias.__version__ + '\n'
 
 
 def test_python_call():
