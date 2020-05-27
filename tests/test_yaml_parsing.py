@@ -4,7 +4,7 @@ import sys
 import os
 import numpy as np
 
-from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
+from pyDeltaRCM.model import DeltaModel
 
 from pyDeltaRCM.shared_tools import set_random_seed, get_random_uniform
 
@@ -23,13 +23,13 @@ def write_parameter_to_file(f, varname, varvalue):
 
 # tests
 def test_with_no_argument():
-    delta = pyDeltaRCM()
+    delta = DeltaModel()
     assert delta.out_dir == 'deltaRCM_Output'
     assert delta.Length == 1000
 
 
 def test_override_from_testfile():
-    delta = pyDeltaRCM(input_file=os.path.join(
+    delta = DeltaModel(input_file=os.path.join(
         os.getcwd(), 'tests', 'test.yaml'))
     assert delta.out_dir == 'test'
     assert delta.Length == 10
@@ -37,7 +37,7 @@ def test_override_from_testfile():
 
 def test_error_if_no_file_found():
     with pytest.raises(FileNotFoundError):
-        delta = pyDeltaRCM(input_file='./nonexisting_file.yaml')
+        delta = DeltaModel(input_file='./nonexisting_file.yaml')
 
 
 def test_override_single_default(tmp_path):
@@ -45,7 +45,7 @@ def test_override_single_default(tmp_path):
     p, f = create_temporary_file(tmp_path, file_name)
     write_parameter_to_file(f, 'S0', 0.005)
     f.close()
-    delta = pyDeltaRCM(input_file=p)
+    delta = DeltaModel(input_file=p)
     assert delta.S0 == 0.005
 
 
@@ -55,7 +55,7 @@ def test_override_two_defaults(tmp_path):
     write_parameter_to_file(f, 'S0', 0.005)
     write_parameter_to_file(f, 'Np_sed', 2)
     f.close()
-    delta = pyDeltaRCM(input_file=p)
+    delta = DeltaModel(input_file=p)
     assert delta.S0 == 0.005
     assert delta.Np_sed == 2
 
@@ -66,7 +66,7 @@ def test_override_bad_type_float_string(tmp_path):
     write_parameter_to_file(f, 'S0', 'a string?!')
     f.close()
     with pytest.raises(TypeError):
-        delta = pyDeltaRCM(input_file=p)
+        delta = DeltaModel(input_file=p)
 
 
 def test_override_bad_type_int_float(tmp_path):
@@ -75,7 +75,7 @@ def test_override_bad_type_int_float(tmp_path):
     write_parameter_to_file(f, 'beta', 24.4234)
     f.close()
     with pytest.raises(TypeError):
-        delta = pyDeltaRCM(input_file=p)
+        delta = DeltaModel(input_file=p)
 
 
 def test_not_creating_illegal_attributes(tmp_path):
@@ -83,7 +83,7 @@ def test_not_creating_illegal_attributes(tmp_path):
     p, f = create_temporary_file(tmp_path, file_name)
     write_parameter_to_file(f, 'illegal_attribute', True)
     f.close()
-    delta = pyDeltaRCM(input_file=p)
+    delta = DeltaModel(input_file=p)
     assert delta.S0 == 0.0002  # from default.yaml
     assert not hasattr(delta, 'illegal_attribute')
 
@@ -93,7 +93,7 @@ def test_not_overwriting_existing_attributes(tmp_path):
     p, f = create_temporary_file(tmp_path, file_name)
     write_parameter_to_file(f, 'input_file', '/fake/path.yaml')
     f.close()
-    delta = pyDeltaRCM(input_file=p)
+    delta = DeltaModel(input_file=p)
     assert delta.S0 == 0.0002  # from default.yaml
     assert hasattr(delta, 'input_file')
     assert delta.input_file == p
@@ -110,7 +110,7 @@ def test_random_seed_settings_value(tmp_path):
     _preval_same = get_random_uniform(1)
     set_random_seed(5)
     _preval_diff = get_random_uniform(1000)
-    delta = pyDeltaRCM(input_file=p)
+    delta = DeltaModel(input_file=p)
     assert delta.seed == 9999
     _postval_same = get_random_uniform(1)
     assert _preval_same == _postval_same
@@ -122,6 +122,6 @@ def test_random_seed_settings_noaction_default(tmp_path):
     p, f = create_temporary_file(tmp_path, file_name)
     write_parameter_to_file(f, 'S0', 0.005)
     f.close()
-    delta = pyDeltaRCM(input_file=p)
+    delta = DeltaModel(input_file=p)
     assert delta.seed is None
     assert np.random.seed is not 0

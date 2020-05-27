@@ -1,4 +1,4 @@
-from pyDeltaRCM import command_line
+from . import preprocessor
 
 if __name__ == '__main__':
-    command_line.run_model()
+    preprocessor.preprocessor_wrapper()
