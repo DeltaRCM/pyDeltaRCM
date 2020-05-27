@@ -6,11 +6,10 @@ import sys
 import os
 import numpy as np
 
-from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
-from pyDeltaRCM import Tools
+from pyDeltaRCM.model import DeltaModel
 
 # need to create a simple case of pydeltarcm object to test these functions
-delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
+delta = DeltaModel(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 
 # now that it is initiated can access the shared_tools via the inherited object
 # delta._delta.**Tools_function**
