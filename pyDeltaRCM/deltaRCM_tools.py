@@ -27,8 +27,23 @@ from .init_tools import init_tools
 class Tools(sed_tools, water_tools, init_tools, object):
 
     def run_one_timestep(self):
-        """
-        Run the time loop once
+        """Run the timestep once.
+
+        The first operation called by :meth:`update`, this method iterates the
+        water surface calculation and sediment parcel routing routines.
+
+        .. note:: Will print the current timestep to stdout, if ``verbose > 0``.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        Raises
+        ------
+        RuntimeError 
+            If model has already been finalized via :meth:`finalize`.
         """
 
         timestep = self._time
@@ -52,8 +67,18 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
     def finalize_timestep(self):
         """
-        Clean up after sediment routing
-        Update sea level if baselevel changes
+
+        Clean up after sediment routing. This includes a correction for
+        flooded cells that are not "wet" (via :meth:`flooding_correction`).
+
+        Update sea level if baselevel changes between timesteps.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
         """
 
         self.flooding_correction()
@@ -65,11 +90,15 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         self.H_SL = self.H_SL + self.SLR * self.dt
 
-    # initialization of stratigraphy
-
     def expand_stratigraphy(self):
-        """
-        Expand the size of arrays that store stratigraphy data
+        """Expand stratigraphy array sizes.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
         """
 
         if self.verbose:
@@ -83,11 +112,26 @@ class Tools(sed_tools, water_tools, init_tools, object):
                                        format='lil')
 
     def record_stratigraphy(self):
-        """
+        """Save stratigraphy to file.
+
         Saves the sand fraction of deposited sediment
         into a sparse array created by init_stratigraphy().
 
-        Only runs if save_strata is True
+        Only runs if save_strata is True.
+
+        .. note:: 
+
+            This routine needs a complete description of the algorithm,
+            additionally, it should be ported to a routine in DeltaMetrics,
+            probably the new and preferred method of computing and storing
+            straitgraphy cubes.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
         """
 
         timestep = self._time
@@ -116,7 +160,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
             sand_loc = self.Vp_dep_sand > 0
             sand_frac[sand_loc] = (self.Vp_dep_sand[sand_loc]
                                    / (self.Vp_dep_mud[sand_loc]
-                                   + self.Vp_dep_sand[sand_loc])
+                                      + self.Vp_dep_sand[sand_loc])
                                    )
             # store indices and sand_frac into a sparse array
             row_s = np.where(sand_frac.flatten() >= 0)[0]
@@ -149,10 +193,17 @@ class Tools(sed_tools, water_tools, init_tools, object):
             self.strata_counter += 1
 
     def apply_subsidence(self):
-        """Apply subsidence.
+        """Apply subsidence pattern.
 
-        Apply subsidence to domain if toggle_subsidence is True and
-        start_subsidence is <= timestep
+        Apply subsidence to domain if toggle_subsidence is True, and
+        start_subsidence is =< timestep.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
         """
 
         if self.toggle_subsidence:
@@ -165,8 +216,18 @@ class Tools(sed_tools, water_tools, init_tools, object):
                 self.eta[:] = self.eta - self.sigma
 
     def output_data(self):
-        """
-        Plots and saves figures of eta, depth, and stage
+        """Save grids and figures.
+
+        Save grids and/or plots of specified variables (``eta``, `discharge``,
+        ``velocity``, ``depth``, and ``stage``, depending on configuration of
+        the relevant flags in the YAML configuration file.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
         """
 
         timestep = self._time
@@ -247,8 +308,16 @@ class Tools(sed_tools, water_tools, init_tools, object):
                 self.save_grids('velocity', self.uw, shape[0])
 
     def output_strata(self):
-        """
-        Saves the stratigraphy sparse matrices into output netcdf file
+        """Save stratigraphy as sparse matrix to file.
+
+        Saves the stratigraphy (sand fraction) sparse matrices into output netcdf file
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
         """
 
         if self.save_strata:
@@ -302,13 +371,20 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         Parameters
         ----------
-        path : `str`
+        path : :obj:`str`
             The path (and filename without extension) to save the figure to.
 
-        ext : `str`, optional
+        ext : :obj:`str`, optional
             The file extension (default='png'). This must be supported by the
             active matplotlib backend (see matplotlib.backends module). Most
             backends support 'png', 'pdf', 'ps', 'eps', and 'svg'.
+
+        close : :obj:`bool`, optional
+            Whether to close the file after saving.
+
+        Returns
+        -------
+
         """
 
         directory = os.path.split(path)[0]
@@ -330,21 +406,27 @@ class Tools(sed_tools, water_tools, init_tools, object):
     def save_grids(self, var_name, var, ts):
         """Save a grid into an existing netCDF file.
 
-        File should already be open (by init_output_grid) as self.output_netcdf
+        File should already be open (by :meth:`init_output_grid`) as
+        ``self.output_netcdf``.
 
         Parameters
         ----------
-        var_name : `str`
+        var_name : :obj:`str`
             The name of the variable to be saved
 
-        var : `ndarray`
+        var : :obj:`ndarray`
             The numpy array to be saved.
 
-        ts : `int`
+        ts : :obj:`int`
             The current timestep (+1, so human readable)
+
+        Returns
+        -------
+
         """
 
         try:
             self.output_netcdf.variables[var_name][ts, :, :] = var
         except:
             self.logger.info('Error: Cannot save grid to netCDF file.')
+            warnings.warn(UserWarning('Cannot save grid to netCDF file.'))

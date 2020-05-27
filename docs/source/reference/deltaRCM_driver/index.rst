@@ -15,3 +15,12 @@ This class is defined in ``pyDeltaRCM.deltaRCM_driver``.
 	:toctree: ../../_autosummary
 
 	pyDeltaRCM
+
+
+Model configuration reference
+=============================
+
+.. toctree::
+    :maxdepth: 1
+
+    yaml_defaults
