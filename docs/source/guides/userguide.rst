@@ -20,7 +20,7 @@ Inside this file you can specify parameters for your run, with each parameter on
 then a :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM` model instance initialized with this file specified as ``input_file`` will have a slope of 0.005.
 Multiple parameters can be specified line by line.
 
-Default values are substituted for any parameter not explicitly given in the ``input_file`` ``.yaml`` file.
+Default values are substituted for any parameter not explicitly given in the ``input_file`` ``.yml`` file.
 Default values of the YAML configuration are listed in the :doc:`../reference/deltaRCM_driver/yaml_defaults`.
 
 
@@ -44,7 +44,7 @@ The high-level API is accessed via either a shell prompt or python script, and i
 Bash API
 --------
 
- For example, to invoke a model run from the bash prompt using the YAML file ``model_configuration.yml`` which looks like:
+For example, to invoke a model run from the bash prompt using the YAML file ``model_configuration.yml`` which looks like:
 
 .. code-block:: yaml
 
@@ -56,13 +56,19 @@ we would simply invoke at the bash prompt:
     
     python -m pyDeltaRCM --config model_configuration.yml
 
-This invokation will run the pyDeltaRCM with the parameters specified in the ``model_configuration.yml`` file, and automatically :obj:`~pyDeltaRCM.deltaRCM_driver.update` the model 500 times.
+or equivalently:
+
+.. code:: bash
+    
+    run_pyDeltaRCM --config model_configuration.yml
+
+These invokations will run the pyDeltaRCM with the parameters specified in the ``model_configuration.yml`` file, and automatically :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM.update` the model 500 times.
 
 
 Python API
 ----------
 
-Alternatively, calling the ``run_pyDeltaRCM`` method from a python script, with the :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM.input_file` parameter specified as the same ``model_configuration.yml`` file above, would run the pyDeltaRCM model, and automatically :obj:`~pyDeltaRCM.deltaRCM_driver.update` the model 500 times.
+Alternatively, calling the ``run_model`` method from a python script, with the :meth:`input file <pyDeltaRCM.deltaRCM_driver.pyDeltaRCM.__init__>` parameter specified as the same ``model_configuration.yml`` file above, would run the pyDeltaRCM model, and automatically :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM.update` the model 500 times.
 
 
 
@@ -80,7 +86,7 @@ iinteract with the model by creating your own script, and manipulating model out
 
     delta.finalize()
 
-However, you can also inspect/modify the :obj:`~pyDeltaRCM.deltaRCM_driver.update` method, and change the order or add operations as desired.
+However, you can also inspect/modify the :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM.update` method, and change the order or add operations as desired.
 
 
 =============================
