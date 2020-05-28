@@ -69,6 +69,7 @@ class BasePreprocessor(abc.ABC):
         for _t in range(self.timesteps):
             self.deltamodel.update()
 
+    def finalize_model(self):
         self.deltamodel.finalize()
 
 
@@ -93,6 +94,7 @@ class CLI_API(BasePreprocessor):
 
         if not self.args['dryrun']:
             self.run_model()
+            self.finalize_model()
 
     def process_arguments(self):
         parser = argparse.ArgumentParser(
