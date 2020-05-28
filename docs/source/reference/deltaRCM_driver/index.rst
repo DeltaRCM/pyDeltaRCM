@@ -12,7 +12,7 @@ This class is defined in ``pyDeltaRCM.deltaRCM_driver``.
 .. currentmodule:: pyDeltaRCM.deltaRCM_driver
 
 .. autosummary:: 
-	:toctree: ../../_autosummary
+    :toctree: ../../_autosummary
 
 	pyDeltaRCM
 
