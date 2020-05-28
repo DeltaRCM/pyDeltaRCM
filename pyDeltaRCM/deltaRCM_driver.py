@@ -104,7 +104,7 @@ class pyDeltaRCM(Tools):
     def finalize(self):
         """Finalize the model run.
 
-        Finalization includes saving output stratigrigraphy, closing relevant
+        Finalization includes saving output stratigraphy, closing relevant
         files on disk and clearing variables.
 
         Parameters
