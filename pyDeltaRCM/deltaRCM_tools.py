@@ -328,6 +328,9 @@ class Tools(sed_tools, water_tools, init_tools, object):
             self.strata_eta = self.strata_eta[:, :self.strata_counter]
 
             shape = self.strata_eta.shape
+            if shape[0] < 1:
+                raise RuntimeError('Stratigraphy are empty! '
+                                   'Are you sure you ran the model with `update()`?')
 
             total_strata_age = self.output_netcdf.createDimension(
                 'total_strata_age',

@@ -52,9 +52,8 @@ class DeltaModel(Tools):
         self._time_step = 1.
 
         self.input_file = input_file
-        self._file_dir = os.path.realpath(os.path.dirname(__file__))
-        self.default_file = os.path.join(self._file_dir, 'default.yml')
-
+        _src_dir = os.path.realpath(os.path.dirname(__file__))
+        self.default_file = os.path.join(_src_dir, 'default.yml')
         self.import_files()
 
         self.create_other_variables()
