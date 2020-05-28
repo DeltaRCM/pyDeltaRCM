@@ -7,6 +7,26 @@ import os
 
 
 class pyDeltaRCM(Tools):
+    """Main pyDeltaRCM model class.
+
+    This is the main model class defined by the package. Instantiating the
+    model class is described in the :meth:`__init__` method below in detail,
+    but generally model instantiation occurs via a model run YAML
+    configuration file. These YAML configuration files define model parameters
+    which are used in the run; read more about creating input YAML
+    configuration files in the :doc:`../../guides/userguide`.
+
+    Once the model has been instantiated, the model is updated via the
+    :meth:`update`. This method coordinates the hydrology, sediment transport,
+    subsidence, and stratigraphic operation that must occur during each
+    timestep. The :meth:`update` should be called iteratively, to "run" the
+    model.
+
+    Finally, after all ``update`` steps are complete, the model should be
+    finalized (:meth:`finalize`), such that files and data are appropriately
+    closed and written to disk.
+
+    """
 
     def __init__(self, input_file=None):
         """Creates an instance of the pyDeltaRCM model.
@@ -18,6 +38,9 @@ class pyDeltaRCM(Tools):
         ----------
         input_file : `str`, `os.PathLike`, optional
             User model run configuration file.
+
+        Returns
+        -------
 
         Notes
         -----
@@ -46,9 +69,27 @@ class pyDeltaRCM(Tools):
         self.init_output_grids()
 
     def update(self):
+        """Run the model for one full instance
+
+        Calls, in sequence:
+
+            * the routine to run one timestep (i.e., water surface estimation
+              and sediment routing, :meth:`run_one_timestep`)
+            * the basin subsidence update pattern (:meth:`apply_subsidence`)
+            * the timestep finalization routine (:meth:`finalize_timestep`)
+            * straigraphy updating routine (:meth:`record_stratigraphy`)
+
+        If you attempt to override the ``update`` routine, you must implement
+        these operations at a minimum.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
         """
-        Run the model for one full instance
-        """
+
         self.run_one_timestep()
 
         self.apply_subsidence()
@@ -61,6 +102,18 @@ class pyDeltaRCM(Tools):
         self._time += self.time_step
 
     def finalize(self):
+        """Finalize the model run.
+
+        Finalization includes saving output stratigraphy, closing relevant
+        files on disk and clearing variables.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        """
 
         self.output_strata()
 
@@ -73,11 +126,16 @@ class pyDeltaRCM(Tools):
 
         self._is_finalized = True
 
-    # define properties
-
     @property
     def time_step(self):
-        """The time step."""
+        """The time step.
+
+        Raises
+        ------
+        UserWarning
+            If a very small timestep is configured.
+        """
+
         return self._time_step
 
     @time_step.setter
