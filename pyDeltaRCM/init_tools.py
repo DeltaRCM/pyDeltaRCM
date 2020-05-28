@@ -217,7 +217,8 @@ class init_tools(object):
 
         self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha
                                      * 0.5 / self.dx**2)
-        # self.prefix
+        
+        # output directory config
         self.prefix = self.out_dir
 
         if self.out_dir[-1] != '/':
