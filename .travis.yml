@@ -26,12 +26,11 @@ jobs:
       python: "3.8"
       install: 
         - pip install -r requirements.txt
-        - pip install -e .
-        - pip install sphinx sphinx-automodapi
+        - pip install -r requirements-docs.txt
         - sudo apt update -y && sudo apt install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended dvipng
+        - pip install -e .
       script:
-        - (cd docs && sphinx-build -E -W -b linkcheck source build) 
-        - (cd docs && make html)
+        - (cd docs && make docs)
       deploy:
         provider: pages:git
         github_token: $GITHUB_TOKEN
