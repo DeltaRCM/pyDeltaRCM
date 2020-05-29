@@ -8,7 +8,7 @@ from .shared_tools import _get_version
 from .model import DeltaModel
 
 
-_ver = _get_version()
+_ver = ' '.join(('pyDeltaRCM', _get_version()))
 
 
 class BasePreprocessor(abc.ABC):
@@ -21,59 +21,81 @@ class BasePreprocessor(abc.ABC):
     and the python API. 
     """
 
-    def __init__(self):
-        pass
+    def extract_yaml_config(self):
+        """Extract yaml into dictionary if provided.
 
-    def preliminary_yaml_parsing(self):
-        """A very preliminiary yaml parsing step.
-
-        Here, we check whether 
-
-            1) the file is valid yaml
-            2) for a field named ``matrix`` in the yaml file
-            3) for a field named ``timesteps`` in the yaml file, which is used
-               for time looping if it is given. If ``timesteps`` is not given, 
-               an error is raised, and the user is directed to either fix the 
-               issue or use the low-level API.
-
+        Here, we check whether the file is valid yaml,
+        and place it into a dictionary.
         """
 
         # open the file, an error will be thrown if invalid yaml?
         user_file = open(self.input_file, mode='r')
-        user_dict = yaml.load(user_file, Loader=yaml.FullLoader)
+        self.user_dict = yaml.load(user_file, Loader=yaml.FullLoader)
         user_file.close()
 
-        if 'matrix' in user_dict.keys():
+        if 'matrix' in self.user_dict.keys():
             raise NotImplementedError(
                 'Matrix expansion not yet implemented...')
+            # 1. compute expansion, create indiv yaml files
+            # 2. loop expanded to create jobs from yaml files
+            self._has_matrix = True
+        else:
+            self._has_matrix = False
 
-        if not hasattr(self, 'timesteps'):
-            if 'timesteps' in user_dict.keys():
-                self.timesteps = user_dict['timesteps']
+    def expand_yaml_matrix(self):
+        """Expand YAML matrix, if given.
 
-    def instatiate_model(self):
-        self.deltamodel = DeltaModel(input_file=self.input_file)
+        Look for a field named ``matrix`` in the yaml dict.
 
-    def run_model(self):
-        """Loop the model.
+        Compute the matrix expansion.
 
-        Iterate the timestep ``update`` routine for the specified number of
-        iterations.
         """
 
+        pass
+
+    def extract_timesteps(self):
+        if hasattr(self, 'cli_timesteps'):
+            # overrides everything else
+            self.timesteps = self.cli_timesteps
+
         if not hasattr(self, 'timesteps'):
-            raise ValueError('You must specify timesteps in either the '
-                             'YAML configuration file or via the --timesteps '
-                             'CLI flag, in order to use the high-level API.')
+            if 'timesteps' in self.user_dict.keys():
+                self.timesteps = self.user_dict['timesteps']
+            else:
+                raise ValueError('You must specify timesteps in either the '
+                                 'YAML configuration file or via the --timesteps '
+                                 'CLI flag, in order to use the high-level API.')
 
-        for _t in range(self.timesteps):
-            self.deltamodel.update()
+    class _Job(object):
 
-    def finalize_model(self):
-        self.deltamodel.finalize()
+        def __init__(self, input_file, yaml_timesteps, cli_timesteps):
+            self.deltamodel = DeltaModel(input_file=input_file)
+
+            if yaml_timesteps:
+                _timesteps = yaml_timesteps
+            elif cli_timesteps:
+                _timesteps = cli_timesteps
+            else:
+                raise ValueError('You must specify timesteps in either the '
+                                 'YAML configuration file or via the --timesteps '
+                                 'CLI flag, in order to use the high-level API.')
+            self.timesteps = _timesteps
+
+        def run_model(self):
+            """Loop the model.
+
+            Iterate the timestep ``update`` routine for the specified number of
+            iterations.
+            """
+
+            for _t in range(self.timesteps):
+                self.deltamodel.update()
+
+        def finalize_model(self):
+            self.deltamodel.finalize()
 
 
-class CLI_API(BasePreprocessor):
+class PreprocessorCLI(BasePreprocessor):
 
     def __init__(self):
 
@@ -81,24 +103,37 @@ class CLI_API(BasePreprocessor):
 
         self.process_arguments()
 
-        if self.args['timesteps']:
-            self.timesteps = int(self.args['timesteps'])
-
         if self.args['config']:
             self.input_file = self.args['config']
-            self.preliminary_yaml_parsing()
+            self.extract_yaml_config()
         else:
             self.input_file = None
+            self.user_dict = {}
+            self._has_matrix = False
 
-        self.instatiate_model()
+        if self.args['timesteps']:
+            self.cli_timesteps = int(self.args['timesteps'])
+        else:
+            self.cli_timesteps = None
 
-        if not self.args['dryrun']:
-            self.run_model()
-            self.finalize_model()
+        if 'timesteps' in self.user_dict.keys():
+            self.yaml_timesteps = self.user_dict['timesteps']
+        else:
+            self.yaml_timesteps = None
+
+        self.job_list = []
+        if self._has_matrix:
+            self.expand_yaml_matrix()
+        else:
+            self.job_list.append(self._Job(self.input_file,
+                                           yaml_timesteps=self.yaml_timesteps,
+                                           cli_timesteps=self.cli_timesteps))
+
+        self.extract_timesteps()
 
     def process_arguments(self):
         parser = argparse.ArgumentParser(
-            description='Options for running pyDeltaRCM from command line')
+            description='Arguments for running pyDeltaRCM from command line')
 
         parser.add_argument('--config',
                             help='Path to a config file that you would like to use.')
@@ -117,7 +152,12 @@ class CLI_API(BasePreprocessor):
         self.args = vars(args)
 
 
-class Python_API(BasePreprocessor):
+class Preprocessor(BasePreprocessor):
+    """Python high level api.
+
+    Call the preprocessor with a yaml file to handle multi-job yaml configs,
+    as well as timestepping from script.
+    """
 
     def __init__(self):
         raise NotImplementedError
@@ -125,12 +165,24 @@ class Python_API(BasePreprocessor):
         pass
 
 
-def CLI_wrapper():
+def preprocessor_wrapper():
     """Wrapper for CLI interface.
     """
-    _CLI = CLI_API()
+    pp = PreprocessorCLI()
+
+    # check no mulitjobs, no implemented
+    if len(pp.job_list) > 1:
+        raise NotImplementedError
+        # 1. set up parallel pool if multiple jobs
+        # 2. run jobs in list
+    ######
+
+    # run the job(s)
+    for job in pp.job_list:
+        job.run_model()
+        job.finalize_model()
 
 
 if __name__ == '__main__':
 
-    CLI_API()
+    preprocessor_wrapper()
