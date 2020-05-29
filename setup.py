@@ -16,6 +16,6 @@ setup(name='pyDeltaRCM',
                         'basic-modeling-interface', 'scipy', 'numpy', 'pyyaml',
                         'numba'],
       entry_points={
-                  'console_scripts': ['pyDeltaRCM=pyDeltaRCM.preprocessor:CLI_wrapper'],
+                  'console_scripts': ['pyDeltaRCM=pyDeltaRCM.preprocessor:preprocessor_wrapper'],
       }
       )
