@@ -54,9 +54,9 @@ class BasePreprocessor(abc.ABC):
         pass
 
     def extract_timesteps(self):
-        if hasattr(self, 'cli_timesteps'):
+        if hasattr(self, 'arg_timesteps'):
             # overrides everything else
-            self.timesteps = self.cli_timesteps
+            self.timesteps = self.arg_timesteps
 
         if not hasattr(self, 'timesteps'):
             if 'timesteps' in self.user_dict.keys():
@@ -66,19 +66,43 @@ class BasePreprocessor(abc.ABC):
                                  'YAML configuration file or via the --timesteps '
                                  'CLI flag, in order to use the high-level API.')
 
+    def construct_job_list(self):
+        self.job_list = []
+        if self._has_matrix:
+            self.expand_yaml_matrix()
+        else:
+            self.job_list.append(self._Job(self.input_file,
+                                           yaml_timesteps=self.yaml_timesteps,
+                                           arg_timesteps=self.arg_timesteps))
+
+    def run_jobs(self):
+
+        # check no mulitjobs, no implemented
+        if len(self.job_list) > 1:
+            raise NotImplementedError()
+            # 1. set up parallel pool if multiple jobs
+            # 2. run jobs in list
+        ######
+
+        # run the job(s)
+        for job in self.job_list:
+            job.run_model()
+            job.finalize_model()
+
     class _Job(object):
 
-        def __init__(self, input_file, yaml_timesteps, cli_timesteps):
+        def __init__(self, input_file, yaml_timesteps, arg_timesteps):
+
             self.deltamodel = DeltaModel(input_file=input_file)
 
             if yaml_timesteps:
                 _timesteps = yaml_timesteps
-            elif cli_timesteps:
-                _timesteps = cli_timesteps
+            elif arg_timesteps:
+                _timesteps = arg_timesteps
             else:
                 raise ValueError('You must specify timesteps in either the '
-                                 'YAML configuration file or via the --timesteps '
-                                 'CLI flag, in order to use the high-level API.')
+                                 'YAML configuration file or via the timesteps '
+                                 'argument, in order to use the high-level API.')
             self.timesteps = _timesteps
 
         def run_model(self):
@@ -112,22 +136,16 @@ class PreprocessorCLI(BasePreprocessor):
             self._has_matrix = False
 
         if self.args['timesteps']:
-            self.cli_timesteps = int(self.args['timesteps'])
+            self.arg_timesteps = int(self.args['timesteps'])
         else:
-            self.cli_timesteps = None
+            self.arg_timesteps = None
 
         if 'timesteps' in self.user_dict.keys():
             self.yaml_timesteps = self.user_dict['timesteps']
         else:
             self.yaml_timesteps = None
 
-        self.job_list = []
-        if self._has_matrix:
-            self.expand_yaml_matrix()
-        else:
-            self.job_list.append(self._Job(self.input_file,
-                                           yaml_timesteps=self.yaml_timesteps,
-                                           cli_timesteps=self.cli_timesteps))
+        self.construct_job_list()
 
         self.extract_timesteps()
 
@@ -159,28 +177,38 @@ class Preprocessor(BasePreprocessor):
     as well as timestepping from script.
     """
 
-    def __init__(self):
-        raise NotImplementedError
-        super().__init__(self)
-        pass
+    def __init__(self, input_file=None, timesteps=None):
+
+        super().__init__()
+
+        if input_file:
+            self.input_file = input_file
+            self.extract_yaml_config()
+        else:
+            self.input_file = None
+            self.user_dict = {}
+            self._has_matrix = False
+
+        if timesteps:
+            self.arg_timesteps = int(timesteps)
+        else:
+            self.arg_timesteps = None
+
+        if 'timesteps' in self.user_dict.keys():
+            self.yaml_timesteps = self.user_dict['timesteps']
+        else:
+            self.yaml_timesteps = None
+
+        self.construct_job_list()
+
+        self.extract_timesteps()
 
 
 def preprocessor_wrapper():
     """Wrapper for CLI interface.
     """
     pp = PreprocessorCLI()
-
-    # check no mulitjobs, no implemented
-    if len(pp.job_list) > 1:
-        raise NotImplementedError
-        # 1. set up parallel pool if multiple jobs
-        # 2. run jobs in list
-    ######
-
-    # run the job(s)
-    for job in pp.job_list:
-        job.run_model()
-        job.finalize_model()
+    pp.run_jobs()
 
 
 if __name__ == '__main__':
