@@ -124,9 +124,6 @@ def test_random_seed_settings_noaction_default(tmp_path):
 
 # test the entry points
 
-from pyDeltaRCM import preprocessor
-import pyDeltaRCM as _pyimportedalias
-
 def test_entry_point_installed_call(tmp_path):
     """
     test calling the command line feature with a config file.
@@ -182,9 +179,6 @@ def test_entry_point_python_main_call(tmp_path):
 
 
 def test_entry_point_python_main_call_dryrun(tmp_path):
-    """
-    test calling the python hook command line feature with a config file.
-    """
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -254,6 +248,12 @@ def test_version_call():
 
 # test high level python api
 from pyDeltaRCM import preprocessor
+
+
+
+@pytest.mark.xfail(raises=ValueError, strict=True)
+def test_python_highlevelapi_call_without_args():
+    pp = preprocessor.Preprocessor()
 
 
 @pytest.mark.xfail(raises=ValueError, strict=True)
