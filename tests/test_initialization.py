@@ -250,7 +250,6 @@ def test_version_call():
 from pyDeltaRCM import preprocessor
 
 
-
 @pytest.mark.xfail(raises=ValueError, strict=True)
 def test_python_highlevelapi_call_without_args():
     pp = preprocessor.Preprocessor()
