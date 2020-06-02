@@ -95,8 +95,10 @@ def random_pick(prob):
 
 @njit
 def custom_unravel(i, shape):
-    '''Spread sand between two cells
-    '''
+    """Function to unravel indexes for 2D array
+    """
+    if i > (shape[1] * shape[0]):
+        raise IndexError("Index is out of matrix bounds")
     x = i // shape[1]
     y = i % shape[1]
     return x, y
@@ -104,6 +106,10 @@ def custom_unravel(i, shape):
 
 @njit
 def custom_ravel(tup, shape):
+    """Function to ravel indexes for 2D array
+    """
+    if tup[0] > shape[0] or tup[1] > shape[1]:
+        raise IndexError("Index is out of matrix bounds")
     x = tup[0] * shape[1]
     y = tup[1]
     return x + y
@@ -146,7 +152,6 @@ def check_for_loops(indices, inds, it, L0, loopedout, domain_shape, CTR, free_su
             free_surf_flag[n] = -1
 
     return inds, loopedout, free_surf_flag
-
 
 
 @njit
