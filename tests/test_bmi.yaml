@@ -1,6 +1,6 @@
 model_output__site_prefix: ''
 model_output__case_prefix: ''
-model_output__out_dir: test
+model_output__out_dir: bmi_test
 model_grid__length: 10.0
 model_grid__width: 10.0
 model_grid__cell_size: 1.0
