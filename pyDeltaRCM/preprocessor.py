@@ -145,9 +145,9 @@ class PreprocessorCLI(BasePreprocessor):
         else:
             self.yaml_timesteps = None
 
-        self.construct_job_list()
-
         self.extract_timesteps()
+
+        self.construct_job_list()
 
     def process_arguments(self):
         parser = argparse.ArgumentParser(
@@ -199,9 +199,9 @@ class Preprocessor(BasePreprocessor):
         else:
             self.yaml_timesteps = None
 
-        self.construct_job_list()
-
         self.extract_timesteps()
+
+        self.construct_job_list()
 
 
 def preprocessor_wrapper():
