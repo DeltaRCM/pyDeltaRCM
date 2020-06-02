@@ -6,33 +6,35 @@ import sys
 import os
 import numpy as np
 
-from pyDeltaRCM.model import DeltaModel
+# from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 from pyDeltaRCM import shared_tools
+from utilities import test_DeltaModel
+
 
 # need to create a simple case of pydeltarcm object to test these functions
-delta = DeltaModel(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
+# delta = DeltaModel(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
 
 # now that it is initiated can access the shared_tools via the inherited object
 # delta._delta.**shared_tools_function**
 
 
-def test_set_random_assignments():
+def test_set_random_assignments(test_DeltaModel):
     """
     Test for function shared_tools.get_random_uniform and
     test for function shared_tools.set_random_seed
     """
-    shared_tools.set_random_seed(delta.seed)
+    shared_tools.set_random_seed(test_DeltaModel.seed)
     got = shared_tools.get_random_uniform(1)
     _exp = 0.5488135039273248
     assert got == pytest.approx(_exp)
 
 
-def test_sand_partition():
+def test_sand_partition(test_DeltaModel):
     """
     Test for function shared_tools.partition_sand
     """
     nx, ny, qsn = shared_tools.partition_sand(
-        delta.qs, 1, 4, 4, 1, 0, 1
+        test_DeltaModel.qs, 1, 4, 4, 1, 0, 1
     )
     assert nx == 5
     assert ny == 4
@@ -63,11 +65,11 @@ def test_get_steps():
     assert d == pytest.approx(d_exp)
 
 
-def test_update_dirQfield():
+def test_update_dirQfield(test_DeltaModel):
     """
     Test for function shared_tools.update_dirQfield
     """
-    np.random.seed(delta.seed)
+    np.random.seed(test_DeltaModel.seed)
     qx = np.random.uniform(0, 10, 9)
     d = np.array([1, np.sqrt(2), 0])
     astep = np.array([True, True, False])
@@ -79,18 +81,18 @@ def test_update_dirQfield():
     assert np.all(qxdiff[3:6] == pytest.approx(qxdiff_exp))
 
 
-def test_update_absQfield():
+def test_update_absQfield(test_DeltaModel):
     """
     Test for function shared_tools.update_absQfield
     """
-    np.random.seed(delta.seed)
+    np.random.seed(test_DeltaModel.seed)
     qw = np.random.uniform(0, 10, 9)
     d = np.array([1, np.sqrt(2), 0])
     astep = np.array([True, True, False])
     inds = np.array([3, 4, 5])
-    qwn = shared_tools.update_absQfield(np.copy(qw), d, inds, astep, delta.Qp_water, delta.dx)
+    qwn = shared_tools.update_absQfield(np.copy(qw), d, inds, astep, test_DeltaModel.Qp_water, test_DeltaModel.dx)
     qwdiff = qwn - qw
-    diffelem = delta.Qp_water / delta.dx / 2
+    diffelem = test_DeltaModel.Qp_water / test_DeltaModel.dx / 2
     qwdiff_exp = np.array([diffelem, diffelem, 0])
     assert np.all(qwdiff[3:6] == pytest.approx(qwdiff_exp))
 
@@ -106,11 +108,11 @@ def test_random_pick():
     assert shared_tools.random_pick(probs) == 0
 
 
-def test_random_pick_anybut_first():
+def test_random_pick_anybut_first(test_DeltaModel):
     """
     Test for function shared_tools.random_pick
     """
-    shared_tools.set_random_seed(delta.seed)
+    shared_tools.set_random_seed(test_DeltaModel.seed)
     probs = (1 / 7) * np.ones((3, 3), dtype=np.float64)
     probs[0, 0] = 0
     probs[1, 1] = 0
@@ -200,10 +202,10 @@ def test_calculate_new_ind():
     assert np.all(nidx == nidx_exp)
 
 
-def test_get_weight_at_cell():
+def test_get_weight_at_cell(test_DeltaModel):
 
     ind = (0, 4)
-    np.random.seed(delta.seed)
+    np.random.seed(test_DeltaModel.seed)
     stage = np.random.uniform(0.5, 1, 9)
     eta = np.random.uniform(0, 0.85, 9)
     depth = stage - eta
@@ -211,9 +213,9 @@ def test_get_weight_at_cell():
     celltype = np.array([-2, -2, -2, 1, 1, -2, 0, 0, 0])
     qx = 1
     qy = 1
-    ivec = delta.ivec.flatten()
-    jvec = delta.jvec.flatten()
-    dists = delta.distances.flatten()
+    ivec = test_DeltaModel.ivec.flatten()
+    jvec = test_DeltaModel.jvec.flatten()
+    dists = test_DeltaModel.distances.flatten()
     dry_thresh = 0.1
     gamma = 0.001962
     theta = 1
