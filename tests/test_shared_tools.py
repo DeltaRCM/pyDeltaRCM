@@ -25,3 +25,38 @@ def test_random_pick():
     probs[0] = 1
     # should return first index
     assert shared_tools.random_pick(probs) == 0
+def test_custom_unravel_square():
+    arr = np.arange(9).reshape((3, 3))
+    # test upper left corner
+    x, y = shared_tools.custom_unravel(0, arr.shape)
+    assert x == 0
+    assert y == 0
+    # test center
+    x, y = shared_tools.custom_unravel(4, arr.shape)
+    assert x == 1
+    assert y == 1
+    # test off-center
+    x, y = shared_tools.custom_unravel(5, arr.shape)
+    assert x == 1
+    assert y == 2
+    # test lower right corner
+    x, y = shared_tools.custom_unravel(8, arr.shape)
+    assert x == 2
+    assert y == 2
+
+
+def test_custom_unravel_rectangle():
+    arr = np.arange(50).reshape((5, 10))
+    # test a few spots
+    x, y = shared_tools.custom_unravel(19, arr.shape)
+    assert x == 1
+    assert y == 9
+    x, y = shared_tools.custom_unravel(34, arr.shape)
+    assert x == 3
+    assert y == 4
+
+
+@pytest.mark.xfail(raises=IndexError, strict=True)
+def test_custom_unravel_exceed_error():
+    arr = np.arange(9).reshape((3, 3))
+    x, y = shared_tools.custom_unravel(99, arr.shape)
