@@ -8,13 +8,13 @@ import numpy as np
 import subprocess
 
 from pyDeltaRCM.model import DeltaModel
+from pyDeltaRCM import shared_tools
 
 import utilities
 from utilities import test_DeltaModel
 
 
 # test yaml parsing 
-
 
 def test_override_from_testfile(test_DeltaModel):
     out_path = test_DeltaModel.out_dir.split('/')
@@ -97,16 +97,16 @@ def test_not_overwriting_existing_attributes(tmp_path):
 def test_random_seed_settings_value(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
     utilities.write_parameter_to_file(f, 'seed', 9999)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
     f.close()
-    np.random.seed(9999)
-    _preval_same = np.random.uniform()
-    np.random.seed(5)
-    _preval_diff = np.random.uniform(1000)
+    shared_tools.set_random_seed(9999)
+    _preval_same = shared_tools.get_random_uniform(1)
+    shared_tools.set_random_seed(5)
+    _preval_diff = shared_tools.get_random_uniform(1000)
     delta = DeltaModel(input_file=p)
     assert delta.seed == 9999
-    _postval_same = np.random.uniform()
+    _postval_same = shared_tools.get_random_uniform(1)
     assert _preval_same == _postval_same
     assert delta.seed == 9999
 
