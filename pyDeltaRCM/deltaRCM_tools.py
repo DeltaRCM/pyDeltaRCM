@@ -23,6 +23,7 @@ from .sed_tools import sed_tools
 from .water_tools import water_tools
 from .init_tools import init_tools
 
+from PIL import Image, ImageDraw
 
 class Tools(sed_tools, water_tools, init_tools, object):
 
@@ -42,7 +43,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         Raises
         ------
-        RuntimeError 
+        RuntimeError
             If model has already been finalized via :meth:`finalize`.
         """
 
@@ -119,7 +120,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         Only runs if save_strata is True.
 
-        .. note:: 
+        .. note::
 
             This routine needs a complete description of the algorithm,
             additionally, it should be ported to a routine in DeltaMetrics,
@@ -136,61 +137,80 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         timestep = self._time
 
-        if self.save_strata and (timestep % self.save_dt == 0):
+        if self.strata_method == 'new':
+            # new method of using sparse arrays to store strata
+            if self.save_strata and (timestep % self.save_dt == 0):
 
-            timestep = int(timestep)
+                timestep = int(timestep)
 
-            if self.strata_eta.shape[1] <= timestep:
-                self.expand_stratigraphy()
+                if self.strata_eta.shape[1] <= timestep:
+                    self.expand_stratigraphy()
 
-            if self.verbose >= 2:
-                self.logger.info('Storing stratigraphy data')
+                if self.verbose >= 2:
+                    self.logger.info('Storing stratigraphy data')
 
-            # ------------------ sand frac ------------------
-            # -1 for cells with deposition volumes < vol_limit
-            # vol_limit for any mud (to diff from no deposition in sparse
-            #   array)
-            # (overwritten if any sand deposited)
+                # ------------------ sand frac ------------------
+                # -1 for cells with deposition volumes < vol_limit
+                # vol_limit for any mud (to diff from no deposition in sparse
+                #   array)
+                # (overwritten if any sand deposited)
 
-            sand_frac = -1 * np.ones((self.L, self.W))
+                sand_frac = -1 * np.ones((self.L, self.W))
 
-            vol_limit = 0.000001  # threshold deposition volume
-            sand_frac[self.Vp_dep_mud > vol_limit] = vol_limit
+                vol_limit = 0.000001  # threshold deposition volume
+                sand_frac[self.Vp_dep_mud > vol_limit] = vol_limit
 
-            sand_loc = self.Vp_dep_sand > 0
-            sand_frac[sand_loc] = (self.Vp_dep_sand[sand_loc]
-                                   / (self.Vp_dep_mud[sand_loc]
-                                      + self.Vp_dep_sand[sand_loc])
-                                   )
-            # store indices and sand_frac into a sparse array
-            row_s = np.where(sand_frac.flatten() >= 0)[0]
-            col_s = np.zeros((len(row_s),))
-            data_s = sand_frac[sand_frac >= 0]
+                sand_loc = self.Vp_dep_sand > 0
+                sand_frac[sand_loc] = (self.Vp_dep_sand[sand_loc]
+                                       / (self.Vp_dep_mud[sand_loc]
+                                          + self.Vp_dep_sand[sand_loc])
+                                       )
+                # store indices and sand_frac into a sparse array
+                row_s = np.where(sand_frac.flatten() >= 0)[0]
+                col_s = np.zeros((len(row_s),))
+                data_s = sand_frac[sand_frac >= 0]
 
-            sand_sparse = csc_matrix((data_s, (row_s, col_s)),
-                                     shape=(self.L * self.W, 1))
-            # store sand_sparse into strata_sand_frac
-            self.strata_sand_frac[:, self.strata_counter] = sand_sparse
+                sand_sparse = csc_matrix((data_s, (row_s, col_s)),
+                                         shape=(self.L * self.W, 1))
+                # store sand_sparse into strata_sand_frac
+                self.strata_sand_frac[:, self.strata_counter] = sand_sparse
 
-            # ------------------ eta ------------------
-            diff_eta = self.eta - self.init_eta
+                # ------------------ eta ------------------
+                diff_eta = self.eta - self.init_eta
 
-            row_s = np.where(diff_eta.flatten() != 0)[0]
-            col_s = np.zeros((len(row_s),))
-            data_s = self.eta[diff_eta != 0]
+                row_s = np.where(diff_eta.flatten() != 0)[0]
+                col_s = np.zeros((len(row_s),))
+                data_s = self.eta[diff_eta != 0]
 
-            eta_sparse = csc_matrix((data_s, (row_s, col_s)),
-                                    shape=(self.L * self.W, 1))
-            self.strata_eta[:, self.strata_counter] = eta_sparse
+                eta_sparse = csc_matrix((data_s, (row_s, col_s)),
+                                        shape=(self.L * self.W, 1))
+                self.strata_eta[:, self.strata_counter] = eta_sparse
 
-            if self.toggle_subsidence and self.start_subsidence <= timestep:
+                if self.toggle_subsidence and self.start_subsidence <= timestep:
 
-                sigma_change = (self.strata_eta[:, :self.strata_counter]
-                                - self.sigma.flatten()[:, np.newaxis])
-                self.strata_eta[:, :self.strata_counter] = lil_matrix(
-                    sigma_change)
+                    sigma_change = (self.strata_eta[:, :self.strata_counter]
+                                    - self.sigma.flatten()[:, np.newaxis])
+                    self.strata_eta[:, :self.strata_counter] = lil_matrix(
+                        sigma_change)
 
-            self.strata_counter += 1
+                self.strata_counter += 1
+
+        elif self.strata_method == 'old':
+            # old method of updating stratigraphy every timestep
+            self.sand_frac[self.Vp_dep_sand>0] = self.Vp_dep_sand[self.Vp_dep_sand>0]/(self.Vp_dep_mud[self.Vp_dep_sand>0]+self.Vp_dep_sand[self.Vp_dep_sand>0])
+            self.sand_frac[self.Vp_dep_sand<0] = 0            
+            for px in range(self.L):
+                for py in range(self.W):
+                    zn = round((self.eta[px,py]-self.z0)/self.dz)
+                    zn = int(max(1,zn))
+                    if zn > self.zmax:
+                        raise ValueError('zn exceeds strata layer depth')
+                    if zn >= self.topz[px,py]:
+                        self.strata[px,py,int(self.topz[px,py]):zn] = self.sand_frac[px,py]
+                    else:
+                        self.strata[px,py,zn:int(self.topz[px,py])] = -1
+                        self.sand_frac[px,py] = self.strata[px,py,max(0,z-2)]#max(1,z-1)
+                    self.topz[px,py] = zn
 
     def apply_subsidence(self):
         """Apply subsidence pattern.
@@ -322,49 +342,73 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         if self.save_strata:
 
-            if self.verbose >= 2:
-                self.logger.info('\nSaving final stratigraphy to netCDF file')
+            if self.strata_method == 'new':
+                # save variables associated with the new method of strata
+                if self.verbose >= 2:
+                    self.logger.info('\nSaving final stratigraphy to netCDF file')
 
-            self.strata_eta = self.strata_eta[:, :self.strata_counter]
+                self.strata_eta = self.strata_eta[:, :self.strata_counter]
 
-            shape = self.strata_eta.shape
+                shape = self.strata_eta.shape
 
-            total_strata_age = self.output_netcdf.createDimension(
-                'total_strata_age',
-                shape[1])
+                total_strata_age = self.output_netcdf.createDimension(
+                    'total_strata_age',
+                    shape[1])
 
-            strata_age = self.output_netcdf.createVariable('strata_age',
-                                                           np.int32,
-                                                           ('total_strata_age'))
-            strata_age.units = 'timesteps'
-            self.output_netcdf.variables['strata_age'][
-                :] = list(range(shape[1] - 1, -1, -1))
+                strata_age = self.output_netcdf.createVariable('strata_age',
+                                                               np.int32,
+                                                               ('total_strata_age'))
+                strata_age.units = 'timesteps'
+                self.output_netcdf.variables['strata_age'][
+                    :] = list(range(shape[1] - 1, -1, -1))
 
-            sand_frac = self.output_netcdf.createVariable('strata_sand_frac',
-                                                          np.float32,
-                                                          ('total_strata_age', 'length', 'width'))
-            sand_frac.units = 'fraction'
+                sand_frac = self.output_netcdf.createVariable('strata_sand_frac',
+                                                              np.float32,
+                                                              ('total_strata_age', 'length', 'width'))
+                sand_frac.units = 'fraction'
 
-            strata_elev = self.output_netcdf.createVariable('strata_depth',
-                                                            np.float32,
-                                                            ('total_strata_age', 'length', 'width'))
-            strata_elev.units = 'meters'
+                strata_elev = self.output_netcdf.createVariable('strata_depth',
+                                                                np.float32,
+                                                                ('total_strata_age', 'length', 'width'))
+                strata_elev.units = 'meters'
 
-            for i in range(shape[1]):
+                for i in range(shape[1]):
 
-                sf = self.strata_sand_frac[:, i].toarray()
-                sf = sf.reshape(self.eta.shape)
-                sf[sf == 0] = -1
+                    sf = self.strata_sand_frac[:, i].toarray()
+                    sf = sf.reshape(self.eta.shape)
+                    sf[sf == 0] = -1
 
-                self.output_netcdf.variables['strata_sand_frac'][i, :, :] = sf
+                    self.output_netcdf.variables['strata_sand_frac'][i, :, :] = sf
 
-                sz = self.strata_eta[:, i].toarray().reshape(self.eta.shape)
-                sz[sz == 0] = self.init_eta[sz == 0]
+                    sz = self.strata_eta[:, i].toarray().reshape(self.eta.shape)
+                    sz[sz == 0] = self.init_eta[sz == 0]
 
-                self.output_netcdf.variables['strata_depth'][i, :, :] = sz
+                    self.output_netcdf.variables['strata_depth'][i, :, :] = sz
 
-            if self.verbose >= 2:
-                self.logger.info('Stratigraphy data saved.')
+                self.strata_postprocess()
+
+                if self.verbose >= 2:
+                    self.logger.info('Stratigraphy data saved.')
+
+            elif self.strata_method == 'old':
+                # save strata matrix which was the only old variable for strata
+
+                # # assign strata_depth to netCDF dimension
+                # strata_depth = self.output_netcdf.createDimension('strata_depth',
+                #                                                  self.zmax)
+                #
+                # # create variable in netCDF
+                # strata = self.output_netcdf.createVariable('strata',
+                #                                             'f4',
+                #                                             ('length',
+                #                                             'width',
+                #                                             'strata_depth'))
+                # strata.units = 'meters'
+                # # put strata into netCDF variable
+                # self.output_netcdf.variables['strata'] = self.strata
+
+                # save as npz
+                np.save(os.path.join(self.prefix,'strata.npy'),self.strata)
 
     def save_figure(self, path, ext='png', close=True):
         """Save a figure.
@@ -430,3 +474,70 @@ class Tools(sed_tools, water_tools, init_tools, object):
         except:
             self.logger.info('Error: Cannot save grid to netCDF file.')
             warnings.warn(UserWarning('Cannot save grid to netCDF file.'))
+
+    def strata_postprocess(self):
+        """
+        Placeholder - ported the `strat_preprocess.py` functionality into the
+        model to get outputs for the "new" stratigraphy that can be directly
+        compared to the "old" strata
+        """
+
+        vertical_spacing = 0.05 # in meters
+        max_depth_of_section = 5 # meters
+
+        strata_sf = self.output_netcdf.variables['strata_sand_frac']
+        strata_depth = self.output_netcdf.variables['strata_depth']
+
+
+        # shortcuts for array sizes
+        dz, dx, dy = strata_depth.shape
+        nx, ny, nz = dx, dy, int(5/vertical_spacing)
+
+        # preserves only the oldest surface when cross-cutting
+        strata = np.zeros_like(strata_depth)
+        strata[-1,:,:] = strata_depth[-1,:,:]
+
+        for i in range(1,dz):
+            strata[-i-1,:,:] = np.minimum(strata_depth[-i-1,:,:], strata[-i,:,:])
+
+        # combines depths and sand fractions into stratigraphy
+        stratigraphy = np.zeros((nz, nx, ny))
+
+        for j in range(dx):
+
+            mask = np.ones((nz,ny)) * -1
+
+            for i in np.arange(dz-1,-1,-1):
+
+                seds = strata[i,j,:] + max_depth_of_section
+
+                sf = strata_sf[i,j,:]
+                sf[sf<0] = 0
+
+                poly = list(zip(np.arange(ny), seds / vertical_spacing)) + list(zip(np.arange(ny)*2, np.arange(ny)*0))
+
+                img = Image.new("L", [ny, nz], 0)
+                ImageDraw.Draw(img).polygon(poly, outline=1, fill=1)
+                img = np.flipud(img).astype(float)
+
+                img *= sf
+                mask[img > 0] = img[img > 0]
+
+            stratigraphy[:,j,:] = mask
+
+        # put into netCDF
+        # strata_shape = stratigraphy.shape
+        # strata_x = self.output_netcdf.createDimension('strata_x',strata_shape[1])
+        # strata_y = self.output_netcdf.createDimension('strata_y',strata_shape[2])
+        # strata_z = self.output_netcdf.createDimension('strata_z',strata_shape[0])
+        #
+        # strata = self.output_netcdf.createVariable('strata',
+        #                                             'f4',
+        #                                             ('strata_x',
+        #                                             'strata_y',
+        #                                             'strata_z'))
+        # strata.units = 'meters'
+        # self.output_netcdf.variables['strata'] = stratigraphy
+
+        # save as npz
+        np.save(os.path.join(self.prefix,'strata.npy'),stratigraphy)

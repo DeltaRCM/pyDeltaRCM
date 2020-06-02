@@ -321,16 +321,40 @@ class init_tools(object):
         """
         if self.save_strata:
 
-            self.strata_counter = 0
+            if self.strata_method == 'new':
+                # use sparse/efficient method of storing stratigraphy
+                self.strata_counter = 0
 
-            self.n_steps = 5 * self.save_dt
+                self.n_steps = 5 * self.save_dt
 
-            self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps),
-                                               dtype = np.float32)
+                self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps),
+                                                   dtype = np.float32)
 
-            self.init_eta = self.eta.copy()
-            self.strata_eta = lil_matrix((self.L * self.W, self.n_steps),
-                                         dtype = np.float32)
+                self.init_eta = self.eta.copy()
+                self.strata_eta = lil_matrix((self.L * self.W, self.n_steps),
+                                             dtype = np.float32)
+
+            elif self.strata_method == 'old':
+                # use more direct translation of original code for strata
+                strataBtm = 1
+                self.z0 = self.H_SL-self.h0*strataBtm # bottom layer elevation
+                self.dz = 0.05*self.h0  # layer thickness hard coded to 0.05 to match the 'vertical_spacing' in new method
+                self.zmax = int(round((self.H_SL+self.SLR*self.timesteps*self.dt+self.S0*self.L/2*self.dx-self.z0)/self.dz)) # max layer number
+                strata0 =-1 # default value of none
+                self.strata = np.ones((self.L,self.W,self.zmax))*strata0
+                topz = np.zeros((self.L,self.W), dtype = np.int) # surface layer number
+                topz = np.rint((self.eta-self.z0)/self.dz)
+                topz[topz < 1] = 1
+                topz[topz > self.zmax] = self.zmax
+                self.topz = topz
+                self.strata_age = np.zeros((self.L,self.W))
+                self.sand_frac = 0.5 + np.zeros((self.L,self.W))
+
+            else:
+                raise TypeError('Input for strata_method is not valid '
+                                'in yaml configuration file. '
+                                'Must be "new" or "old".')
+
 
     def init_output_grids(self):
         """Creates a netCDF file to store output grids.

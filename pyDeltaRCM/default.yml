@@ -145,3 +145,6 @@ alpha:
 timesteps:
   type: ['float', 'int']
   default: 10
+strata_method:
+  type: 'str'
+  default: 'new'

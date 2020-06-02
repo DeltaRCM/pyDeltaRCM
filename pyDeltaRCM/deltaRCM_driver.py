@@ -92,10 +92,11 @@ class pyDeltaRCM(Tools):
 
         self.run_one_timestep()
 
-        self.apply_subsidence()
-
         self.finalize_timestep()
+
         self.record_stratigraphy()
+
+        self.apply_subsidence()
 
         self.output_data()
 
