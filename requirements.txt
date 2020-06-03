@@ -4,3 +4,4 @@ scipy
 netCDF4
 basic_modeling_interface
 pyyaml
+numba

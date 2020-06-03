@@ -4,12 +4,11 @@
 shared_tools
 *********************************
 
-The tools are defined in ``pyDeltaRCM.shared_tools``. 
+The tools are defined in ``pyDeltaRCM.shared_tools``.
 
+.. currentmodule:: pyDeltaRCM
 
-.. currentmodule:: pyDeltaRCM.shared_tools
+.. autosummary::
+  :toctree: ../../_autosummary
 
-.. autosummary:: 
-	:toctree: ../../_autosummary
-
-	shared_tools
+  shared_tools

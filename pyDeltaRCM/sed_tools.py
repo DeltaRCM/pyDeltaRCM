@@ -18,12 +18,12 @@ from scipy import ndimage
 
 from netCDF4 import Dataset
 
-from .shared_tools import shared_tools
+from . import shared_tools
 
 # tools for sediment routing algorithms and deposition/erosion
 
 
-class sed_tools(shared_tools):
+class sed_tools(object):
 
     def sed_route(self):
         """route all sediment"""
@@ -183,51 +183,36 @@ class sed_tools(shared_tools):
             # choose next with weights
 
             it += 1
-            ind = (px, py)
 
-            depth_ind = self.pad_depth[
-                ind[0] - 1 + 1:ind[0] + 2 + 1, ind[1] - 1 + 1:ind[1] + 2 + 1]
-            cell_type_ind = self.pad_cell_type[
-                ind[0] - 1 + 1:ind[0] + 2 + 1, ind[1] - 1 + 1:ind[1] + 2 + 1]
+            stage_nbrs = self.pad_stage[px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            depth_ind = self.pad_depth[px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            cell_type_ind = self.pad_cell_type[px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
 
-            w1 = np.maximum(0, (self.qx[ind] * self.jvec +
-                                self.qy[ind] * self.ivec))
-            w2 = depth_ind ** theta_sed
-            weight = (w1 * w2 / self.distances)
+            weights = shared_tools.get_weight_at_cell(
+                (px, py),
+                stage_nbrs.flatten(), depth_ind.flatten(), cell_type_ind.flatten(),
+                self.stage[px, py], self.qx[px, py], self.qy[px, py],
+                self.ivec.flatten(), self.jvec.flatten(), self.distances.flatten(),
+                self.dry_depth, self.gamma, theta_sed)
 
-            weight[depth_ind <= self.dry_depth] = 0.0001
-            weight[cell_type_ind == -2] = 0
+            new_cell = shared_tools.random_pick(weights)
 
-            if ind[0] == 0:
-                weight[0, :] = 0
-
-            new_cell = self.random_pick(np.cumsum(weight.flatten()))
-
-            jstep = self.iwalk.flat[new_cell]
-            istep = self.jwalk.flat[new_cell]
-            dist = np.sqrt(istep * istep + jstep * jstep)
+            dist, istep, jstep, _ = shared_tools.get_steps(new_cell, self.iwalk.flat[:], self.jwalk.flat[:])
 
             # deposition and erosion
 
             if sed == 'sand':  # sand
-                if dist > 0:
-                    # deposition in current cell
-                    self.qs[px, py] = (self.qs[px, py] +
-                                       self.Vp_res / 2 / self.dt / self.dx)
-                px = px + istep
-                py = py + jstep
 
-                if dist > 0:
-                    # deposition in downstream cell
-                    self.qs[px, py] = (self.qs[px, py] +
-                                       self.Vp_res / 2 / self.dt / self.dx)
+                depoPart = self.Vp_res / 2 / self.dt / self.dx
+
+                px, py, self.qs = shared_tools.partition_sand(self.qs, depoPart, py, px, dist, istep, jstep)
 
                 self.sand_dep_ero(px, py)
 
             if sed == 'mud':  # mud
 
-                px = px + istep
-                py = py + jstep
+                px = px + jstep
+                py = py + istep
 
                 self.mud_dep_ero(px, py)
 
@@ -240,8 +225,10 @@ class sed_tools(shared_tools):
         theta_sed = self.theta_sand
 
         num_starts = int(self.Np_sed * self.f_bedload)
-        start_indices = [self.random_pick_inlet(
-            self.inlet) for x in range(num_starts)]
+        inlet_weights = np.ones_like(self.inlet)
+        start_indices = [
+            self.inlet[shared_tools.random_pick(inlet_weights / sum(inlet_weights))]
+            for x in range(num_starts)]
 
         for np_sed in range(num_starts):
 
@@ -281,8 +268,10 @@ class sed_tools(shared_tools):
         theta_sed = self.theta_mud
 
         num_starts = int(self.Np_sed * (1 - self.f_bedload))
-        start_indices = [self.random_pick_inlet(
-            self.inlet) for x in range(num_starts)]
+        inlet_weights = np.ones_like(self.inlet)
+        start_indices = [
+            self.inlet[shared_tools.random_pick(inlet_weights / sum(inlet_weights))]
+            for x in range(num_starts)]
 
         for np_sed in range(num_starts):
 
