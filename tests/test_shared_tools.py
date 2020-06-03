@@ -160,10 +160,11 @@ def test_custom_unravel_rectangle():
     assert y == 4
 
 
-@pytest.mark.xfail(raises=IndexError, strict=True)
 def test_custom_unravel_exceed_error():
     arr = np.arange(9).reshape((3, 3))
-    x, y = shared_tools.custom_unravel(99, arr.shape)
+    # next line should throw IndexError
+    with pytest.raises(IndexError):
+        x, y = shared_tools.custom_unravel(99, arr.shape)
 
 
 def test_check_for_loops():
