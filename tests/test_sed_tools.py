@@ -21,6 +21,8 @@ def test_sed_route():
     test the function sed_tools.sed_route
     """
     delta.pad_cell_type = np.pad(delta.cell_type, 1, 'edge')
+    delta.pad_stage = np.pad(delta.stage, 1, 'edge')
+    delta.pad_depth = np.pad(delta.depth, 1, 'edge')
     delta.sed_route()
     [a, b] = np.shape(delta.pad_depth)
 

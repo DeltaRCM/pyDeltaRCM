@@ -22,6 +22,9 @@ from scipy.sparse import lil_matrix, csc_matrix, hstack
 import logging
 import time
 import yaml
+
+from . import shared_tools
+
 # tools for initiating deltaRCM model domain
 
 
@@ -97,7 +100,7 @@ class init_tools(object):
         if self.seed is not None:
             if self.verbose >= 2:
                 print("setting random seed to %s " % str(self.seed))
-            np.random.seed(self.seed)
+            shared_tools.set_random_seed(self.seed)
 
     def set_constants(self):
 
@@ -113,17 +116,13 @@ class init_tools(object):
                               [-1, 0, 1],
                               [-sqrt05, 0, sqrt05]])
 
-        self.iwalk = np.array([[-1, 0, 1],
-                               [-1, 0, 1],
-                               [-1, 0, 1]])
+        self.iwalk = shared_tools.get_iwalk()
 
         self.jvec = np.array([[-sqrt05, -1, -sqrt05],
                               [0, 0, 0],
                               [sqrt05, 1, sqrt05]])
 
-        self.jwalk = np.array([[-1, -1, -1],
-                               [0, 0, 0],
-                               [1, 1, 1]])
+        self.jwalk = shared_tools.get_jwalk()
         self.dxn_iwalk = [1, 1, 0, -1, -1, -1, 0, 1]
         self.dxn_jwalk = [0, 1, 1, 1, 0, -1, -1, -1]
         self.dxn_dist = \

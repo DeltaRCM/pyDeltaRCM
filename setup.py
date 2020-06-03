@@ -13,7 +13,8 @@ setup(name='pyDeltaRCM',
       include_package_data=True,
       url='https://github.com/DeltaRCM/pyDeltaRCM',
       install_requires=['matplotlib', 'netCDF4',
-                        'basic-modeling-interface', 'scipy', 'numpy', 'pyyaml'],
+                        'basic-modeling-interface', 'scipy', 'numpy', 'pyyaml',
+                        'numba'],
       entry_points={
                   'console_scripts': ['run_pyDeltaRCM=pyDeltaRCM.command_line:run_model'],
       }
