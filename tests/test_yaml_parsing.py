@@ -35,9 +35,9 @@ def test_override_from_testfile():
     assert delta.Length == 10
 
 
-@pytest.mark.xfail(raises=FileNotFoundError, strict=True)
 def test_error_if_no_file_found():
-    delta = pyDeltaRCM(input_file='./nonexisting_file.yaml')
+    with pytest.raises(FileNotFoundError):
+        delta = pyDeltaRCM(input_file='./nonexisting_file.yaml')
 
 
 def test_override_single_default(tmp_path):
@@ -60,22 +60,22 @@ def test_override_two_defaults(tmp_path):
     assert delta.Np_sed == 2
 
 
-@pytest.mark.xfail(raises=TypeError, strict=True)
 def test_override_bad_type_float_string(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = create_temporary_file(tmp_path, file_name)
     write_parameter_to_file(f, 'S0', 'a string?!')
     f.close()
-    delta = pyDeltaRCM(input_file=p)
+    with pytest.raises(TypeError):
+        delta = pyDeltaRCM(input_file=p)
 
 
-@pytest.mark.xfail(raises=TypeError, strict=True)
 def test_override_bad_type_int_float(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = create_temporary_file(tmp_path, file_name)
     write_parameter_to_file(f, 'beta', 24.4234)
     f.close()
-    delta = pyDeltaRCM(input_file=p)
+    with pytest.raises(TypeError):
+        delta = pyDeltaRCM(input_file=p)
 
 
 def test_not_creating_illegal_attributes(tmp_path):
