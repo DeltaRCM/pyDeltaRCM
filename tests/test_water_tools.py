@@ -8,6 +8,7 @@ import numpy as np
 
 from pyDeltaRCM.deltaRCM_driver import pyDeltaRCM
 from pyDeltaRCM import water_tools
+from pyDeltaRCM import shared_tools
 
 # need to create a simple case of pydeltarcm object to test these functions
 delta = pyDeltaRCM(input_file=os.path.join(os.getcwd(), 'tests', 'test.yaml'))
@@ -76,8 +77,9 @@ def test_calculate_new_ind():
     Test for function water_tools.calculate_new_ind
     """
     # assign old index
-    old_ind = [0, 4]
+    old_inds = np.array([4, 5])
     # assign new cell location
-    new_cell = 7
+    new_cells = np.array([7, 7])
     # expect new cell to be in location (1,4) -> 14
-    assert delta.calculate_new_ind(old_ind, new_cell) == 14
+    new_inds = shared_tools.calculate_new_ind(old_inds, new_cells, delta.iwalk.flatten(), delta.jwalk.flatten(), delta.eta.shape)
+    assert np.all(new_inds == np.array([14, 15]))
