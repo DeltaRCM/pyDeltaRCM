@@ -11,12 +11,13 @@ methods.
 .. toctree::
    :maxdepth: 2
 
-   deltaRCM_driver/index
+   model/index
    deltaRCM_tools/index
    init_tools/index
    water_tools/index
    sed_tools/index
    shared_tools/index
+   preprocessor/index
 
 
 References
