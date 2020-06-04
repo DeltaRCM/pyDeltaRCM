@@ -16,21 +16,22 @@ Inside this file you can specify parameters for your run, with each parameter on
 .. code-block:: yaml
 
     S0: 0.005
+    seed: 42
 
-then a :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM` model instance initialized with this file specified as ``input_file`` will have a slope of 0.005.
+then a :obj:`~pyDeltaRCM.model.DeltaModel` model instance initialized with this file specified as ``input_file`` will have a slope of 0.005, and will use a random seed of 42.
 Multiple parameters can be specified line by line.
 
 Default values are substituted for any parameter not explicitly given in the ``input_file`` ``.yml`` file.
-Default values of the YAML configuration are listed in the :doc:`../reference/deltaRCM_driver/yaml_defaults`.
+Default values of the YAML configuration are listed in the :doc:`../reference/model/yaml_defaults`.
 
 
 ===================
 Starting model runs
 ===================
 
-There are three ways to interact with the pyDeltaRCM model. 
-Two methods are part of the "high-level" model API, and these approaches each consist of a single line of code.
-The third method is to create a model instance via the "low-level" model API and manually handle timestepping and model finalization.
+There are two API levels at which you can interact with the pyDeltaRCM model.
+There is a "high-level" model API, which takes as argument a YAML configuration file, and will compose a list as jobs as indicated in the YAML file; the setup can be configured to automatically execute the job list, as well.
+The "low-level" API consists of creating a model instance from a YAML configuration file and manually handling the timestepping, or optionally, augmenting operations of the model to implement new features.
 
 
 High-level model API
@@ -38,38 +39,40 @@ High-level model API
 
 The high-level API is accessed via either a shell prompt or python script, and is invoked directly if a YAML configuration file includes the ``timesteps`` variable.
 
-.. note::
-    To use the high-level API, the configuration YAML file must contain the ``timesteps`` variable.
-
-Bash API
---------
-
-For example, to invoke a model run from the bash prompt using the YAML file ``model_configuration.yml`` which looks like:
+For the following high-level API demonstrations, consider a YAML input file named ``model_configuration.yml`` which looks like:
 
 .. code-block:: yaml
 
+    Length: 5000
+    Width: 2000
     timesteps: 500
 
-we would simply invoke at the bash prompt:
+
+Command line API
+----------------
+
+To invoke a model run from the command line using the YAML file ``model_configuration.yml``, 
+we would simply invoke:
 
 .. code:: bash
     
-    python -m pyDeltaRCM --config model_configuration.yml
+    pyDeltaRCM --config model_configuration.yml
 
 or equivalently:
 
 .. code:: bash
     
-    run_pyDeltaRCM --config model_configuration.yml
+    python -m pyDeltaRCM --config model_configuration.yml
 
-These invokations will run the pyDeltaRCM with the parameters specified in the ``model_configuration.yml`` file, and automatically :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM.update` the model 500 times.
+These invokations will run the pyDeltaRCM :obj:`preprocessor <pyDeltaRCM.preprocessor.PreprocessorCLI>` model with the parameters specified in the ``model_configuration.yml`` file. 
+If the YAML configuration indicated multiple jobs (:ref:`via matrix expansion or ensemble specification <configuring_multiple_jobs>`), the jobs will each be run automatically by calling :obj:`~pyDeltaRCM.model.DeltaModel.update` on the model 500 times.
+
 
 
 Python API
 ----------
 
-Alternatively, calling the ``run_model`` method from a python script, with the :meth:`input file <pyDeltaRCM.deltaRCM_driver.pyDeltaRCM.__init__>` parameter specified as the same ``model_configuration.yml`` file above, would run the pyDeltaRCM model, and automatically :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM.update` the model 500 times.
-
+Alternatively, calling the ``run_model`` method from a python script, with the :meth:`input file <pyDeltaRCM.model.DeltaModel.__init__>` parameter specified as the same ``model_configuration.yml`` file above, would run the pyDeltaRCM model, and automatically :obj:`~pyDeltaRCM.model.DeltaModel.update` the model 500 times.
 
 
 Low-level model API
@@ -79,19 +82,21 @@ iinteract with the model by creating your own script, and manipulating model out
 
 .. code::
 
-    delta = pyDeltaRCM(input_file='model_configuration.yml')
+    delta = DeltaModel(input_file='model_configuration.yml')
 
     for time in range(0,1):
         delta.update()
 
     delta.finalize()
 
-However, you can also inspect/modify the :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM.update` method, and change the order or add operations as desired.
+However, you can also inspect/modify the :obj:`~pyDeltaRCM.model.DeltaModel.update` method, and change the order or add operations as desired.
 
 
 =============================
 Advanced model configurations
 =============================
+
+.. _configuring_multiple_jobs:
 
 Configuring multiple model runs from a single YAML file
 ==============================================================
