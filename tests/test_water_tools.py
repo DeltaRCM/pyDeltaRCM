@@ -80,5 +80,3 @@ def test_calculate_new_ind(test_DeltaModel):
                                               test_DeltaModel.jwalk.flatten(),
                                               test_DeltaModel.eta.shape)
     assert np.all(new_inds == np.array([14, 15]))
-
-    # assert test_DeltaModel.calculate_new_ind(old_ind, new_cell) == 14

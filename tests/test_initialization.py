@@ -22,9 +22,9 @@ def test_override_from_testfile(test_DeltaModel):
     assert test_DeltaModel.Length == 10
 
 
-@pytest.mark.xfail(raises=FileNotFoundError, strict=True)
 def test_error_if_no_file_found():
-    delta = DeltaModel(input_file='./nonexisting_file.yaml')
+    with pytest.raises(FileNotFoundError):
+        delta = DeltaModel(input_file='./nonexisting_file.yaml')
 
 
 def test_override_single_default(tmp_path):
@@ -49,24 +49,24 @@ def test_override_two_defaults(tmp_path):
     assert delta.Np_sed == 2
 
 
-@pytest.mark.xfail(raises=TypeError, strict=True)
 def test_override_bad_type_float_string(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
     utilities.write_parameter_to_file(f, 'S0', 'a string?!')
     f.close()
-    delta = DeltaModel(input_file=p)
+    with pytest.raises(TypeError):
+        delta = DeltaModel(input_file=p)
 
 
-@pytest.mark.xfail(raises=TypeError, strict=True)
 def test_override_bad_type_int_float(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
     utilities.write_parameter_to_file(f, 'beta', 24.4234)
     f.close()
-    delta = DeltaModel(input_file=p)
+    with pytest.raises(TypeError):
+        delta = DeltaModel(input_file=p)
 
 
 def test_not_creating_illegal_attributes(tmp_path):
@@ -221,14 +221,14 @@ def test_entry_point_python_main_call_timesteps(tmp_path):
     assert os.path.isfile(exp_path_png)
 
 
-@pytest.mark.xfail(raises=subprocess.CalledProcessError, strict=True)
 def test_error_if_no_timesteps(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     f.close()
-    subprocess.check_output(['python', '-m', 'pyDeltaRCM',
-                             '--config', p])
+    with pytest.raises(subprocess.CalledProcessError):
+        subprocess.check_output(['python', '-m', 'pyDeltaRCM',
+                                 '--config', p])
 
 
 import pyDeltaRCM as _pyimportedalias
@@ -250,18 +250,18 @@ def test_version_call():
 from pyDeltaRCM import preprocessor
 
 
-@pytest.mark.xfail(raises=ValueError, strict=True)
 def test_python_highlevelapi_call_without_args():
-    pp = preprocessor.Preprocessor()
+    with pytest.raises(ValueError):
+        pp = preprocessor.Preprocessor()
 
 
-@pytest.mark.xfail(raises=ValueError, strict=True)
 def test_python_highlevelapi_call_without_timesteps(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     f.close()
-    pp = preprocessor.Preprocessor(p)
+    with pytest.raises(ValueError):
+        pp = preprocessor.Preprocessor(p)
 
 
 def test_python_highlevelapi_call_with_args(tmp_path):
