@@ -31,7 +31,6 @@ def test_finalize(test_DeltaModel):
     assert test_DeltaModel._is_finalized == True
 
 
-# @pytest.mark.xfail(raises=RuntimeError, strict=True)
 def test_multifinalization_error(test_DeltaModel):
     err_delta = test_DeltaModel
     err_delta.update()
