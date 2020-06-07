@@ -14,7 +14,7 @@ import utilities
 from utilities import test_DeltaModel
 
 
-# test yaml parsing 
+# test yaml parsing
 
 def test_override_from_testfile(test_DeltaModel):
     out_path = test_DeltaModel.out_dir.split('/')
@@ -196,7 +196,7 @@ def test_entry_point_python_main_call_dryrun(tmp_path):
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_0.0.png')
     assert os.path.isfile(exp_path_nc)
-    assert not os.path.isfile(exp_path_png) # does not exist because --dryrun
+    assert not os.path.isfile(exp_path_png)  # does not exist because --dryrun
 
 
 def test_entry_point_python_main_call_timesteps(tmp_path):
@@ -233,12 +233,13 @@ def test_error_if_no_timesteps(tmp_path):
 
 import pyDeltaRCM as _pyimportedalias
 
+
 def test_version_call():
     """
     test calling the command line feature to query the version.
     """
     encoding = locale.getpreferredencoding()
-    printed1 = subprocess.run(['pyDeltaRCM', '--version'], 
+    printed1 = subprocess.run(['pyDeltaRCM', '--version'],
                               stdout=subprocess.PIPE, encoding=encoding)
     assert printed1.stdout == 'pyDeltaRCM ' + _pyimportedalias.__version__ + '\n'
     printed2 = subprocess.run(
@@ -264,6 +265,38 @@ def test_python_highlevelapi_call_without_timesteps(tmp_path):
         pp = preprocessor.Preprocessor(p)
 
 
+def test_python_highlevelapi_call_with_timesteps_yaml_init_types(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'timesteps', 2)
+    f.close()
+    pp = preprocessor.Preprocessor(p)
+    assert type(pp.job_list) is list
+    assert len(pp.job_list) == 1
+    assert type(pp.job_list[0]) is preprocessor.Preprocessor._Job
+    assert type(pp.job_list[0].deltamodel) is DeltaModel
+    assert pp.job_list[0]._is_completed == False
+
+
+def test_python_highlevelapi_call_with_timesteps_yaml_runjobs(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'timesteps', 2)
+    f.close()
+    pp = preprocessor.Preprocessor(p)
+    assert len(pp.job_list) == 1
+    assert pp.job_list[0]._is_completed == False
+    pp.run_jobs()
+    assert pp.job_list[0]._is_completed == True
+
+
 def test_python_highlevelapi_call_with_args(tmp_path):
     """
     test calling the python hook command line feature with a config file.
@@ -283,13 +316,16 @@ def test_python_highlevelapi_call_with_args(tmp_path):
     pp = preprocessor.Preprocessor(input_file=p, timesteps=2)
     assert type(pp.job_list) is list
     assert len(pp.job_list) == 1
-    pp.run_jobs()
     assert type(pp.job_list[0]) is preprocessor.Preprocessor._Job
     assert type(pp.job_list[0].deltamodel) is DeltaModel
     assert pp.job_list[0].deltamodel.Length == 10.0
     assert pp.job_list[0].deltamodel.Width == 10.0
     assert pp.job_list[0].deltamodel.dx == 1.0
     assert pp.job_list[0].deltamodel.seed == 0
+    assert pp.job_list[0]._is_completed == False
+    pp.run_jobs()
+    assert len(pp.job_list) == 1
+    assert pp.job_list[0]._is_completed == True
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_0.0.png')
     exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_1.0.png')
@@ -300,8 +336,8 @@ def test_python_highlevelapi_call_with_args(tmp_path):
     assert not os.path.isfile(exp_path_png3)
 
 
-import pyDeltaRCM
-
 def test_Preprocessor_toplevelimport():
+    import pyDeltaRCM
+
     assert 'Preprocessor' in dir(pyDeltaRCM)
     assert pyDeltaRCM.Preprocessor is pyDeltaRCM.preprocessor.Preprocessor

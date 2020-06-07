@@ -154,6 +154,8 @@ class BasePreprocessor(abc.ABC):
                                  'argument, in order to use the high-level API.')
             self.timesteps = _timesteps
 
+            self._is_completed = False
+
         def run_job(self):
             """Loop the model.
 
@@ -168,6 +170,7 @@ class BasePreprocessor(abc.ABC):
             """Finalize the job.
             """
             self.deltamodel.finalize()
+            self._is_completed = True
 
 
 class PreprocessorCLI(BasePreprocessor):
