@@ -298,3 +298,10 @@ def test_python_highlevelapi_call_with_args(tmp_path):
     assert os.path.isfile(exp_path_png)
     assert os.path.isfile(exp_path_png1)
     assert not os.path.isfile(exp_path_png3)
+
+
+import pyDeltaRCM
+
+def test_Preprocessor_toplevelimport():
+    assert 'Preprocessor' in dir(pyDeltaRCM)
+    assert pyDeltaRCM.Preprocessor is pyDeltaRCM.preprocessor.Preprocessor
