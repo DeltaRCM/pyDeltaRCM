@@ -1,9 +1,3 @@
-site_prefix:
-  type: 'str'
-  default: ''
-case_prefix:
-  type: 'str'
-  default: ''
 out_dir:
   type: 'str'
   default: 'deltaRCM_Output'

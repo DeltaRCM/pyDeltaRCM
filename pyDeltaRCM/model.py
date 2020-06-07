@@ -56,15 +56,19 @@ class DeltaModel(Tools):
         self.default_file = os.path.join(_src_dir, 'default.yml')
         self.import_files()
 
-        self.create_other_variables()
-
+        self.init_output_infrastructure()
         self.init_logger()
 
+        self.create_other_variables()
+
+        self.determine_random_seed()
         self.create_domain()
 
         self.init_subsidence()
         self.init_stratigraphy()
         self.init_output_grids()
+
+        self.logger.info('Model initialization complete')
 
     def update(self):
         """Run the model for one full instance
@@ -113,12 +117,16 @@ class DeltaModel(Tools):
 
         """
 
+        self.logger.info('Finalize model run')
+
         self.output_strata()
 
         try:
             self.output_netcdf.close()
-            if self.verbose >= 1:
-                print('Closed output netcdf file.')
+            _msg = 'Closed output netcdf file'
+            self.logger.info(_msg)
+            if self.verbose >= 2:
+                print(_msg)
         except Exception:
             pass
 
