@@ -444,7 +444,7 @@ class init_tools(object):
                                                              ('total_time', 'length', 'width'))
                 velocity.units = 'meters per second'
 
-            _msg = 'Output netCDF file created.'
+            _msg = 'Output netCDF file created'
             self.logger.info(_msg)
             if self.verbose >= 2:
                 print(_msg)

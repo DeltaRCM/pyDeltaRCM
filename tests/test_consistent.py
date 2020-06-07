@@ -59,11 +59,11 @@ def test_long_multi_validation(tmp_path):
     _exp1 = np.array([-4.971009,  -3.722004,  -4.973,     -3.7240038, -3.7250037])
     assert np.all(delta.eta[:5, 62] == pytest.approx(_exp1))
 
-    for _ in range(0, 30):
+    for _ in range(0, 10):
         delta.update()
 
     # slice is: test_DeltaModel.eta[:5, 4]
     print(delta.eta[:5, 62])
 
-    _exp2 = np.array([-4.962428,  -1.3612521, -2.2904062, -1.4572337, -0.864957])
+    _exp2 = np.array([-4.971052,  -2.0813923, -2.0824013, -4.6614914, -1.5570664])
     assert np.all(delta.eta[:5, 62] == pytest.approx(_exp2))
