@@ -72,7 +72,20 @@ If the YAML configuration indicates multiple jobs (:ref:`via matrix expansion or
 Python API
 ----------
 
-Alternatively, calling the ``run_model`` method from a python script, with the :meth:`input file <pyDeltaRCM.model.DeltaModel.__init__>` parameter specified as the same ``model_configuration.yml`` file above, would run the pyDeltaRCM model, and automatically :obj:`~pyDeltaRCM.model.DeltaModel.update` the model 500 times.
+The Python high-level API is accessed via the :obj:`~pyDeltaRCM.Preprocessor` object. 
+First, the `Preprocessor` is instantiated with a YAML configuration file (e.g., ``model_configuration.yml``):
+
+.. code::
+
+    >>> pp = preprocessor.Preprocessor(p)
+    
+which returns an object containing the list of jobs to run. 
+Jobs are then run with:
+
+.. code::
+
+    >>> pp.run_jobs()
+
 
 
 Low-level model API
@@ -82,12 +95,12 @@ iinteract with the model by creating your own script, and manipulating model out
 
 .. code::
 
-    delta = DeltaModel(input_file='model_configuration.yml')
+    >>> delta = DeltaModel(input_file='model_configuration.yml')
 
-    for _ in range(0, 1):
-        delta.update()
+    >>> for _ in range(0, 1):
+    ...    delta.update()
 
-    delta.finalize()
+    >>> delta.finalize()
 
 However, you can also inspect/modify the :obj:`~pyDeltaRCM.DeltaModel.update` method, and change the order of operations, or add operations, as desired.
 
