@@ -63,7 +63,6 @@ def test_DeltaModel(tmp_path):
     write_parameter_to_file(f, 'save_velocity_grids', False)
     write_parameter_to_file(f, 'save_dt', 50)
     write_parameter_to_file(f, 'save_strata', True)
-    write_parameter_to_file(f, 'timesteps', 1)
     f.close()
     _delta = DeltaModel(input_file=p)
     return _delta
