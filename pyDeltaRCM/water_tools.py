@@ -194,9 +194,10 @@ class water_tools(object):
             Once it reaches it > self.itmax/2 once, make the size
             self.iter for all further timesteps
             """
-
+            _msg = 'Increasing size of self.indices'
+            self.logger.info(_msg)
             if self.verbose >= 2:
-                self.logger.info('Increasing size of self.indices')
+                print(_msg)
 
             indices_blank = np.zeros(
                 (np.int(self.Np_water), np.int(self.itmax / 4)), dtype=np.int)
