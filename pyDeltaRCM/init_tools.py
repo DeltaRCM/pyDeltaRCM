@@ -346,8 +346,6 @@ class init_tools(object):
         self.inlet = list(np.unique(np.where(self.cell_type == 1)[1]))
         self.eta[:] = self.stage - self.depth
 
-        self.clim_eta = (-self.h0 - 1, 0.05)
-
     def init_stratigraphy(self):
         """Creates sparse array to store stratigraphy data.
         """
