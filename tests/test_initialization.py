@@ -329,7 +329,7 @@ def test_python_highlevelapi_call_with_args(tmp_path):
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
     exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
-    exp_path_png3 = os.path.join(tmp_path / 'test', 'eta_00003.png')
+    exp_path_png3 = os.path.join(tmp_path / 'test', 'eta_00002.png')
     assert os.path.isfile(exp_path_nc)
     assert os.path.isfile(exp_path_png)
     assert os.path.isfile(exp_path_png1)
