@@ -246,7 +246,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         if _timestep % self.save_dt == 0:
 
-            _timestep = self._time
+            _timestep = int(self._time)
 
             # ------------------ Figures ------------------
             if self._save_any_figs:
@@ -255,37 +255,31 @@ class Tools(sed_tools, water_tools, init_tools, object):
                 self.logger.info(_msg)
                 if self.verbose >= 2:
                     print(_msg)
-            
+
                 if self.save_eta_figs:
-                    plt.pcolor(self.eta)
-                    plt.clim(np.min(self.eta), 1.1*np.max(self.eta))
-                    plt.colorbar()
-                    plt.axis('equal')
-                    self.save_figure(os.path.join(self.prefix, 'eta_' + str(_timestep)))
+                    _fe = self.make_figure('eta')
+                    self.save_figure(_fe, directory=self.prefix,
+                                     filename='eta_' + str(_timestep).zfill(5))
 
                 if self.save_stage_figs:
-                    plt.pcolor(self.stage)
-                    plt.colorbar()
-                    plt.axis('equal')
-                    self.save_figure(os.path.join(self.prefix, 'stage_' + str(_timestep)))
+                    _fs = self.make_figure('stage')
+                    self.save_figure(_fs, directory=self.prefix,
+                                     filename='stage_' + str(_timestep).zfill(5))
 
                 if self.save_depth_figs:
-                    plt.pcolor(self.depth)
-                    plt.colorbar()
-                    plt.axis('equal')
-                    self.save_figure(os.path.join(self.prefix, 'depth_' + str(_timestep)))
+                    _fh = self.make_figure('depth')
+                    self.save_figure(_fh, directory=self.prefix,
+                                     filename='depth_' + str(_timestep).zfill(5))
 
                 if self.save_discharge_figs:
-                    plt.pcolor(self.qw)
-                    plt.colorbar()
-                    plt.axis('equal')
-                    self.save_figure(os.path.join(self.prefix, 'discharge_' + str(_timestep)))
+                    _fq = self.make_figure('qw')
+                    self.save_figure(_fq, directory=self.prefix,
+                                     filename='discharge_' + str(_timestep).zfill(5))
 
                 if self.save_velocity_figs:
-                    plt.pcolor(self.uw)
-                    plt.colorbar()
-                    plt.axis('equal')
-                    self.save_figure(os.path.join(self.prefix, 'velocity_' + str(_timestep)))
+                    _fu = self.make_figure('uw')
+                    self.save_figure(_fu, directory=self.prefix,
+                                     filename='velocity_' + str(_timestep).zfill(5))
 
             # ------------------ grids ------------------
             if self._save_any_grids:
@@ -375,10 +369,37 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
                 self.output_netcdf.variables['strata_depth'][i, :, :] = sz
 
+            _msg = 'Stratigraphy data saved.'
+            self.logger.info(_msg)
             if self.verbose >= 2:
-                self.logger.info('Stratigraphy data saved.')
+                print(_msg)
 
-    def save_figure(self, path, ext='png', close=True):
+    def make_figure(self, var):
+        """Create a figure.
+
+        Parameters
+        ----------
+        var : :obj:`str`
+            Which variable to plot into the figure. Specified as a string and
+            looked up via `getattr`.
+
+        Returns
+        -------
+        fig : :obj:`matplotlib.figure`
+            The created figure object.
+        """
+
+        _data = getattr(self, var)
+
+        fig, ax = plt.subplots()
+        pc = ax.pcolor(_data)
+        fig.colorbar(pc)
+        ax.set_title(var)
+        ax.axis('equal')
+
+        return fig
+
+    def save_figure(self, fig, directory, filename, ext='.png', close=True):
         """Save a figure.
 
         Parameters
@@ -387,9 +408,10 @@ class Tools(sed_tools, water_tools, init_tools, object):
             The path (and filename without extension) to save the figure to.
 
         ext : :obj:`str`, optional
-            The file extension (default='png'). This must be supported by the
+            The file extension (default='.png'). This must be supported by the
             active matplotlib backend (see matplotlib.backends module). Most
-            backends support 'png', 'pdf', 'ps', 'eps', and 'svg'.
+            backends support '.png', '.pdf', '.ps', '.eps', and '.svg'. Be
+            sure to include the '.' before the extension.
 
         close : :obj:`bool`, optional
             Whether to close the file after saving.
@@ -399,20 +421,8 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         """
 
-        directory = os.path.split(path)[0]
-        filename = "%s.%s" % (os.path.split(path)[1], ext)
-        if directory == '':
-            directory = '.'
-
-        if not os.path.exists(directory):
-            _msg = 'No dir for figures, creating output directory'
-            self.logger.info(_msg)
-            if self.verbose >= 2:
-                print(_msg)
-            os.makedirs(directory)
-
-        savepath = os.path.join(directory, filename)
-        plt.savefig(savepath)
+        savepath = os.path.join(directory, filename + ext)
+        fig.savefig(savepath)
 
         if close:
             plt.close()

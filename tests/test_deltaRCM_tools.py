@@ -283,9 +283,9 @@ def test_save_one_fig_no_grids(tmp_path):
     assert _delta._time == 2.0
 
     exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
-    exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_0.0.png')
-    exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'eta_1.0.png')
-    exp_path_png2 = os.path.join(tmp_path / 'out_dir', 'eta_2.0.png')
+    exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'eta_00001.png')
+    exp_path_png2 = os.path.join(tmp_path / 'out_dir', 'eta_00002.png')
     assert not os.path.isfile(exp_path_nc)
     assert os.path.isfile(exp_path_png0)
     assert os.path.isfile(exp_path_png1)
@@ -365,11 +365,11 @@ def test_save_all_figures_no_grids(tmp_path):
     for _ in range(0, 2):
         _delta.update()
 
-    exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_0.0.png')
-    exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'depth_0.0.png')
-    exp_path_png2 = os.path.join(tmp_path / 'out_dir', 'stage_0.0.png')
-    exp_path_png3 = os.path.join(tmp_path / 'out_dir', 'velocity_0.0.png')
-    exp_path_png4 = os.path.join(tmp_path / 'out_dir', 'discharge_0.0.png')
+    exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'depth_00000.png')
+    exp_path_png2 = os.path.join(tmp_path / 'out_dir', 'stage_00000.png')
+    exp_path_png3 = os.path.join(tmp_path / 'out_dir', 'velocity_00000.png')
+    exp_path_png4 = os.path.join(tmp_path / 'out_dir', 'discharge_00000.png')
     assert os.path.isfile(exp_path_png0)
     assert os.path.isfile(exp_path_png1)
     assert os.path.isfile(exp_path_png2)
