@@ -1,25 +1,16 @@
 
-import sys
 import os
-import re
-import string
 import logging
 import time
 
 from math import floor, sqrt, pi
 import numpy as np
-from random import shuffle
 
-import matplotlib
-from matplotlib import pyplot as plt
-
-from scipy.sparse import lil_matrix, csc_matrix, hstack
+from scipy.sparse import lil_matrix
 from scipy import ndimage
 
 from netCDF4 import Dataset
 import time as time_lib
-from scipy.sparse import lil_matrix, csc_matrix, hstack
-import logging
 import time
 import yaml
 
@@ -38,7 +29,7 @@ class init_tools(object):
             self.logger.setLevel(logging.INFO)
 
             # create the logging file handler
-            st = timestr = time.strftime("%Y%m%d-%H%M%S")
+            st = time.strftime("%Y%m%d-%H%M%S")
             fh = logging.FileHandler("pyDeltaRCM_" + st + ".log")
             formatter = logging.Formatter(
                 '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -150,7 +141,6 @@ class init_tools(object):
         ``channel_width``, ``channel_flow_depth``, and
         ``influx_sediment_concentration``.
         """
-
         self.init_Np_water = self.Np_water
         self.init_Np_sed = self.Np_sed
 
@@ -217,7 +207,7 @@ class init_tools(object):
 
         self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha
                                      * 0.5 / self.dx**2)
-        
+
         # output directory config
         self.prefix = self.out_dir
 
@@ -234,18 +224,14 @@ class init_tools(object):
         """
         Creates the model domain
         """
-
         # ---- empty arrays ----
-
         self.x, self.y = np.meshgrid(
             np.arange(0, self.W), np.arange(0, self.L))
 
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int)
-
         self.eta = np.zeros((self.L, self.W)).astype(np.float32)
         self.stage = np.zeros((self.L, self.W)).astype(np.float32)
         self.depth = np.zeros((self.L, self.W)).astype(np.float32)
-
         self.qx = np.zeros((self.L, self.W))
         self.qy = np.zeros((self.L, self.W))
         self.qxn = np.zeros((self.L, self.W))
@@ -254,11 +240,9 @@ class init_tools(object):
         self.ux = np.zeros((self.L, self.W))
         self.uy = np.zeros((self.L, self.W))
         self.uw = np.zeros((self.L, self.W))
-
         self.qs = np.zeros((self.L, self.W))
         self.Vp_dep_sand = np.zeros((self.L, self.W))
         self.Vp_dep_mud = np.zeros((self.L, self.W))
-
         self.free_surf_flag = np.zeros((self.Np_water,), dtype=np.int)
         self.looped = np.zeros((self.Np_water,))
         self.indices = np.zeros((self.Np_water, self.size_indices),
@@ -317,8 +301,7 @@ class init_tools(object):
         self.clim_eta = (-self.h0 - 1, 0.05)
 
     def init_stratigraphy(self):
-        """Creates sparse array to store stratigraphy data.
-        """
+        """Creates sparse array to store stratigraphy data."""
         if self.save_strata:
 
             self.strata_counter = 0
@@ -326,11 +309,11 @@ class init_tools(object):
             self.n_steps = 5 * self.save_dt
 
             self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps),
-                                               dtype = np.float32)
+                                               dtype=np.float32)
 
             self.init_eta = self.eta.copy()
             self.strata_eta = lil_matrix((self.L * self.W, self.n_steps),
-                                         dtype = np.float32)
+                                         dtype=np.float32)
 
     def init_output_grids(self):
         """Creates a netCDF file to store output grids.
@@ -340,7 +323,6 @@ class init_tools(object):
         .. warning:: Overwrites an existing netcdf file with the same name.
 
         """
-
         if (self.save_eta_grids or
                 self.save_depth_grids or
                 self.save_stage_grids or
@@ -431,7 +413,6 @@ class init_tools(object):
 
         Modify the equations for self.subsidence_mask and self.sigma as desired
         """
-
         if self.toggle_subsidence:
 
             R1 = 0.3 * self.L

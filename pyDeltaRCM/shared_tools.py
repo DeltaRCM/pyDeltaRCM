@@ -1,8 +1,6 @@
 
-from math import floor, sqrt, pi
 import numpy as np
 
-import time
 from numba import njit, jit, typed
 
 # tools shared between deltaRCM water and sediment routing
@@ -32,8 +30,7 @@ def get_random_uniform(N):
 
 @njit
 def partition_sand(qs, depoPart, py, px, dist, istep, jstep):
-    '''Spread sand between two cells
-    '''
+    """Spread sand between two cells."""
     if dist > 0:
         # deposition in current cell
         qs[px, py] += depoPart
@@ -49,8 +46,7 @@ def partition_sand(qs, depoPart, py, px, dist, istep, jstep):
 
 @njit
 def get_steps(new_cells, iwalk, jwalk):
-    '''find the values giving the next step
-    '''
+    """Find the values giving the next step."""
     istep = iwalk[new_cells]
     jstep = jwalk[new_cells]
     dist = np.sqrt(istep * istep + jstep * jstep)
@@ -62,8 +58,7 @@ def get_steps(new_cells, iwalk, jwalk):
 
 @njit
 def update_dirQfield(qfield, dist, inds, astep, dirstep):
-    '''update unit vector of water flux in x or y
-    '''
+    """Update unit vector of water flux in x or y."""
     for i, ii in enumerate(inds):
         if astep[i]:
             qfield[ii] += dirstep[i] / dist[i]
@@ -72,8 +67,7 @@ def update_dirQfield(qfield, dist, inds, astep, dirstep):
 
 @njit
 def update_absQfield(qfield, dist, inds, astep, Qp_water, dx):
-    '''Update norm of water flux vector
-    '''
+    """Update norm of water flux vector."""
     for i, ii in enumerate(inds):
         if astep[i]:
             qfield[ii] += Qp_water / dx / 2
@@ -82,21 +76,20 @@ def update_absQfield(qfield, dist, inds, astep, Qp_water, dx):
 
 @njit
 def random_pick(prob):
-    """
+    """Pick number from weighted array.
+
     Randomly pick a number weighted by array probabilities (len 9)
     Return the index of the selected weight in array probs
     Takes a numpy array that is the precalculated cumulative probability
     around the cell flattened to 1D.
     """
-
     arr = np.arange(len(prob))
     return arr[np.searchsorted(np.cumsum(prob), get_random_uniform(1))]
 
 
 @njit
 def custom_unravel(i, shape):
-    """Function to unravel indexes for 2D array
-    """
+    """Unravel indexes for 2D array."""
     if i > (shape[1] * shape[0]):
         raise IndexError("Index is out of matrix bounds")
     x = i // shape[1]
@@ -106,8 +99,7 @@ def custom_unravel(i, shape):
 
 @njit
 def custom_ravel(tup, shape):
-    """Function to ravel indexes for 2D array
-    """
+    """Ravel indexes for 2D array."""
     if tup[0] > shape[0] or tup[1] > shape[1]:
         raise IndexError("Index is out of matrix bounds")
     x = tup[0] * shape[1]
@@ -118,7 +110,7 @@ def custom_ravel(tup, shape):
 @njit
 def check_for_loops(indices, inds, it, L0, loopedout, domain_shape, CTR, free_surf_flag):
 
-    looped = typed.List() # numba typed list for iteration
+    looped = typed.List()  # numba typed list for iteration
     for i in np.arange(len(indices)):
         row = indices[i, :]
         v = len(row[row > 0]) != len(set(row[row > 0]))
@@ -206,9 +198,9 @@ def get_weight_at_cell(ind, stage_nbrs, depth_nbrs, ct_nbrs, stage, qx, qy,
     return weight
 
 
-
 def _get_version():
-    """
+    """Extract version from file.
+
     Extract version number from single file, and make it availabe everywhere.
     """
     from . import _version
