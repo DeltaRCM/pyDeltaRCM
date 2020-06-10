@@ -256,31 +256,31 @@ class Tools(sed_tools, water_tools, init_tools, object):
                     print(_msg)
 
                 if self.save_eta_figs:
-                    _fe = self.make_figure('eta')
+                    _fe = self.make_figure('eta', _timestep)
                     self.save_figure(_fe, directory=self.prefix,
                                      filename_root='eta_',
                                      timestep=_timestep)
 
                 if self.save_stage_figs:
-                    _fs = self.make_figure('stage')
+                    _fs = self.make_figure('stage', _timestep)
                     self.save_figure(_fs, directory=self.prefix,
                                      filename_root='stage_',
                                      timestep=_timestep)
 
                 if self.save_depth_figs:
-                    _fh = self.make_figure('depth')
+                    _fh = self.make_figure('depth', _timestep)
                     self.save_figure(_fh, directory=self.prefix,
                                      filename_root='depth_',
                                      timestep=_timestep)
 
                 if self.save_discharge_figs:
-                    _fq = self.make_figure('qw')
+                    _fq = self.make_figure('qw', _timestep)
                     self.save_figure(_fq, directory=self.prefix,
                                      filename_root='discharge_',
                                      timestep=_timestep)
 
                 if self.save_velocity_figs:
-                    _fu = self.make_figure('uw')
+                    _fu = self.make_figure('uw', _timestep)
                     self.save_figure(_fu, directory=self.prefix,
                                      filename_root='velocity_',
                                      timestep=_timestep)
@@ -378,7 +378,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
             if self.verbose >= 2:
                 print(_msg)
 
-    def make_figure(self, var):
+    def make_figure(self, var, timestep):
         """Create a figure.
 
         Parameters
@@ -398,7 +398,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
         fig, ax = plt.subplots()
         pc = ax.pcolor(_data)
         fig.colorbar(pc)
-        ax.set_title(var)
+        ax.set_title(var + ' --- ' + 'time = ' + str(timestep))
         ax.axis('equal')
 
         return fig
