@@ -252,6 +252,12 @@ class init_tools(object):
         self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha
                                      * 0.5 / self.dx**2)
 
+        self._save_any_grids = (self.save_eta_grids or self.save_depth_grids or
+                                self.save_stage_grids or self.save_discharge_grids or
+                                self.save_velocity_grids)
+        self._save_any_figs = (self.save_eta_figs or self.save_depth_figs or
+                               self.save_stage_figs or self.save_discharge_figs or
+                               self.save_velocity_figs)
         self._is_finalized = False
 
     def create_domain(self):
