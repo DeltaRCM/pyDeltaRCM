@@ -243,7 +243,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         """
 
         _timestep = self._time
-
         if _timestep % self.save_dt == 0:
 
             _timestep = int(self._time)
@@ -259,27 +258,32 @@ class Tools(sed_tools, water_tools, init_tools, object):
                 if self.save_eta_figs:
                     _fe = self.make_figure('eta')
                     self.save_figure(_fe, directory=self.prefix,
-                                     filename='eta_' + str(_timestep).zfill(5))
+                                     filename_root='eta_',
+                                     timestep=_timestep)
 
                 if self.save_stage_figs:
                     _fs = self.make_figure('stage')
                     self.save_figure(_fs, directory=self.prefix,
-                                     filename='stage_' + str(_timestep).zfill(5))
+                                     filename_root='stage_',
+                                     timestep=_timestep)
 
                 if self.save_depth_figs:
                     _fh = self.make_figure('depth')
                     self.save_figure(_fh, directory=self.prefix,
-                                     filename='depth_' + str(_timestep).zfill(5))
+                                     filename_root='depth_',
+                                     timestep=_timestep)
 
                 if self.save_discharge_figs:
                     _fq = self.make_figure('qw')
                     self.save_figure(_fq, directory=self.prefix,
-                                     filename='discharge_' + str(_timestep).zfill(5))
+                                     filename_root='discharge_',
+                                     timestep=_timestep)
 
                 if self.save_velocity_figs:
                     _fu = self.make_figure('uw')
                     self.save_figure(_fu, directory=self.prefix,
-                                     filename='velocity_' + str(_timestep).zfill(5))
+                                     filename_root='velocity_',
+                                     timestep=_timestep)
 
             # ------------------ grids ------------------
             if self._save_any_grids:
@@ -399,7 +403,8 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
         return fig
 
-    def save_figure(self, fig, directory, filename, ext='.png', close=True):
+    def save_figure(self, fig, directory, filename_root,
+                    timestep, ext='.png', close=True):
         """Save a figure.
 
         Parameters
@@ -420,10 +425,16 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-
-        savepath = os.path.join(directory, filename + ext)
+        if self._save_figs_sequential:
+            # save as a padded number with the timestep
+            savepath = os.path.join(directory,
+                                    filename_root + str(timestep).zfill(5) + ext)
+        else:
+            # save as "latest"
+            savepath = os.path.join(directory,
+                                    filename_root + 'latest' + ext)
+        
         fig.savefig(savepath)
-
         if close:
             plt.close()
 

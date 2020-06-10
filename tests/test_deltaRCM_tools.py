@@ -377,6 +377,53 @@ def test_save_all_figures_no_grids(tmp_path):
     assert os.path.isfile(exp_path_png4)
 
 
+def test_save_all_figures_sequential_false(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'h0', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'f_bedload', 0.5)
+    utilities.write_parameter_to_file(f, 'C0_percent', 0.1)
+    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+    utilities.write_parameter_to_file(f, 'save_discharge_figs', True)
+    utilities.write_parameter_to_file(f, 'save_velocity_figs', True)
+    utilities.write_parameter_to_file(f, 'save_stage_figs', True)
+    utilities.write_parameter_to_file(f, 'save_depth_figs', True)
+    utilities.write_parameter_to_file(f, 'save_figs_sequential', False)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'save_strata', False)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert not os.path.isfile(exp_path_nc)
+
+    for _ in range(0, 5):
+        _delta.update()
+    exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'depth_00000.png')
+    exp_path_png0_latest = os.path.join(tmp_path / 'out_dir', 'eta_latest.png')
+    exp_path_png1_latest = os.path.join(tmp_path / 'out_dir', 'depth_latest.png')
+    exp_path_png2_latest = os.path.join(tmp_path / 'out_dir', 'stage_latest.png')
+    exp_path_png3_latest = os.path.join(tmp_path / 'out_dir', 'velocity_latest.png')
+    exp_path_png4_latest = os.path.join(tmp_path / 'out_dir', 'discharge_latest.png')
+    assert not os.path.isfile(exp_path_png0)
+    assert not os.path.isfile(exp_path_png1)
+    assert os.path.isfile(exp_path_png0_latest)
+    assert os.path.isfile(exp_path_png1_latest)
+    assert os.path.isfile(exp_path_png2_latest)
+    assert os.path.isfile(exp_path_png3_latest)
+    assert os.path.isfile(exp_path_png4_latest)
+
+
 def test_save_eta_grids(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
