@@ -24,9 +24,7 @@ class DeltaModel(Tools):
     Finally, after all ``update`` steps are complete, the model should be
     finalized (:meth:`finalize`), such that files and data are appropriately
     closed and written to disk.
-
     """
-
     def __init__(self, input_file=None):
         """Creates an instance of the pyDeltaRCM model.
 
@@ -47,7 +45,6 @@ class DeltaModel(Tools):
         :doc:`../../guides/userguide`.
 
         """
-
         self._time = 0.
         self._time_step = 1.
 
@@ -87,7 +84,6 @@ class DeltaModel(Tools):
         -------
 
         """
-
         self.run_one_timestep()
 
         self.apply_subsidence()
@@ -112,7 +108,6 @@ class DeltaModel(Tools):
         -------
 
         """
-
         self.output_strata()
 
         try:
@@ -133,7 +128,6 @@ class DeltaModel(Tools):
         UserWarning
             If a very small timestep is configured.
         """
-
         return self._time_step
 
     @time_step.setter
@@ -152,7 +146,7 @@ class DeltaModel(Tools):
 
     @property
     def channel_flow_velocity(self):
-        """ Get channel flow velocity """
+        """Get channel flow velocity."""
         return self.u0
 
     @channel_flow_velocity.setter
@@ -162,7 +156,7 @@ class DeltaModel(Tools):
 
     @property
     def channel_width(self):
-        """ Get channel width """
+        """Get channel width."""
         return self.N0_meters
 
     @channel_width.setter
@@ -172,7 +166,7 @@ class DeltaModel(Tools):
 
     @property
     def channel_flow_depth(self):
-        """ Get channel flow depth """
+        """Get channel flow depth."""
         return self.h0
 
     @channel_flow_depth.setter
@@ -182,7 +176,7 @@ class DeltaModel(Tools):
 
     @property
     def sea_surface_mean_elevation(self):
-        """ Get sea surface mean elevation """
+        """Get sea surface mean elevation."""
         return self.H_SL
 
     @sea_surface_mean_elevation.setter
@@ -191,17 +185,16 @@ class DeltaModel(Tools):
 
     @property
     def sea_surface_elevation_change(self):
-        """ Get rate of change of sea surface elevation, per timestep"""
+        """Get rate of change of sea surface elevation, per timestep."""
         return self.SLR
 
     @sea_surface_elevation_change.setter
     def sea_surface_elevation_change(self, new_SLR):
-        """ Set rate of change of sea surface elevation, per timestep"""
         self.SLR = new_SLR
 
     @property
     def bedload_fraction(self):
-        """ Get bedload fraction """
+        """Get bedload fraction."""
         return self.f_bedload
 
     @bedload_fraction.setter
@@ -210,7 +203,7 @@ class DeltaModel(Tools):
 
     @property
     def influx_sediment_concentration(self):
-        """ Get influx sediment concentration """
+        """Get influx sediment concentration."""
         return self.C0_percent
 
     @influx_sediment_concentration.setter
@@ -220,15 +213,15 @@ class DeltaModel(Tools):
 
     @property
     def sea_surface_elevation(self):
-        """ Get stage """
+        """Get stage."""
         return self.stage
 
     @property
     def water_depth(self):
-        """ Get depth """
+        """Get depth."""
         return self.depth
 
     @property
     def bed_elevation(self):
-        """ Get bed elevation """
+        """Get bed elevation."""
         return self.eta

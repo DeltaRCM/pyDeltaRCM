@@ -1,21 +1,6 @@
-import sys
-import os
-import re
-import string
-import logging
-import time
 
-from math import floor, sqrt, pi
 import numpy as np
-from random import shuffle
 
-import matplotlib
-from matplotlib import pyplot as plt
-
-from scipy.sparse import lil_matrix, csc_matrix, hstack
-from scipy import ndimage
-
-from netCDF4 import Dataset
 from . import shared_tools
 
 # tools for water routing algorithms
@@ -42,7 +27,7 @@ class water_tools(object):
 
     def run_water_iteration(self):
 
-        iter = 0
+        _iter = 0
         inlet_weights = np.ones_like(self.inlet)
         start_indices = [
             self.inlet[shared_tools.random_pick(inlet_weights / sum(inlet_weights))]
@@ -58,11 +43,11 @@ class water_tools(object):
 
         self.get_water_weight_array()
 
-        while (sum(current_inds) > 0) & (iter < self.itmax):
+        while (sum(current_inds) > 0) & (_iter < self.itmax):
 
-            iter += 1
+            _iter += 1
 
-            self.check_size_of_indices_matrix(iter)
+            self.check_size_of_indices_matrix(_iter)
 
             inds = np.unravel_index(current_inds, self.depth.shape)
             inds_tuple = list(zip(*inds))
@@ -90,7 +75,7 @@ class water_tools(object):
             current_inds, self.looped, self.free_surf_flag = shared_tools.check_for_loops(
                 self.indices,
                 next_index,
-                iter,
+                _iter,
                 self.L0,
                 self.looped,
                 self.eta.shape,
@@ -99,13 +84,12 @@ class water_tools(object):
 
             current_inds = self.check_for_boundary(current_inds)
 
-            self.indices[:, iter] = current_inds
+            self.indices[:, _iter] = current_inds
 
             current_inds[self.free_surf_flag > 0] = 0
 
     def free_surf(self, it):
-        """calculate free surface after routing one water parcel"""
-
+        """Calculate free surface after routing one water parcel."""
         Hnew = np.zeros((self.L, self.W))
 
         for n, i in enumerate(self.indices):
@@ -171,11 +155,10 @@ class water_tools(object):
                     self.sfc_sum[i, j] = self.sfc_sum[i, j] + Hnew[i, j]
 
     def finalize_water_iteration(self, timestep, iteration):
-        """
-        Finish updating flow fields
+        """Finish updating flow fields.
+
         Clean up at end of water iteration
         """
-
         self.update_water(timestep, iteration)
 
         self.stage[:] = np.maximum(self.stage, self.H_SL)
@@ -253,7 +236,6 @@ class water_tools(object):
 
         Could divide into 3 functions for cleanliness.
         """
-
         Hnew = self.eta + self.depth
         Hnew[Hnew < self.H_SL] = self.H_SL # water surface height not under sea level
 
@@ -305,15 +287,13 @@ class water_tools(object):
         self.flooding_correction()
 
     def flooding_correction(self):
-        """
-        Flood dry cells along the shore if necessary
+        """Flood dry cells along the shore if necessary.
 
         Check the neighbors of all dry cells. If any dry cells have wet
         neighbors, check that their stage is not higher than the bed elevation
         of the center cell.
         If it is, flood the dry cell.
         """
-
         wet_mask = self.depth > self.dry_depth
         wet_mask_nh = self.get_wet_mask_nh()
         wet_mask_nh_sum = np.sum(wet_mask_nh, axis=0)
@@ -339,22 +319,22 @@ class water_tools(object):
                 self.stage[shore_ind[0][i], shore_ind[1][i]] = max(stage_nh)
 
     def get_wet_mask_nh(self):
-        """
+        """Get wet mask.
+
         Returns np.array((8,L,W)), for each neighbor around a cell
         with 1 if the neighbor is wet and 0 if dry
         """
-
         wet_mask = (self.depth > self.dry_depth) * 1
         wet_mask_nh = self.build_weight_array(wet_mask, fix_edges=True)
 
         return wet_mask_nh
 
     def build_weight_array(self, array, fix_edges=False, normalize=False):
-        """
+        """Weighting array of neighbors.
+
         Create np.array((8,L,W)) of quantity a
         in each of the neighbors to a cell
         """
-
         a_shape = array.shape
 
         wgt_array = np.zeros((8, a_shape[0], a_shape[1]))
@@ -391,10 +371,7 @@ class water_tools(object):
         return wgt_array
 
     def update_flow_field(self, iteration):
-        """
-        Update water discharge after one water iteration
-        """
-
+        """Update water discharge after one water iteration."""
         timestep = self._time
 
         dloc = (self.qxn**2 + self.qyn**2)**(0.5)
@@ -426,10 +403,7 @@ class water_tools(object):
         self.qw[0, self.inlet] = self.qw0
 
     def update_velocity_field(self):
-        """
-        Update the flow velocity field after one water iteration
-        """
-
+        """Update the flow velocity field after one water iteration."""
         mask = (self.depth > self.dry_depth) * (self.qw > 0)
 
         self.uw[mask] = np.minimum(

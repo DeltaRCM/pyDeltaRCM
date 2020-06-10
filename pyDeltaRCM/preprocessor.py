@@ -26,7 +26,6 @@ class BasePreprocessor(abc.ABC):
         out the Python API.
 
     """
-
     def extract_yaml_config(self):
         """Preliminary YAML parsing. 
 
@@ -41,7 +40,6 @@ class BasePreprocessor(abc.ABC):
         :meth:`expand_yaml_matrix`.
 
         """
-
         # open the file, an error will be thrown if invalid yaml?
         user_file = open(self.input_file, mode='r')
         self.user_dict = yaml.load(user_file, Loader=yaml.FullLoader)
@@ -62,7 +60,6 @@ class BasePreprocessor(abc.ABC):
         Compute the matrix expansion.
 
         """
-
         pass
 
     def extract_timesteps(self):
@@ -93,7 +90,6 @@ class BasePreprocessor(abc.ABC):
         forming ensemble runs as needed.
 
         """
-
         self.job_list = []
         if self._has_matrix:
             self.expand_yaml_matrix()
@@ -110,7 +106,6 @@ class BasePreprocessor(abc.ABC):
             TODO: implement the parallel pool.
 
         """
-
         if len(self.job_list) > 1:
             # check no mulitjobs, not implemented
             raise NotImplementedError()
@@ -138,7 +133,6 @@ class BasePreprocessor(abc.ABC):
             input arguments, *but the YAML input will override an argument
             values.
             """
-
             self.deltamodel = DeltaModel(input_file=input_file)
 
             # determine the timestep from the two arguments given. Either the
@@ -162,13 +156,11 @@ class BasePreprocessor(abc.ABC):
             Iterate the timestep ``update`` routine for the specified number of
             iterations.
             """
-
             for _ in range(self.timesteps):
                 self.deltamodel.update()
 
         def finalize_model(self):
-            """Finalize the job.
-            """
+            """Finalize the job."""
             self.deltamodel.finalize()
             self._is_completed = True
 
@@ -192,7 +184,6 @@ class PreprocessorCLI(BasePreprocessor):
         CLI (entry point) calls directly.
 
     """
-
     def __init__(self):
         """Initialize the CLI preprocessor.
 
@@ -200,7 +191,6 @@ class PreprocessorCLI(BasePreprocessor):
         (parsing, timesteps, etc.). The jobs are *not* run automatically
         during instantiation of the class.
         """
-
         super().__init__()
 
         self.process_arguments()
@@ -236,7 +226,6 @@ class PreprocessorCLI(BasePreprocessor):
             any way.
 
         """
-
         parser = argparse.ArgumentParser(
             description='Arguments for running pyDeltaRCM from command line')
 
@@ -278,7 +267,6 @@ class Preprocessor(BasePreprocessor):
         >>> pp.run_jobs()
 
     """
-
     def __init__(self, input_file=None, timesteps=None):
         """Initialize the python preprocessor.
 
@@ -302,7 +290,6 @@ class Preprocessor(BasePreprocessor):
             file.
 
         """
-
         super().__init__()
 
         if input_file:
