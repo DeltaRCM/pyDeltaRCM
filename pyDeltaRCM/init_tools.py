@@ -258,6 +258,7 @@ class init_tools(object):
         self._save_any_figs = (self.save_eta_figs or self.save_depth_figs or
                                self.save_stage_figs or self.save_discharge_figs or
                                self.save_velocity_figs)
+        self._save_figs_sequential = self.save_figs_sequential  # copy as private
         self._is_finalized = False
 
     def create_domain(self):
