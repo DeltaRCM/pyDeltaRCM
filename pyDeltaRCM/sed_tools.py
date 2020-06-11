@@ -42,7 +42,7 @@ class sed_tools(object):
             Index.
 
         py : :obj:`int`
-            Index.        
+            Index.
 
         Returns
         -------
