@@ -8,6 +8,8 @@ pyDeltaRCM_WMT
 .. image:: https://coveralls.io/repos/github/DeltaRCM/pyDeltaRCM_WMT/badge.svg?branch=develop
     :target: https://coveralls.io/github/DeltaRCM/pyDeltaRCM_WMT?branch=develop
 
+.. image:: https://app.codacy.com/project/badge/Grade/1c137d0227914741a9ba09f0b00a49a7
+    :target: https://www.codacy.com/gh/DeltaRCM/pyDeltaRCM_WMT?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DeltaRCM/pyDeltaRCM_WMT&amp;utm_campaign=Badge_Grade
 
 pyDeltaRCM is the Python version of the `Matlab deltaRCM <https://csdms.colorado.edu/wiki/Model:DeltaRCM>`_ model by Man Liang. 
 The pyDeltaRCM scripts in this repository can be run as a stand-alone model following the instructions below.
