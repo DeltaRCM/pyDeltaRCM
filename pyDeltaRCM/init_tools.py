@@ -12,7 +12,6 @@ from scipy import ndimage
 
 from netCDF4 import Dataset
 import time as time_lib
-import time
 import yaml
 
 from . import shared_tools
@@ -42,17 +41,7 @@ class init_tools(object):
 
         """
         # create the logging file handler
-        st = time.strftime("%Y%m%d-%H%M%S")
-        fh = logging.FileHandler("pyDeltaRCM_" + st + ".log")
-        formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
-
-        self.logger = logging.getLogger('driver')
-        self.logger.setLevel(logging.INFO)
-
-        # create the logging file handler
-        st = timestr = time_lib.strftime('%Y%m%d-%H%M%S')
+        st = time_lib.strftime('%Y%m%d-%H%M%S')
         fh = logging.FileHandler(
             self.prefix_abspath + '/pyDeltaRCM_' + st + '.log')
         formatter = logging.Formatter(
@@ -177,9 +166,9 @@ class init_tools(object):
         Creates variables for model implementation, from specified boundary
         condition variables. This method is run during initial model
         instantition, but it is also run any time an inlet flow condition
-        variable is changed, including ``channel_flow_velocity``,
-        ``channel_width``, ``channel_flow_depth``, and
-        ``influx_sediment_concentration``.
+        variable is changed, including `channel_flow_velocity`,
+        `channel_width`, `channel_flow_depth`, and
+        `influx_sediment_concentration`.
         """
         self.init_Np_water = self.Np_water
         self.init_Np_sed = self.Np_sed
