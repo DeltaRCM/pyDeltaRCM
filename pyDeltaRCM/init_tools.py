@@ -1,7 +1,6 @@
 
 import os
 import logging
-# import time
 import warnings
 
 from math import floor, sqrt, pi
@@ -34,14 +33,15 @@ class init_tools(object):
 
     def init_logger(self):
         """Initialize a logger.
-
         The logger is initialized regardless of the value of ``self.verbose``.
         The level of information printed to the log depends on the verbosity
         setting. 
-
         """
+        self.logger = logging.getLogger('driver')
+        self.logger.setLevel(logging.INFO)
+
         # create the logging file handler
-        st = time_lib.strftime('%Y%m%d-%H%M%S')
+        st = timestr = time_lib.strftime('%Y%m%d-%H%M%S')
         fh = logging.FileHandler(
             self.prefix_abspath + '/pyDeltaRCM_' + st + '.log')
         formatter = logging.Formatter(
