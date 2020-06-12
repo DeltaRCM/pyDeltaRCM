@@ -1,7 +1,8 @@
 
 import os
 import logging
-import time
+# import time
+import warnings
 
 from math import floor, sqrt, pi
 import numpy as np
@@ -21,22 +22,45 @@ from . import shared_tools
 
 class init_tools(object):
 
+    def init_output_infrastructure(self):
+
+        # output directory config
+        self.prefix = self.out_dir
+        self.prefix_abspath = os.path.abspath(self.prefix)
+
+        # create directory if it does not exist
+        if not os.path.exists(self.prefix_abspath):
+            os.makedirs(self.prefix_abspath)
+            assert os.path.isdir(self.prefix_abspath)  # validate dir created
+
     def init_logger(self):
+        """Initialize a logger.
 
-        if self.verbose >= 1:
+        The logger is initialized regardless of the value of ``self.verbose``.
+        The level of information printed to the log depends on the verbosity
+        setting. 
 
-            self.logger = logging.getLogger("driver")
-            self.logger.setLevel(logging.INFO)
+        """
+        # create the logging file handler
+        st = time.strftime("%Y%m%d-%H%M%S")
+        fh = logging.FileHandler("pyDeltaRCM_" + st + ".log")
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
 
-            # create the logging file handler
-            st = time.strftime("%Y%m%d-%H%M%S")
-            fh = logging.FileHandler("pyDeltaRCM_" + st + ".log")
-            formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-            fh.setFormatter(formatter)
+        self.logger = logging.getLogger('driver')
+        self.logger.setLevel(logging.INFO)
 
-            # add handler to logger object
-            self.logger.addHandler(fh)
+        # create the logging file handler
+        st = timestr = time_lib.strftime('%Y%m%d-%H%M%S')
+        fh = logging.FileHandler(
+            self.prefix_abspath + '/pyDeltaRCM_' + st + '.log')
+        formatter = logging.Formatter(
+            '%(asctime)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+
+        # add handler to logger object
+        self.logger.addHandler(fh)
 
     def import_files(self):
 
@@ -88,12 +112,28 @@ class init_tools(object):
         for k, v in list(input_file_vars.items()):
             setattr(self, k, v)
 
+    def determine_random_seed(self):
+        """Set the random seed if given.
+
+        If a random seed is specified, set the seed to this value.
+
+        Writes the seed to the log for record.
+        """
         if self.seed is not None:
+
+            _msg = 'Setting random seed to: %s ' % str(self.seed)
+            self.logger.info(_msg)
             if self.verbose >= 2:
-                print("setting random seed to %s " % str(self.seed))
+                print(_msg)
+
             shared_tools.set_random_seed(self.seed)
 
+        # always write the seed to file for record and reproducability
+        self.logger.info('Random seed is: %s ' % str(self.seed))
+
     def set_constants(self):
+
+        self.logger.info('Setting model constants')
 
         self.g = 9.81   # (gravitation const.)
 
@@ -208,22 +248,14 @@ class init_tools(object):
         self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha
                                      * 0.5 / self.dx**2)
 
-        # output directory config
-        self.prefix = self.out_dir
-
-        if self.out_dir[-1] != '/':
-            self.prefix = self.out_dir + '/'
-        if self.site_prefix:
-            self.prefix += self.site_prefix + '_'
-        if self.case_prefix:
-            self.prefix += self.case_prefix + '_'
-
         self._is_finalized = False
 
     def create_domain(self):
         """
         Creates the model domain
         """
+        self.logger.info('Creating model domain')
+
         # ---- empty arrays ----
         self.x, self.y = np.meshgrid(
             np.arange(0, self.W), np.arange(0, self.L))
@@ -330,22 +362,20 @@ class init_tools(object):
                 self.save_velocity_grids or
                 self.save_strata):
 
+            _msg = 'Generating netCDF file for output grids'
+            self.logger.info(_msg)
             if self.verbose >= 2:
-                self.logger.info('Generating netCDF file for output grids...')
+                print(_msg)
 
             directory = self.prefix
             filename = 'pyDeltaRCM_output.nc'
 
-            if not os.path.exists(directory):
-                if self.verbose >= 2:
-                    self.logger.info('Creating output directory')
-                os.makedirs(directory)
-
             file_path = os.path.join(directory, filename)
-
             if os.path.exists(file_path):
+                _msg = 'Replacing existing netCDF file'
+                self.logger.warning(_msg)
                 if self.verbose >= 2:
-                    self.logger.info('*** Replaced existing netCDF file ***')
+                    warnings.warn(UserWarning(_msg))
                 os.remove(file_path)
 
             self.output_netcdf = Dataset(file_path, 'w',
@@ -403,8 +433,10 @@ class init_tools(object):
                                                              ('total_time', 'length', 'width'))
                 velocity.units = 'meters per second'
 
+            _msg = 'Output netCDF file created'
+            self.logger.info(_msg)
             if self.verbose >= 2:
-                self.logger.info('Output netCDF file created.')
+                print(_msg)
 
     def init_subsidence(self):
         """
