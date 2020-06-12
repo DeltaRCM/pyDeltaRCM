@@ -36,6 +36,8 @@ class Tools(sed_tools, water_tools, init_tools, object):
         """
         timestep = self._time
 
+        self.logger.info('-' * 4 + ' Timestep ' +
+                         str(self._time) + ' ' + '-' * 4)
         if self.verbose > 0:
             print('-' * 20)
             print('Timestep: ' + str(self._time))
@@ -43,6 +45,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
         if self._is_finalized:
             raise RuntimeError('Cannot update model, model already finalized!')
 
+        # model operations
         for iteration in range(self.itermax):
 
             self.init_water_iteration()
@@ -87,8 +90,10 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-        if self.verbose:
-            self.logger.info('Expanding stratigraphy arrays')
+        _msg = 'Expanding stratigraphy arrays'
+        self.logger.info(_msg)
+        if self.verbose >= 2:
+            print(_msg)
 
         lil_blank = lil_matrix((self.L * self.W, self.n_steps),
                                dtype=np.float32)
@@ -128,8 +133,10 @@ class Tools(sed_tools, water_tools, init_tools, object):
             if self.strata_eta.shape[1] <= timestep:
                 self.expand_stratigraphy()
 
+            _msg = 'Storing stratigraphy data'
+            self.logger.info(_msg)
             if self.verbose >= 2:
-                self.logger.info('Storing stratigraphy data')
+                print(_msg)
 
             # ------------------ sand frac ------------------
             # -1 for cells with deposition volumes < vol_limit
@@ -195,8 +202,12 @@ class Tools(sed_tools, water_tools, init_tools, object):
             timestep = self._time
 
             if self.start_subsidence <= timestep:
+
+                _msg = 'Applying subsidence'
+                self.logger.info(_msg)
                 if self.verbose >= 2:
-                    self.logger.info('Applying subsidence')
+                    print(_msg)
+
                 self.eta[:] = self.eta - self.sigma
 
     def output_data(self):
@@ -235,34 +246,34 @@ class Tools(sed_tools, water_tools, init_tools, object):
                 plt.clim(self.clim_eta[0], self.clim_eta[1])
                 plt.colorbar()
                 plt.axis('equal')
-                self.save_figure(self.prefix + "eta_" + str(timestep))
+                self.save_figure(os.path.join(self.prefix, 'eta_' + str(timestep)))
 
             if self.save_stage_figs:
 
                 plt.pcolor(self.stage)
                 plt.colorbar()
                 plt.axis('equal')
-                self.save_figure(self.prefix + "stage_" + str(timestep))
+                self.save_figure(os.path.join(self.prefix, 'stage_' + str(timestep)))
 
             if self.save_depth_figs:
 
                 plt.pcolor(self.depth)
                 plt.colorbar()
                 plt.axis('equal')
-                self.save_figure(self.prefix + "depth_" + str(timestep))
+                self.save_figure(os.path.join(self.prefix, 'depth_' + str(timestep)))
 
             if self.save_discharge_figs:
 
                 plt.pcolor(self.qw)
                 plt.colorbar()
                 plt.axis('equal')
-                self.save_figure(self.prefix + "discharge_" + str(timestep))
+                self.save_figure(os.path.join(self.prefix, 'discharge_' + str(timestep)))
 
             if self.save_velocity_figs:
                 plt.pcolor(self.uw)
                 plt.colorbar()
                 plt.axis('equal')
-                self.save_figure(self.prefix + "velocity_" + str(timestep))
+                self.save_figure(os.path.join(self.prefix, 'velocity_' + str(timestep)))
 
             # ------------------ grids ------------------
             if self.save_eta_grids:
@@ -304,15 +315,18 @@ class Tools(sed_tools, water_tools, init_tools, object):
         """
         if self.save_strata:
 
+            _msg = 'Saving final stratigraphy to netCDF file'
+            self.logger.info(_msg)
             if self.verbose >= 2:
-                self.logger.info('\nSaving final stratigraphy to netCDF file')
+                print(_msg)
 
             self.strata_eta = self.strata_eta[:, :self.strata_counter]
 
             shape = self.strata_eta.shape
             if shape[0] < 1:
                 raise RuntimeError('Stratigraphy are empty! '
-                                   'Are you sure you ran the model with `update()`?')
+                                   'Are you sure you ran the model at least '
+                                   'one timestep with `update()`?')
 
             total_strata_age = self.output_netcdf.createDimension(
                 'total_strata_age',
