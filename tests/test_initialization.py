@@ -111,15 +111,16 @@ def test_random_seed_settings_value(tmp_path):
     assert delta.seed == 9999
 
 
-def test_random_seed_settings_noaction_default(tmp_path):
+def test_random_seed_settings_newinteger_default(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
     utilities.write_parameter_to_file(f, 'S0', 0.005)
     f.close()
     delta = DeltaModel(input_file=p)
-    assert delta.seed is None
-    assert np.random.seed is not 0
+    assert delta.seed is not None
+    assert delta.seed <= (2**32) - 1
+    assert isinstance(int(delta.seed), int)
 
 
 # test the entry points
