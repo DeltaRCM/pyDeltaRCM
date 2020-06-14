@@ -237,6 +237,13 @@ class init_tools(object):
         self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha
                                      * 0.5 / self.dx**2)
 
+        self._save_any_grids = (self.save_eta_grids or self.save_depth_grids or
+                                self.save_stage_grids or self.save_discharge_grids or
+                                self.save_velocity_grids)
+        self._save_any_figs = (self.save_eta_figs or self.save_depth_figs or
+                               self.save_stage_figs or self.save_discharge_figs or
+                               self.save_velocity_figs)
+        self._save_figs_sequential = self.save_figs_sequential  # copy as private
         self._is_finalized = False
 
     def create_domain(self):
@@ -318,8 +325,6 @@ class init_tools(object):
 
         self.inlet = list(np.unique(np.where(self.cell_type == 1)[1]))
         self.eta[:] = self.stage - self.depth
-
-        self.clim_eta = (-self.h0 - 1, 0.05)
 
     def init_stratigraphy(self):
         """Creates sparse array to store stratigraphy data."""

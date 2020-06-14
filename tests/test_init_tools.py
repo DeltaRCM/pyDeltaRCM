@@ -306,7 +306,3 @@ def test_sfc_visit(test_DeltaModel):
 
 def test_sfc_sum(test_DeltaModel):
     assert np.any(test_DeltaModel.sfc_sum) == 0
-
-
-def test_clim_eta(test_DeltaModel):
-    assert test_DeltaModel.clim_eta == (-2, 0.05)

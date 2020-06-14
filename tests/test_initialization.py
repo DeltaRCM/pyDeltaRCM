@@ -144,8 +144,8 @@ def test_entry_point_installed_call(tmp_path):
     subprocess.check_output(['pyDeltaRCM',
                              '--config', p])
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_0.0.png')
-    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_1.0.png')
+    exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
     assert os.path.isfile(exp_path_nc)
     assert os.path.isfile(exp_path_png0)
     assert os.path.isfile(exp_path_png1)
@@ -171,8 +171,8 @@ def test_entry_point_python_main_call(tmp_path):
     subprocess.check_output(['python', '-m', 'pyDeltaRCM',
                              '--config', p])
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png = os.path.join(tmp_path / 'test', 'eta_0.0.png')
-    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_1.0.png')
+    exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
     assert os.path.isfile(exp_path_nc)
     assert os.path.isfile(exp_path_png)
     assert not os.path.isfile(exp_path_png1)
@@ -194,7 +194,7 @@ def test_entry_point_python_main_call_dryrun(tmp_path):
                              '--config', p,
                              '--dryrun'])
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png = os.path.join(tmp_path / 'test', 'eta_0.0.png')
+    exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
     assert os.path.isfile(exp_path_nc)
     assert not os.path.isfile(exp_path_png)  # does not exist because --dryrun
 
@@ -216,7 +216,7 @@ def test_entry_point_python_main_call_timesteps(tmp_path):
                              '--config', p,
                              '--timesteps', '2'])
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png = os.path.join(tmp_path / 'test', 'eta_0.0.png')
+    exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
     assert os.path.isfile(exp_path_nc)
     assert os.path.isfile(exp_path_png)
 
@@ -327,9 +327,9 @@ def test_python_highlevelapi_call_with_args(tmp_path):
     assert len(pp.job_list) == 1
     assert pp.job_list[0]._is_completed == True
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png = os.path.join(tmp_path / 'test', 'eta_0.0.png')
-    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_1.0.png')
-    exp_path_png3 = os.path.join(tmp_path / 'test', 'eta_3.0.png')
+    exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+    exp_path_png3 = os.path.join(tmp_path / 'test', 'eta_00002.png')
     assert os.path.isfile(exp_path_nc)
     assert os.path.isfile(exp_path_png)
     assert os.path.isfile(exp_path_png1)
