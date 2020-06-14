@@ -1,24 +1,12 @@
 #! /usr/bin/env python
 
-import sys
 import os
-import re
-import string
-import logging
-import time
 import warnings
 
-from math import floor, sqrt, pi
 import numpy as np
-from random import shuffle
-
-import matplotlib
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 from scipy.sparse import lil_matrix, csc_matrix, hstack
-from scipy import ndimage
-
-from netCDF4 import Dataset
 
 from .sed_tools import sed_tools
 from .water_tools import water_tools
@@ -46,7 +34,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         RuntimeError 
             If model has already been finalized via :meth:`finalize`.
         """
-
         timestep = self._time
 
         self.logger.info('-' * 4 + ' Timestep ' +
@@ -70,7 +57,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
         self.sed_route()
 
     def finalize_timestep(self):
-        """
+        """Finalize timestep.
 
         Clean up after sediment routing. This includes a correction for
         flooded cells that are not "wet" (via :meth:`flooding_correction`).
@@ -84,7 +71,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-
         self.flooding_correction()
         self.stage[:] = np.maximum(self.stage, self.H_SL)
         self.depth[:] = np.maximum(self.stage - self.eta, 0)
@@ -104,7 +90,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-
         _msg = 'Expanding stratigraphy arrays'
         self.logger.info(_msg)
         if self.verbose >= 2:
@@ -139,7 +124,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-
         timestep = self._time
 
         if self.save_strata and (timestep % self.save_dt == 0):
@@ -213,7 +197,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-
         if self.toggle_subsidence:
 
             timestep = self._time
@@ -241,7 +224,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-
         _timestep = self._time
         if _timestep % self.save_dt == 0:
 
@@ -323,7 +305,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-
         if self.save_strata:
 
             _msg = 'Saving final stratigraphy to netCDF file'
@@ -433,7 +414,7 @@ class Tools(sed_tools, water_tools, init_tools, object):
             # save as "latest"
             savepath = os.path.join(directory,
                                     filename_root + 'latest' + ext)
-        
+
         fig.savefig(savepath)
         if close:
             plt.close()
@@ -459,7 +440,6 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-
         try:
             self.output_netcdf.variables[var_name][ts, :, :] = var
         except:
