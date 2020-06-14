@@ -179,7 +179,6 @@ def test_logger_has_timestep_lines(tmp_path):
         assert not '---- Timestep 2.0 ----' in _lines
 
 
-@pytest.mark.xfail(raises=ValueError, strict=True)
 def test_logger_random_seed_always_recorded(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
