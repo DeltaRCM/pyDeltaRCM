@@ -224,82 +224,74 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-        timestep = self._time
+        _timestep = self._time
+        if _timestep % self.save_dt == 0:
 
-        if timestep % self.save_dt == 0:
-
-            if (self.save_eta_grids or
-                    self.save_depth_grids or
-                    self.save_stage_grids or
-                    self.save_discharge_grids or
-                    self.save_velocity_grids or
-                    self.save_strata):
-
-                timestep = self._time
-                shape = self.output_netcdf.variables['time'].shape
-                self.output_netcdf.variables['time'][shape[0]] = timestep
+            _timestep = int(self._time)
 
             # ------------------ Figures ------------------
-            if self.save_eta_figs:
+            if self._save_any_figs:
 
-                plt.pcolor(self.eta)
-                plt.clim(self.clim_eta[0], self.clim_eta[1])
-                plt.colorbar()
-                plt.axis('equal')
-                self.save_figure(os.path.join(self.prefix, 'eta_' + str(timestep)))
+                _msg = 'Saving figures'
+                self.logger.info(_msg)
+                if self.verbose >= 2:
+                    print(_msg)
 
-            if self.save_stage_figs:
+                if self.save_eta_figs:
+                    _fe = self.make_figure('eta', _timestep)
+                    self.save_figure(_fe, directory=self.prefix,
+                                     filename_root='eta_',
+                                     timestep=_timestep)
 
-                plt.pcolor(self.stage)
-                plt.colorbar()
-                plt.axis('equal')
-                self.save_figure(os.path.join(self.prefix, 'stage_' + str(timestep)))
+                if self.save_stage_figs:
+                    _fs = self.make_figure('stage', _timestep)
+                    self.save_figure(_fs, directory=self.prefix,
+                                     filename_root='stage_',
+                                     timestep=_timestep)
 
-            if self.save_depth_figs:
+                if self.save_depth_figs:
+                    _fh = self.make_figure('depth', _timestep)
+                    self.save_figure(_fh, directory=self.prefix,
+                                     filename_root='depth_',
+                                     timestep=_timestep)
 
-                plt.pcolor(self.depth)
-                plt.colorbar()
-                plt.axis('equal')
-                self.save_figure(os.path.join(self.prefix, 'depth_' + str(timestep)))
+                if self.save_discharge_figs:
+                    _fq = self.make_figure('qw', _timestep)
+                    self.save_figure(_fq, directory=self.prefix,
+                                     filename_root='discharge_',
+                                     timestep=_timestep)
 
-            if self.save_discharge_figs:
-
-                plt.pcolor(self.qw)
-                plt.colorbar()
-                plt.axis('equal')
-                self.save_figure(os.path.join(self.prefix, 'discharge_' + str(timestep)))
-
-            if self.save_velocity_figs:
-                plt.pcolor(self.uw)
-                plt.colorbar()
-                plt.axis('equal')
-                self.save_figure(os.path.join(self.prefix, 'velocity_' + str(timestep)))
+                if self.save_velocity_figs:
+                    _fu = self.make_figure('uw', _timestep)
+                    self.save_figure(_fu, directory=self.prefix,
+                                     filename_root='velocity_',
+                                     timestep=_timestep)
 
             # ------------------ grids ------------------
-            if self.save_eta_grids:
-                if self.verbose >= 2:
-                    self.logger.info('Saving grid: eta')
-                self.save_grids('eta', self.eta, shape[0])
+            if self._save_any_grids:
 
-            if self.save_depth_grids:
-                if self.verbose >= 2:
-                    self.logger.info('Saving grid: depth')
-                self.save_grids('depth', self.depth, shape[0])
+                shape = self.output_netcdf.variables['time'].shape
+                self.output_netcdf.variables['time'][shape[0]] = _timestep
 
-            if self.save_stage_grids:
+                _msg = 'Saving grids'
+                self.logger.info(_msg)
                 if self.verbose >= 2:
-                    self.logger.info('Saving grid: stage')
-                self.save_grids('stage', self.stage, shape[0])
+                    print(_msg)
 
-            if self.save_discharge_grids:
-                if self.verbose >= 2:
-                    self.logger.info('Saving grid: discharge')
-                self.save_grids('discharge', self.qw, shape[0])
+                if self.save_eta_grids:
+                    self.save_grids('eta', self.eta, shape[0])
 
-            if self.save_velocity_grids:
-                if self.verbose >= 2:
-                    self.logger.info('Saving grid: velocity')
-                self.save_grids('velocity', self.uw, shape[0])
+                if self.save_depth_grids:
+                    self.save_grids('depth', self.depth, shape[0])
+
+                if self.save_stage_grids:
+                    self.save_grids('stage', self.stage, shape[0])
+
+                if self.save_discharge_grids:
+                    self.save_grids('discharge', self.qw, shape[0])
+
+                if self.save_velocity_grids:
+                    self.save_grids('velocity', self.uw, shape[0])
 
     def output_strata(self):
         """Save stratigraphy as sparse matrix to file.
@@ -362,10 +354,38 @@ class Tools(sed_tools, water_tools, init_tools, object):
 
                 self.output_netcdf.variables['strata_depth'][i, :, :] = sz
 
+            _msg = 'Stratigraphy data saved.'
+            self.logger.info(_msg)
             if self.verbose >= 2:
-                self.logger.info('Stratigraphy data saved.')
+                print(_msg)
 
-    def save_figure(self, path, ext='png', close=True):
+    def make_figure(self, var, timestep):
+        """Create a figure.
+
+        Parameters
+        ----------
+        var : :obj:`str`
+            Which variable to plot into the figure. Specified as a string and
+            looked up via `getattr`.
+
+        Returns
+        -------
+        fig : :obj:`matplotlib.figure`
+            The created figure object.
+        """
+
+        _data = getattr(self, var)
+
+        fig, ax = plt.subplots()
+        pc = ax.pcolor(_data)
+        fig.colorbar(pc)
+        ax.set_title(var + ' --- ' + 'time = ' + str(timestep))
+        ax.axis('equal')
+
+        return fig
+
+    def save_figure(self, fig, directory, filename_root,
+                    timestep, ext='.png', close=True):
         """Save a figure.
 
         Parameters
@@ -374,9 +394,10 @@ class Tools(sed_tools, water_tools, init_tools, object):
             The path (and filename without extension) to save the figure to.
 
         ext : :obj:`str`, optional
-            The file extension (default='png'). This must be supported by the
+            The file extension (default='.png'). This must be supported by the
             active matplotlib backend (see matplotlib.backends module). Most
-            backends support 'png', 'pdf', 'ps', 'eps', and 'svg'.
+            backends support '.png', '.pdf', '.ps', '.eps', and '.svg'. Be
+            sure to include the '.' before the extension.
 
         close : :obj:`bool`, optional
             Whether to close the file after saving.
@@ -385,19 +406,16 @@ class Tools(sed_tools, water_tools, init_tools, object):
         -------
 
         """
-        directory = os.path.split(path)[0]
-        filename = "%s.%s" % (os.path.split(path)[1], ext)
-        if directory == '':
-            directory = '.'
+        if self._save_figs_sequential:
+            # save as a padded number with the timestep
+            savepath = os.path.join(directory,
+                                    filename_root + str(timestep).zfill(5) + ext)
+        else:
+            # save as "latest"
+            savepath = os.path.join(directory,
+                                    filename_root + 'latest' + ext)
 
-        if not os.path.exists(directory):
-            if self.verbose >= 2:
-                self.logger.info('Creating output directory')
-            os.makedirs(directory)
-
-        savepath = os.path.join(directory, filename)
-        plt.savefig(savepath)
-
+        fig.savefig(savepath)
         if close:
             plt.close()
 
@@ -425,5 +443,5 @@ class Tools(sed_tools, water_tools, init_tools, object):
         try:
             self.output_netcdf.variables[var_name][ts, :, :] = var
         except:
-            self.logger.info('Error: Cannot save grid to netCDF file.')
+            self.logger.error('Cannot save grid to netCDF file.')
             warnings.warn(UserWarning('Cannot save grid to netCDF file.'))

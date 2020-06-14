@@ -7,6 +7,7 @@ import os
 import numpy as np
 
 import glob
+import netCDF4
 
 from pyDeltaRCM.model import DeltaModel
 
@@ -208,3 +209,371 @@ def test_logger_random_seed_always_recorded(tmp_path):
             raise ValueError('Could not convert the seed to int')
 
         assert _intseed >= 0
+
+
+def test_save_no_figs_no_grids(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'h0', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'f_bedload', 0.5)
+    utilities.write_parameter_to_file(f, 'C0_percent', 0.1)
+    utilities.write_parameter_to_file(f, 'save_dt', 5)
+    utilities.write_parameter_to_file(f, 'save_strata', False)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    img_glob = glob.glob(os.path.join(_delta.prefix, '*.png'))
+    nc_glob = glob.glob(os.path.join(_delta.prefix, '*.nc'))
+    assert len(img_glob) == 0
+    assert len(nc_glob) == 0
+
+    for _t in range(0, 4):
+        _delta.update()
+    assert _delta._time == 4.0
+    img_glob = glob.glob(os.path.join(_delta.prefix, '*.png'))
+    nc_glob = glob.glob(os.path.join(_delta.prefix, '*.nc'))
+    assert len(img_glob) == 0
+    assert len(nc_glob) == 0
+
+    _delta.update()
+    assert _delta._time == 5.0
+    img_glob = glob.glob(os.path.join(_delta.prefix, '*.png'))
+    nc_glob = glob.glob(os.path.join(_delta.prefix, '*.nc'))
+    assert len(img_glob) == 0
+    assert len(nc_glob) == 0
+
+
+def test_save_one_fig_no_grids(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'h0', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'f_bedload', 0.5)
+    utilities.write_parameter_to_file(f, 'C0_percent', 0.1)
+    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'save_strata', False)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    img_glob = glob.glob(os.path.join(_delta.prefix, '*.png'))
+    nc_glob = glob.glob(os.path.join(_delta.prefix, '*.nc'))
+    assert len(img_glob) == 0
+    assert len(nc_glob) == 0
+
+    for _ in range(0, 2):
+        _delta.update()
+    assert _delta._time == 2.0
+
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'eta_00001.png')
+    exp_path_png2 = os.path.join(tmp_path / 'out_dir', 'eta_00002.png')
+    assert not os.path.isfile(exp_path_nc)
+    assert os.path.isfile(exp_path_png0)
+    assert os.path.isfile(exp_path_png1)
+    assert not os.path.isfile(exp_path_png2)
+
+
+def test_save_one_fig_one_grid(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'h0', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'f_bedload', 0.5)
+    utilities.write_parameter_to_file(f, 'C0_percent', 0.1)
+    utilities.write_parameter_to_file(f, 'save_discharge_figs', True)
+    utilities.write_parameter_to_file(f, 'save_eta_grids', True)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'save_strata', True)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc)
+    nc_size_before = os.path.getsize(exp_path_nc)
+    assert nc_size_before > 0
+
+    # update a couple times, should not increase size until finalize()
+    for _ in range(0, 2):
+        _delta.update()
+    nc_size_middle = os.path.getsize(exp_path_nc)
+    assert _delta._time == 2.0
+    assert nc_size_middle == nc_size_before
+
+    # now finalize, and then file size should increase
+    _delta.finalize()
+    nc_size_after = os.path.getsize(exp_path_nc)
+    assert _delta._time == 2.0
+    assert nc_size_after > nc_size_middle
+    assert nc_size_after > nc_size_before
+
+
+def test_save_all_figures_no_grids(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'h0', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'f_bedload', 0.5)
+    utilities.write_parameter_to_file(f, 'C0_percent', 0.1)
+    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+    utilities.write_parameter_to_file(f, 'save_discharge_figs', True)
+    utilities.write_parameter_to_file(f, 'save_velocity_figs', True)
+    utilities.write_parameter_to_file(f, 'save_stage_figs', True)
+    utilities.write_parameter_to_file(f, 'save_depth_figs', True)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'save_strata', False)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert not os.path.isfile(exp_path_nc)
+
+    for _ in range(0, 2):
+        _delta.update()
+
+    exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'depth_00000.png')
+    exp_path_png2 = os.path.join(tmp_path / 'out_dir', 'stage_00000.png')
+    exp_path_png3 = os.path.join(tmp_path / 'out_dir', 'velocity_00000.png')
+    exp_path_png4 = os.path.join(tmp_path / 'out_dir', 'discharge_00000.png')
+    assert os.path.isfile(exp_path_png0)
+    assert os.path.isfile(exp_path_png1)
+    assert os.path.isfile(exp_path_png2)
+    assert os.path.isfile(exp_path_png3)
+    assert os.path.isfile(exp_path_png4)
+
+
+def test_save_all_figures_sequential_false(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'h0', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'f_bedload', 0.5)
+    utilities.write_parameter_to_file(f, 'C0_percent', 0.1)
+    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+    utilities.write_parameter_to_file(f, 'save_discharge_figs', True)
+    utilities.write_parameter_to_file(f, 'save_velocity_figs', True)
+    utilities.write_parameter_to_file(f, 'save_stage_figs', True)
+    utilities.write_parameter_to_file(f, 'save_depth_figs', True)
+    utilities.write_parameter_to_file(f, 'save_figs_sequential', False)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'save_strata', False)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert not os.path.isfile(exp_path_nc)
+
+    for _ in range(0, 5):
+        _delta.update()
+    exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'depth_00000.png')
+    exp_path_png0_latest = os.path.join(tmp_path / 'out_dir', 'eta_latest.png')
+    exp_path_png1_latest = os.path.join(tmp_path / 'out_dir', 'depth_latest.png')
+    exp_path_png2_latest = os.path.join(tmp_path / 'out_dir', 'stage_latest.png')
+    exp_path_png3_latest = os.path.join(tmp_path / 'out_dir', 'velocity_latest.png')
+    exp_path_png4_latest = os.path.join(tmp_path / 'out_dir', 'discharge_latest.png')
+    assert not os.path.isfile(exp_path_png0)
+    assert not os.path.isfile(exp_path_png1)
+    assert os.path.isfile(exp_path_png0_latest)
+    assert os.path.isfile(exp_path_png1_latest)
+    assert os.path.isfile(exp_path_png2_latest)
+    assert os.path.isfile(exp_path_png3_latest)
+    assert os.path.isfile(exp_path_png4_latest)
+
+
+def test_save_eta_grids(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'save_eta_grids', True)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc)
+
+    for _ in range(0, 2):
+        _delta.update()
+    assert _delta._time == 2.0
+    _delta.finalize()
+
+    ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+    _arr = ds.variables['eta']
+    assert _arr.shape[1] == _delta.eta.shape[0]
+    assert _arr.shape[2] == _delta.eta.shape[1]
+
+
+def test_save_depth_grids(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'save_depth_grids', True)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc)
+
+    for _ in range(0, 2):
+        _delta.update()
+    assert _delta._time == 2.0
+    _delta.finalize()
+
+    ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+    _arr = ds.variables['depth']
+    assert _arr.shape[1] == _delta.depth.shape[0]
+    assert _arr.shape[2] == _delta.depth.shape[1]
+
+
+def test_save_velocity_grids(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'save_velocity_grids', True)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc)
+
+    for _ in range(0, 2):
+        _delta.update()
+    assert _delta._time == 2.0
+    _delta.finalize()
+
+    ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+    _arr = ds.variables['velocity']
+    assert _arr.shape[1] == _delta.eta.shape[0]
+    assert _arr.shape[2] == _delta.eta.shape[1]
+
+
+def test_save_stage_grids(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'save_stage_grids', True)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc)
+
+    for _ in range(0, 2):
+        _delta.update()
+    assert _delta._time == 2.0
+    _delta.finalize()
+
+    ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+    _arr = ds.variables['stage']
+    assert _arr.shape[1] == _delta.eta.shape[0]
+    assert _arr.shape[2] == _delta.eta.shape[1]
+
+
+def test_save_discharge_grids(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'save_discharge_grids', True)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc)
+
+    for _ in range(0, 2):
+        _delta.update()
+    assert _delta._time == 2.0
+    _delta.finalize()
+
+    ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+    _arr = ds.variables['discharge']
+    assert _arr.shape[1] == _delta.eta.shape[0]
+    assert _arr.shape[2] == _delta.eta.shape[1]
