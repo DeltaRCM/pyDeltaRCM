@@ -1,22 +1,7 @@
 
-import sys
-import os
-import re
-import string
-import logging
-import time
-
-from math import floor, sqrt, pi
 import numpy as np
-from random import shuffle
 
-import matplotlib
-from matplotlib import pyplot as plt
-
-from scipy.sparse import lil_matrix, csc_matrix, hstack
 from scipy import ndimage
-
-from netCDF4 import Dataset
 
 from . import shared_tools
 
@@ -26,8 +11,11 @@ from . import shared_tools
 class sed_tools(object):
 
     def sed_route(self):
-        """route all sediment"""
+        """Sediment routing main method.
 
+        This is the main method for sediment routing in the model. It is
+        called once per `update()` call.
+        """
         self.pad_depth = np.pad(self.depth, 1, 'edge')
 
         self.qs[:] = 0
@@ -41,8 +29,25 @@ class sed_tools(object):
         self.topo_diffusion()
 
     def deposit(self, Vp_dep, px, py):
-        """deposit sand or mud"""
+        """Deposit sand or mud.
 
+        Deposit sediment volume `Vp_dep`.
+
+        Parameters
+        ----------
+        Vp_dep : :obj:`float`
+            Volume of sediment.
+
+        px : :obj:`int`
+            Index.
+
+        py : :obj:`int`
+            Index.
+
+        Returns
+        -------
+
+        """
         eta_change_loc = Vp_dep / self.dx**2
 
         self.eta[px, py] = self.eta[px, py] + eta_change_loc  # update bed
@@ -63,10 +68,11 @@ class sed_tools(object):
         # update amount of sediment left in parcel
 
     def erode(self, Vp_ero, px, py):
-        """erode sand or mud
-        total sediment mass is preserved but individual categories
-        of sand and mud are not"""
+        """Erode sand or mud.
 
+        Total sediment mass is preserved but individual categories
+        of sand and mud are not.
+        """
         eta_change_loc = -Vp_ero / (self.dx**2)
 
         self.eta[px, py] = self.eta[px, py] + eta_change_loc
@@ -86,8 +92,10 @@ class sed_tools(object):
         self.Vp_res = self.Vp_res + Vp_ero
 
     def update_u(self, px, py):
-        """update velocities after erosion or deposition"""
+        """Update velocity.
 
+        Update velocities after erosion or deposition.
+        """
         if self.qw[px, py] > 0:
 
             self.ux[px, py] = self.uw[px, py] * \
@@ -100,8 +108,7 @@ class sed_tools(object):
             self.uy[px, py] = 0
 
     def sand_dep_ero(self, px, py):
-        """decide if erode or deposit sand"""
-
+        """Decide if erode or deposit sand."""
         U_loc = self.uw[px, py]
 
         qs_cap = (self.qs0 * self.f_bedload / self.u0**self.beta *
@@ -138,8 +145,7 @@ class sed_tools(object):
         self.Vp_dep_sand[px, py] = self.Vp_dep_sand[px, py] + Vp_dep
 
     def mud_dep_ero(self, px, py):
-        """decide if deposit or erode mud"""
-
+        """Decide if deposit or erode mud."""
         U_loc = self.uw[px, py]
 
         Vp_dep = 0
@@ -174,8 +180,7 @@ class sed_tools(object):
         self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_dep
 
     def sed_parcel(self, theta_sed, sed, px, py):
-        """route one sediment parcel"""
-
+        """Route one sediment parcel."""
         it = 0
         sed_continue = 1
 
@@ -184,9 +189,12 @@ class sed_tools(object):
 
             it += 1
 
-            stage_nbrs = self.pad_stage[px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-            depth_ind = self.pad_depth[px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-            cell_type_ind = self.pad_cell_type[px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            stage_nbrs = self.pad_stage[
+                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            depth_ind = self.pad_depth[
+                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            cell_type_ind = self.pad_cell_type[
+                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
 
             weights = shared_tools.get_weight_at_cell(
                 (px, py),
@@ -197,7 +205,8 @@ class sed_tools(object):
 
             new_cell = shared_tools.random_pick(weights)
 
-            dist, istep, jstep, _ = shared_tools.get_steps(new_cell, self.iwalk.flat[:], self.jwalk.flat[:])
+            dist, istep, jstep, _ = shared_tools.get_steps(
+                new_cell, self.iwalk.flat[:], self.jwalk.flat[:])
 
             # deposition and erosion
 
@@ -205,7 +214,8 @@ class sed_tools(object):
 
                 depoPart = self.Vp_res / 2 / self.dt / self.dx
 
-                px, py, self.qs = shared_tools.partition_sand(self.qs, depoPart, py, px, dist, istep, jstep)
+                px, py, self.qs = shared_tools.partition_sand(
+                    self.qs, depoPart, py, px, dist, istep, jstep)
 
                 self.sand_dep_ero(px, py)
 
@@ -220,14 +230,14 @@ class sed_tools(object):
                 sed_continue = 0
 
     def sand_route(self):
-        """route sand parcels; topo diffusion"""
-
+        """Route sand parcels; topo diffusion."""
         theta_sed = self.theta_sand
 
         num_starts = int(self.Np_sed * self.f_bedload)
         inlet_weights = np.ones_like(self.inlet)
         start_indices = [
-            self.inlet[shared_tools.random_pick(inlet_weights / sum(inlet_weights))]
+            self.inlet[shared_tools.random_pick(
+                inlet_weights / sum(inlet_weights))]
             for x in range(num_starts)]
 
         for np_sed in range(num_starts):
@@ -243,11 +253,14 @@ class sed_tools(object):
             self.sed_parcel(theta_sed, 'sand', px, py)
 
     def topo_diffusion(self):
-        """
-        Diffuse topography after routing all coarse sediment parcels
-        """
+        """Diffuse topography after routing.
 
-        for crossdiff in range(self.N_crossdiff):
+        Diffuse topography after routing all coarse sediment parcels. The
+        method uses convolution with a kernel to compute smoother topography,
+        and then adds this different to the current eta to do the smoothing.
+        The operation is repeated `N_crossdiff` times.
+        """
+        for _ in range(self.N_crossdiff):
 
             a = ndimage.convolve(self.eta, self.kernel1, mode='constant')
             b = ndimage.convolve(self.qs, self.kernel2, mode='constant')
@@ -263,14 +276,14 @@ class sed_tools(object):
             self.eta += self.cf
 
     def mud_route(self):
-        """route mud parcels"""
-
+        """Route mud parcels."""
         theta_sed = self.theta_mud
 
         num_starts = int(self.Np_sed * (1 - self.f_bedload))
         inlet_weights = np.ones_like(self.inlet)
         start_indices = [
-            self.inlet[shared_tools.random_pick(inlet_weights / sum(inlet_weights))]
+            self.inlet[shared_tools.random_pick(
+                inlet_weights / sum(inlet_weights))]
             for x in range(num_starts)]
 
         for np_sed in range(num_starts):

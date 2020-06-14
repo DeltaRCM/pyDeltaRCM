@@ -1,27 +1,16 @@
 
-import sys
 import os
-import re
-import string
 import logging
-# import time
 import warnings
 
 from math import floor, sqrt, pi
 import numpy as np
-from random import shuffle
 
-import matplotlib
-from matplotlib import pyplot as plt
-
-from scipy.sparse import lil_matrix, csc_matrix, hstack
+from scipy.sparse import lil_matrix
 from scipy import ndimage
 
 from netCDF4 import Dataset
 import time as time_lib
-from scipy.sparse import lil_matrix, csc_matrix, hstack
-import logging
-# import time
 import yaml
 
 from . import shared_tools
@@ -44,13 +33,10 @@ class init_tools(object):
 
     def init_logger(self):
         """Initialize a logger.
-
         The logger is initialized regardless of the value of ``self.verbose``.
         The level of information printed to the log depends on the verbosity
         setting. 
-
         """
-
         self.logger = logging.getLogger('driver')
         self.logger.setLevel(logging.INFO)
 
@@ -180,11 +166,10 @@ class init_tools(object):
         Creates variables for model implementation, from specified boundary
         condition variables. This method is run during initial model
         instantition, but it is also run any time an inlet flow condition
-        variable is changed, including ``channel_flow_velocity``,
-        ``channel_width``, ``channel_flow_depth``, and
-        ``influx_sediment_concentration``.
+        variable is changed, including `channel_flow_velocity`,
+        `channel_width`, `channel_flow_depth`, and
+        `influx_sediment_concentration`.
         """
-
         self.init_Np_water = self.Np_water
         self.init_Np_sed = self.Np_sed
 
@@ -265,7 +250,6 @@ class init_tools(object):
         """
         Creates the model domain
         """
-
         self.logger.info('Creating model domain')
 
         # ---- empty arrays ----
@@ -273,11 +257,9 @@ class init_tools(object):
             np.arange(0, self.W), np.arange(0, self.L))
 
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int)
-
         self.eta = np.zeros((self.L, self.W)).astype(np.float32)
         self.stage = np.zeros((self.L, self.W)).astype(np.float32)
         self.depth = np.zeros((self.L, self.W)).astype(np.float32)
-
         self.qx = np.zeros((self.L, self.W))
         self.qy = np.zeros((self.L, self.W))
         self.qxn = np.zeros((self.L, self.W))
@@ -286,11 +268,9 @@ class init_tools(object):
         self.ux = np.zeros((self.L, self.W))
         self.uy = np.zeros((self.L, self.W))
         self.uw = np.zeros((self.L, self.W))
-
         self.qs = np.zeros((self.L, self.W))
         self.Vp_dep_sand = np.zeros((self.L, self.W))
         self.Vp_dep_mud = np.zeros((self.L, self.W))
-
         self.free_surf_flag = np.zeros((self.Np_water,), dtype=np.int)
         self.looped = np.zeros((self.Np_water,))
         self.indices = np.zeros((self.Np_water, self.size_indices),
@@ -347,8 +327,7 @@ class init_tools(object):
         self.eta[:] = self.stage - self.depth
 
     def init_stratigraphy(self):
-        """Creates sparse array to store stratigraphy data.
-        """
+        """Creates sparse array to store stratigraphy data."""
         if self.save_strata:
 
             self.strata_counter = 0
@@ -370,7 +349,6 @@ class init_tools(object):
         .. warning:: Overwrites an existing netcdf file with the same name.
 
         """
-
         if (self.save_eta_grids or
                 self.save_depth_grids or
                 self.save_stage_grids or
@@ -461,7 +439,6 @@ class init_tools(object):
 
         Modify the equations for self.subsidence_mask and self.sigma as desired
         """
-
         if self.toggle_subsidence:
 
             R1 = 0.3 * self.L
