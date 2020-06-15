@@ -3,10 +3,10 @@ import argparse
 import abc
 
 import itertools
-from math import prod
 from pathlib import Path
 
 import yaml
+import numpy as np
 
 from .shared_tools import _get_version
 from .model import DeltaModel
@@ -96,7 +96,7 @@ class BasePreprocessor(abc.ABC):
             lil = [_matrix[v] for k, v in enumerate(var_list)]
             dims = len(lil)
             pts = [len(l) for l in lil]
-            jobs = prod(pts)
+            jobs = np.prod(pts)
 
             # create combinations (matrix expansion)
             _combs = list(itertools.product(*lil))
