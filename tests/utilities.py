@@ -19,6 +19,15 @@ def write_parameter_to_file(f, varname, varvalue):
     f.write(varname + ': ' + str(varvalue) + '\n')
 
 
+def write_matrix_to_file(f, keys, lists):
+    # assert len(keys) == len(lists)
+    f.write('matrix' + ': ' + '\n')
+    for i in range(len(keys)):
+        f.write('  ' + keys[i] + ': ' + '\n')
+        for j in range(len(lists[i])):
+            f.write('    ' + '- ' + str(lists[i][j]) + '\n')
+
+
 def yaml_from_dict(tmp_path, file_name, _dict):
     p, f = create_temporary_file(tmp_path, file_name)
     for k in _dict.keys():

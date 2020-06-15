@@ -2,6 +2,10 @@ import os
 import argparse
 import abc
 
+import itertools
+from math import prod
+from pathlib import Path
+
 import yaml
 
 from .shared_tools import _get_version
@@ -46,13 +50,23 @@ class BasePreprocessor(abc.ABC):
         user_file.close()
 
         if 'matrix' in self.user_dict.keys():
-            raise NotImplementedError(
-                'Matrix expansion not yet implemented...')
-            # 1. compute expansion, create indiv yaml files
-            # 2. loop expanded to create jobs from yaml files
             self._has_matrix = True
         else:
             self._has_matrix = False
+
+    def write_yaml_config(self, i, ith_config, ith_dir, ith_id):
+
+        def _write_parameter_to_file(f, varname, varvalue):
+            f.write(varname + ': ' + str(varvalue) + '\n')
+
+        d = Path(ith_dir)
+        d.mkdir()
+        p = d / (str(ith_id) + '.yml')
+        f = open(p, "a")
+        for k in ith_config.keys():
+            _write_parameter_to_file(f, k, ith_config[k])
+        f.close()
+        return p
 
     def expand_yaml_matrix(self):
         """Expand YAML matrix, if given.
@@ -60,7 +74,57 @@ class BasePreprocessor(abc.ABC):
         Compute the matrix expansion.
 
         """
-        pass
+        if self._has_matrix:
+            # extract and remove 'matrix' from config
+            _matrix = self.user_dict.pop('matrix')
+
+            if not isinstance(_matrix, dict):
+                raise ValueError('Invalid matrix spceification, was not type dict.')
+
+            # check validity of keys, depth == 1, yields list
+            for k in _matrix.keys():
+                if not isinstance(_matrix[k], list):
+                    raise ValueError(
+                        'Each key in matrix config must yield a valid list.')
+
+            # check for specified output
+            if not 'out_dir' in self.user_dict.keys():
+                raise ValueError(
+                    'You must specify "out_dir" in yaml to use matrix expansion.')
+
+            var_list = [k for k in _matrix.keys()]
+            lil = [_matrix[v] for k, v in enumerate(var_list)]
+            dims = len(lil)
+            pts = [len(l) for l in lil]
+            jobs = prod(pts)
+
+            # create combinations (matrix expansion)
+            _combs = list(itertools.product(*lil))
+
+            # create fixed configuration dict to produce yaml files from
+            _fixed_config = self.user_dict.copy()
+
+            # create directory at root
+            jobs_root = self.user_dict['out_dir']  # checked above for exist
+            p = Path(jobs_root)
+            try:
+                p.mkdir()
+            except FileExistsError:
+                raise FileExistsError(
+                    'Job output directory (%s) already exists.' % str(p))
+
+            # loop, create job yamls
+            self.file_list = []
+            for i in range(jobs):
+                _ith_config = _fixed_config.copy()
+                ith_id = 'job_' + str(i).zfill(3)
+                ith_dir = os.path.join(jobs_root, ith_id)
+                _ith_config['out_dir'] = ith_dir
+                for j, val in enumerate(_combs[i]):
+                    _ith_config[var_list[j]] = val
+
+                ith_p = self.write_yaml_config(i, _ith_config, ith_dir, ith_id)
+                self.file_list.append(ith_p)
 
     def extract_timesteps(self):
         """Pull timestep from arg and YAML.
@@ -93,6 +157,11 @@ class BasePreprocessor(abc.ABC):
         self.job_list = []
         if self._has_matrix:
             self.expand_yaml_matrix()
+            # loop the expanded jobs
+            for i in range(len(self.file_list)):
+                self.job_list.append(self._Job(self.file_list[i],
+                                           yaml_timesteps=self.yaml_timesteps,
+                                           arg_timesteps=self.arg_timesteps))
         else:
             # there's only one job so append directly.
             self.job_list.append(self._Job(self.input_file,
@@ -107,11 +176,8 @@ class BasePreprocessor(abc.ABC):
 
         """
         if len(self.job_list) > 1:
-            # check no mulitjobs, not implemented
-            raise NotImplementedError()
-            # Todo:
-            #   1. set up parallel pool if multiple jobs
-            #   2. run jobs in list
+            # set up parallel pool if multiple jobs
+            pass
 
         # run the job(s)
         for job in self.job_list:
@@ -291,6 +357,9 @@ class Preprocessor(BasePreprocessor):
 
         """
         super().__init__()
+
+        if not input_file and not timesteps:
+            raise ValueError('Cannot use Preprocessor with no arguments.')
 
         if input_file:
             self.input_file = input_file

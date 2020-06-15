@@ -310,6 +310,8 @@ def test_python_highlevelapi_call_with_args(tmp_path):
     utilities.write_parameter_to_file(f, 'dx', 1.0)
     utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
     utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     utilities.write_parameter_to_file(f, 'save_dt', 1)
     utilities.write_parameter_to_file(f, 'save_eta_figs', True)
@@ -336,6 +338,172 @@ def test_python_highlevelapi_call_with_args(tmp_path):
     assert os.path.isfile(exp_path_png1)
     assert not os.path.isfile(exp_path_png3)
 
+
+def test_python_highlevelapi_matrix_expansion_one_list(tmp_path):
+    """
+    test calling the python hook command line feature with a config file.
+    """
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload'],
+                                   [[0.2, 0.6]])
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    assert pp._has_matrix == True
+    assert type(pp.job_list) is list
+    assert len(pp.job_list) == 2
+    f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
+    assert sum([j == 0.2 for j in f_bedload_list]) == 1
+    assert sum([j == 0.6 for j in f_bedload_list]) == 1
+    
+    assert pp.job_list[0]._is_completed == False
+    pp.run_jobs()
+    assert len(pp.job_list) == 2
+    assert pp.job_list[0]._is_completed == True
+    assert pp.job_list[0].deltamodel._time == 3.0
+    assert pp.job_list[1].deltamodel._time == 3.0
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc1)
+
+
+def test_python_highlevelapi_matrix_expansion_timesteps_config(tmp_path):
+    """
+    test calling the python hook command line feature with a config file.
+    """
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'timesteps', 3)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload'],
+                                   [[0.2, 0.6]])
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p)
+    assert pp._has_matrix == True
+    assert type(pp.job_list) is list
+    assert len(pp.job_list) == 2
+    f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
+    assert sum([j == 0.2 for j in f_bedload_list]) == 1
+    assert sum([j == 0.6 for j in f_bedload_list]) == 1
+    
+    assert pp.job_list[0]._is_completed == False
+    pp.run_jobs()
+    assert len(pp.job_list) == 2
+    assert pp.job_list[0]._is_completed == True
+    assert pp.job_list[0].deltamodel._time == 3.0
+    assert pp.job_list[1].deltamodel._time == 3.0
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc1)
+    
+
+def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
+    """
+    test calling the python hook command line feature with a config file.
+    """
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload', 'u0'],
+                                   [[0.2, 0.5, 0.6], [1.0, 1.5, 2.0]])
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    assert pp._has_matrix == True
+    assert type(pp.job_list) is list
+    assert len(pp.job_list) == 9
+    f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
+    assert sum([j == 0.2 for j in f_bedload_list]) == 3
+    assert sum([j == 0.5 for j in f_bedload_list]) == 3
+    assert sum([j == 0.6 for j in f_bedload_list]) == 3
+    comb_list = [(j.deltamodel.f_bedload, j.deltamodel.u0)
+                 for j in pp.job_list]
+    assert (0.2, 2.0) in comb_list
+    assert (0.5, 1.0) in comb_list
+    assert not (0.5, 0.2) in comb_list
+
+    assert pp.job_list[0]._is_completed == False
+    pp.run_jobs()
+    assert len(pp.job_list) == 9
+    assert pp.job_list[0]._is_completed == True
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc5 = os.path.join(
+        tmp_path / 'test', 'job_005', 'pyDeltaRCM_output.nc')
+    exp_path_nc8 = os.path.join(
+        tmp_path / 'test', 'job_008', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc5)
+    assert os.path.isfile(exp_path_nc8)
+
+
+def test_python_highlevelapi_matrix_needs_out_dir(tmp_path):
+    """
+    test calling the python hook command line feature with a config file.
+    """
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    # missing out_dir in the config will throw an error
+    # utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload'],
+                                   [[0.2, 0.5, 0.6]])
+    f.close()
+    with pytest.raises(ValueError):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
+def test_python_highlevelapi_matrix_bad_configlist(tmp_path):
+    """
+    test calling the python hook command line feature with a config file.
+    """
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    # missing out_dir in the config will throw an error
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['- f_bedload'],
+                                   [[0.2, 0.5, 0.6]])
+    f.close()
+    with pytest.raises(ValueError):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    
 
 def test_Preprocessor_toplevelimport():
     import pyDeltaRCM
