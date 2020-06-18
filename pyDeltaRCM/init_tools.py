@@ -108,14 +108,16 @@ class init_tools(object):
 
         Writes the seed to the log for record.
         """
-        if self.seed is not None:
+        if self.seed is None:
+            # generate a random seed for reproducibility
+            self.seed = np.random.randint((2**32) - 1)
 
-            _msg = 'Setting random seed to: %s ' % str(self.seed)
-            self.logger.info(_msg)
-            if self.verbose >= 2:
-                print(_msg)
+        _msg = 'Setting random seed to: %s ' % str(self.seed)
+        self.logger.info(_msg)
+        if self.verbose >= 2:
+            print(_msg)
 
-            shared_tools.set_random_seed(self.seed)
+        shared_tools.set_random_seed(self.seed)
 
         # always write the seed to file for record and reproducability
         self.logger.info('Random seed is: %s ' % str(self.seed))
