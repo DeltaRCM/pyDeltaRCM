@@ -45,7 +45,7 @@ class init_tools(object):
         fh = logging.FileHandler(
             self.prefix_abspath + '/pyDeltaRCM_' + st + '.log')
         formatter = logging.Formatter(
-            '%(asctime)s - %(levelname)s - %(message)s')
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
 
         # add handler to logger object

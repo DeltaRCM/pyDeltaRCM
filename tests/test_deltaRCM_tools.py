@@ -145,6 +145,8 @@ def test_logger_has_initialization_lines(tmp_path):
         assert 'Generating netCDF file for output grids' in _lines
         assert 'Output netCDF file created' in _lines
         assert 'Model initialization complete' in _lines
+    assert not os.path.isfile(tmp_path, 'out_dir', 'discharge_0.0.png')
+    assert not os.path.isfile(tmp_path, 'out_dir', 'eta_0.0.png')
 
 
 def test_logger_has_timestep_lines(tmp_path):

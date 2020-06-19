@@ -78,15 +78,13 @@ class BasePreprocessor(abc.ABC):
             # extract and remove 'matrix' from config
             _matrix = self.user_dict.pop('matrix')
 
+            # check validity of matrix specs
             if not isinstance(_matrix, dict):
                 raise ValueError('Invalid matrix spceification, was not type dict.')
-
-            # check validity of keys, depth == 1, yields list
-            for k in _matrix.keys():
+            for k in _matrix.keys():  # check validity of keys, depth == 1
                 if not isinstance(_matrix[k], list):
                     raise ValueError(
                         'Each key in matrix config must yield a valid list.')
-
             # check for specified output
             if not 'out_dir' in self.user_dict.keys():
                 raise ValueError(
@@ -97,12 +95,8 @@ class BasePreprocessor(abc.ABC):
             dims = len(lil)
             pts = [len(l) for l in lil]
             jobs = np.prod(pts)
-
-            # create combinations (matrix expansion)
-            _combs = list(itertools.product(*lil))
-
-            # create fixed configuration dict to produce yaml files from
-            _fixed_config = self.user_dict.copy()
+            _combs = list(itertools.product(*lil))  # combinations (matrix expansion)
+            _fixed_config = self.user_dict.copy()  # fixed config dict to expand on
 
             # create directory at root
             jobs_root = self.user_dict['out_dir']  # checked above for exist
@@ -122,7 +116,6 @@ class BasePreprocessor(abc.ABC):
                 _ith_config['out_dir'] = ith_dir
                 for j, val in enumerate(_combs[i]):
                     _ith_config[var_list[j]] = val
-
                 ith_p = self.write_yaml_config(i, _ith_config, ith_dir, ith_id)
                 self.file_list.append(ith_p)
 
