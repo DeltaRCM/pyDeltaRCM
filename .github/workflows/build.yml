@@ -1,6 +1,6 @@
 # This workflow installs and tests pyDeltaRCM on mulitple python versions and operating systems.
 
-name: test pyDeltaRCM
+name: actions
 
 on:
   push:
