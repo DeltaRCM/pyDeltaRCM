@@ -10,7 +10,7 @@ on:
     branches: [ develop ]
 
 jobs:
-  build:
+  docs:
     runs-on: ubuntu-latest
     
     steps:
