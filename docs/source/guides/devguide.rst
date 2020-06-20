@@ -2,7 +2,7 @@
 Developer Guide
 ***************
 
-.. image:: https://api.travis-ci.com/DeltaRCM/pyDeltaRCM_WMT.svg?branch=develop
-    :target: https://travis-ci.com/DeltaRCM/pyDeltaRCM_WMT
+.. image:: https://github.com/DeltaRCM/pyDeltaRCM_WMT/workflows/actions/badge.svg
+    :target: https://github.com/DeltaRCM/pyDeltaRCM_WMT/actions
 
 Guide to developers!
