@@ -28,8 +28,6 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-docs.txt
         sudo apt update -y && sudo apt install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended dvipng
-      script:
-        - 
     - name: Install pyDeltaRCM
       run: |
         python setup.py install
@@ -38,10 +36,7 @@ jobs:
         (cd docs && make docs)
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.5.5
-      on:
-        push:
-          branches:
-            - develop
+      if: ${{ github.event_name == 'push' && github.ref == 'develop' }}
       with:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
