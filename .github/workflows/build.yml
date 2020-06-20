@@ -41,3 +41,4 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         flag-name: ${{ matrix.os }}_${{ matrix.python-version }}
         parallel: true
+        path-to-lcov: .coverage
