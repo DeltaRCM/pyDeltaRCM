@@ -17,7 +17,7 @@ from utilities import test_DeltaModel
 # test yaml parsing
 
 def test_override_from_testfile(test_DeltaModel):
-    out_path = test_DeltaModel.out_dir.split('/')
+    out_path = test_DeltaModel.out_dir.split(os.path.sep)
     assert out_path[-1] == 'out_dir'
     assert test_DeltaModel.Length == 10
 
@@ -143,7 +143,7 @@ def test_entry_point_installed_call(tmp_path):
     utilities.write_parameter_to_file(f, 'save_eta_figs', True)
     f.close()
     subprocess.check_output(['pyDeltaRCM',
-                             '--config', p])
+                             '--config', str(p)])
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
     exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
@@ -170,7 +170,7 @@ def test_entry_point_python_main_call(tmp_path):
     utilities.write_parameter_to_file(f, 'save_eta_figs', True)
     f.close()
     subprocess.check_output(['python', '-m', 'pyDeltaRCM',
-                             '--config', p])
+                             '--config', str(p)])
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
     exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
@@ -192,7 +192,7 @@ def test_entry_point_python_main_call_dryrun(tmp_path):
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     f.close()
     subprocess.check_output(['python', '-m', 'pyDeltaRCM',
-                             '--config', p,
+                             '--config', str(p),
                              '--dryrun'])
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
@@ -214,7 +214,7 @@ def test_entry_point_python_main_call_timesteps(tmp_path):
     utilities.write_parameter_to_file(f, 'save_eta_figs', True)
     f.close()
     subprocess.check_output(['python', '-m', 'pyDeltaRCM',
-                             '--config', p,
+                             '--config', str(p),
                              '--timesteps', '2'])
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
@@ -229,7 +229,7 @@ def test_error_if_no_timesteps(tmp_path):
     f.close()
     with pytest.raises(subprocess.CalledProcessError):
         subprocess.check_output(['python', '-m', 'pyDeltaRCM',
-                                 '--config', p])
+                                 '--config', str(p)])
 
 
 import pyDeltaRCM as _pyimportedalias
