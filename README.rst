@@ -5,8 +5,8 @@ pyDeltaRCM_WMT
 .. image:: https://api.travis-ci.com/DeltaRCM/pyDeltaRCM_WMT.svg?branch=develop
     :target: https://travis-ci.com/DeltaRCM/pyDeltaRCM_WMT
 
-.. image:: https://coveralls.io/repos/github/DeltaRCM/pyDeltaRCM_WMT/badge.svg?branch=develop
-    :target: https://coveralls.io/github/DeltaRCM/pyDeltaRCM_WMT?branch=develop
+.. image:: https://codecov.io/gh/DeltaRCM/pyDeltaRCM_WMT/branch/develop/graph/badge.svg
+  :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM_WMT
 
 .. image:: https://app.codacy.com/project/badge/Grade/1c137d0227914741a9ba09f0b00a49a7
     :target: https://www.codacy.com/gh/DeltaRCM/pyDeltaRCM_WMT?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DeltaRCM/pyDeltaRCM_WMT&amp;utm_campaign=Badge_Grade

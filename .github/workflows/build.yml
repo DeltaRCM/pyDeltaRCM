@@ -16,6 +16,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6, 3.7, 3.8]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON: ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -32,12 +35,15 @@ jobs:
         pip install -e .
     - name: Test with pytest
       run: |
-        pytest --cov=pyDeltaRCM/
-    - name: Report code coverage
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-      run: |
-        coveralls
+        pytest --cov=pyDeltaRCM/ --cov-report=xml
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+        env_vars: OS,PYTHON
+        name: codecov-umbrella
+        fail_ci_if_error: true
 
   docs:
     runs-on: ubuntu-latest
@@ -62,11 +68,18 @@ jobs:
     - name: Build and test documentation
       run: |
         (cd docs && make docs)
+    - name: Debug
+      run: |
+        echo REF
+        echo EVENT_NAME
+        echo ${{ github.event_name == 'push' && github.ref == 'develop' }}
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.5.5
       if: ${{ github.event_name == 'push' && github.ref == 'develop' }}
       with:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
           BRANCH: gh-pages
           FOLDER: docs/build/html
           GIT_CONFIG_NAME: deltarcm-helper
