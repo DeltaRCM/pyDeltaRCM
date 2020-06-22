@@ -70,8 +70,10 @@ jobs:
         (cd docs && make docs)
     - name: Debug
       run: |
-        echo REF
-        echo EVENT_NAME
+        echo $REF
+        echo $EVENT_NAME
+        echo ${{ github.event_name }}
+        echo ${{ github.ref }}
         echo ${{ github.event_name == 'push' && github.ref == 'develop' }}
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.5.5
