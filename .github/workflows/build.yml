@@ -79,7 +79,7 @@ jobs:
         echo ${{ github.ref }}
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.5.5
-      if: ${{ github.event_name == 'push' && github.ref == 'ref/heads/develop' }}
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
       with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_NAME: ${{ github.event_name }}
