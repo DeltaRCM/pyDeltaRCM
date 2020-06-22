@@ -86,4 +86,3 @@ jobs:
           REF: ${{ github.ref }}
           BRANCH: gh-pages
           FOLDER: docs/build/html
-          GIT_CONFIG_NAME: deltarcm-helper
