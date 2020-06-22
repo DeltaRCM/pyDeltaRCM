@@ -110,7 +110,7 @@ class init_tools(object):
         """
         if self.seed is None:
             # generate a random seed for reproducibility
-            self.seed = np.random.randint((2**32) - 1)
+            self.seed = np.random.randint((2**32) - 1, dtype='u8')
 
         _msg = 'Setting random seed to: %s ' % str(self.seed)
         self.logger.info(_msg)
