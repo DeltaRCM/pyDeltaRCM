@@ -75,8 +75,6 @@ jobs:
         echo ${{ github.event_name == 'push' }}
         echo ${{ github.ref == 'refs/heads/develop' }}
         echo ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
-        echo ${{ github.event_name }}
-        echo ${{ github.ref }}
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.5.5
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
