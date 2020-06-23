@@ -25,6 +25,7 @@ class DeltaModel(Tools):
     finalized (:meth:`finalize`), such that files and data are appropriately
     closed and written to disk.
     """
+
     def __init__(self, input_file=None):
         """Creates an instance of the pyDeltaRCM model.
 
