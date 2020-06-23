@@ -6,6 +6,7 @@ import shutil
 import locale
 import numpy as np
 import subprocess
+import glob
 
 from pyDeltaRCM.model import DeltaModel
 from pyDeltaRCM import shared_tools
@@ -339,10 +340,7 @@ def test_python_highlevelapi_call_with_args(tmp_path):
     assert not os.path.isfile(exp_path_png3)
 
 
-def test_python_highlevelapi_matrix_expansion_one_list(tmp_path):
-    """
-    test calling the python hook command line feature with a config file.
-    """
+def test_python_highlevelapi_matrix_expansion_one_list_timesteps_argument(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -378,11 +376,17 @@ def test_python_highlevelapi_matrix_expansion_one_list(tmp_path):
     assert os.path.isfile(exp_path_nc0)
     assert os.path.isfile(exp_path_nc1)
 
+    _logs = glob.glob(os.path.join(pp.job_list[0].deltamodel.prefix, '*.log'))
+    assert len(_logs) == 1  # log file exists
+    with open(_logs[0], 'r') as _logfile:
+        _lines = _logfile.readlines()
+        _lines = ' '.join(_lines)  # collapse to a single string
+        assert '---- Timestep 0.0 ----' in _lines
+        assert '---- Timestep 2.0 ----' in _lines
+        assert not '---- Timestep 3.0 ----' in _lines
 
-def test_python_highlevelapi_matrix_expansion_timesteps_config(tmp_path):
-    """
-    test calling the python hook command line feature with a config file.
-    """
+
+def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -421,9 +425,6 @@ def test_python_highlevelapi_matrix_expansion_timesteps_config(tmp_path):
     
 
 def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
-    """
-    test calling the python hook command line feature with a config file.
-    """
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -468,9 +469,6 @@ def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
 
 
 def test_python_highlevelapi_matrix_needs_out_dir(tmp_path):
-    """
-    test calling the python hook command line feature with a config file.
-    """
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -487,16 +485,13 @@ def test_python_highlevelapi_matrix_needs_out_dir(tmp_path):
 
 
 def test_python_highlevelapi_matrix_bad_configlist(tmp_path):
-    """
-    test calling the python hook command line feature with a config file.
-    """
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
     utilities.write_parameter_to_file(f, 'Width', 10.0)
     utilities.write_parameter_to_file(f, 'dx', 1.0)
-    # missing out_dir in the config will throw an error
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    # bad configuration (an extra "-") will lead to error
     utilities.write_matrix_to_file(f,
                                    ['- f_bedload'],
                                    [[0.2, 0.5, 0.6]])
