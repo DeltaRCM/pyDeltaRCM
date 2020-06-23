@@ -65,7 +65,6 @@ class DeltaModel(Tools):
         self.init_stratigraphy()
         self.init_output_grids()
 
-        # self.logger = logging.getLogger(__name__)
         self.logger.info('Model initialization complete')
 
     def update(self):
@@ -126,7 +125,6 @@ class DeltaModel(Tools):
             pass
 
         self._is_finalized = True
-        logging.shutdown()
 
     @property
     def time_step(self):
