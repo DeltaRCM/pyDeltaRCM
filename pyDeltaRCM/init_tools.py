@@ -37,15 +37,15 @@ class init_tools(object):
         The level of information printed to the log depends on the verbosity
         setting. 
         """
-        self.logger = logging.getLogger('driver')
+        timestamp = time_lib.strftime('%Y%m%d-%H%M%S')
+        self.logger = logging.getLogger(self.prefix_abspath+timestamp)
         self.logger.setLevel(logging.INFO)
 
         # create the logging file handler
-        st = timestr = time_lib.strftime('%Y%m%d-%H%M%S')
         fh = logging.FileHandler(
-            self.prefix_abspath + '/pyDeltaRCM_' + st + '.log')
+            self.prefix_abspath + '/pyDeltaRCM_' + timestamp + '.log')
         formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            '%(asctime)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
 
         # add handler to logger object
