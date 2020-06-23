@@ -30,6 +30,7 @@ class BasePreprocessor(abc.ABC):
         out the Python API.
 
     """
+
     def extract_yaml_config(self):
         """Preliminary YAML parsing. 
 
@@ -54,9 +55,19 @@ class BasePreprocessor(abc.ABC):
         else:
             self._has_matrix = False
 
-    def write_yaml_config(self, i, ith_config, ith_dir, ith_id):
+        if 'verbose' in self.user_dict.keys():
+            self.verbose = self.user_dict['verbose']
+        else:
+            self.verbose = 0
 
+    def write_yaml_config(self, i, ith_config, ith_dir, ith_id):
+        """Write full config to file in output folder.
+
+        Write the entire yaml configuation for the configured job out to a
+        file in the job output foler.
+        """
         def _write_parameter_to_file(f, varname, varvalue):
+            """Write each line, formatted."""
             f.write(varname + ': ' + str(varvalue) + '\n')
 
         d = Path(ith_dir)
@@ -80,11 +91,13 @@ class BasePreprocessor(abc.ABC):
 
             # check validity of matrix specs
             if not isinstance(_matrix, dict):
-                raise ValueError('Invalid matrix spceification, was not type dict.')
+                raise ValueError(
+                    'Invalid matrix spceification, was not type dict.')
             for k in _matrix.keys():  # check validity of keys, depth == 1
                 if not isinstance(_matrix[k], list):
                     raise ValueError(
-                        'Each key in matrix config must yield a valid list.')
+                        'Each dimension (variable) in "matrix" configuration'
+                        ' must yield a valid list.')
             # check for specified output
             if not 'out_dir' in self.user_dict.keys():
                 raise ValueError(
@@ -95,8 +108,13 @@ class BasePreprocessor(abc.ABC):
             dims = len(lil)
             pts = [len(l) for l in lil]
             jobs = np.prod(pts)
-            _combs = list(itertools.product(*lil))  # combinations (matrix expansion)
+            # combinations (matrix expansion)
+            _combs = list(itertools.product(*lil))
             _fixed_config = self.user_dict.copy()  # fixed config dict to expand on
+
+            if self.verbose > 0:
+                print('Matrix expansion:', '  dims {_dims}', '  jobs {_jobs}'.format(
+                    _dims=dims, _jobs=jobs))
 
             # create directory at root
             jobs_root = self.user_dict['out_dir']  # checked above for exist
@@ -153,8 +171,8 @@ class BasePreprocessor(abc.ABC):
             # loop the expanded jobs
             for i in range(len(self.file_list)):
                 self.job_list.append(self._Job(self.file_list[i],
-                                           yaml_timesteps=self.yaml_timesteps,
-                                           arg_timesteps=self.arg_timesteps))
+                                               yaml_timesteps=self.yaml_timesteps,
+                                               arg_timesteps=self.arg_timesteps))
         else:
             # there's only one job so append directly.
             self.job_list.append(self._Job(self.input_file,
@@ -173,7 +191,11 @@ class BasePreprocessor(abc.ABC):
             pass
 
         # run the job(s)
-        for job in self.job_list:
+        for i, job in enumerate(self.job_list):
+
+            if self.verbose > 0:
+                print("Starting job %s" % str(i))
+
             job.run_job()
             job.finalize_model()
 
@@ -243,6 +265,7 @@ class PreprocessorCLI(BasePreprocessor):
         CLI (entry point) calls directly.
 
     """
+
     def __init__(self):
         """Initialize the CLI preprocessor.
 
@@ -326,6 +349,7 @@ class Preprocessor(BasePreprocessor):
         >>> pp.run_jobs()
 
     """
+
     def __init__(self, input_file=None, timesteps=None):
         """Initialize the python preprocessor.
 
