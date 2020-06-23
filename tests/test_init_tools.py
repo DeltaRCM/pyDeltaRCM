@@ -10,6 +10,35 @@ from pyDeltaRCM.model import DeltaModel
 from pyDeltaRCM import init_tools
 
 from utilities import test_DeltaModel
+import utilities
+
+
+def test_inlet_size_specified(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 4000.)
+    utilities.write_parameter_to_file(f, 'Width', 8000.)
+    utilities.write_parameter_to_file(f, 'dx', 20)
+    utilities.write_parameter_to_file(f, 'N0_meters', 150)
+    utilities.write_parameter_to_file(f, 'L0_meters', 200)
+    f.close()
+    delta = DeltaModel(input_file=p)
+    assert delta.N0 == 8
+    assert delta.L0 == 10
+
+
+def test_inlet_size_set_to_one_fourth_domain(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 4000.)
+    utilities.write_parameter_to_file(f, 'Width', 8000.)
+    utilities.write_parameter_to_file(f, 'dx', 20)
+    utilities.write_parameter_to_file(f, 'N0_meters', 5500)
+    utilities.write_parameter_to_file(f, 'L0_meters', 3300)
+    f.close()
+    delta = DeltaModel(input_file=p)
+    assert delta.N0 == 50
+    assert delta.L0 == 100
 
 
 # tests for attrs set during yaml parsing

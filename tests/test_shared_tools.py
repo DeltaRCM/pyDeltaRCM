@@ -229,71 +229,7 @@ def test_version_is_valid():
 
 
 @pytest.mark.xfail(raises=IndexError, strict=True)
-def test_limit_inds_error(tmp_path):
-    """IndexError on corner.
-
-    This test throws an error by trying to index cell 1800 of a 30x60 array.
-    This exceeds the limit of the array. I suspect this is a bug with the
-    unravel in shared_tools.
-
-    The xfail should be removed when the bug is fixed.
-    """
-
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'seed', 42)
-    utilities.write_parameter_to_file(f, 'Length', 30.)
-    utilities.write_parameter_to_file(f, 'Width', 60.)
-    utilities.write_parameter_to_file(f, 'dx', 1)
-    utilities.write_parameter_to_file(f, 'verbose', 1)
-    utilities.write_parameter_to_file(f, 'Np_water', 20)
-    utilities.write_parameter_to_file(f, 'Np_sed', 20)
-    utilities.write_parameter_to_file(f, 'f_bedload', 0.65)
-    f.close()
-    delta = DeltaModel(input_file=p)
-
-    for _ in range(0, 2):
-        delta.update()
-
-    # slice is: test_DeltaModel.eta[:5, 4]
-    print(delta.eta[:5, 2])
-
-    _exp = np.array([1.7, 0.83358884, -0.9256229,  -1., -1.])
-    assert np.all(delta.eta[:5, 2] == pytest.approx(_exp))    
-
-
-"""
-This test cannot be enabled because it causes a segfault. For some reason,
-this configuration results in an index error (like the below test) if you run
-the config as a normal model run, but produces a segfault inside the test.
-
-@pytest.mark.xfail(raises=IndexError, strict=True)
-def test_limits_inds_error_segfault_error(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'seed', 43)
-    utilities.write_parameter_to_file(f, 'Length', 30.)
-    utilities.write_parameter_to_file(f, 'Width', 60.)
-    utilities.write_parameter_to_file(f, 'dx', 1)
-    utilities.write_parameter_to_file(f, 'verbose', 1)
-    utilities.write_parameter_to_file(f, 'Np_water', 20)
-    utilities.write_parameter_to_file(f, 'Np_sed', 20)
-    utilities.write_parameter_to_file(f, 'f_bedload', 0.65)
-    f.close()
-    delta = DeltaModel(input_file=p)
-
-    for _ in range(0, 2):
-        delta.update()
-
-    # slice is: test_DeltaModel.eta[:5, 4]
-    print(delta.eta[:5, 2])
-
-    _exp = np.array([1.7, 0.83358884, -0.9256229,  -1., -1.])
-    assert np.all(delta.eta[:5, 2] == pytest.approx(_exp))    
-
-
-@pytest.mark.xfail(raises=IndexError, strict=True)
-def test_limit_inds_error(tmp_path):
+def test_limit_inds_error_fixed_bug_example_3(tmp_path):
     # IndexError on corner.
 
     # This test throws an error by trying to index cell 1800 of a 30x60 array.
@@ -322,6 +258,4 @@ def test_limit_inds_error(tmp_path):
     print(delta.eta[:5, 2])
 
     _exp = np.array([1.7, 0.83358884, -0.9256229,  -1., -1.])
-    assert np.all(delta.eta[:5, 2] == pytest.approx(_exp))    
-
-"""
+    assert np.all(delta.eta[:5, 2] == pytest.approx(_exp))
