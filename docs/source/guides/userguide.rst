@@ -114,4 +114,56 @@ Advanced model configurations
 Configuring multiple model runs from a single YAML file
 ==============================================================
 
+Multiple model runs (referred to as "jobs") can be configured by a single `.yml` configuration file, by using the `matrix` and `ensemble` configuration keys.
+
+Matrix expansion
+----------------
+
+To use matrix expansion to configure multiple model runs, the dimensions of the matrix (i.e., the variables you want to run) should be listed below the `matrix` key. For example, the following configuration is a one-dimensional matrix with the variable `f_bedload`:
+
+.. code::yaml
+
+    out_dir: 'out_dir'
+    dx: 2.0
+    h0: 1.0
+
+    matrix:
+      f_bedload: 
+        - 0.5
+        - 0.2
+
+This configuation would produce two model runs, one with bedload fraction (`f_bedload`) 0.5 and another with bedload fraction 0.2, and both with grid spacing (`dx`) 2.0 and basin depth (`h0`) 1.0.
+The matrix expansions will create two folders at `./out_dir/job_000` and `./out_dir/job_001` that each correspond to a created job.
+Each folder will contain a copy of the configuration file used for that job; for example, the full configuration for `job_000` is:
+
+.. code::yaml
+
+    out_dir: 'out_dir'
+    dx: 2.0
+    h0: 1.0
+    f_bedload: 0.5
+
+Additionally, a log file for each job is located in the output folder, and any output grid files or images specified by the input configuration will be located in the respective job output folder.
+
+.. note:: You must specify the `out_dir` key in the input YAML configuation to use matrix expansion.
+
+Multiple dimensional matrix expansion is additionally supported. For example, the following configuation produces six jobs:
+
+.. code::yaml
+    
+    out_dir: 'out_dir'
+
+    matrix:
+      f_bedload: 
+        - 0.5
+        - 0.4
+        - 0.2
+      h0:
+        - 1
+        - 5
+
+
+Ensemble expansion
+------------------
+
 todo
