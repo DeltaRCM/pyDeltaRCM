@@ -201,6 +201,8 @@ class init_tools(object):
         # (m) critial depth to switch to "dry" node
         self.dry_depth = min(0.1, 0.1 * self.h0)
         self.CTR = floor(self.W / 2.) - 1
+        if self.CTR <= 1:
+            self.CTR = floor(self.W / 2.)
 
         self.gamma = self.g * self.S0 * self.dx / (self.u0**2)
 
