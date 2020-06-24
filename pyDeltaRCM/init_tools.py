@@ -185,11 +185,12 @@ class init_tools(object):
         self.U_ero_sand = self.coeff_U_ero_sand * self.u0
         self.U_ero_mud = self.coeff_U_ero_mud * self.u0
 
-        self.L0 = max(1, int(round(self.L0_meters / self.dx)))
-        self.N0 = max(3, int(round(self.N0_meters / self.dx)))
-
         self.L = int(round(self.Length / self.dx))        # num cells in x
         self.W = int(round(self.Width / self.dx))         # num cells in y
+
+        # inlet length and width
+        self.L0 = max(1, min(int(round(self.L0_meters / self.dx)), self.W // 4))
+        self.N0 = max(3, min(int(round(self.N0_meters / self.dx)), self.L // 4))
 
         self.set_constants()
 
@@ -200,16 +201,17 @@ class init_tools(object):
         # (m) critial depth to switch to "dry" node
         self.dry_depth = min(0.1, 0.1 * self.h0)
         self.CTR = floor(self.W / 2.) - 1
+        if self.CTR <= 1:
+            self.CTR = floor(self.W / 2.)
 
         self.gamma = self.g * self.S0 * self.dx / (self.u0**2)
 
         self.V0 = self.h0 * (self.dx**2)    # (m^3) reference volume (volume to
 
         # fill cell to characteristic depth)
-
         self.Qw0 = self.u0 * self.h0 * self.N0 * self.dx    # const discharge
-        # at inlet
 
+        # at inlet
         self.qw0 = self.u0 * self.h0                # water unit input discharge
         self.Qp_water = self.Qw0 / self.Np_water    # volume each water parcel
 

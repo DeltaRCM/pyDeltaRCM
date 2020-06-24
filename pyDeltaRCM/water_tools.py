@@ -73,14 +73,8 @@ class water_tools(object):
             self.update_Q(dist, current_inds, next_index, astep, jstep, istep)
 
             current_inds, self.looped, self.free_surf_flag = shared_tools.check_for_loops(
-                self.indices,
-                next_index,
-                _iter,
-                self.L0,
-                self.looped,
-                self.eta.shape,
-                self.CTR,
-                self.free_surf_flag)
+                self.indices, next_index, _iter, self.L0, self.looped, self.eta.shape,
+                self.CTR, self.free_surf_flag)
 
             current_inds = self.check_for_boundary(current_inds)
 
