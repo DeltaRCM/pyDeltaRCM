@@ -1,12 +1,8 @@
 # This workflow installs and tests pyDeltaRCM on mulitple python versions and operating systems.
 
-name: actions
+name: build
 
-on:
-  push:
-    branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
+on: [push, pull_request]
 
 jobs:
   build:
