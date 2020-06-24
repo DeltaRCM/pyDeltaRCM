@@ -1,12 +1,8 @@
 # This workflow installs and tests pyDeltaRCM on mulitple python versions and operating systems.
 
-name: actions
+name: build
 
-on:
-  push:
-    branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -68,6 +64,11 @@ jobs:
     - name: Build and test documentation
       run: |
         (cd docs && make docs)
+    - name: Upload log file
+      uses: actions/upload-artifact@v2
+      with:
+        name: log-file
+        path: docs/deltaRCM_Output/*.log
     - name: Debug
       run: |
         echo $REF
