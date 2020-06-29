@@ -194,10 +194,12 @@ def get_weight_at_cell(ind, stage_nbrs, depth_nbrs, ct_nbrs, stage, qx, qy,
         weight = weight / np.nansum(weight)
         weight[nanWeight] = 0
     elif np.any(~nanWeight):
+        # if there are any value that are non-nan
         weight[~nanWeight] = 1 / len(weight[~nanWeight])
         weight[nanWeight] = 0
     else:
-        weight[~nanWeight] = 1 / len(weight)
+        # if the whole array is nan
+        weight[~nanWeight] = 1 / (len(weight)-1)
         weight[4] = 0
 
     return weight
