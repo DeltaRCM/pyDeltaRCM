@@ -187,14 +187,19 @@ def get_weight_at_cell(ind, stage_nbrs, depth_nbrs, ct_nbrs, stage, qx, qy,
     weight = depth_nbrs ** theta * weight
     weight[depth_nbrs <= dry_depth] = 0
 
-    nanWeight = np.isnan(weight)
+    nanWeight = np.isnan(weight)  # which weights are nan
 
     if np.any(weight[~nanWeight] != 0):
+        # if any non-nan value is non-zero
         weight = weight / np.nansum(weight)
         weight[nanWeight] = 0
-    else:
+    elif np.any(~nanWeight):
         weight[~nanWeight] = 1 / len(weight[~nanWeight])
         weight[nanWeight] = 0
+    else:
+        weight[~nanWeight] = 1 / len(weight)
+        weight[4] = 0
+
     return weight
 
 
