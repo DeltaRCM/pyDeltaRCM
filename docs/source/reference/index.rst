@@ -18,6 +18,7 @@ methods.
    sed_tools/index
    shared_tools/index
    preprocessor/index
+   debug_tools/index
 
 
 References

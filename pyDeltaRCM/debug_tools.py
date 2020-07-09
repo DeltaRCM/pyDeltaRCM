@@ -29,9 +29,9 @@ class debug_tools(object):
     .. doctest::
 
         >>> self.show_attribute('cell_type')
-        >>> delta.show_ind([144, 22, 33, 34, 35])
-        >>> delta.show_ind((12, 14), 'bs')
-        >>> delta.show_ind([(11, 4), (11, 5)], 'g^')
+        >>> self.show_ind([144, 22, 33, 34, 35])
+        >>> self.show_ind((12, 14), 'bs')
+        >>> self.show_ind([(11, 4), (11, 5)], 'g^')
         >>> plt.show()
 
     .. plot:: debug_tools/debug_demo.py
@@ -81,13 +81,15 @@ class debug_tools(object):
             Whether to plot a grid over the domain to demarcate individual
             cells. Default is `True` (show the grid).
 
-        block : :obj:`bool, optional
+        block : :obj:`bool`, optional
             Whether to show the plot automatically. Default is `False` (do not
             show automatically).
 
         """
 
-        assert type(attribute) is str
+        if not isinstance(attribute, str):
+            raise TypeError('Expected string for `attribute`, but was %s'
+                            % type(attribute))
         self._plot_domain(attribute, **kwargs)
 
     def _plot_ind(self, _ind, *args, **kwargs):
@@ -103,8 +105,10 @@ class debug_tools(object):
 
         if len(args) == 0:
             args = 'r.',
-        if type(_ind) is tuple:
-            assert len(_ind) == 2
+        if isinstance(_ind, tuple):
+            if not len(_ind) == 2:
+                raise ValueError('Expected tuple length to be 2, but was %s'
+                                 % str(len(_ind)))
         else:
             _ind = shared_tools.custom_unravel(_ind, self.depth.shape)
         plt.plot(_ind[1], _ind[0], *args, **kwargs)
@@ -130,7 +134,7 @@ class debug_tools(object):
             Which axes to render point into. Uses ``gca()`` if no axis is
             provided.
 
-        block : :obj:`bool, optional
+        block : :obj:`bool`, optional
             Whether to show the plot automatically. Default is `False` (do not
             show automatically).
 
@@ -143,9 +147,8 @@ class debug_tools(object):
             Any `kwargs` supported by `matplotlib.pyplot.plt`.
 
         """
-        print(*args)
-        if type(ind) is list:
-            for i, iind in enumerate(ind):
+        if isinstance(ind, list):
+            for _, iind in enumerate(ind):
                 self._plot_ind(iind, *args, **kwargs)
         else:
             self._plot_ind(ind, *args, **kwargs)
