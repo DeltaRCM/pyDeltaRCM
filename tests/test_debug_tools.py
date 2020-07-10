@@ -21,6 +21,36 @@ def test_plot_domain_cell_type(test_DeltaModel):
 
 
 @pytest.mark.mpl_image_compare()
+def test_plot_iwalk(test_DeltaModel):
+    test_DeltaModel.show_attribute('iwalk')
+    return plt.gcf()
+
+
+def test_plot_attribute_bad_shape_1d(test_DeltaModel):
+    with pytest.raises(ValueError):
+        test_DeltaModel.show_attribute('free_surf_flag')
+
+
+def test_plot_attribute_bad_shape_3d(test_DeltaModel):
+    # not sure if there are any 3d arrays actually, so just make a fake one
+    test_DeltaModel.threedeearray = np.zeros((10, 10, 2))
+    with pytest.raises(ValueError):
+        test_DeltaModel.show_attribute('threedeearray')
+
+
+def test_plot_attribute_missing_unknown(test_DeltaModel):
+    with pytest.raises(AttributeError):
+        test_DeltaModel.show_attribute('FAKE_NAME_ATTRIBUTE')
+
+
+def test_plot_attribute_numeric_bad_type(test_DeltaModel):
+    with pytest.raises(TypeError):
+        test_DeltaModel.show_attribute('dx')
+    with pytest.raises(TypeError):
+        test_DeltaModel.show_attribute('strata_sand_frac')
+
+
+@pytest.mark.mpl_image_compare()
 def test_plot_domain_cell_type_no_grid(test_DeltaModel):
     test_DeltaModel.show_attribute('cell_type', grid=False)
     return plt.gcf()

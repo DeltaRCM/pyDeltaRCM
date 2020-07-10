@@ -46,6 +46,15 @@ class debug_tools(object):
             ax = plt.gca()
 
         _attr = getattr(self, attribute)
+        if not isinstance(_attr, np.ndarray):
+            raise TypeError('Attribute must be a numpy.ndarray, but was:'
+                            '%s' % str(type(_attr)))
+        _attr_shape = _attr.shape
+        if len(_attr_shape) != 2:
+            raise ValueError('Attribute "{at}" has shape {shp}, '
+                             'but must be two-dimensional.'.format(at=attribute,
+                                                                   shp=_attr_shape))
+
 
         ax.imshow(_attr,
                   cmap=plt.get_cmap('viridis'),
@@ -53,7 +62,7 @@ class debug_tools(object):
         ax.autoscale(False)
 
         if grid:
-            shp = _attr.shape
+            shp = _attr_shape
             ax.yaxis.set_major_locator(MaxNLocator(integer=True))
             ax.xaxis.set_major_locator(MaxNLocator(integer=True))
             ax.set_xticks(np.arange(-.5, shp[1], 1), minor=True)
