@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
+import mpl_toolkits.axes_grid1 as axtk
 
 from . import shared_tools
 
@@ -55,10 +56,12 @@ class debug_tools(object):
                              'but must be two-dimensional.'.format(at=attribute,
                                                                    shp=_attr_shape))
 
-
-        ax.imshow(_attr,
-                  cmap=plt.get_cmap('viridis'),
-                  interpolation='none')
+        cobj = ax.imshow(_attr,
+                         cmap=plt.get_cmap('viridis'),
+                         interpolation='none')
+        divider = axtk.axes_divider.make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="2%", pad=0.05)
+        cb = plt.colorbar(cobj, cax=cax)
         ax.autoscale(False)
 
         if grid:
