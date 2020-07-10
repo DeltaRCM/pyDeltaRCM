@@ -45,13 +45,15 @@ class debug_tools(object):
         if not ax:
             ax = plt.gca()
 
-        ax.imshow(getattr(self, attribute),
+        _attr = getattr(self, attribute)
+
+        ax.imshow(_attr,
                   cmap=plt.get_cmap('viridis'),
                   interpolation='none')
         ax.autoscale(False)
 
         if grid:
-            shp = self.depth.shape
+            shp = _attr.shape
             ax.yaxis.set_major_locator(MaxNLocator(integer=True))
             ax.xaxis.set_major_locator(MaxNLocator(integer=True))
             ax.set_xticks(np.arange(-.5, shp[1], 1), minor=True)
