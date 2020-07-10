@@ -15,6 +15,7 @@ from .debug_tools import debug_tools
 
 
 class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
+    """Aggregate all `*_tools` modules into single class, define api methods."""
 
     def run_one_timestep(self):
         """Run the timestep once.
