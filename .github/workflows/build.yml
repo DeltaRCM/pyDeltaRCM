@@ -31,7 +31,7 @@ jobs:
         pip install -e .
     - name: Test with pytest
       run: |
-        pytest --cov=pyDeltaRCM/ --cov-report=xml --mpl --mpl-baseline-path=imgs_baseline
+        pytest --cov=pyDeltaRCM/ --cov-report=xml --mpl --mpl-baseline-path=tests/imgs_baseline
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:

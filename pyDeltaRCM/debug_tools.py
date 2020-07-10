@@ -61,8 +61,9 @@ class debug_tools(object):
                          interpolation='none')
         divider = axtk.axes_divider.make_axes_locatable(ax)
         cax = divider.append_axes("right", size="2%", pad=0.05)
-        cb = plt.colorbar(cobj, cax=cax)
+        plt.colorbar(cobj, cax=cax)
         ax.autoscale(False)
+        plt.sca(ax)
 
         if grid:
             shp = _attr_shape
