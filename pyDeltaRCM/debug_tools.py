@@ -17,7 +17,7 @@ class debug_tools(object):
 
     Add ``breakpoint()`` to any line in the code to enter the debugger and use
     these tools interactively at that breakpoint. Note, for Python < 3.7 use
-    pdb.set_trace().
+    ``pdb.set_trace()``.
 
     .. testsetup::
         >>> self = pyDeltaRCM.DeltaModel()
