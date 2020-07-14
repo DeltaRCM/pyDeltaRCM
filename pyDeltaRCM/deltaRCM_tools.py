@@ -11,9 +11,11 @@ from scipy.sparse import lil_matrix, csc_matrix, hstack
 from .sed_tools import sed_tools
 from .water_tools import water_tools
 from .init_tools import init_tools
+from .debug_tools import debug_tools
 
 
-class Tools(sed_tools, water_tools, init_tools, object):
+class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
+    """Aggregate all `*_tools` modules into single class, define api methods."""
 
     def run_one_timestep(self):
         """Run the timestep once.
