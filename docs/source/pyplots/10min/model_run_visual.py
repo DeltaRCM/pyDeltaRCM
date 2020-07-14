@@ -1,7 +1,3 @@
-import sys
-import os
-# sys.path.append(os.path.realpath(os.getcwd() + "/../../../../"))
-
 import matplotlib.pyplot as plt
 
 import pyDeltaRCM
