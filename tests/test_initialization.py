@@ -278,7 +278,7 @@ def test_python_highlevelapi_call_with_timesteps_yaml_init_types(tmp_path):
     assert len(pp.job_list) == 1
     assert type(pp.job_list[0]) is preprocessor.Preprocessor._Job
     assert type(pp.job_list[0].deltamodel) is DeltaModel
-    assert pp.job_list[0]._is_completed == False
+    assert pp.job_list[0]._is_completed is False
 
 
 def test_python_highlevelapi_call_with_timesteps_yaml_runjobs(tmp_path):
@@ -294,9 +294,9 @@ def test_python_highlevelapi_call_with_timesteps_yaml_runjobs(tmp_path):
     f.close()
     pp = preprocessor.Preprocessor(p)
     assert len(pp.job_list) == 1
-    assert pp.job_list[0]._is_completed == False
+    assert pp.job_list[0]._is_completed is False
     pp.run_jobs()
-    assert pp.job_list[0]._is_completed == True
+    assert pp.job_list[0]._is_completed is True
 
 
 def test_python_highlevelapi_call_with_args(tmp_path):
@@ -326,10 +326,10 @@ def test_python_highlevelapi_call_with_args(tmp_path):
     assert pp.job_list[0].deltamodel.Width == 10.0
     assert pp.job_list[0].deltamodel.dx == 1.0
     assert pp.job_list[0].deltamodel.seed == 0
-    assert pp.job_list[0]._is_completed == False
+    assert pp.job_list[0]._is_completed is False
     pp.run_jobs()
     assert len(pp.job_list) == 1
-    assert pp.job_list[0]._is_completed == True
+    assert pp.job_list[0]._is_completed is True
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
     exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
@@ -356,17 +356,17 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_argument(tmp_pa
                                    [[0.2, 0.6]])
     f.close()
     pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    assert pp._has_matrix == True
+    assert pp._has_matrix is True
     assert type(pp.job_list) is list
     assert len(pp.job_list) == 2
     f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
     assert sum([j == 0.2 for j in f_bedload_list]) == 1
     assert sum([j == 0.6 for j in f_bedload_list]) == 1
-    
-    assert pp.job_list[0]._is_completed == False
+
+    assert pp.job_list[0]._is_completed is False
     pp.run_jobs()
     assert len(pp.job_list) == 2
-    assert pp.job_list[0]._is_completed == True
+    assert pp.job_list[0]._is_completed is True
     assert pp.job_list[0].deltamodel._time == 3.0
     assert pp.job_list[1].deltamodel._time == 3.0
     exp_path_nc0 = os.path.join(
@@ -383,7 +383,7 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_argument(tmp_pa
         _lines = ' '.join(_lines)  # collapse to a single string
         assert '---- Timestep 0.0 ----' in _lines
         assert '---- Timestep 2.0 ----' in _lines
-        assert not '---- Timestep 3.0 ----' in _lines
+        assert '---- Timestep 3.0 ----' not in _lines
 
 
 def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path):
@@ -403,17 +403,17 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path
                                    [[0.2, 0.6]])
     f.close()
     pp = preprocessor.Preprocessor(input_file=p)
-    assert pp._has_matrix == True
+    assert pp._has_matrix is True
     assert type(pp.job_list) is list
     assert len(pp.job_list) == 2
     f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
     assert sum([j == 0.2 for j in f_bedload_list]) == 1
     assert sum([j == 0.6 for j in f_bedload_list]) == 1
-    
-    assert pp.job_list[0]._is_completed == False
+
+    assert pp.job_list[0]._is_completed is False
     pp.run_jobs()
     assert len(pp.job_list) == 2
-    assert pp.job_list[0]._is_completed == True
+    assert pp.job_list[0]._is_completed is True
     assert pp.job_list[0].deltamodel._time == 3.0
     assert pp.job_list[1].deltamodel._time == 3.0
     exp_path_nc0 = os.path.join(
@@ -422,7 +422,7 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path
         tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
     assert os.path.isfile(exp_path_nc0)
     assert os.path.isfile(exp_path_nc1)
-    
+
 
 def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
     file_name = 'user_parameters.yaml'
@@ -440,7 +440,7 @@ def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
                                    [[0.2, 0.5, 0.6], [1.0, 1.5, 2.0]])
     f.close()
     pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    assert pp._has_matrix == True
+    assert pp._has_matrix is True
     assert type(pp.job_list) is list
     assert len(pp.job_list) == 9
     f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
@@ -453,10 +453,10 @@ def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
     assert (0.5, 1.0) in comb_list
     assert not (0.5, 0.2) in comb_list
 
-    assert pp.job_list[0]._is_completed == False
+    assert pp.job_list[0]._is_completed is False
     pp.run_jobs()
     assert len(pp.job_list) == 9
-    assert pp.job_list[0]._is_completed == True
+    assert pp.job_list[0]._is_completed is True
     exp_path_nc0 = os.path.join(
         tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
     exp_path_nc5 = os.path.join(
@@ -498,7 +498,37 @@ def test_python_highlevelapi_matrix_bad_configlist(tmp_path):
     f.close()
     with pytest.raises(ValueError):
         pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    
+
+
+def test_python_highlevelapi_matrix_verbosity(tmp_path, capsys):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'verbose', 1)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload', 'u0'],
+                                   [[0.2, 0.5, 0.6], [1.5, 2.0]])
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    captd = capsys.readouterr()
+    assert 'Timestep: 0.0' not in captd.out
+    assert 'Writing YAML file for job 0' in captd.out
+    assert 'Writing YAML file for job 1' in captd.out
+    assert 'Writing YAML file for job 2' in captd.out
+    assert 'Writing YAML file for job 3' in captd.out
+    assert 'Writing YAML file for job 4' in captd.out
+    assert 'Writing YAML file for job 5' in captd.out
+    assert 'Matrix expansion:' in captd.out
+    assert '  dims 2' in captd.out
+    assert '  jobs 6' in captd.out
+
 
 def test_Preprocessor_toplevelimport():
     import pyDeltaRCM
