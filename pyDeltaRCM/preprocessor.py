@@ -69,8 +69,11 @@ class BasePreprocessor(abc.ABC):
         if self.verbose > 0:
             print('Writing YAML file for job ' + str(int(i)))
 
-        p = shared_tools.write_yaml_config_to_file(ith_config, ith_dir, ith_id)
-        return p
+        d = Path(ith_dir)
+        d.mkdir()
+        ith_p = d / (str(ith_id) + '.yml')
+        shared_tools.write_yaml_config_to_file(ith_config, ith_p)
+        return ith_p
 
     def expand_yaml_matrix(self):
         """Expand YAML matrix, if given.
@@ -107,8 +110,8 @@ class BasePreprocessor(abc.ABC):
 
             if self.verbose > 0:
                 print(('Matrix expansion:\n' +
-                      '  dims {_dims}\n' +
-                      '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
+                       '  dims {_dims}\n' +
+                       '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
 
             # create directory at root
             jobs_root = self.user_dict['out_dir']  # checked above for exist
