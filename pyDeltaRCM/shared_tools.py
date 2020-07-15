@@ -208,7 +208,7 @@ def _get_version():
     return _version.__version__()
 
 
-def write_yaml_config_to_file(_config, _dir, _id):
+def write_yaml_config_to_file(_config, _path):
     """Write a config to file in output folder.
 
     Write the entire yaml configuation for the configured job out to a
@@ -218,11 +218,7 @@ def write_yaml_config_to_file(_config, _dir, _id):
         """Write each line, formatted."""
         f.write(varname + ': ' + str(varvalue) + '\n')
 
-    d = Path(_dir)
-    d.mkdir()
-    p = d / (str(_id) + '.yml')
-    f = open(p, "a")
+    f = open(_path, "a")
     for k in _config.keys():
         _write_parameter_to_file(f, k, _config[k])
     f.close()
-    return p
