@@ -60,12 +60,15 @@ class BasePreprocessor(abc.ABC):
         else:
             self.verbose = 0
 
-    def write_yaml_config(self, ith_config, ith_dir, ith_id):
+    def write_yaml_config(self, i, ith_config, ith_dir, ith_id):
         """Write full config to file in output folder.
 
         Write the entire yaml configuation for the configured job out to a
         file in the job output foler.
         """
+        if self.verbose > 0:
+            print('Writing YAML file for job ' + str(int(i)))
+
         p = shared_tools.write_yaml_config_to_file(ith_config, ith_dir, ith_id)
         return p
 
@@ -89,9 +92,9 @@ class BasePreprocessor(abc.ABC):
                         'Each dimension (variable) in "matrix" configuration'
                         ' must yield a valid list.')
             # check for specified output
-            if not 'out_dir' in self.user_dict.keys():
+            if 'out_dir' not in self.user_dict.keys():
                 raise ValueError(
-                    'You must specify "out_dir" in yaml to use matrix expansion.')
+                    'You must specify "out_dir" in YAML to use matrix expansion.')
 
             var_list = [k for k in _matrix.keys()]
             lil = [_matrix[v] for k, v in enumerate(var_list)]
@@ -103,8 +106,9 @@ class BasePreprocessor(abc.ABC):
             _fixed_config = self.user_dict.copy()  # fixed config dict to expand on
 
             if self.verbose > 0:
-                print('Matrix expansion:', '  dims {_dims}', '  jobs {_jobs}'.format(
-                    _dims=dims, _jobs=jobs))
+                print(('Matrix expansion:\n' +
+                      '  dims {_dims}\n' +
+                      '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
 
             # create directory at root
             jobs_root = self.user_dict['out_dir']  # checked above for exist
@@ -124,7 +128,7 @@ class BasePreprocessor(abc.ABC):
                 _ith_config['out_dir'] = ith_dir
                 for j, val in enumerate(_combs[i]):
                     _ith_config[var_list[j]] = val
-                ith_p = self.write_yaml_config(_ith_config, ith_dir, ith_id)
+                ith_p = self.write_yaml_config(i, _ith_config, ith_dir, ith_id)
                 self.file_list.append(ith_p)
 
     def extract_timesteps(self):
