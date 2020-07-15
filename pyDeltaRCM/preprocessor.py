@@ -8,11 +8,11 @@ from pathlib import Path
 import yaml
 import numpy as np
 
-from .shared_tools import _get_version
+from . import shared_tools
 from .model import DeltaModel
 
 
-_ver = ' '.join(('pyDeltaRCM', _get_version()))
+_ver = ' '.join(('pyDeltaRCM', shared_tools._get_version()))
 
 
 class BasePreprocessor(abc.ABC):
@@ -60,23 +60,13 @@ class BasePreprocessor(abc.ABC):
         else:
             self.verbose = 0
 
-    def write_yaml_config(self, i, ith_config, ith_dir, ith_id):
+    def write_yaml_config(self, ith_config, ith_dir, ith_id):
         """Write full config to file in output folder.
 
         Write the entire yaml configuation for the configured job out to a
         file in the job output foler.
         """
-        def _write_parameter_to_file(f, varname, varvalue):
-            """Write each line, formatted."""
-            f.write(varname + ': ' + str(varvalue) + '\n')
-
-        d = Path(ith_dir)
-        d.mkdir()
-        p = d / (str(ith_id) + '.yml')
-        f = open(p, "a")
-        for k in ith_config.keys():
-            _write_parameter_to_file(f, k, ith_config[k])
-        f.close()
+        p = shared_tools.write_yaml_config_to_file(ith_config, ith_dir, ith_id)
         return p
 
     def expand_yaml_matrix(self):
@@ -134,7 +124,7 @@ class BasePreprocessor(abc.ABC):
                 _ith_config['out_dir'] = ith_dir
                 for j, val in enumerate(_combs[i]):
                     _ith_config[var_list[j]] = val
-                ith_p = self.write_yaml_config(i, _ith_config, ith_dir, ith_id)
+                ith_p = self.write_yaml_config(_ith_config, ith_dir, ith_id)
                 self.file_list.append(ith_p)
 
     def extract_timesteps(self):

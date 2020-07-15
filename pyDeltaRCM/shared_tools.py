@@ -1,5 +1,6 @@
 
 import numpy as np
+from pathlib import Path
 
 from numba import njit, jit, typed
 
@@ -205,3 +206,23 @@ def _get_version():
     """
     from . import _version
     return _version.__version__()
+
+
+def write_yaml_config_to_file(_config, _dir, _id):
+    """Write a config to file in output folder.
+
+    Write the entire yaml configuation for the configured job out to a
+    file in the job output foler.
+    """
+    def _write_parameter_to_file(f, varname, varvalue):
+        """Write each line, formatted."""
+        f.write(varname + ': ' + str(varvalue) + '\n')
+
+    d = Path(_dir)
+    d.mkdir()
+    p = d / (str(_id) + '.yml')
+    f = open(p, "a")
+    for k in _config.keys():
+        _write_parameter_to_file(f, k, _config[k])
+    f.close()
+    return p
