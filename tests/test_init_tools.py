@@ -37,8 +37,8 @@ def test_inlet_size_set_to_one_fourth_domain(tmp_path):
     utilities.write_parameter_to_file(f, 'L0_meters', 3300)
     f.close()
     delta = DeltaModel(input_file=p)
-    assert delta.N0 == 50
-    assert delta.L0 == 100
+    assert delta.N0 == 100
+    assert delta.L0 == 50
 
 
 # tests for attrs set during yaml parsing
@@ -106,59 +106,104 @@ def test_kernel1(test_DeltaModel):
 def test_kernel2(test_DeltaModel):
     assert test_DeltaModel.kernel2[0, 0] == 1
 
+
 # Tests for other variables
+def test_init_Np_water(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml', {'Np_water': 50})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.init_Np_water == 50
 
 
-def test_init_Np_water(test_DeltaModel):
-    assert test_DeltaModel.init_Np_water == 10
+def test_init_Np_sed(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml', {'Np_sed': 60})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.init_Np_sed == 60
 
 
-def test_init_Np_sed(test_DeltaModel):
-    assert test_DeltaModel.init_Np_sed == 10
+def test_dx(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml', {'dx': 20})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.dx == 20
 
 
-def test_dx(test_DeltaModel):
-    assert test_DeltaModel.dx == float(1)
+def test_theta_sand(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'coeff_theta_sand': 1.4,
+                                  'theta_water': 1.2})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.theta_sand == 1.68
 
 
-def test_theta_sand(test_DeltaModel):
-    assert test_DeltaModel.theta_sand == 2
+def test_theta_mud(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'coeff_theta_mud': 0.8,
+                                  'theta_water': 1.3})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.theta_mud == 1.04
 
 
-def test_theta_mud(test_DeltaModel):
-    assert test_DeltaModel.theta_mud == 1
+def test_Nsmooth(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml', {'Nsmooth': 6})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.Nsmooth == 6
 
 
-def test_Nsmooth(test_DeltaModel):
-    assert test_DeltaModel.Nsmooth == 1
+def test_U_dep_mud(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'coeff_U_dep_mud': 0.4325,
+                                  'u0': 2.2})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.U_dep_mud == 0.9515
 
 
-def test_U_dep_mud(test_DeltaModel):
-    assert test_DeltaModel.U_dep_mud == 0.3
+def test_U_ero_sand(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'coeff_U_ero_sand': 1.23,
+                                  'u0': 2.2})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.U_ero_sand == 2.706
 
 
-def test_U_ero_sand(test_DeltaModel):
-    assert test_DeltaModel.U_ero_sand == 1.05
+def test_U_ero_mud(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'coeff_U_ero_mud': 1.67,
+                                  'u0': 2.2})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.U_ero_mud == 3.674
 
 
-def test_U_ero_mud(test_DeltaModel):
-    assert test_DeltaModel.U_ero_mud == 1.5
+def test_L0(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'L0_meters': 100,
+                                  'Length': 6000,
+                                  'dx': 5})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.L0 == 20
 
 
-def test_L0(test_DeltaModel):
-    assert test_DeltaModel.L0 == 1
+def test_N0(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'N0_meters': 500,
+                                  'Width': 6000,
+                                  'dx': 5})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.N0 == 100
 
 
-def test_N0(test_DeltaModel):
-    assert test_DeltaModel.N0 == 3
+def test_L(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'Length': 1600,
+                                  'dx': 20})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.L == 80
 
 
-def test_L(test_DeltaModel):
-    assert test_DeltaModel.L == 10
-
-
-def test_W(test_DeltaModel):
-    assert test_DeltaModel.W == 10
+def test_W(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'Width': 1200,
+                                  'dx': 20})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.W == 60
 
 
 def test_u_max(test_DeltaModel):
@@ -225,8 +270,10 @@ def test_dt(test_DeltaModel):
     assert test_DeltaModel.dt == 0.9 / 0.003
 
 
-def test_omega_flow(test_DeltaModel):
-    assert test_DeltaModel.omega_flow == 0.9
+def test_omega_flow(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml', {'omega_flow': 0.8})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.omega_flow == 0.8
 
 
 def test_omega_flow_iter(test_DeltaModel):
