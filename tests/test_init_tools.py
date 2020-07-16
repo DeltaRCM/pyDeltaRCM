@@ -206,6 +206,12 @@ def test_W(tmp_path):
     assert _delta.W == 60
 
 
+def test_SLR(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml', {'SLR': 0.01})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.SLR == 0.01
+
+
 def test_u_max(test_DeltaModel):
     assert test_DeltaModel.u_max == 2.0
 
