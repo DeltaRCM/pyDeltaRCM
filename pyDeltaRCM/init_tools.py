@@ -193,48 +193,37 @@ class init_tools(object):
 
         self.set_constants()
 
-        self.u_max = 2.0 * self.u0              # maximum allowed flow velocity
+        self.u_max = 2.0 * self.u0  # maximum allowed flow velocity
+        self.C0 = self.C0_percent * 1 / 100.  # sediment concentration
 
-        self.C0 = self.C0_percent * 1 / 100.      # sediment concentration
-
-        # (m) critial depth to switch to "dry" node
-        self.dry_depth = min(0.1, 0.1 * self.h0)
+        self.dry_depth = min(0.1, 0.1 * self.h0)  # (m) critial depth to switch to "dry" node
         self.CTR = floor(self.W / 2.) - 1
         if self.CTR <= 1:
             self.CTR = floor(self.W / 2.)
 
         self.gamma = self.g * self.S0 * self.dx / (self.u0**2)
 
-        self.V0 = self.h0 * (self.dx**2)    # (m^3) reference volume (volume to
-
-        # fill cell to characteristic depth)
+        self.V0 = self.h0 * (self.dx**2)  # (m^3) reference volume, volume to fill cell to characteristic depth
         self.Qw0 = self.u0 * self.h0 * self.N0 * self.dx    # const discharge
 
         # at inlet
-        self.qw0 = self.u0 * self.h0                # water unit input discharge
+        self.qw0 = self.u0 * self.h0  # water unit input discharge
         self.Qp_water = self.Qw0 / self.Np_water    # volume each water parcel
+        self.qs0 = self.qw0 * self.C0  # sed unit discharge
+        self.dVs = 0.1 * self.N0**2 * self.V0  # total amount of sed added to domain per timestep
+        self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
+        self.Vp_sed = self.dVs / self.Np_sed   # volume of each sediment parcel
 
-        self.qs0 = self.qw0 * self.C0               # sed unit discharge
+        self.itmax = 2 * (self.L + self.W)  # max number of jumps for parcel
+        self.size_indices = int(self.itmax / 2)  # initial width of self.indices
 
-        self.dVs = 0.1 * self.N0**2 * self.V0       # total amount of sed added
-        # to domain per timestep
-
-        self.Qs0 = self.Qw0 * self.C0           # sediment total input discharge
-        self.Vp_sed = self.dVs / self.Np_sed    # volume of each sediment parcel
-
-        # max number of jumps for parcel
-        self.itmax = 2 * (self.L + self.W)
-        # initial width of self.indices
-        self.size_indices = int(self.itmax / 2)
-
-        self.dt = self.dVs / self.Qs0           # time step size
+        self.dt = self.dVs / self.Qs0  # time step size
 
         self.omega_flow_iter = 2. / self.itermax
 
-        # number of times to repeat topo diffusion
-        self.N_crossdiff = int(round(self.dVs / self.V0))
+        self.N_crossdiff = int(round(self.dVs / self.V0))  # number of times to repeat topo diffusion
 
-        self._lambda = 1.                       # sedimentation lag
+        self._lambda = self.sed_lag  # sedimentation lag
 
         self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha
                                      * 0.5 / self.dx**2)
