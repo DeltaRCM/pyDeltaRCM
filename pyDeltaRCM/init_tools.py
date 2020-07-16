@@ -35,7 +35,7 @@ class init_tools(object):
         """Initialize a logger.
         The logger is initialized regardless of the value of ``self.verbose``.
         The level of information printed to the log depends on the verbosity
-        setting. 
+        setting.
         """
         self.logger = logging.getLogger('driver')
         self.logger.setLevel(logging.INFO)
@@ -179,7 +179,6 @@ class init_tools(object):
 
         self.theta_sand = self.coeff_theta_sand * self.theta_water
         self.theta_mud = self.coeff_theta_mud * self.theta_water
-        self.Nsmooth = 1
 
         self.U_dep_mud = self.coeff_U_dep_mud * self.u0
         self.U_ero_sand = self.coeff_U_ero_sand * self.u0
@@ -189,8 +188,8 @@ class init_tools(object):
         self.W = int(round(self.Width / self.dx))         # num cells in y
 
         # inlet length and width
-        self.L0 = max(1, min(int(round(self.L0_meters / self.dx)), self.W // 4))
-        self.N0 = max(3, min(int(round(self.N0_meters / self.dx)), self.L // 4))
+        self.L0 = max(1, min(int(round(self.L0_meters / self.dx)), self.L // 4))
+        self.N0 = max(3, min(int(round(self.N0_meters / self.dx)), self.W // 4))
 
         self.set_constants()
 
@@ -230,7 +229,6 @@ class init_tools(object):
 
         self.dt = self.dVs / self.Qs0           # time step size
 
-        self.omega_flow = 0.9
         self.omega_flow_iter = 2. / self.itermax
 
         # number of times to repeat topo diffusion
