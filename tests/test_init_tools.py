@@ -433,6 +433,95 @@ def test_diffusion_multiplier(tmp_path):
     assert _delta.diffusion_multiplier == (625 / 1000 * 0.3 * 0.5 / 5**2)
 
 
+def test_save_eta_grids(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_eta_grids': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_grids is True
+    assert _delta._save_any_figs is False
+
+
+def test_save_depth_grids(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_depth_grids': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_grids is True
+    assert _delta._save_any_figs is False
+
+
+def test_save_stage_grids(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_stage_grids': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_grids is True
+    assert _delta._save_any_figs is False
+
+
+def test_save_discharge_grids(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_discharge_grids': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_grids is True
+    assert _delta._save_any_figs is False
+
+
+def test_save_velocity_grids(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_velocity_grids': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_grids is True
+    assert _delta._save_any_figs is False
+
+
+def test_save_eta_figs(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_eta_figs': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_figs is True
+    assert _delta._save_any_grids is False
+
+
+def test_save_depth_figs(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_depth_figs': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_figs is True
+    assert _delta._save_any_grids is False
+
+
+def test_save_stage_figs(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_stage_figs': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_figs is True
+    assert _delta._save_any_grids is False
+
+
+def test_save_discharge_figs(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_discharge_figs': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_figs is True
+    assert _delta._save_any_grids is False
+
+
+def test_save_velocity_figs(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_velocity_figs': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_figs is True
+    assert _delta._save_any_grids is False
+
+
+def test_save_figs_sequential(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'save_figs_sequential': False})
+    _delta = DeltaModel(input_file=p)
+    assert _delta._save_any_figs is False
+    assert _delta._save_any_grids is False
+    assert _delta._save_figs_sequential is False
+
+
 # test definition of the model domain
 
 def test_x(test_DeltaModel):
