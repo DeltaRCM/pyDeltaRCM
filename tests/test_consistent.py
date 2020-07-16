@@ -56,7 +56,7 @@ def test_long_multi_validation(tmp_path):
     # slice is: test_DeltaModel.eta[:5, 62]
     print(delta.eta[:5, 62])
 
-    _exp1 = np.array([-4.9709888, -4.972, -3.722989, -7.786886, -3.7249935])
+    _exp1 = np.array([-4.9709163, -4.972, -3.722989, -7.786886, -3.7249935])
     assert np.all(delta.eta[:5, 62] == pytest.approx(_exp1))
 
     for _ in range(0, 10):
@@ -65,12 +65,12 @@ def test_long_multi_validation(tmp_path):
     # slice is: test_DeltaModel.eta[:5, 4]
     print(delta.eta[:5, 62])
 
-    _exp2 = np.array([-4.9710174, -1.5536911, -3.268889, -3.2696986, -2.0843806])
+    _exp2 = np.array([-4.9709163, -1.5536911, -3.268889, -3.2696986, -2.0843806])
     assert np.all(delta.eta[:5, 62] == pytest.approx(_exp2))
 
 
 def test_limit_inds_error_inlet_size_fixed_bug_example_1(tmp_path):
-    """IndexError due to inlet size being too large by default. 
+    """IndexError due to inlet size being too large by default.
 
     If the domain was made small (30x60), but the `N0_meters` and `L0_meters`
     parameters were not adjusted, the model domain was filled with landscape
@@ -101,12 +101,12 @@ def test_limit_inds_error_inlet_size_fixed_bug_example_1(tmp_path):
     # slice is: test_DeltaModel.eta[:5, 30]
     print(delta.eta[:5, 30])
 
-    _exp = np.array([-4.9969087, -5.0120177, -5.0507884, -5.142324, -5.1529646])
+    _exp = np.array([-4.9988008, -4.7794013, -4.5300136, -4.4977293, -4.56228])
     assert np.all(delta.eta[:5, 30] == pytest.approx(_exp))
 
 
 def test_limit_inds_error_inlet_size_fixed_bug_example_2(tmp_path):
-    """IndexError due to inlet size being too large by default. 
+    """IndexError due to inlet size being too large by default.
 
     If the domain was made small (30x60), but the `N0_meters` and `L0_meters`
     parameters were not adjusted, the model domain was filled with landscape
@@ -137,7 +137,7 @@ def test_limit_inds_error_inlet_size_fixed_bug_example_2(tmp_path):
     # slice is: test_DeltaModel.eta[:5, 30]
     print(delta.eta[:5, 30])
 
-    _exp = np.array([-4.9960604, -5.7494435, -7.1670866, -6.7887363, -6.3081055])
+    _exp = np.array([-4.9975486, -4.9140935, -5.15276, -5.3690896, -5.1903167])
     assert np.all(delta.eta[:5, 30] == pytest.approx(_exp))
 
 
@@ -174,5 +174,5 @@ def test_limit_inds_error_fixed_bug_example_3(tmp_path):
     # slice is: test_DeltaModel.eta[:5, 2]
     print(delta.eta[:5, 2])
 
-    _exp = np.array([-5., -4.41237, -4.965255, -5., -5.])
+    _exp = np.array([-4.99961, -4.605685, -3.8314152, -4.9007816, -5.])
     assert np.all(delta.eta[:5, 2] == pytest.approx(_exp))
