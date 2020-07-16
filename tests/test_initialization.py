@@ -468,6 +468,28 @@ def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
     assert os.path.isfile(exp_path_nc8)
 
 
+def test_python_highlevelapi_matrix_expansion_scientificnotation(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload', 'SLR'],
+                                   [[0.2, 0.5, 0.6], [0.00004, 1e-6]])
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    SLR_list = [j.deltamodel.SLR for j in pp.job_list]
+    print("SLR_LIST:", SLR_list)
+    assert sum([j == 4e-5 for j in SLR_list]) == 3
+    assert sum([j == 0.000001 for j in SLR_list]) == 3
+
+
 def test_python_highlevelapi_matrix_needs_out_dir(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)

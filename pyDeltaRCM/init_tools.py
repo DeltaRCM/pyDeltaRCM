@@ -12,6 +12,7 @@ from scipy import ndimage
 from netCDF4 import Dataset
 import time as time_lib
 import yaml
+import re
 
 from . import shared_tools
 
@@ -35,7 +36,7 @@ class init_tools(object):
         """Initialize a logger.
         The logger is initialized regardless of the value of ``self.verbose``.
         The level of information printed to the log depends on the verbosity
-        setting. 
+        setting.
         """
         timestamp = time_lib.strftime('%Y%m%d-%H%M%S')
         self.logger = logging.getLogger(self.prefix_abspath+timestamp)
@@ -57,10 +58,24 @@ class init_tools(object):
         # user-specified file and the internal defaults.
         input_file_vars = dict()
 
+        # Define a loader to handle scientific notation.
+        #   waiting for upstream fix here:
+        #      https://github.com/yaml/pyyaml/pull/174
+        loader = yaml.SafeLoader
+        loader.add_implicit_resolver(
+            u'tag:yaml.org,2002:float',
+            re.compile(r'''^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+]?[0-9]+)?
+                           |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
+                           |\.[0-9_]+(?:[eE][-+]?[0-9]+)?
+                           |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*
+                           |[-+]?\.(?:inf|Inf|INF)
+                           |\.(?:nan|NaN|NAN))$''', re.X),
+            list(u'-+0123456789.'))
+
         # Open and access both yaml files --> put in dictionaries
         # parse default yaml and find expected types
         default_file = open(self.default_file, mode='r')
-        default_dict = yaml.load(default_file, Loader=yaml.FullLoader)
+        default_dict = yaml.load(default_file, Loader=loader)
         default_file.close()
         for k, v in default_dict.items():
             if not type(v['type']) is list:
@@ -72,7 +87,7 @@ class init_tools(object):
         if self.input_file:
             try:
                 user_file = open(self.input_file, mode='r')
-                user_dict = yaml.load(user_file, Loader=yaml.FullLoader)
+                user_dict = yaml.load(user_file, Loader=loader)
                 user_file.close()
             except ValueError as e:
                 raise e
