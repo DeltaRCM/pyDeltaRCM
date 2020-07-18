@@ -23,7 +23,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         The first operation called by :meth:`update`, this method iterates the
         water surface calculation and sediment parcel routing routines.
 
-        .. note:: Will print the current timestep to stdout, if ``verbose > 0``.
+        .. note:: Will print the current time to stdout, if ``verbose > 0``.
 
         Parameters
         ----------
@@ -33,28 +33,24 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
 
         Raises
         ------
-        RuntimeError 
+        RuntimeError
             If model has already been finalized via :meth:`finalize`.
         """
-        timestep = self._time
-
-        self.logger.info('-' * 4 + ' Timestep ' +
-                         str(self._time) + ' ' + '-' * 4)
+        self.logger.info('-' * 4 + ' Model time ' +
+                         str(self.time) + ' ' + '-' * 4)
         if self.verbose > 0:
             print('-' * 20)
-            print('Timestep: ' + str(self._time))
+            print('Model time: ' + str(self.time))
 
         if self._is_finalized:
             raise RuntimeError('Cannot update model, model already finalized!')
 
         # model operations
         for iteration in range(self.itermax):
-
             self.init_water_iteration()
             self.run_water_iteration()
-
             self.free_surf(iteration)
-            self.finalize_water_iteration(timestep, iteration)
+            self.finalize_water_iteration(self.time, iteration)
 
         self.sed_route()
 
@@ -112,7 +108,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
 
         Only runs if save_strata is True.
 
-        .. note:: 
+        .. note::
 
             This routine needs a complete description of the algorithm,
             additionally, it should be ported to a routine in DeltaMetrics,
@@ -201,9 +197,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         """
         if self.toggle_subsidence:
 
-            timestep = self._time
-
-            if self.start_subsidence <= timestep:
+            if self.start_subsidence <= self._time:
 
                 _msg = 'Applying subsidence'
                 self.logger.info(_msg)
@@ -226,10 +220,10 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         -------
 
         """
-        _timestep = self._time
-        if _timestep % self.save_dt == 0:
+        if self._save_time_since_last > self.save_dt:
 
-            _timestep = int(self._time)
+            _model_time = self.time
+            _save_iteration = self.save_iter
 
             # ------------------ Figures ------------------
             if self._save_any_figs:
@@ -240,40 +234,40 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
                     print(_msg)
 
                 if self.save_eta_figs:
-                    _fe = self.make_figure('eta', _timestep)
+                    _fe = self.make_figure('eta', _model_time)
                     self.save_figure(_fe, directory=self.prefix,
                                      filename_root='eta_',
-                                     timestep=_timestep)
+                                     timestep=_save_iteration)
 
                 if self.save_stage_figs:
-                    _fs = self.make_figure('stage', _timestep)
+                    _fs = self.make_figure('stage', _model_time)
                     self.save_figure(_fs, directory=self.prefix,
                                      filename_root='stage_',
-                                     timestep=_timestep)
+                                     timestep=_save_iteration)
 
                 if self.save_depth_figs:
-                    _fh = self.make_figure('depth', _timestep)
+                    _fh = self.make_figure('depth', _model_time)
                     self.save_figure(_fh, directory=self.prefix,
                                      filename_root='depth_',
-                                     timestep=_timestep)
+                                     timestep=_save_iteration)
 
                 if self.save_discharge_figs:
-                    _fq = self.make_figure('qw', _timestep)
+                    _fq = self.make_figure('qw', _model_time)
                     self.save_figure(_fq, directory=self.prefix,
                                      filename_root='discharge_',
-                                     timestep=_timestep)
+                                     timestep=_save_iteration)
 
                 if self.save_velocity_figs:
-                    _fu = self.make_figure('uw', _timestep)
+                    _fu = self.make_figure('uw', _model_time)
                     self.save_figure(_fu, directory=self.prefix,
                                      filename_root='velocity_',
-                                     timestep=_timestep)
+                                     timestep=_save_iteration)
 
             # ------------------ grids ------------------
             if self._save_any_grids:
 
                 shape = self.output_netcdf.variables['time'].shape
-                self.output_netcdf.variables['time'][shape[0]] = _timestep
+                self.output_netcdf.variables['time'][shape[0]] = _model_time
 
                 _msg = 'Saving grids'
                 self.logger.info(_msg)
@@ -294,6 +288,9 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
 
                 if self.save_velocity_grids:
                     self.save_grids('velocity', self.uw, shape[0])
+
+            self._save_iter += int(1)
+            self._save_time_since_last = 0
 
     def output_strata(self):
         """Save stratigraphy as sparse matrix to file.
