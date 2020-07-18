@@ -99,7 +99,7 @@ save_velocity_grids:
   default: False
 save_dt:
   type: 'int'
-  default: 50
+  default: 86400
 save_strata:
   type: 'bool'
   default: True
