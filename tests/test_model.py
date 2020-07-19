@@ -15,13 +15,13 @@ def test_init(test_DeltaModel):
     """
     test the deltaRCM_driver init (happened when delta.initialize was run)
     """
-    assert test_DeltaModel._time == 0.
+    assert test_DeltaModel.time_iter == 0.
     assert test_DeltaModel._is_finalized == False
 
 
 def test_update(test_DeltaModel):
     test_DeltaModel.update()
-    assert test_DeltaModel._time == 1.0
+    assert test_DeltaModel.time_iter == 1.0
     assert test_DeltaModel._is_finalized == False
 
 
@@ -35,7 +35,7 @@ def test_multifinalization_error(test_DeltaModel):
     err_delta = test_DeltaModel
     err_delta.update()
     # test will fail if any assertion is wrong
-    assert err_delta._time == 1.0 
+    assert err_delta.time_iter == 1.0 
     assert err_delta._is_finalized == False
     err_delta.finalize()
     assert err_delta._is_finalized == True

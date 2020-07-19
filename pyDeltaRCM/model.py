@@ -167,6 +167,10 @@ class DeltaModel(Tools):
 
         self._dt = new_dt
 
+    @time_step.setter
+    def time_step(self, new_time_step):
+        self.dt = new_time_step
+
     @property
     def time_iter(self):
         """Number of time iterations.
