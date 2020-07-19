@@ -54,7 +54,7 @@ def test_verbose_printing_0(tmp_path, capsys):
                ) == 1  # log file exists
     delta.update()
     captd = capsys.readouterr()
-    assert not 'Timestep: 0.0' in captd.out
+    assert 'Model time: 0.0' not in captd.out
 
 
 def test_verbose_printing_1(tmp_path, capsys):
@@ -81,8 +81,8 @@ def test_verbose_printing_1(tmp_path, capsys):
     assert captd1.out == ''
     assert len(glob.glob(os.path.join(delta.prefix, '*.log'))
                ) == 1  # log file exists
-    assert 'Timestep: 0.0' in captd2.out  # if verbose >= 1
-    assert not 'Creating output directory' in captd2.out  # goes to logger
+    assert 'Model time: 0.0' in captd2.out  # if verbose >= 1
+    assert 'Creating output directory' not in captd2.out  # goes to logger
 
 
 def test_verbose_printing_2(tmp_path, capsys):
@@ -110,7 +110,7 @@ def test_verbose_printing_2(tmp_path, capsys):
     assert len(glob.glob(os.path.join(delta.prefix, '*.log'))
                ) == 1  # log file exists
     assert 'Setting random seed to' in captd1.out   # if verbose >= 2
-    assert 'Timestep: 0.0' in captd2.out  # if verbose >= 1
+    assert 'Model time: 0.0' in captd2.out  # if verbose >= 1
     assert delta.seed == 10
 
 
@@ -168,6 +168,7 @@ def test_logger_has_timestep_lines(tmp_path):
     utilities.write_parameter_to_file(f, 'C0_percent', 0.1)
     f.close()
     delta = DeltaModel(input_file=p)
+    assert delta.time_step == 300
     _logs = glob.glob(os.path.join(delta.prefix, '*.log'))
     assert len(_logs) == 1  # log file exists
     for _ in range(0, 2):
@@ -176,9 +177,9 @@ def test_logger_has_timestep_lines(tmp_path):
     with open(_logs[0], 'r') as _logfile:
         _lines = _logfile.readlines()
         _lines = ' '.join(_lines)  # collapse to a single string
-        assert '---- Timestep 0.0 ----' in _lines
-        assert '---- Timestep 1.0 ----' in _lines
-        assert not '---- Timestep 2.0 ----' in _lines
+        assert '---- Model time 0.0 ----' in _lines
+        assert '---- Model time 300.0 ----' in _lines
+        assert '---- Model time 600.0 ----' not in _lines
 
 
 def test_logger_random_seed_always_recorded(tmp_path):
@@ -239,14 +240,14 @@ def test_save_no_figs_no_grids(tmp_path):
 
     for _t in range(0, 4):
         _delta.update()
-    assert _delta._time == 4.0
+    assert _delta.time_iter == 4.0
     img_glob = glob.glob(os.path.join(_delta.prefix, '*.png'))
     nc_glob = glob.glob(os.path.join(_delta.prefix, '*.nc'))
     assert len(img_glob) == 0
     assert len(nc_glob) == 0
 
     _delta.update()
-    assert _delta._time == 5.0
+    assert _delta.time_iter == 5.0
     img_glob = glob.glob(os.path.join(_delta.prefix, '*.png'))
     nc_glob = glob.glob(os.path.join(_delta.prefix, '*.nc'))
     assert len(img_glob) == 0
@@ -281,7 +282,7 @@ def test_save_one_fig_no_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
 
     exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
     exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
@@ -324,13 +325,13 @@ def test_save_one_fig_one_grid(tmp_path):
     for _ in range(0, 2):
         _delta.update()
     nc_size_middle = os.path.getsize(exp_path_nc)
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     assert nc_size_middle == nc_size_before
 
     # now finalize, and then file size should increase
     _delta.finalize()
     nc_size_after = os.path.getsize(exp_path_nc)
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     assert nc_size_after > nc_size_middle
     assert nc_size_after > nc_size_before
 
@@ -447,7 +448,7 @@ def test_save_eta_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     _delta.finalize()
 
     ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
@@ -478,7 +479,7 @@ def test_save_depth_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     _delta.finalize()
 
     ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
@@ -509,7 +510,7 @@ def test_save_velocity_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     _delta.finalize()
 
     ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
@@ -540,7 +541,7 @@ def test_save_stage_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     _delta.finalize()
 
     ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
@@ -571,7 +572,7 @@ def test_save_discharge_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     _delta.finalize()
 
     ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")

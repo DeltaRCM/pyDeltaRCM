@@ -261,12 +261,12 @@ def test_version_call():
 from pyDeltaRCM import preprocessor
 
 
-def test_python_highlevelapi_call_without_args():
+def test_py_hlvl_wo_args():
     with pytest.raises(ValueError):
         pp = preprocessor.Preprocessor()
 
 
-def test_python_highlevelapi_call_without_timesteps(tmp_path):
+def test_py_hlvl_wo_timesteps(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -275,7 +275,7 @@ def test_python_highlevelapi_call_without_timesteps(tmp_path):
         pp = preprocessor.Preprocessor(p)
 
 
-def test_python_highlevelapi_call_with_timesteps_yaml_init_types(tmp_path):
+def test_py_hlvl_tsteps_yml_init_types(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -289,7 +289,7 @@ def test_python_highlevelapi_call_with_timesteps_yaml_init_types(tmp_path):
     assert pp.job_list[0]._is_completed is False
 
 
-def test_python_highlevelapi_call_with_timesteps_yaml_runjobs(tmp_path):
+def test_py_hlvl_tsteps_yml_runjobs_sngle(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -300,6 +300,7 @@ def test_python_highlevelapi_call_with_timesteps_yaml_runjobs(tmp_path):
     utilities.write_parameter_to_file(f, 'Np_water', 10)
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
     utilities.write_parameter_to_file(f, 'timesteps', 2)
     f.close()
     pp = preprocessor.Preprocessor(p)
@@ -309,7 +310,7 @@ def test_python_highlevelapi_call_with_timesteps_yaml_runjobs(tmp_path):
     assert pp.job_list[0]._is_completed is True
 
 
-def test_python_highlevelapi_call_with_args(tmp_path):
+def test_py_hlvl_args(tmp_path):
     """
     test calling the python hook command line feature with a config file.
     """
