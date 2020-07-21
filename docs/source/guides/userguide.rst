@@ -121,7 +121,7 @@ Matrix expansion
 
 To use matrix expansion to configure multiple model runs, the dimensions of the matrix (i.e., the variables you want to run) should be listed below the `matrix` key. For example, the following configuration is a one-dimensional matrix with the variable `f_bedload`:
 
-.. code::yaml
+.. code:: yaml
 
     out_dir: 'out_dir'
     dx: 2.0
@@ -136,7 +136,7 @@ This configuation would produce two model runs, one with bedload fraction (`f_be
 The matrix expansions will create two folders at `./out_dir/job_000` and `./out_dir/job_001` that each correspond to a created job.
 Each folder will contain a copy of the configuration file used for that job; for example, the full configuration for `job_000` is:
 
-.. code::yaml
+.. code:: yaml
 
     out_dir: 'out_dir/job_000'
     dx: 2.0
@@ -149,7 +149,7 @@ Additionally, a log file for each job is located in the output folder, and any o
 
 Multiple dimensional matrix expansion is additionally supported. For example, the following configuation produces six jobs:
 
-.. code::yaml
+.. code:: yaml
     
     out_dir: 'out_dir'
 
