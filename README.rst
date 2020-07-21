@@ -14,6 +14,9 @@ pyDeltaRCM_WMT
 pyDeltaRCM is the Python version of the `Matlab deltaRCM <https://csdms.colorado.edu/wiki/Model:DeltaRCM>`_ model by Man Liang. 
 The pyDeltaRCM scripts in this repository can be run as a stand-alone model following the instructions below.
 
+This model repository no longer includes support for the `Basic Model Interface (BMI) <https://bmi.readthedocs.io/en/latest/?badge=latest>`_.
+We have separated BMI support for pyDeltaRCM to another repository (`the BMI_pyDeltaRCM model <https://deltarcm.org/BMI_pyDeltaRCM/>`_).
+
 
 Documentation
 #############
