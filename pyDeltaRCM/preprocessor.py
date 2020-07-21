@@ -72,7 +72,7 @@ class BasePreprocessor(abc.ABC):
         d = Path(ith_dir)
         d.mkdir()
         ith_p = d / (str(ith_id) + '.yml')
-        shared_tools.write_yaml_config_to_file(ith_config, ith_p)
+        write_yaml_config_to_file(ith_config, ith_p)
         return ith_p
 
     def expand_yaml_matrix(self):
@@ -426,6 +426,22 @@ def preprocessor_wrapper():
     """
     pp = PreprocessorCLI()
     pp.run_jobs()
+
+
+def write_yaml_config_to_file(_config, _path):
+    """Write a config to file in output folder.
+
+    Write the entire yaml configuation for the configured job out to a
+    file in the job output foler.
+    """
+    def _write_parameter_to_file(f, varname, varvalue):
+        """Write each line, formatted."""
+        f.write(varname + ': ' + str(varvalue) + '\n')
+
+    f = open(_path, "a")
+    for k in _config.keys():
+        _write_parameter_to_file(f, k, _config[k])
+    f.close()
 
 
 if __name__ == '__main__':
