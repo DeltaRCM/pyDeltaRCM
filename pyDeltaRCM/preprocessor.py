@@ -101,7 +101,6 @@ class BasePreprocessor(abc.ABC):
                         'Length of matrix key "%s" was 1, '
                         'relocate to fixed configuration.' % str(k))
                 for v in _matrix[k]:
-                    print(v)
                     if isinstance(v, list):
                         raise ValueError(
                             'Depth of matrix expansion must not be > 1')
