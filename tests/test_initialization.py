@@ -506,6 +506,22 @@ def test_python_highlevelapi_matrix_needs_out_dir(tmp_path):
         pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
 
 
+def test_py_hlvl_mtrx_bad_type(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    # bad configuration will lead to error
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload', 'u0'],
+                                   [[0.2, 0.5, 0.6], ['badstr1', 'badstr2']])
+    f.close()
+    with pytest.raises(TypeError, match='During job instantiation, one of the model .*'):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
 def test_py_hlvl_mtrx_bad_len1(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
