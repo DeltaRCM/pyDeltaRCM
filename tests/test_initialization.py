@@ -497,28 +497,92 @@ def test_python_highlevelapi_matrix_needs_out_dir(tmp_path):
     utilities.write_parameter_to_file(f, 'Width', 10.0)
     utilities.write_parameter_to_file(f, 'dx', 1.0)
     # missing out_dir in the config will throw an error
-    # utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    #   ==>  utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     utilities.write_matrix_to_file(f,
                                    ['f_bedload'],
                                    [[0.2, 0.5, 0.6]])
     f.close()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r'You must specify "out_dir" in YAML .*'):
         pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
 
 
-def test_python_highlevelapi_matrix_bad_configlist(tmp_path):
+def test_py_hlvl_mtrx_bad_len1(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
     utilities.write_parameter_to_file(f, 'Width', 10.0)
     utilities.write_parameter_to_file(f, 'dx', 1.0)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    # bad configuration (an extra "-") will lead to error
+    # bad configuration is a list of length 1
     utilities.write_matrix_to_file(f,
-                                   ['- f_bedload'],
-                                   [[0.2, 0.5, 0.6]])
+                                   ['f_bedload', 'u0'],
+                                   [[0.2], [0.5, 0.6, 1.25]])
     f.close()
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError,  match=r'Length of matrix key "f_bedload" was 1,'):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
+def test_py_hlvl_mtrx_bad_listinlist(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    # bad configuration will lead to error
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload', 'u0'],
+                                   [[0.2, [0.5, 0.6]], [0.5, 1.25]])
+    f.close()
+    with pytest.raises(ValueError,  match=r'Depth of matrix expansion must not be > 1'):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
+def test_py_hlvl_mtrx_bad_samekey(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'f_bedload', 0.3)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    # bad configuration will lead to error
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload', 'u0'],
+                                   [[0.2, 0.5, 0.6], [0.5, 1.25]])
+    f.close()
+    with pytest.raises(ValueError,  match=r'You cannot specify the same key in the matrix .*'):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
+def test_py_hlvl_mtrx_bad_colon(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    # bad configuration will lead to error
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload', 'u0:'],
+                                   [[0.2, 0.5], [0.5, 1.25]])
+    f.close()
+    with pytest.raises(ValueError,  match=r'Colon operator found in matrix expansion key.'):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
+def test_py_hlvl_mtrx_no_out_dir_in_mtrx(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['out_dir', 'f_bedload'],
+                                   [['dir1', 'dir2'], [0.2, 0.5, 0.6]])
+    f.close()
+    with pytest.raises(ValueError, match=r'You cannot specify "out_dir" as .*'):
         pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
 
 

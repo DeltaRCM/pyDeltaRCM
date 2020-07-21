@@ -88,24 +88,39 @@ class BasePreprocessor(abc.ABC):
             # check validity of matrix specs
             if not isinstance(_matrix, dict):
                 raise ValueError(
-                    'Invalid matrix spceification, was not type dict.')
-            for k in _matrix.keys():  # check validity of keys, depth == 1
-                if not isinstance(_matrix[k], list):
-                    raise ValueError(
-                        'Each dimension (variable) in "matrix" configuration'
-                        ' must yield a valid list.')
-            # check for specified output
+                    'Invalid matrix spceification, was not evaluated to "dict".')
             if 'out_dir' not in self.user_dict.keys():
                 raise ValueError(
                     'You must specify "out_dir" in YAML to use matrix expansion.')
+            if 'out_dir' in _matrix.keys():
+                raise ValueError(
+                    'You cannot specify "out_dir" as a matrix expansion key.')
+            for k in _matrix.keys():  # check validity of keys, depth == 1
+                if len(_matrix[k]) == 1:
+                    raise ValueError(
+                        'Length of matrix key "%s" was 1, '
+                        'relocate to fixed configuration.' % str(k))
+                for v in _matrix[k]:
+                    print(v)
+                    if isinstance(v, list):
+                        raise ValueError(
+                            'Depth of matrix expansion must not be > 1')
+                if ':' in k:
+                    raise ValueError(
+                        'Colon operator found in matrix expansion key.')
+                if k in self.user_dict.keys():
+                    raise ValueError(
+                        'You cannot specify the same key in the matrix '
+                        'configuration and fixed configuration. '
+                        'Key "%s" was specified in both.' % str(k))
 
+            # compute the expansion
             var_list = [k for k in _matrix.keys()]
             lil = [_matrix[v] for k, v in enumerate(var_list)]
             dims = len(lil)
             pts = [len(l) for l in lil]
             jobs = np.prod(pts)
-            # combinations (matrix expansion)
-            _combs = list(itertools.product(*lil))
+            _combs = list(itertools.product(*lil))  # actual matrix expansion
             _fixed_config = self.user_dict.copy()  # fixed config dict to expand on
 
             if self.verbose > 0:
