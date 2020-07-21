@@ -2,13 +2,17 @@ import os
 import argparse
 import abc
 
-import yaml
+import itertools
+from pathlib import Path
 
-from .shared_tools import _get_version
+import yaml
+import numpy as np
+
+from . import shared_tools
 from .model import DeltaModel
 
 
-_ver = ' '.join(('pyDeltaRCM', _get_version()))
+_ver = ' '.join(('pyDeltaRCM', shared_tools._get_version()))
 
 
 class BasePreprocessor(abc.ABC):
@@ -26,6 +30,7 @@ class BasePreprocessor(abc.ABC):
         out the Python API.
 
     """
+
     def extract_yaml_config(self):
         """Preliminary YAML parsing. 
 
@@ -46,13 +51,29 @@ class BasePreprocessor(abc.ABC):
         user_file.close()
 
         if 'matrix' in self.user_dict.keys():
-            raise NotImplementedError(
-                'Matrix expansion not yet implemented...')
-            # 1. compute expansion, create indiv yaml files
-            # 2. loop expanded to create jobs from yaml files
             self._has_matrix = True
         else:
             self._has_matrix = False
+
+        if 'verbose' in self.user_dict.keys():
+            self.verbose = self.user_dict['verbose']
+        else:
+            self.verbose = 0
+
+    def write_yaml_config(self, i, ith_config, ith_dir, ith_id):
+        """Write full config to file in output folder.
+
+        Write the entire yaml configuation for the configured job out to a
+        file in the job output foler.
+        """
+        if self.verbose > 0:
+            print('Writing YAML file for job ' + str(int(i)))
+
+        d = Path(ith_dir)
+        d.mkdir()
+        ith_p = d / (str(ith_id) + '.yml')
+        write_yaml_config_to_file(ith_config, ith_p)
+        return ith_p
 
     def expand_yaml_matrix(self):
         """Expand YAML matrix, if given.
@@ -60,7 +81,73 @@ class BasePreprocessor(abc.ABC):
         Compute the matrix expansion.
 
         """
-        pass
+        if self._has_matrix:
+            # extract and remove 'matrix' from config
+            _matrix = self.user_dict.pop('matrix')
+
+            # check validity of matrix specs
+            if not isinstance(_matrix, dict):
+                raise ValueError(
+                    'Invalid matrix spceification, was not evaluated to "dict".')
+            if 'out_dir' not in self.user_dict.keys():
+                raise ValueError(
+                    'You must specify "out_dir" in YAML to use matrix expansion.')
+            if 'out_dir' in _matrix.keys():
+                raise ValueError(
+                    'You cannot specify "out_dir" as a matrix expansion key.')
+            for k in _matrix.keys():  # check validity of keys, depth == 1
+                if len(_matrix[k]) == 1:
+                    raise ValueError(
+                        'Length of matrix key "%s" was 1, '
+                        'relocate to fixed configuration.' % str(k))
+                for v in _matrix[k]:
+                    print(v)
+                    if isinstance(v, list):
+                        raise ValueError(
+                            'Depth of matrix expansion must not be > 1')
+                if ':' in k:
+                    raise ValueError(
+                        'Colon operator found in matrix expansion key.')
+                if k in self.user_dict.keys():
+                    raise ValueError(
+                        'You cannot specify the same key in the matrix '
+                        'configuration and fixed configuration. '
+                        'Key "%s" was specified in both.' % str(k))
+
+            # compute the expansion
+            var_list = [k for k in _matrix.keys()]
+            lil = [_matrix[v] for k, v in enumerate(var_list)]
+            dims = len(lil)
+            pts = [len(l) for l in lil]
+            jobs = np.prod(pts)
+            _combs = list(itertools.product(*lil))  # actual matrix expansion
+            _fixed_config = self.user_dict.copy()  # fixed config dict to expand on
+
+            if self.verbose > 0:
+                print(('Matrix expansion:\n' +
+                       '  dims {_dims}\n' +
+                       '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
+
+            # create directory at root
+            jobs_root = self.user_dict['out_dir']  # checked above for exist
+            p = Path(jobs_root)
+            try:
+                p.mkdir()
+            except FileExistsError:
+                raise FileExistsError(
+                    'Job output directory (%s) already exists.' % str(p))
+
+            # loop, create job yamls
+            self.file_list = []
+            for i in range(jobs):
+                _ith_config = _fixed_config.copy()
+                ith_id = 'job_' + str(i).zfill(3)
+                ith_dir = os.path.join(jobs_root, ith_id)
+                _ith_config['out_dir'] = ith_dir
+                for j, val in enumerate(_combs[i]):
+                    _ith_config[var_list[j]] = val
+                ith_p = self.write_yaml_config(i, _ith_config, ith_dir, ith_id)
+                self.file_list.append(ith_p)
 
     def extract_timesteps(self):
         """Pull timestep from arg and YAML.
@@ -93,6 +180,22 @@ class BasePreprocessor(abc.ABC):
         self.job_list = []
         if self._has_matrix:
             self.expand_yaml_matrix()
+            # loop the expanded jobs
+            for i in range(len(self.file_list)):
+                try:
+                    self.job_list.append(self._Job(self.file_list[i],
+                                                   yaml_timesteps=self.yaml_timesteps,
+                                                   arg_timesteps=self.arg_timesteps))
+                except TypeError as e:
+                    raise TypeError(
+                        'During job instantiation, one of the model '
+                        'configurations received an incorrect type. This '
+                        'is likely because one of the "matrix" keys was '
+                        'misconfigured in your input YAML file. '
+                        'Check that the type of each value matches the '
+                        'expected type for that key. The original error '
+                        'is reproduced below:\n\n' +
+                        str(e))
         else:
             # there's only one job so append directly.
             self.job_list.append(self._Job(self.input_file,
@@ -107,14 +210,15 @@ class BasePreprocessor(abc.ABC):
 
         """
         if len(self.job_list) > 1:
-            # check no mulitjobs, not implemented
-            raise NotImplementedError()
-            # Todo:
-            #   1. set up parallel pool if multiple jobs
-            #   2. run jobs in list
+            # set up parallel pool if multiple jobs
+            pass
 
         # run the job(s)
-        for job in self.job_list:
+        for i, job in enumerate(self.job_list):
+
+            if self.verbose > 0:
+                print("Starting job %s" % str(i))
+
             job.run_job()
             job.finalize_model()
 
@@ -184,6 +288,7 @@ class PreprocessorCLI(BasePreprocessor):
         CLI (entry point) calls directly.
 
     """
+
     def __init__(self):
         """Initialize the CLI preprocessor.
 
@@ -267,6 +372,7 @@ class Preprocessor(BasePreprocessor):
         >>> pp.run_jobs()
 
     """
+
     def __init__(self, input_file=None, timesteps=None):
         """Initialize the python preprocessor.
 
@@ -291,6 +397,9 @@ class Preprocessor(BasePreprocessor):
 
         """
         super().__init__()
+
+        if not input_file and not timesteps:
+            raise ValueError('Cannot use Preprocessor with no arguments.')
 
         if input_file:
             self.input_file = input_file
@@ -328,6 +437,22 @@ def preprocessor_wrapper():
     """
     pp = PreprocessorCLI()
     pp.run_jobs()
+
+
+def write_yaml_config_to_file(_config, _path):
+    """Write a config to file in output folder.
+
+    Write the entire yaml configuation for the configured job out to a
+    file in the job output foler.
+    """
+    def _write_parameter_to_file(f, varname, varvalue):
+        """Write each line, formatted."""
+        f.write(varname + ': ' + str(varvalue) + '\n')
+
+    f = open(_path, "a")
+    for k in _config.keys():
+        _write_parameter_to_file(f, k, _config[k])
+    f.close()
 
 
 if __name__ == '__main__':
