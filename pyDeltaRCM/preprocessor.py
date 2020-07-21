@@ -182,9 +182,20 @@ class BasePreprocessor(abc.ABC):
             self.expand_yaml_matrix()
             # loop the expanded jobs
             for i in range(len(self.file_list)):
-                self.job_list.append(self._Job(self.file_list[i],
-                                               yaml_timesteps=self.yaml_timesteps,
-                                               arg_timesteps=self.arg_timesteps))
+                try:
+                    self.job_list.append(self._Job(self.file_list[i],
+                                                   yaml_timesteps=self.yaml_timesteps,
+                                                   arg_timesteps=self.arg_timesteps))
+                except TypeError as e:
+                    raise TypeError(
+                        'During job instantiation, one of the model '
+                        'configurations received an incorrect type. This '
+                        'is likely because one of the "matrix" keys was '
+                        'misconfigured in your input YAML file. '
+                        'Check that the type of each value matches the '
+                        'expected type for that key. The original error '
+                        'is reproduced below:\n\n' +
+                        str(e))
         else:
             # there's only one job so append directly.
             self.job_list.append(self._Job(self.input_file,
