@@ -1,15 +1,15 @@
 **************
-pyDeltaRCM_WMT
+pyDeltaRCM
 **************
 
-.. image:: https://github.com/DeltaRCM/pyDeltaRCM_WMT/workflows/actions/badge.svg
-    :target: https://github.com/DeltaRCM/pyDeltaRCM_WMT/actions
+.. image:: https://github.com/DeltaRCM/pyDeltaRCM/workflows/actions/badge.svg
+    :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
 
-.. image:: https://codecov.io/gh/DeltaRCM/pyDeltaRCM_WMT/branch/develop/graph/badge.svg
-  :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM_WMT
+.. image:: https://codecov.io/gh/DeltaRCM/pyDeltaRCM/branch/develop/graph/badge.svg
+  :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM
 
 .. image:: https://app.codacy.com/project/badge/Grade/1c137d0227914741a9ba09f0b00a49a7
-    :target: https://www.codacy.com/gh/DeltaRCM/pyDeltaRCM_WMT?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DeltaRCM/pyDeltaRCM_WMT&amp;utm_campaign=Badge_Grade
+    :target: https://www.codacy.com/gh/DeltaRCM/pyDeltaRCM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DeltaRCM/pyDeltaRCM&amp;utm_campaign=Badge_Grade
 
 pyDeltaRCM is the Python version of the `Matlab deltaRCM <https://csdms.colorado.edu/wiki/Model:DeltaRCM>`_ model by Man Liang. 
 The pyDeltaRCM scripts in this repository can be run as a stand-alone model following the instructions below.
@@ -21,7 +21,7 @@ We have separated BMI support for pyDeltaRCM to another repository (`the BMI_pyD
 Documentation
 #############
 
-`Find the full documentation here <https://deltarcm.org/pyDeltaRCM_WMT/index.html>`_.
+`Find the full documentation here <https://deltarcm.org/pyDeltaRCM/index.html>`_.
 
 
 
@@ -44,7 +44,7 @@ Or for a developer installation run:
 Executing the model
 ###################
 
-We recommend you check out our `pyDeltaRCM in 10 minutes tutorial <https://deltarcm.org/pyDeltaRCM_WMT/guides/10min.html>`_, which is part of our documentation.
+We recommend you check out our `pyDeltaRCM in 10 minutes tutorial <https://deltarcm.org/pyDeltaRCM/guides/10min.html>`_, which is part of our documentation.
 
 Additionally, the model can be run with example script ``run_pyDeltaRCM.py``:
 
