@@ -1,9 +1,0 @@
-name: PyDeltaRCM
-language: python
-
-package: pyDeltaRCM
-class: BmiDelta
-initialize_args: "deltaRCM.yaml"
-
-build:
-  - python setup.py install
