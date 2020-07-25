@@ -16,18 +16,18 @@ First, we instantiate the main :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM` mod
 
 Next, since this is just a simple demo, we will run for a few short timesteps.
 The delta model is run forward with a call to the :meth:`~pyDeltaRCM.DeltaModel.update()` method of the delta model.
-So we loop the update function, and then finalize the model:
+So we loop the `update` function, and then finalize the model:
 
 .. doctest::
 
-    >>> for _ in range(0, 2):
+    >>> for _ in range(0, 5):
     ...     delta.update()
 
     >>> delta.finalize()
 
-That's it! You ran the pyDeltaRCM model for two timesteps. 
+That's it! You ran the pyDeltaRCM model for five timesteps. 
 
-We can visualize the delta bed elevation, though it's not very exciting after only two timestep...
+We can visualize the delta bed elevation, though it's not very exciting after only five timesteps...
 
 .. code::
 

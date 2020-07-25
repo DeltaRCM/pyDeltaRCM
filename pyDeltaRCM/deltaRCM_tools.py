@@ -124,7 +124,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         """
         timestep = self._time
 
-        if self.save_strata and (timestep % self.save_dt == 0):
+        if self.save_strata and self._save_time_since_last > self.save_dt:
 
             timestep = int(timestep)
 
@@ -314,10 +314,6 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
             self.strata_eta = self.strata_eta[:, :self.strata_counter]
 
             shape = self.strata_eta.shape
-            if shape[0] < 1:
-                raise RuntimeError('Stratigraphy are empty! '
-                                   'Are you sure you ran the model at least '
-                                   'one timestep with `update()`?')
 
             total_strata_age = self.output_netcdf.createDimension(
                 'total_strata_age',
