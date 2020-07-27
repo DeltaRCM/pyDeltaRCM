@@ -159,9 +159,6 @@ class DeltaModel(Tools):
             warnings.warn(UserWarning('Using a very small timestep, '
                                       'Delta might evolve very slowly.'))
 
-        # self.Np_sed = int(new_dt * self.init_Np_sed)
-        # self.Np_water = int(new_dt * self.init_Np_water)
-
         if self.toggle_subsidence:
             self.sigma = self.subsidence_mask * self.sigma_max * new_dt
 
