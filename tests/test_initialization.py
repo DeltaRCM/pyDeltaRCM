@@ -7,6 +7,7 @@ import locale
 import numpy as np
 import subprocess
 import glob
+import netCDF4
 
 from pyDeltaRCM.model import DeltaModel
 from pyDeltaRCM import shared_tools
@@ -124,6 +125,40 @@ def test_random_seed_settings_newinteger_default(tmp_path):
     assert isinstance(int(delta.seed), int)
 
 
+def test_no_outputs_save_dt_notreached(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'save_strata', True)
+    utilities.write_parameter_to_file(f, 'save_dt', 43200)
+    f.close()
+    delta = DeltaModel(input_file=p)
+    for _ in range(2):
+        delta.update()
+    assert delta.dt == 20000.0
+    assert delta.strata_counter == 0
+    assert delta.time < delta.save_dt
+    with pytest.raises(RuntimeError, match=r'Model has no computed strat.*'):
+        delta.finalize()
+
+
+def test_no_outputs_save_strata_false(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'save_strata', False)
+    utilities.write_parameter_to_file(f, 'save_dt', 21600)
+    f.close()
+    delta = DeltaModel(input_file=p)
+    for _ in range(2):
+        delta.update()
+    assert delta.dt == 20000.0
+    assert not hasattr(delta, 'strata_counter')
+    assert delta.time > delta.save_dt
+
+
 # test the entry points
 
 def test_entry_point_installed_call(tmp_path):
@@ -142,7 +177,7 @@ def test_entry_point_installed_call(tmp_path):
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'timesteps', 2)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
     utilities.write_parameter_to_file(f, 'save_eta_figs', True)
     f.close()
     subprocess.check_output(['pyDeltaRCM',
@@ -171,7 +206,7 @@ def test_entry_point_python_main_call(tmp_path):
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'timesteps', 1)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
     utilities.write_parameter_to_file(f, 'save_eta_figs', True)
     f.close()
     subprocess.check_output(['python', '-m', 'pyDeltaRCM',
@@ -219,7 +254,7 @@ def test_entry_point_python_main_call_timesteps(tmp_path):
     utilities.write_parameter_to_file(f, 'Np_water', 10)
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
     utilities.write_parameter_to_file(f, 'save_eta_figs', True)
     f.close()
     subprocess.check_output(['python', '-m', 'pyDeltaRCM',
@@ -300,7 +335,7 @@ def test_py_hlvl_tsteps_yml_runjobs_sngle(tmp_path):
     utilities.write_parameter_to_file(f, 'Np_water', 10)
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
     utilities.write_parameter_to_file(f, 'timesteps', 2)
     f.close()
     pp = preprocessor.Preprocessor(p)
@@ -325,7 +360,7 @@ def test_py_hlvl_args(tmp_path):
     utilities.write_parameter_to_file(f, 'Np_water', 10)
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
     utilities.write_parameter_to_file(f, 'save_eta_figs', True)
     f.close()
     pp = preprocessor.Preprocessor(input_file=p, timesteps=2)
@@ -361,6 +396,7 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_argument(tmp_pa
     utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
     utilities.write_parameter_to_file(f, 'Np_water', 10)
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'save_dt', 600)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     utilities.write_matrix_to_file(f,
                                    ['f_bedload'],
@@ -378,8 +414,10 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_argument(tmp_pa
     pp.run_jobs()
     assert len(pp.job_list) == 2
     assert pp.job_list[0]._is_completed is True
-    assert pp.job_list[0].deltamodel._time == 3.0
-    assert pp.job_list[1].deltamodel._time == 3.0
+    assert pp.job_list[0].deltamodel.time == 900.0
+    assert pp.job_list[1].deltamodel.time == 900.0
+    assert pp.job_list[1].deltamodel.dt == 300.0
+    assert pp.job_list[1].deltamodel.time == pp.job_list[1].deltamodel.dt * 3
     exp_path_nc0 = os.path.join(
         tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
     exp_path_nc1 = os.path.join(
@@ -392,9 +430,11 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_argument(tmp_pa
     with open(_logs[0], 'r') as _logfile:
         _lines = _logfile.readlines()
         _lines = ' '.join(_lines)  # collapse to a single string
-        assert '---- Timestep 0.0 ----' in _lines
-        assert '---- Timestep 2.0 ----' in _lines
-        assert '---- Timestep 3.0 ----' not in _lines
+        assert '---- Model time 0.0 ----' in _lines
+        assert '---- Model time 300.0 ----' in _lines
+        assert '---- Model time 600.0 ----' in _lines
+        assert '---- Model time 900.0 ----' not in _lines
+        assert '---- Model time 1200.0 ----' not in _lines
 
 
 def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path):
@@ -408,6 +448,7 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path
     utilities.write_parameter_to_file(f, 'Np_water', 10)
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'timesteps', 3)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     utilities.write_matrix_to_file(f,
                                    ['f_bedload'],
@@ -425,14 +466,18 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path
     pp.run_jobs()
     assert len(pp.job_list) == 2
     assert pp.job_list[0]._is_completed is True
-    assert pp.job_list[0].deltamodel._time == 3.0
-    assert pp.job_list[1].deltamodel._time == 3.0
+    assert pp.job_list[0].deltamodel.time == 900.0
+    assert pp.job_list[1].deltamodel.time == 900.0
     exp_path_nc0 = os.path.join(
         tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
     exp_path_nc1 = os.path.join(
         tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
     assert os.path.isfile(exp_path_nc0)
     assert os.path.isfile(exp_path_nc1)
+    ds = netCDF4.Dataset(exp_path_nc0, "r", format="NETCDF4")
+    assert ds.variables['strata_sand_frac'].shape[1:] == (10, 10)
+    assert ds.variables['strata_sand_frac'].shape[1:] == (10, 10)
+    assert ds.variables['strata_age'].shape == (3,)
 
 
 def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
@@ -445,6 +490,7 @@ def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
     utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
     utilities.write_parameter_to_file(f, 'Np_water', 10)
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     utilities.write_matrix_to_file(f,
                                    ['f_bedload', 'u0'],
@@ -463,9 +509,12 @@ def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
     assert (0.2, 2.0) in comb_list
     assert (0.5, 1.0) in comb_list
     assert not (0.5, 0.2) in comb_list
+    assert pp.job_list[0].deltamodel.dt == 300.0
+    assert pp.job_list[0].deltamodel.time == 0.0
 
     assert pp.job_list[0]._is_completed is False
     pp.run_jobs()
+    assert pp.job_list[0].deltamodel.time == 900.0
     assert len(pp.job_list) == 9
     assert pp.job_list[0]._is_completed is True
     exp_path_nc0 = os.path.join(

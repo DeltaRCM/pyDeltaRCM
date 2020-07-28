@@ -98,8 +98,11 @@ class DeltaModel(Tools):
         self._time += self.dt
         self._save_time_since_last += self.dt
 
-        self.record_stratigraphy()
-        self.output_data()
+        if self._save_time_since_last >= self.save_dt:
+            self.record_stratigraphy()
+            self.output_data()
+            self._save_iter += int(1)
+            self._save_time_since_last = 0
 
         self._time_iter += int(1)
 
@@ -172,7 +175,7 @@ class DeltaModel(Tools):
     def time_iter(self):
         """Number of time iterations.
 
-        The number of times the `:obj:`update` method has been called.
+        The number of times the :obj:`update` method has been called.
         """
         return self._time_iter
 
@@ -180,7 +183,7 @@ class DeltaModel(Tools):
     def save_time_since_last(self):
         """Time since data last output.
 
-        The number of times the `:obj:`update` method has been called.
+        The number of times the :obj:`update` method has been called.
         """
         return self._save_time_since_last
 

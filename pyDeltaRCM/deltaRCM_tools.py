@@ -103,10 +103,10 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
     def record_stratigraphy(self):
         """Save stratigraphy to file.
 
-        Saves the sand fraction of deposited sediment
-        into a sparse array created by init_stratigraphy().
+        Saves the sand fraction of deposited sediment into a sparse array
+        created by :obj:`~pyDeltaRCM.DeltaModel.init_stratigraphy()`.
 
-        Only runs if save_strata is True.
+        Only runs if :obj:`~pyDeltaRCM.DeltaModel.save_strata` is True.
 
         .. note::
 
@@ -122,12 +122,10 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         -------
 
         """
-        timestep = self._time
 
-        if self.save_strata and self._save_time_since_last > self.save_dt:
+        if self.save_strata:
 
-            timestep = int(timestep)
-
+            timestep = int(self.time)
             if self.strata_eta.shape[1] <= timestep:
                 self.expand_stratigraphy()
 
@@ -213,6 +211,11 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         ``velocity``, ``depth``, and ``stage``, depending on configuration of
         the relevant flags in the YAML configuration file.
 
+        .. note:
+
+            This method is called often throughout the model, each
+            occurance :obj:`save_dt` is elapsed in model time.
+
         Parameters
         ----------
 
@@ -220,82 +223,80 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         -------
 
         """
-        if self._save_time_since_last > self.save_dt:
+        # ------------------ Figures ------------------
+        if self._save_any_figs:
 
-            _model_time = self.time
-            _save_iteration = self.save_iter
+            _msg = 'Saving figures'
+            self.logger.info(_msg)
+            if self.verbose >= 2:
+                print(_msg)
 
-            # ------------------ Figures ------------------
-            if self._save_any_figs:
+            if self.save_eta_figs:
+                _fe = self.make_figure('eta', self.time)
+                self.save_figure(_fe, directory=self.prefix,
+                                 filename_root='eta_',
+                                 timestep=self.save_iter)
 
-                _msg = 'Saving figures'
-                self.logger.info(_msg)
-                if self.verbose >= 2:
-                    print(_msg)
+            if self.save_stage_figs:
+                _fs = self.make_figure('stage', self.time)
+                self.save_figure(_fs, directory=self.prefix,
+                                 filename_root='stage_',
+                                 timestep=self.save_iter)
 
-                if self.save_eta_figs:
-                    _fe = self.make_figure('eta', _model_time)
-                    self.save_figure(_fe, directory=self.prefix,
-                                     filename_root='eta_',
-                                     timestep=_save_iteration)
+            if self.save_depth_figs:
+                _fh = self.make_figure('depth', self.time)
+                self.save_figure(_fh, directory=self.prefix,
+                                 filename_root='depth_',
+                                 timestep=self.save_iter)
 
-                if self.save_stage_figs:
-                    _fs = self.make_figure('stage', _model_time)
-                    self.save_figure(_fs, directory=self.prefix,
-                                     filename_root='stage_',
-                                     timestep=_save_iteration)
+            if self.save_discharge_figs:
+                _fq = self.make_figure('qw', self.time)
+                self.save_figure(_fq, directory=self.prefix,
+                                 filename_root='discharge_',
+                                 timestep=self.save_iter)
 
-                if self.save_depth_figs:
-                    _fh = self.make_figure('depth', _model_time)
-                    self.save_figure(_fh, directory=self.prefix,
-                                     filename_root='depth_',
-                                     timestep=_save_iteration)
+            if self.save_velocity_figs:
+                _fu = self.make_figure('uw', self.time)
+                self.save_figure(_fu, directory=self.prefix,
+                                 filename_root='velocity_',
+                                 timestep=self.save_iter)
 
-                if self.save_discharge_figs:
-                    _fq = self.make_figure('qw', _model_time)
-                    self.save_figure(_fq, directory=self.prefix,
-                                     filename_root='discharge_',
-                                     timestep=_save_iteration)
+        # ------------------ grids ------------------
+        if self._save_any_grids:
 
-                if self.save_velocity_figs:
-                    _fu = self.make_figure('uw', _model_time)
-                    self.save_figure(_fu, directory=self.prefix,
-                                     filename_root='velocity_',
-                                     timestep=_save_iteration)
+            shape = self.output_netcdf.variables['time'].shape
+            self.output_netcdf.variables['time'][shape[0]] = self.time
 
-            # ------------------ grids ------------------
-            if self._save_any_grids:
+            _msg = 'Saving grids'
+            self.logger.info(_msg)
+            if self.verbose >= 2:
+                print(_msg)
 
-                shape = self.output_netcdf.variables['time'].shape
-                self.output_netcdf.variables['time'][shape[0]] = _model_time
+            if self.save_eta_grids:
+                self.save_grids('eta', self.eta, shape[0])
 
-                _msg = 'Saving grids'
-                self.logger.info(_msg)
-                if self.verbose >= 2:
-                    print(_msg)
+            if self.save_depth_grids:
+                self.save_grids('depth', self.depth, shape[0])
 
-                if self.save_eta_grids:
-                    self.save_grids('eta', self.eta, shape[0])
+            if self.save_stage_grids:
+                self.save_grids('stage', self.stage, shape[0])
 
-                if self.save_depth_grids:
-                    self.save_grids('depth', self.depth, shape[0])
+            if self.save_discharge_grids:
+                self.save_grids('discharge', self.qw, shape[0])
 
-                if self.save_stage_grids:
-                    self.save_grids('stage', self.stage, shape[0])
-
-                if self.save_discharge_grids:
-                    self.save_grids('discharge', self.qw, shape[0])
-
-                if self.save_velocity_grids:
-                    self.save_grids('velocity', self.uw, shape[0])
-
-            self._save_iter += int(1)
-            self._save_time_since_last = 0
+            if self.save_velocity_grids:
+                self.save_grids('velocity', self.uw, shape[0])
 
     def output_strata(self):
         """Save stratigraphy as sparse matrix to file.
 
-        Saves the stratigraphy (sand fraction) sparse matrices into output netcdf file
+        Saves the stratigraphy (sand fraction) sparse matrices into output
+        netcdf file.
+
+        .. note:
+
+            This method is called only once, within the
+            :obj:`pyDeltaRCM.DeltaModel.finalize()` step of model execution.
 
         Parameters
         ----------
@@ -310,6 +311,15 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
             self.logger.info(_msg)
             if self.verbose >= 2:
                 print(_msg)
+
+            if not self.strata_counter > 0:
+                _msg = 'Model has no computed stratigraphy. This is likely ' \
+                    'because `delta.time < delta.save_dt`, and the model ' \
+                    'has not computed stratigraphy.'
+                self.logger.error(_msg)
+                if self.verbose > 0:
+                    print(_msg)
+                raise RuntimeError(_msg)
 
             self.strata_eta = self.strata_eta[:, :self.strata_counter]
 
