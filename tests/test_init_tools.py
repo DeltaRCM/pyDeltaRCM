@@ -522,6 +522,30 @@ def test_save_figs_sequential(tmp_path):
     assert _delta._save_figs_sequential is False
 
 
+def test_toggle_subsidence(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'toggle_subsidence': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.toggle_subsidence is True
+
+
+def test_start_subsidence(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'start_subsidence': 12345})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.start_subsidence == 12345
+
+
+def test_sigma_max(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'toggle_subsidence': True,
+                                  'sigma_max': 1e-9})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.sigma_max == 1e-9
+    assert np.any(_delta.sigma > 0)
+    assert np.all(_delta.sigma <= (1e-9 * _delta.dt))
+
+
 # test definition of the model domain
 
 def test_x(test_DeltaModel):

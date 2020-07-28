@@ -232,7 +232,7 @@ class init_tools(object):
         self.itmax = 2 * (self.L + self.W)  # max number of jumps for parcel
         self.size_indices = int(self.itmax / 2)  # initial width of self.indices
 
-        self.dt = self.dVs / self.Qs0  # time step size
+        self._dt = self.dVs / self.Qs0  # time step size
 
         self.omega_flow_iter = 2. / self.itermax
 

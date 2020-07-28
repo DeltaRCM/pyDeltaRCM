@@ -28,6 +28,56 @@ def test_finalize_timestep(test_DeltaModel):
     assert test_DeltaModel.H_SL == 0.3
 
 
+def test_subsidence_in_update(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'toggle_subsidence': True,
+                                  'sigma_max': 1e-8,
+                                  'start_subsidence': 0,
+                                  'seed': 0})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.dt == 20000
+    assert _delta.sigma_max == 1e-8
+    assert _delta.sigma[17, 5] == 0.0  # outside the sigma mask
+    assert _delta.sigma[17, 6] == 0.0002  # inside the sigma mask
+    assert np.all(_delta.eta[17, 5:7] == -_delta.h0)
+    _delta.update()
+    assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
+    assert _delta.eta[17, 6] == pytest.approx(-_delta.h0 - 0.0002)
+
+
+def test_subsidence_in_update_delayed_start(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'toggle_subsidence': True,
+                                  'sigma_max': 1e-8,
+                                  'start_subsidence': 20000,
+                                  'seed': 0})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.dt == 20000
+    assert _delta.sigma_max == 1e-8
+    assert _delta.sigma[17, 5] == 0.0  # outside the sigma mask
+    assert _delta.sigma[17, 6] == 0.0002  # inside the sigma mask
+    assert np.all(_delta.eta[17, 5:7] == -_delta.h0)
+    _delta.update()  # no subsidence applied
+    assert _delta.time == 20000
+    assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
+    assert _delta.eta[17, 6] == pytest.approx(-_delta.h0)
+    _delta.update()
+    assert _delta.time == 40000
+    assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
+    assert _delta.eta[17, 6] == pytest.approx(-_delta.h0 - 0.0002)
+
+
+def test_subsidence_changed_with_timestep(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'toggle_subsidence': True,
+                                  'sigma_max': 1e-8})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.dt == 20000
+    assert _delta.sigma[17, 6] == 0.0002
+    _delta.time_step = 86400
+    assert _delta.sigma[17, 6] == 0.000864
+
+
 def test_verbose_printing_0(tmp_path, capsys):
     """
     This test should create the log, and then print nothing at all.
