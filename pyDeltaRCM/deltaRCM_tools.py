@@ -184,7 +184,13 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         """Apply subsidence pattern.
 
         Apply subsidence to domain if toggle_subsidence is True, and
-        start_subsidence is =< timestep.
+        :obj:`~pyDeltaRCM.DeltaModel.time` is ``>=``
+        ::obj:`~pyDeltaRCM.DeltaModel.start_subsidence`. Note, that the
+        :configuration of the :obj:`~pyDeltaRCM.DeltaModel.update()` method
+        :determines that the subsidence may be applied before the model time
+        :is incremented, such that subsidence will begin on the step
+        :*following* the time step that brings the model to ``time ==
+        :start_subsidence``.
 
         Parameters
         ----------
@@ -195,7 +201,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         """
         if self.toggle_subsidence:
 
-            if self.start_subsidence <= self._time:
+            if self.time >= self.start_subsidence:
 
                 _msg = 'Applying subsidence'
                 self.logger.info(_msg)

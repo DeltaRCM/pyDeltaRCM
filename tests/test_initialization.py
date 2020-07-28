@@ -545,7 +545,6 @@ def test_python_highlevelapi_matrix_expansion_scientificnotation(tmp_path):
     f.close()
     pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
     SLR_list = [j.deltamodel.SLR for j in pp.job_list]
-    print("SLR_LIST:", SLR_list)
     assert sum([j == 4e-5 for j in SLR_list]) == 3
     assert sum([j == 0.000001 for j in SLR_list]) == 3
 

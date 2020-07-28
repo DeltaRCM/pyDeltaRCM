@@ -156,20 +156,16 @@ class DeltaModel(Tools):
         """
         return self._dt
 
-    @dt.setter
-    def dt(self, new_dt):
-        if new_dt * self.init_Np_sed < 100:
-            warnings.warn(UserWarning('Using a very small timestep, '
+    @time_step.setter
+    def time_step(self, new_time_step):
+        if new_time_step * self.init_Np_sed < 100:
+            warnings.warn(UserWarning('Using a very small time step, '
                                       'Delta might evolve very slowly.'))
 
         if self.toggle_subsidence:
-            self.sigma = self.subsidence_mask * self.sigma_max * new_dt
+            self.sigma = self.subsidence_mask * self.sigma_max * new_time_step
 
-        self._dt = new_dt
-
-    @time_step.setter
-    def time_step(self, new_time_step):
-        self.dt = new_time_step
+        self._dt = new_time_step
 
     @property
     def time_iter(self):
