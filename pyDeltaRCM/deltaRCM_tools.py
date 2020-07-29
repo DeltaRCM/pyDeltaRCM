@@ -125,8 +125,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
 
         if self.save_strata:
 
-            timestep = int(self.time)
-            if self.strata_eta.shape[1] <= timestep:
+            if self.strata_counter >= self.strata_eta.shape[1]:
                 self.expand_stratigraphy()
 
             _msg = 'Storing stratigraphy data'
@@ -171,7 +170,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
                                     shape=(self.L * self.W, 1))
             self.strata_eta[:, self.strata_counter] = eta_sparse
 
-            if self.toggle_subsidence and self.start_subsidence <= timestep:
+            if self.toggle_subsidence and (self.time >= self.start_subsidence):
 
                 sigma_change = (self.strata_eta[:, :self.strata_counter]
                                 - self.sigma.flatten()[:, np.newaxis])
@@ -338,7 +337,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
             strata_age = self.output_netcdf.createVariable('strata_age',
                                                            np.int32,
                                                            ('total_strata_age'))
-            strata_age.units = 'timesteps'
+            strata_age.units = 'seconds'
             self.output_netcdf.variables['strata_age'][
                 :] = list(range(shape[1] - 1, -1, -1))
 

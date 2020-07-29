@@ -78,6 +78,58 @@ def test_subsidence_changed_with_timestep(tmp_path):
     assert _delta.sigma[17, 6] == 0.000864
 
 
+def test_expand_stratigraphy(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'verbose', 0)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'h0', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'f_bedload', 0.5)
+    utilities.write_parameter_to_file(f, 'C0_percent', 0.1)
+    utilities.write_parameter_to_file(f, 'save_dt', 600)
+    utilities.write_parameter_to_file(f, 'toggle_subsidence', True)
+    utilities.write_parameter_to_file(f, 'sigma_max', 1e-8)
+    utilities.write_parameter_to_file(f, 'start_subsidence', 20000)
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    f.close()
+    _delta = DeltaModel(input_file=p)
+    assert _delta.dt == 300
+    assert _delta.n_steps == 10
+    assert _delta.strata_counter == 0
+    for _t in range(20):
+        assert _delta.strata_eta[:, _delta.strata_counter].getnnz() == 0
+        _delta.update()
+        assert _delta.strata_eta.shape[1] == 10
+        assert (_delta.time // _delta.save_dt) + ((_delta.time % _delta.dt) / _delta.dt) == _delta.strata_counter
+    assert _delta.time == 20 * 300
+    assert _delta.strata_counter == 10  # stored 10 but invalid index next store
+    assert _delta.strata_eta.shape[1] == 10
+    # nothing occurs on next  update, because save_dt = 2 * dt
+    _delta.update()
+    assert _delta.time == 21 * 300
+    assert _delta.strata_counter == 10
+    assert _delta.strata_eta.shape[1] == 10
+    # expansion occurs when model tries to save strata after next update
+    _delta.update()
+    assert _delta.time == 22 * 300
+    assert _delta.strata_counter == 11
+    assert _delta.strata_eta.shape[1] == 20
+    # run to bring to even 100 steps, check status again
+    for _t in range(78):
+        _delta.update()
+    assert _delta.time == 100 * 300
+    assert _delta.strata_counter == 50
+    assert _delta.strata_eta.shape[1] == 50
+
+
 def test_verbose_printing_0(tmp_path, capsys):
     """
     This test should create the log, and then print nothing at all.
