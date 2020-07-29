@@ -5,6 +5,11 @@ pyDeltaRCM
 .. image:: https://github.com/DeltaRCM/pyDeltaRCM/workflows/build/badge.svg
     :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
 
+.. image:: https://badge.fury.io/py/pyDeltaRCM.svg
+    :target: https://badge.fury.io/py/pyDeltaRCM
+
+
+
 .. image:: https://codecov.io/gh/DeltaRCM/pyDeltaRCM/branch/develop/graph/badge.svg
   :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM
 
