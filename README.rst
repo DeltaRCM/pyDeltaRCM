@@ -2,17 +2,14 @@
 pyDeltaRCM
 **************
 
-.. image:: https://github.com/DeltaRCM/pyDeltaRCM/workflows/build/badge.svg
+| .. image:: https://github.com/DeltaRCM/pyDeltaRCM/workflows/build/badge.svg
     :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
-
 .. image:: https://badge.fury.io/py/pyDeltaRCM.svg
     :target: https://badge.fury.io/py/pyDeltaRCM
 
 
-
-.. image:: https://codecov.io/gh/DeltaRCM/pyDeltaRCM/branch/develop/graph/badge.svg
-  :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM
-
+|.. image:: https://codecov.io/gh/DeltaRCM/pyDeltaRCM/branch/develop/graph/badge.svg
+    :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM
 .. image:: https://app.codacy.com/project/badge/Grade/1c137d0227914741a9ba09f0b00a49a7
     :target: https://www.codacy.com/gh/DeltaRCM/pyDeltaRCM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DeltaRCM/pyDeltaRCM&amp;utm_campaign=Badge_Grade
 
@@ -33,7 +30,14 @@ Documentation
 Installation
 ############
 
-To install this package into an existing Python 3.x environment, download or clone the repository and run:
+pyDeltaRCM can be installed from the Pypi package respository.
+To install this package into an existing Python 3.x environment:
+
+.. code:: bash
+
+    $ pip install pyDeltaRCM
+
+For the latest version of pyDeltaRCM, download or clone the repository and run:
 
 .. code:: bash
 

@@ -332,6 +332,13 @@ class init_tools(object):
         self.inlet = list(np.unique(np.where(self.cell_type == 1)[1]))
         self.eta[:] = self.stage - self.depth
 
+    def after_init(self):
+        """After initialization user hook.
+
+        Optional hook for user adjustments to the model domain or parameters.
+        """
+        pass
+
     def init_stratigraphy(self):
         """Creates sparse array to store stratigraphy data."""
         if self.save_strata:
