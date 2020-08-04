@@ -224,10 +224,12 @@ So, as an example we don't recommend trying out, change the number of steps a wa
     ...
     ...         # inherit base DeltaModel methods
     ...         super().__init__(input_file)
-    ...     
-    ...      def after_init(self):
-    ...          # default is (2 x (L + W))
-    ...          self.itmax = 10  # always 10
+    ...
+    ...     def after_init(self):
+    ...
+    ...         # default is (2 x (L + W))
+    ...         self.itmax = 10  # always 10
+
 
 Now, during the initializing of a `TenStepDeltaModel` instance, our implementation of `after_init()` will be called and `self.itmax` will be adjusted accordingly. 
 
