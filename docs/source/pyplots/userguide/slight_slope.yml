@@ -1,0 +1,9 @@
+Length: 5000.
+Width: 8000.
+dx: 25
+Np_water: 1000
+Np_sed: 1000
+f_bedload: 0.35
+C0_percent: 0.15
+SLR: 0.0
+h0: 6

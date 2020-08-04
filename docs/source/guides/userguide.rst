@@ -167,3 +167,129 @@ Ensemble expansion
 ------------------
 
 todo
+
+
+
+================================
+Customizing the model operations
+================================
+
+.. _customize_the_model:
+
+The :obj:`~pyDeltaRCM.DeltaModel` is designed for flexibility and extension by users, and to support arbitrary and imaginative changes to the model routine.
+For example, one could easily extend the model to include additional delta controls (such as vegetation or permafrost development), or modify the model domain boundary conditions (such as imposing a sloped receiving basin).
+This flexibility is achieved by "subclassing" the `DeltaModel` to create a custom model object, and using "hooks" in the model to achieve the desired modifications.
+
+Subclassing is a standard concept in object-oriented programming, whereby a `subclass` obtains all the functionality of the `parent` object, and then adds/modifies existing functionality of the parent, to create a new class of object (i.e., the `subclass`).
+To subclass the :obj:`~pyDeltaRCM.model.DeltaModel` we simply create a new Python object class, which inherits from the model class:
+
+.. doctest::
+    
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> import pyDeltaRCM
+
+    >>> class SubclassDeltaModel(pyDeltaRCM.DeltaModel):
+    ...     def __init__(self, input_file=None):
+    ...
+    ...         # inherit base DeltaModel methods
+    ...         super().__init__(input_file)
+
+
+We then can initialize our new model type, and see that this model has all of the attributes and functionality of the original `DeltaModel`, but its type is our subclass.
+
+.. doctest::
+
+    >>> mdl = SubclassDeltaModel()
+    
+    # for example, the `mdl` has the `update` method
+    >>> hasattr(mdl, 'update')
+    True
+
+    >>> mdl
+    <SubclassDeltaModel object at 0x...>
+    
+
+Hooks are methods in the model sequence that, do nothing by default, but can be augmented to provide arbitrary desired behavior in the model.
+Hooks have been integrated throughout the model initialization and update sequences, to allow the users to achieve complex behavior at various times in the default model sequence.
+For example, ``after_init()`` is a hook which occurs after the default model initiazization is complete.
+To utilize the hooks, we simply define a method in our subclass with the name corresponding to the hook we want to augment to achieve the desired behavior.
+
+So, as an example we don't recommend trying out, change the number of steps a water or sediment parcel could take by changing the model definition from above:
+
+.. doctest::
+
+    >>> class TenStepDeltaModel(pyDeltaRCM.DeltaModel):
+    ...     def __init__(self, input_file=None):
+    ...
+    ...         # inherit base DeltaModel methods
+    ...         super().__init__(input_file)
+    ...     
+    ...      def after_init(self):
+    ...          # default is (2 x (L + W))
+    ...          self.itmax = 10  # always 10
+
+Now, during the initializing of a `TenStepDeltaModel` instance, our implementation of `after_init()` will be called and `self.itmax` will be adjusted accordingly. 
+
+.. doctest::
+
+    >>> mdl = TenStepDeltaModel()
+    >>> mdl.itmax
+    10
+
+A complete list of hooks in the model follows:
+
+.. csv-table:: Available model hooks
+   :header: "Initializing", "Updating", "Finalizing"
+   :widths: 20, 30, 20
+
+   :obj:`~pyDeltaRCM.init_tools.init_tools.after_init`, ~, ~
+   ~, ~, ~
+   ~, ~, ~
+
+
+Subclass example 
+----------------
+
+Consider the case where we are a researcher seeking to explore the effects of a receiving basin that is sloped perpendicular to the channel outlet. 
+This researcher asks: does this sloped basin cause channels to steer towards the deeper water, where compensation is higher?
+
+We can easily use subclassing and the model hooks to achieve our desired effect.
+
+.. doctest:: 
+
+    >>> class SlightSlopeModel(pyDeltaRCM.DeltaModel):
+    ...    def __init__(self, input_file):
+    ...        super().__init__(input_file)
+    ...
+    ...    def after_init(self):
+    ...        """Called at end of initialize."""
+    ...        _slope = 0.0005
+    ...        lin = _slope * np.arange(0, self.Width, step=self.dx)
+    ...        grid = np.tile(lin, (self.L - self.L0, 1)) - ((_slope*self.Width)/2)
+    ...        self.eta[self.L0:, :] = self.eta[self.L0:, :] + grid
+
+    
+Coupling this custom model subclass with the :doc:`misc/slight_slope` model configuration file, the `bed_elevation` at the start of the model run reflects our modification to create a sloped receiving basin.
+
+.. code:: python
+
+    >>> mdl = SlightSlopeModel('slight_slope.yml')
+
+.. plot:: userguide/slight_slope.py
+
+and after 500 timesteps, the model has evolved to the bed elevation below. 
+
+.. image:: misc/slight_slope_results.png
+
+While this is not a robust scientific study, this simple modification seems to support the notion that the channels are steered towards deeper water where there is higher accomodation.
+
+
+
+Supporting documentation and files
+==================================
+
+.. toctree::
+   :maxdepth: 2
+
+   misc/slight_slope
