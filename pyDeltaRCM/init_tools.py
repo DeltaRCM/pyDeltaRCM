@@ -259,8 +259,10 @@ class init_tools(object):
         self.logger.info('Creating model domain')
 
         # ---- empty arrays ----
-        self.x, self.y = np.meshgrid(
-            np.arange(0, self.W), np.arange(0, self.L))
+        self.x, self.y = np.meshgrid(np.arange(0, self.W),
+                                     np.arange(0, self.L))
+        self.X, self.Y = np.meshgrid(np.arange(0, self.W+1)*self.dx,
+                                     np.arange(0, self.L+1)*self.dx)
 
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int)
         self.eta = np.zeros((self.L, self.W)).astype(np.float32)
