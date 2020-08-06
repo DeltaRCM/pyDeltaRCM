@@ -66,7 +66,7 @@ class DeltaModel(Tools):
         self.init_stratigraphy()
         self.init_output_grids()
 
-        self.after_init()  # user hook
+        self.after_init() # user hook
 
         self.logger.info('Model initialization complete')
 

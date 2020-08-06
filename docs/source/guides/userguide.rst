@@ -64,7 +64,7 @@ or equivalently:
     
     python -m pyDeltaRCM --config model_configuration.yml
 
-These invokations will run the pyDeltaRCM :obj:`preprocessor <pyDeltaRCM.preprocessor.PreprocessorCLI>` with the parameters specified in the ``model_configuration.yml`` file. 
+These invocations will run the pyDeltaRCM :obj:`preprocessor <pyDeltaRCM.preprocessor.PreprocessorCLI>` with the parameters specified in the ``model_configuration.yml`` file. 
 If the YAML configuration indicates multiple jobs (:ref:`via matrix expansion or ensemble specification <configuring_multiple_jobs>`), the jobs will each be run automatically by calling :obj:`~pyDeltaRCM.DeltaModel.update` on the model 500 times.
 
 
@@ -132,7 +132,7 @@ To use matrix expansion to configure multiple model runs, the dimensions of the 
         - 0.5
         - 0.2
 
-This configuation would produce two model runs, one with bedload fraction (`f_bedload`) 0.5 and another with bedload fraction 0.2, and both with grid spacing (`dx`) 2.0 and basin depth (`h0`) 1.0.
+This configuration would produce two model runs, one with bedload fraction (`f_bedload`) 0.5 and another with bedload fraction 0.2, and both with grid spacing (`dx`) 2.0 and basin depth (`h0`) 1.0.
 The matrix expansions will create two folders at `./out_dir/job_000` and `./out_dir/job_001` that each correspond to a created job.
 Each folder will contain a copy of the configuration file used for that job; for example, the full configuration for `job_000` is:
 
@@ -145,9 +145,9 @@ Each folder will contain a copy of the configuration file used for that job; for
 
 Additionally, a log file for each job is located in the output folder, and any output grid files or images specified by the input configuration will be located in the respective job output folder.
 
-.. note:: You must specify the `out_dir` key in the input YAML configuation to use matrix expansion.
+.. note:: You must specify the `out_dir` key in the input YAML configuration to use matrix expansion.
 
-Multiple dimensional matrix expansion is additionally supported. For example, the following configuation produces six jobs:
+Multiple dimensional matrix expansion is additionally supported. For example, the following configuration produces six jobs:
 
 .. code:: yaml
     
@@ -212,7 +212,7 @@ We then can initialize our new model type, and see that this model has all of th
 
 Hooks are methods in the model sequence that, do nothing by default, but can be augmented to provide arbitrary desired behavior in the model.
 Hooks have been integrated throughout the model initialization and update sequences, to allow the users to achieve complex behavior at various times in the default model sequence.
-For example, ``after_init()`` is a hook which occurs after the default model initiazization is complete.
+For example, ``after_init()`` is a hook which occurs after the default model initialization is complete.
 To utilize the hooks, we simply define a method in our subclass with the name corresponding to the hook we want to augment to achieve the desired behavior.
 
 So, as an example we don't recommend trying out, change the number of steps a water or sediment parcel could take by changing the model definition from above:
@@ -284,7 +284,7 @@ and after 500 timesteps, the model has evolved to the bed elevation below.
 
 .. image:: misc/slight_slope_results.png
 
-While this is not a robust scientific study, this simple modification seems to support the notion that the channels are steered towards deeper water where there is higher accomodation.
+While this is not a robust scientific study, this simple modification seems to support the notion that the channels are steered towards deeper water where there is higher accommodation.
 
 
 
