@@ -193,7 +193,7 @@ def get_weight_at_cell(ind, stage_nbrs, depth_nbrs, ct_nbrs, stage, qx, qy,
         weight = weight / np.nansum(weight)
         weight[nanWeight] = 0
     else:
-        weight[~nanWeight] = 1 / len(weight[~nanWeight])
+        weight[~nanWeight] = 1 / np.maximum(1, len(weight[~nanWeight]))
         weight[nanWeight] = 0
     return weight
 
