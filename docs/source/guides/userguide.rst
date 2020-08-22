@@ -10,8 +10,8 @@ Configuring an input YAML file
 ==============================
 
 The configuration for a pyDeltaRCM run is set up by a parameter set, described in the ``YAML`` markup format.
-To configure a run, you should create a file called, for example, ``run_parameters.yml``. 
-Inside this file you can specify parameters for your run, with each parameter on a new line. For example, if ``run_parameters.yml`` contained the line: 
+To configure a run, you should create a file called, for example, ``run_parameters.yml``.
+Inside this file you can specify parameters for your run, with each parameter on a new line. For example, if ``run_parameters.yml`` contained the line:
 
 .. code-block:: yaml
 
@@ -51,20 +51,20 @@ For the following high-level API demonstrations, consider a YAML input file name
 Command line API
 ----------------
 
-To invoke a model run from the command line using the YAML file ``model_configuration.yml`` defined above, 
+To invoke a model run from the command line using the YAML file ``model_configuration.yml`` defined above,
 we would simply call:
 
 .. code:: bash
-    
+
     pyDeltaRCM --config model_configuration.yml
 
 or equivalently:
 
 .. code:: bash
-    
+
     python -m pyDeltaRCM --config model_configuration.yml
 
-These invokations will run the pyDeltaRCM :obj:`preprocessor <pyDeltaRCM.preprocessor.PreprocessorCLI>` with the parameters specified in the ``model_configuration.yml`` file. 
+These invokations will run the pyDeltaRCM :obj:`preprocessor <pyDeltaRCM.preprocessor.PreprocessorCLI>` with the parameters specified in the ``model_configuration.yml`` file.
 If the YAML configuration indicates multiple jobs (:ref:`via matrix expansion or ensemble specification <configuring_multiple_jobs>`), the jobs will each be run automatically by calling :obj:`~pyDeltaRCM.DeltaModel.update` on the model 500 times.
 
 
@@ -72,14 +72,14 @@ If the YAML configuration indicates multiple jobs (:ref:`via matrix expansion or
 Python API
 ----------
 
-The Python high-level API is accessed via the :obj:`~pyDeltaRCM.Preprocessor` object. 
+The Python high-level API is accessed via the :obj:`~pyDeltaRCM.Preprocessor` object.
 First, the `Preprocessor` is instantiated with a YAML configuration file (e.g., ``model_configuration.yml``):
 
 .. code::
 
     >>> pp = preprocessor.Preprocessor(p)
-    
-which returns an object containing the list of jobs to run. 
+
+which returns an object containing the list of jobs to run.
 Jobs are then run with:
 
 .. code::
@@ -128,7 +128,7 @@ To use matrix expansion to configure multiple model runs, the dimensions of the 
     h0: 1.0
 
     matrix:
-      f_bedload: 
+      f_bedload:
         - 0.5
         - 0.2
 
@@ -150,11 +150,11 @@ Additionally, a log file for each job is located in the output folder, and any o
 Multiple dimensional matrix expansion is additionally supported. For example, the following configuation produces six jobs:
 
 .. code:: yaml
-    
+
     out_dir: 'out_dir'
 
     matrix:
-      f_bedload: 
+      f_bedload:
         - 0.5
         - 0.4
         - 0.2
@@ -166,4 +166,30 @@ Multiple dimensional matrix expansion is additionally supported. For example, th
 Ensemble expansion
 ------------------
 
-todo
+Ensemble expansion creates replicates of specified model configurations with different random seed values.
+Like the matrix expansion, the `out_dir` key must be specified in the input configuration file.
+The `ensemble` key can be added to any configuration file that does not explicitly define the random seed.
+As an example, two model runs can be generated with the same input sediment fraction using the following configuration `.yml`:
+
+.. code:: yaml
+
+    out_dir: 'out_dir'
+
+    f_bedload: 0.5
+    ensemble: 2
+
+This configuration file would produce two model runs that share the same parameters, but have different initial random seed values.
+The ensemble expansion can be applied to configuration files that include a matrix expansion as well:
+
+.. code:: yaml
+
+    out_dir: 'out_dir'
+
+    ensemble: 3
+
+    matrix:
+      h0:
+        - 1.0
+        - 2.0
+
+The above configuration file would produce 6 model runs, 3 with a basin depth (`h0`) of 1.0, and 3 with a basin depth of 2.0.
