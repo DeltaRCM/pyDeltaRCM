@@ -21,8 +21,8 @@ class BasePreprocessor(abc.ABC):
     Defines a prelimiary yaml reading, then handles the YAML "meta" tag
     parsing, model instatiation, and job running.
 
-    Subclasses create the high-level command line API 
-    and the high-level python API. 
+    Subclasses create the high-level command line API
+    and the high-level python API.
 
     .. note::
 
@@ -32,7 +32,7 @@ class BasePreprocessor(abc.ABC):
     """
 
     def extract_yaml_config(self):
-        """Preliminary YAML parsing. 
+        """Preliminary YAML parsing.
 
         Extract ``.yml`` file (``self.input_file``) into a dictionary, if
         provided. This dictionary provides a few keys used throughout the
@@ -50,6 +50,10 @@ class BasePreprocessor(abc.ABC):
         self.user_dict = yaml.load(user_file, Loader=yaml.FullLoader)
         user_file.close()
 
+        if 'ensemble' in self.user_dict.keys():
+            self._has_ensemble = True
+            self.expand_ensemble()
+
         if 'matrix' in self.user_dict.keys():
             self._has_matrix = True
         else:
@@ -59,6 +63,57 @@ class BasePreprocessor(abc.ABC):
             self.verbose = self.user_dict['verbose']
         else:
             self.verbose = 0
+
+    def expand_ensemble(self):
+        """Create ensemble random seeds and put into matrix.
+
+        Seed the yaml configuration based on the number of ensembles specified.
+        If matrix exists add seeds there, if not, create matrix and add seeds.
+        """
+        if self._has_ensemble:
+            # ensemble must be integer - check if valid
+            _ensemble = self.user_dict.pop('ensemble')
+            if not isinstance(_ensemble, int):
+                raise TypeError('Invalid ensemble type, must be an integer.')
+
+            # if matrix does not exist, then it must be created
+            if 'matrix' not in self.user_dict.keys():
+                self.create_matrix()
+
+            # then the seed values must be added to the matrix
+            self.seed_matrix(_ensemble)
+
+    def create_matrix(self):
+        """Create a matrix if not already in the yaml."""
+        _matrix = dict()
+        self.user_dict['matrix'] = _matrix
+
+    def seed_matrix(self, n_ensembles):
+        """Generate random integers to be used as seeds for ensemble runs.
+
+        Parameters
+        ----------
+        n_ensembles : `int`
+            Number of ensembles which is the number of seeds to generate.
+
+        """
+        _matrix = self.user_dict.pop('matrix')
+        if not isinstance(_matrix, dict):
+            raise ValueError(
+                'Invalid matrix specification, was not evaluated to "dict".')
+
+        if 'seed' in _matrix.keys():
+            raise ValueError('Random seeds cannot be specified in the matrix, '
+                             'if an "ensemble" number is specified as well.')
+
+        # generate list of random seeds
+        seed_list = []
+        for i in range(n_ensembles):
+            seed_list.append(np.random.randint((2**32) - 1, dtype='u8'))
+
+        # add list of random seeds to the matrix
+        _matrix['seed'] = seed_list
+        self.user_dict['matrix'] = _matrix
 
     def write_yaml_config(self, i, ith_config, ith_dir, ith_id):
         """Write full config to file in output folder.
@@ -88,7 +143,7 @@ class BasePreprocessor(abc.ABC):
             # check validity of matrix specs
             if not isinstance(_matrix, dict):
                 raise ValueError(
-                    'Invalid matrix spceification, was not evaluated to "dict".')
+                    'Invalid matrix specification, was not evaluated to "dict".')
             if 'out_dir' not in self.user_dict.keys():
                 raise ValueError(
                     'You must specify "out_dir" in YAML to use matrix expansion.')
@@ -275,11 +330,11 @@ class PreprocessorCLI(BasePreprocessor):
     defines a method to process the arguments from the command line (using the
     `argparse` package).
 
-    .. note:: 
+    .. note::
 
         You probably do not need to interact with this class directly.
         Instead, you can use the command line API as it is defined HERE XX or
-        the python API :class:`~pyDeltaRCM.preprocessor.Preprocessor`. 
+        the python API :class:`~pyDeltaRCM.preprocessor.Preprocessor`.
 
         When the class is called from the command line the instantiated object's
         method :meth:`run_jobs` is called by the
@@ -324,7 +379,7 @@ class PreprocessorCLI(BasePreprocessor):
     def process_arguments(self):
         """Process the command line arguments.
 
-        .. note:: 
+        .. note::
 
             The command line args are not directly passed to this function in
             any way.
@@ -355,7 +410,7 @@ class Preprocessor(BasePreprocessor):
 
     This is the python high-level API class that is callable from a python
     script. For complete documentation on the API configurations, see
-    XXXXXXXXXXXXXX. 
+    XXXXXXXXXXXXXX.
 
     The class gives a way to configure and run multiple jobs from a python script.
 
