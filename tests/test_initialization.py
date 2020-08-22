@@ -642,6 +642,131 @@ def test_python_highlevelapi_matrix_verbosity(tmp_path, capsys):
     assert '  jobs 6' in captd.out
 
 
+def test_py_hlvl_ensemble(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'ensemble', 2)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    # assertions for job creation
+    assert pp._has_matrix is True
+    assert type(pp.job_list) is list
+    assert len(pp.job_list) == 2
+    assert pp.job_list[0]._is_completed is False
+    pp.run_jobs()
+    # assertions after running jobs
+    assert len(pp.job_list) == 2
+    assert pp.job_list[0]._is_completed is True
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc1)
+
+
+def test_py_hlvl_ensemble_with_matrix(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'ensemble', 2)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload'],
+                                   [[0.2, 0.5, 0.6]])
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    # assertions for job creation
+    assert pp._has_matrix is True
+    assert type(pp.job_list) is list
+    assert len(pp.job_list) == 6
+    assert pp.job_list[0]._is_completed is False
+    pp.run_jobs()
+    # assertions after running jobs
+    assert len(pp.job_list) == 6
+    assert pp.job_list[0]._is_completed is True
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc5 = os.path.join(
+        tmp_path / 'test', 'job_005', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc5)
+
+
+def test_py_hlvl_ensemble_badtype(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'ensemble', 2.0)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    f.close()
+    with pytest.raises(TypeError, match=r'Invalid ensemble type, must be an integer.'):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
+def test_py_hlvl_ensemble_double_seeds(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'ensemble', 2)
+    utilities.write_parameter_to_file(f, 'seed', 1)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    f.close()
+    with pytest.raises(ValueError,
+                       match=r'You cannot specify the same key in the matrix '
+                             'configuration and fixed configuration. Key "seed" '
+                             'was specified in both.'):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
+def test_py_hlvl_ensemble_matrix_seeds(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'ensemble', 2)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['seed'],
+                                   [[1, 2]])
+    f.close()
+    with pytest.raises(ValueError,
+                       match=r'Random seeds cannot be specified in the matrix, '
+                             'if an "ensemble" number is specified as well.'):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
 def test_Preprocessor_toplevelimport():
     import pyDeltaRCM
 
