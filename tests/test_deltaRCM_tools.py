@@ -104,26 +104,27 @@ def test_expand_stratigraphy(tmp_path):
     assert _delta.dt == 300
     assert _delta.n_steps == 10
     assert _delta.strata_counter == 0
-    for _t in range(20):
+    assert _delta.strata_eta[:, _delta.strata_counter].getnnz() == 0
+    for _t in range(19):
         assert _delta.strata_eta[:, _delta.strata_counter].getnnz() == 0
         _delta.update()
+        assert _delta.time == _delta.dt * (_t + 1)
         assert _delta.strata_eta.shape[1] == 10
-        assert (_delta.time // _delta.save_dt) + ((_delta.time % _delta.dt) / _delta.dt) == _delta.strata_counter
-    assert _delta.time == 20 * 300
+    assert _delta.time == 19 * 300
     assert _delta.strata_counter == 10  # stored 10 but invalid index next store
     assert _delta.strata_eta.shape[1] == 10
     # nothing occurs on next  update, because save_dt = 2 * dt
     _delta.update()
-    assert _delta.time == 21 * 300
+    assert _delta.time == 20 * 300
     assert _delta.strata_counter == 10
     assert _delta.strata_eta.shape[1] == 10
     # expansion occurs when model tries to save strata after next update
     _delta.update()
-    assert _delta.time == 22 * 300
+    assert _delta.time == 21 * 300
     assert _delta.strata_counter == 11
     assert _delta.strata_eta.shape[1] == 20
     # run to bring to even 100 steps, check status again
-    for _t in range(78):
+    for _t in range(79):
         _delta.update()
     assert _delta.time == 100 * 300
     assert _delta.strata_counter == 50

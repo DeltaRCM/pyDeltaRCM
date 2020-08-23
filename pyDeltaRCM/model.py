@@ -48,7 +48,7 @@ class DeltaModel(Tools):
         """
         self._time = 0.
         self._time_iter = int(0)
-        self._save_time_since_last = 0.
+        self._save_time_since_last = float("inf")  # force save on t==0
         self._save_iter = int(0)
 
         self.input_file = input_file
@@ -91,19 +91,18 @@ class DeltaModel(Tools):
         -------
 
         """
-        self.run_one_timestep()
-        self.apply_subsidence()
-        self.finalize_timestep()
-
-        self._time += self.dt
-        self._save_time_since_last += self.dt
-
         if self._save_time_since_last >= self.save_dt:
             self.record_stratigraphy()
             self.output_data()
             self._save_iter += int(1)
             self._save_time_since_last = 0
 
+        self.run_one_timestep()
+        self.apply_subsidence()
+        self.finalize_timestep()
+
+        self._time += self.dt
+        self._save_time_since_last += self.dt
         self._time_iter += int(1)
 
     def finalize(self):
