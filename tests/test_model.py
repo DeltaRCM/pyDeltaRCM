@@ -34,11 +34,16 @@ def test_update_saving_intervals(test_DeltaModel):
     test_DeltaModel.update()
     assert test_DeltaModel.time_iter == int(1)
     assert test_DeltaModel.time == test_DeltaModel.dt
-    assert test_DeltaModel.strata_counter == 0
+    assert test_DeltaModel.strata_counter == 1
     test_DeltaModel.update()
     assert test_DeltaModel.time_iter == int(2)
     assert test_DeltaModel.time == 2 * test_DeltaModel.dt
     assert test_DeltaModel.strata_counter == 1
+    assert test_DeltaModel._is_finalized is False
+    test_DeltaModel.update()
+    assert test_DeltaModel.time_iter == int(3)
+    assert test_DeltaModel.time == 3 * test_DeltaModel.dt
+    assert test_DeltaModel.strata_counter == 2
     assert test_DeltaModel._is_finalized is False
 
 

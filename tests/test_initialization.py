@@ -134,13 +134,14 @@ def test_no_outputs_save_dt_notreached(tmp_path):
     utilities.write_parameter_to_file(f, 'save_dt', 43200)
     f.close()
     delta = DeltaModel(input_file=p)
+    with pytest.raises(RuntimeError, match=r'Model has no computed strat.*'):
+        delta.finalize()
     for _ in range(2):
         delta.update()
     assert delta.dt == 20000.0
-    assert delta.strata_counter == 0
+    assert delta.strata_counter == 1  # one saved, t==0
     assert delta.time < delta.save_dt
-    with pytest.raises(RuntimeError, match=r'Model has no computed strat.*'):
-        delta.finalize()
+    delta.finalize()
 
 
 def test_no_outputs_save_strata_false(tmp_path):

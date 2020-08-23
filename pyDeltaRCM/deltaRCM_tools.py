@@ -389,7 +389,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         fig, ax = plt.subplots()
         pc = ax.pcolor(_data)
         fig.colorbar(pc)
-        ax.set_title(var + ' --- ' + 'time = ' + str(timestep))
+        ax.set_title(var + ' --- ' + 'time = ' + str(round(timestep, 2)))
         ax.axis('equal')
 
         return fig
