@@ -134,8 +134,6 @@ def test_no_outputs_save_dt_notreached(tmp_path):
     utilities.write_parameter_to_file(f, 'save_dt', 43200)
     f.close()
     delta = DeltaModel(input_file=p)
-    with pytest.raises(RuntimeError, match=r'Model has no computed strat.*'):
-        delta.finalize()
     for _ in range(2):
         delta.update()
     assert delta.dt == 20000.0
@@ -215,9 +213,11 @@ def test_entry_point_python_main_call(tmp_path):
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
     exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+    exp_path_png2 = os.path.join(tmp_path / 'test', 'eta_00002.png')
     assert os.path.isfile(exp_path_nc)
     assert os.path.isfile(exp_path_png)
-    assert not os.path.isfile(exp_path_png1)
+    assert os.path.isfile(exp_path_png1)
+    assert not os.path.isfile(exp_path_png2)
 
 
 def test_entry_point_python_main_call_dryrun(tmp_path):
@@ -380,7 +380,8 @@ def test_py_hlvl_args(tmp_path):
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
     exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
-    exp_path_png3 = os.path.join(tmp_path / 'test', 'eta_00002.png')
+    exp_path_png2 = os.path.join(tmp_path / 'test', 'eta_00002.png')
+    exp_path_png3 = os.path.join(tmp_path / 'test', 'eta_00003.png')
     assert os.path.isfile(exp_path_nc)
     assert os.path.isfile(exp_path_png)
     assert os.path.isfile(exp_path_png1)
@@ -478,7 +479,7 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path
     ds = netCDF4.Dataset(exp_path_nc0, "r", format="NETCDF4")
     assert ds.variables['strata_sand_frac'].shape[1:] == (10, 10)
     assert ds.variables['strata_sand_frac'].shape[1:] == (10, 10)
-    assert ds.variables['strata_age'].shape == (3,)
+    assert ds.variables['strata_age'].shape == (4,)
 
 
 def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
