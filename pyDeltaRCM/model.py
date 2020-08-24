@@ -119,6 +119,12 @@ class DeltaModel(Tools):
 
         """
         self.logger.info('Finalize model run')
+
+        # get the final timestep recorded, if needed.
+        if self._save_time_since_last >= self.save_dt:
+            self.record_stratigraphy()
+            self.output_data()
+
         self.output_strata()
 
         try:
