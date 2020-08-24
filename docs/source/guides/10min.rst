@@ -34,7 +34,7 @@ We can visualize the delta bed elevation, though it's not very exciting after on
     >>> import matplotlib.pyplot as plt
 
     >>> fig, ax = plt.subplots()
-    >>> ax.imshow(delta.bed_elevation, vmax=-4)
+    >>> ax.imshow(delta.bed_elevation, vmax=-3)
     >>> plt.show()
 
 .. plot:: 10min/model_run_visual.py
