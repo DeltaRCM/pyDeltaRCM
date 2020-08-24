@@ -6,6 +6,8 @@ import sys
 import os
 import numpy as np
 
+import netCDF4
+
 from utilities import test_DeltaModel
 
 # need to create a simple case of pydeltarcm object to test these functions
@@ -29,7 +31,81 @@ def test_update(test_DeltaModel):
     assert test_DeltaModel._is_finalized is False
 
 
-def test_update_saving_intervals(test_DeltaModel):
+def get_saved_times_from_file(_path):
+    """Utility for extracting saved times from netcdf file after closed."""
+    exp_path_nc = os.path.join(os.path.join(_path, 'pyDeltaRCM_output.nc'))
+    assert os.path.isfile(exp_path_nc)
+    ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+    return ds.variables['time']
+
+
+def test_update_saving_intervals_on_cycle(test_DeltaModel):
+    """dt == 300; save_dt == 600"""
+    test_DeltaModel.save_dt = 600
+    test_DeltaModel._save_any_grids = True  # override from settings
+    assert test_DeltaModel.strata_counter == 0
+    test_DeltaModel.update()
+    assert test_DeltaModel.time_iter == int(1)
+    assert test_DeltaModel.time == test_DeltaModel.dt
+    assert test_DeltaModel.strata_counter == 1
+    test_DeltaModel.update()
+    assert test_DeltaModel.save_time_since_last == 600
+    assert test_DeltaModel.time_iter == int(2)
+    assert test_DeltaModel.time == 2 * test_DeltaModel.dt
+    assert test_DeltaModel.strata_counter == 1  # not saved yet
+    test_DeltaModel.update()  # should save now, at top of update()
+    assert test_DeltaModel.time_iter == int(3)
+    assert test_DeltaModel.strata_counter == 2
+    assert test_DeltaModel.save_iter == 2
+    for _ in range(7):
+        test_DeltaModel.update()
+    assert test_DeltaModel.time_iter == int(10)
+    assert test_DeltaModel.strata_counter == 5
+    assert test_DeltaModel.save_iter == 5
+    # time will be longer than number of saves.
+    _saves = np.array(test_DeltaModel.output_netcdf.variables['time'])
+    assert np.all(_saves == np.array([0, 600, 1200, 1800, 2400]))
+    assert test_DeltaModel.time == 3000
+    assert test_DeltaModel._is_finalized is False
+    test_DeltaModel.finalize()
+    with pytest.raises(RuntimeError):
+        _saves = np.array(test_DeltaModel.output_netcdf.variables['time'])
+    _saves = get_saved_times_from_file(test_DeltaModel.prefix_abspath)
+    assert np.all(_saves == np.array([0, 600, 1200, 1800, 2400, 3000]))
+
+
+def test_update_saving_intervals_short(test_DeltaModel):
+    """dt == 300; save_dt == 100"""
+    test_DeltaModel.save_dt = 100
+    test_DeltaModel._save_any_grids = True  # override from settings
+    assert test_DeltaModel.strata_counter == 0
+    test_DeltaModel.update()
+    assert test_DeltaModel.time_iter == int(1)
+    assert test_DeltaModel.time == test_DeltaModel.dt
+    assert test_DeltaModel.strata_counter == 1
+    test_DeltaModel.update()
+    assert test_DeltaModel.save_time_since_last == 300
+    assert test_DeltaModel.time_iter == int(2)
+    assert test_DeltaModel.time == 2 * test_DeltaModel.dt
+    assert test_DeltaModel.strata_counter == 2
+    test_DeltaModel.update()
+    assert test_DeltaModel.save_time_since_last == 300
+    assert test_DeltaModel.time_iter == int(3)
+    assert test_DeltaModel.strata_counter == 3
+    assert test_DeltaModel.save_iter == 3
+    assert test_DeltaModel.time == 900
+    _saves = np.array(test_DeltaModel.output_netcdf.variables['time'])
+    assert np.all(_saves == np.array([0, 300, 600]))
+    test_DeltaModel.finalize()
+    _saves = get_saved_times_from_file(test_DeltaModel.prefix_abspath)
+    # new save, because 900, but not saved
+    assert np.all(_saves == np.array([0, 300, 600, 900]))
+
+
+def test_update_saving_intervals_offset_long_not_double(test_DeltaModel):
+    """dt == 300; save_dt == 500"""
+    test_DeltaModel.save_dt = 500
+    test_DeltaModel._save_any_grids = True  # override from settings
     assert test_DeltaModel.strata_counter == 0
     test_DeltaModel.update()
     assert test_DeltaModel.time_iter == int(1)
@@ -39,12 +115,53 @@ def test_update_saving_intervals(test_DeltaModel):
     assert test_DeltaModel.time_iter == int(2)
     assert test_DeltaModel.time == 2 * test_DeltaModel.dt
     assert test_DeltaModel.strata_counter == 1
-    assert test_DeltaModel._is_finalized is False
+    for _ in range(10):
+        test_DeltaModel.update()
+    assert test_DeltaModel.time_iter == int(12)
+    assert test_DeltaModel.time == 3600
+    assert test_DeltaModel.strata_counter == 6
+    _saves = np.array(test_DeltaModel.output_netcdf.variables['time'])
+    assert np.all(_saves == np.array([0, 600, 1200, 1800, 2400, 3000]))
+    test_DeltaModel.finalize()
+    _saves = get_saved_times_from_file(test_DeltaModel.prefix_abspath)
+    # add final save, because time reached
+    assert np.all(_saves == np.array([0, 600, 1200, 1800, 2400, 3000, 3600]))
+
+
+def test_update_saving_intervals_offset_long_over_double(test_DeltaModel):
+    """dt == 300; save_dt == 1000"""
+    test_DeltaModel.save_dt = 1000
+    test_DeltaModel._save_any_grids = True  # override from settings
+    assert test_DeltaModel.strata_counter == 0
+    test_DeltaModel.update()
+    assert test_DeltaModel.time_iter == int(1)
+    assert test_DeltaModel.time == test_DeltaModel.dt
+    assert test_DeltaModel.strata_counter == 1
+    test_DeltaModel.update()
+    assert test_DeltaModel.time_iter == int(2)
+    assert test_DeltaModel.time == 2 * test_DeltaModel.dt
+    assert test_DeltaModel.strata_counter == 1
     test_DeltaModel.update()
     assert test_DeltaModel.time_iter == int(3)
     assert test_DeltaModel.time == 3 * test_DeltaModel.dt
+    assert test_DeltaModel.strata_counter == 1
+    test_DeltaModel.update()
+    assert test_DeltaModel.time == 4 * test_DeltaModel.dt
+    assert test_DeltaModel.strata_counter == 1
+    test_DeltaModel.update()
+    assert test_DeltaModel.time == 5 * test_DeltaModel.dt
     assert test_DeltaModel.strata_counter == 2
+    for _ in range(33):
+        test_DeltaModel.update()
+    assert test_DeltaModel.time == 38 * test_DeltaModel.dt
+    assert test_DeltaModel.strata_counter == 10
     assert test_DeltaModel._is_finalized is False
+    _saves = np.array(test_DeltaModel.output_netcdf.variables['time'])
+    assert np.all(_saves == np.array([0, 1200, 2400, 3600, 4800, 6000, 7200, 8400, 9600, 10800]))
+    test_DeltaModel.finalize()
+    _saves = get_saved_times_from_file(test_DeltaModel.prefix_abspath)
+    # no new saves, because time not reached
+    assert np.all(_saves == np.array([0, 1200, 2400, 3600, 4800, 6000, 7200, 8400, 9600, 10800]))
 
 
 def test_finalize(test_DeltaModel):
