@@ -263,6 +263,9 @@ class BasePreprocessor(abc.ABC):
             TODO: implement the parallel pool.
 
         """
+        if self._dryrun:
+            return
+
         if len(self.job_list) > 1:
             # set up parallel pool if multiple jobs
             pass
@@ -336,8 +339,8 @@ class PreprocessorCLI(BasePreprocessor):
         Instead, you can use the command line API as it is defined HERE XX or
         the python API :class:`~pyDeltaRCM.preprocessor.Preprocessor`.
 
-        When the class is called from the command line the instantiated object's
-        method :meth:`run_jobs` is called by the
+        When the class is called from the command line the instantiated
+        object's method :meth:`run_jobs` is called by the
         :obj:`~pyDeltaRCM.preprocessor.preprocessor_wrapper` function that the
         CLI (entry point) calls directly.
 
@@ -376,6 +379,11 @@ class PreprocessorCLI(BasePreprocessor):
 
         self.construct_job_list()
 
+        if self.args['dryrun']:
+            self._dryrun = True
+        else:
+            self._dryrun = False
+
     def process_arguments(self):
         """Process the command line arguments.
 
@@ -412,7 +420,8 @@ class Preprocessor(BasePreprocessor):
     script. For complete documentation on the API configurations, see
     XXXXXXXXXXXXXX.
 
-    The class gives a way to configure and run multiple jobs from a python script.
+    The class gives a way to configure and run multiple jobs from a python
+    script.
 
     Examples
     --------
@@ -451,6 +460,7 @@ class Preprocessor(BasePreprocessor):
 
         """
         super().__init__()
+        self._dryrun = False
 
         if not input_file and not timesteps:
             raise ValueError('Cannot use Preprocessor with no arguments.')

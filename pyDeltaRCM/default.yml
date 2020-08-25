@@ -60,10 +60,10 @@ toggle_subsidence:
   default: False
 sigma_max:
   type: ['float', 'int']
-  default: 0.000825
+  default: 2e-9
 start_subsidence:
   type: ['float', 'int']
-  default: 2.5
+  default: 216000
 save_eta_figs:
   type: 'bool'
   default: False
@@ -99,7 +99,7 @@ save_velocity_grids:
   default: False
 save_dt:
   type: 'int'
-  default: 50
+  default: 86400
 save_strata:
   type: 'bool'
   default: True

@@ -232,7 +232,7 @@ class init_tools(object):
         self.itmax = 2 * (self.L + self.W)  # max number of jumps for parcel
         self.size_indices = int(self.itmax / 2)  # initial width of self.indices
 
-        self.dt = self.dVs / self.Qs0  # time step size
+        self._dt = self.dVs / self.Qs0  # time step size
 
         self.omega_flow_iter = 2. / self.itermax
 
@@ -338,7 +338,7 @@ class init_tools(object):
 
             self.strata_counter = 0
 
-            self.n_steps = 5 * self.save_dt
+            self.n_steps = int(max(1, 5 * int(self.save_dt / self.dt)))
 
             self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps),
                                                dtype=np.float32)
@@ -398,7 +398,7 @@ class init_tools(object):
                                                      ('total_time',))
             x.units = 'meters'
             y.units = 'meters'
-            time.units = 'timesteps'
+            time.units = 'seconds'
 
             x[:] = self.x
             y[:] = self.y
