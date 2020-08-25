@@ -47,7 +47,9 @@ class DeltaModel(Tools):
 
         """
         self._time = 0.
-        self._time_step = 1.
+        self._time_iter = int(0)
+        self._save_time_since_last = float("inf")  # force save on t==0
+        self._save_iter = int(0)
 
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
@@ -89,16 +91,19 @@ class DeltaModel(Tools):
         -------
 
         """
+        if self._save_time_since_last >= self.save_dt:
+            self.record_stratigraphy()
+            self.output_data()
+            self._save_iter += int(1)
+            self._save_time_since_last = 0
+
         self.run_one_timestep()
-
         self.apply_subsidence()
-
         self.finalize_timestep()
-        self.record_stratigraphy()
 
-        self.output_data()
-
-        self._time += self.time_step
+        self._time += self.dt
+        self._save_time_since_last += self.dt
+        self._time_iter += int(1)
 
     def finalize(self):
         """Finalize the model run.
@@ -114,6 +119,12 @@ class DeltaModel(Tools):
 
         """
         self.logger.info('Finalize model run')
+
+        # get the final timestep recorded, if needed.
+        if self._save_time_since_last >= self.save_dt:
+            self.record_stratigraphy()
+            self.output_data()
+
         self.output_strata()
 
         try:
@@ -128,7 +139,13 @@ class DeltaModel(Tools):
         self._is_finalized = True
 
     @property
-    def time_step(self):
+    def time(self):
+        """Elapsed model time in seconds.
+        """
+        return self._time
+
+    @property
+    def dt(self):
         """The time step.
 
         Raises
@@ -136,21 +153,45 @@ class DeltaModel(Tools):
         UserWarning
             If a very small timestep is configured.
         """
-        return self._time_step
+        return self._dt
+
+    @property
+    def time_step(self):
+        """Alias for `dt`.
+        """
+        return self._dt
 
     @time_step.setter
-    def time_step(self, new_dt):
-        if new_dt * self.init_Np_sed < 100:
-            warnings.warn(UserWarning('Using a very small timestep, '
+    def time_step(self, new_time_step):
+        if new_time_step * self.init_Np_sed < 100:
+            warnings.warn(UserWarning('Using a very small time step, '
                                       'Delta might evolve very slowly.'))
 
-        self.Np_sed = int(new_dt * self.init_Np_sed)
-        self.Np_water = int(new_dt * self.init_Np_water)
-
         if self.toggle_subsidence:
-            self.sigma = self.subsidence_mask * self.sigma_max * new_dt
+            self.sigma = self.subsidence_mask * self.sigma_max * new_time_step
 
-        self._time_step = new_dt
+        self._dt = new_time_step
+
+    @property
+    def time_iter(self):
+        """Number of time iterations.
+
+        The number of times the :obj:`update` method has been called.
+        """
+        return self._time_iter
+
+    @property
+    def save_time_since_last(self):
+        """Time since data last output.
+
+        The number of times the :obj:`update` method has been called.
+        """
+        return self._save_time_since_last
+
+    @property
+    def save_iter(self):
+        """Number of times data has been saved."""
+        return self._save_iter
 
     @property
     def channel_flow_velocity(self):

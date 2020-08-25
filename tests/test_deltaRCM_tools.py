@@ -28,6 +28,109 @@ def test_finalize_timestep(test_DeltaModel):
     assert test_DeltaModel.H_SL == 0.3
 
 
+def test_subsidence_in_update(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'toggle_subsidence': True,
+                                  'sigma_max': 1e-8,
+                                  'start_subsidence': 0,
+                                  'seed': 0})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.dt == 20000
+    assert _delta.sigma_max == 1e-8
+    assert _delta.sigma[17, 5] == 0.0  # outside the sigma mask
+    assert _delta.sigma[17, 6] == 0.0002  # inside the sigma mask
+    assert np.all(_delta.eta[17, 5:7] == -_delta.h0)
+    _delta.update()
+    assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
+    assert _delta.eta[17, 6] == pytest.approx(-_delta.h0 - 0.0002)
+
+
+def test_subsidence_in_update_delayed_start(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'toggle_subsidence': True,
+                                  'sigma_max': 1e-8,
+                                  'start_subsidence': 20000,
+                                  'seed': 0})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.dt == 20000
+    assert _delta.sigma_max == 1e-8
+    assert _delta.sigma[17, 5] == 0.0  # outside the sigma mask
+    assert _delta.sigma[17, 6] == 0.0002  # inside the sigma mask
+    assert np.all(_delta.eta[17, 5:7] == -_delta.h0)
+    _delta.update()  # no subsidence applied
+    assert _delta.time == 20000
+    assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
+    assert _delta.eta[17, 6] == pytest.approx(-_delta.h0)
+    _delta.update()
+    assert _delta.time == 40000
+    assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
+    assert _delta.eta[17, 6] == pytest.approx(-_delta.h0 - 0.0002)
+
+
+def test_subsidence_changed_with_timestep(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'toggle_subsidence': True,
+                                  'sigma_max': 1e-8})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.dt == 20000
+    assert _delta.sigma[17, 6] == 0.0002
+    _delta.time_step = 86400
+    assert _delta.sigma[17, 6] == 0.000864
+
+
+def test_expand_stratigraphy(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'verbose', 0)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'h0', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'f_bedload', 0.5)
+    utilities.write_parameter_to_file(f, 'C0_percent', 0.1)
+    utilities.write_parameter_to_file(f, 'save_dt', 600)
+    utilities.write_parameter_to_file(f, 'toggle_subsidence', True)
+    utilities.write_parameter_to_file(f, 'sigma_max', 1e-8)
+    utilities.write_parameter_to_file(f, 'start_subsidence', 20000)
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    f.close()
+    _delta = DeltaModel(input_file=p)
+    assert _delta.dt == 300
+    assert _delta.n_steps == 10
+    assert _delta.strata_counter == 0
+    assert _delta.strata_eta[:, _delta.strata_counter].getnnz() == 0
+    for _t in range(19):
+        assert _delta.strata_eta[:, _delta.strata_counter].getnnz() == 0
+        _delta.update()
+        assert _delta.time == _delta.dt * (_t + 1)
+        assert _delta.strata_eta.shape[1] == 10
+    assert _delta.time == 19 * 300
+    assert _delta.strata_counter == 10  # stored 10 but invalid index next store
+    assert _delta.strata_eta.shape[1] == 10
+    # nothing occurs on next  update, because save_dt = 2 * dt
+    _delta.update()
+    assert _delta.time == 20 * 300
+    assert _delta.strata_counter == 10
+    assert _delta.strata_eta.shape[1] == 10
+    # expansion occurs when model tries to save strata after next update
+    _delta.update()
+    assert _delta.time == 21 * 300
+    assert _delta.strata_counter == 11
+    assert _delta.strata_eta.shape[1] == 20
+    # run to bring to even 100 steps, check status again
+    for _t in range(79):
+        _delta.update()
+    assert _delta.time == 100 * 300
+    assert _delta.strata_counter == 50
+    assert _delta.strata_eta.shape[1] == 50
+
+
 def test_verbose_printing_0(tmp_path, capsys):
     """
     This test should create the log, and then print nothing at all.
@@ -54,7 +157,7 @@ def test_verbose_printing_0(tmp_path, capsys):
                ) == 1  # log file exists
     delta.update()
     captd = capsys.readouterr()
-    assert not 'Timestep: 0.0' in captd.out
+    assert 'Model time: 0.0' not in captd.out
 
 
 def test_verbose_printing_1(tmp_path, capsys):
@@ -81,8 +184,8 @@ def test_verbose_printing_1(tmp_path, capsys):
     assert captd1.out == ''
     assert len(glob.glob(os.path.join(delta.prefix, '*.log'))
                ) == 1  # log file exists
-    assert 'Timestep: 0.0' in captd2.out  # if verbose >= 1
-    assert not 'Creating output directory' in captd2.out  # goes to logger
+    assert 'Model time: 0.0' in captd2.out  # if verbose >= 1
+    assert 'Creating output directory' not in captd2.out  # goes to logger
 
 
 def test_verbose_printing_2(tmp_path, capsys):
@@ -110,7 +213,7 @@ def test_verbose_printing_2(tmp_path, capsys):
     assert len(glob.glob(os.path.join(delta.prefix, '*.log'))
                ) == 1  # log file exists
     assert 'Setting random seed to' in captd1.out   # if verbose >= 2
-    assert 'Timestep: 0.0' in captd2.out  # if verbose >= 1
+    assert 'Model time: 0.0' in captd2.out  # if verbose >= 1
     assert delta.seed == 10
 
 
@@ -168,6 +271,7 @@ def test_logger_has_timestep_lines(tmp_path):
     utilities.write_parameter_to_file(f, 'C0_percent', 0.1)
     f.close()
     delta = DeltaModel(input_file=p)
+    assert delta.time_step == 300
     _logs = glob.glob(os.path.join(delta.prefix, '*.log'))
     assert len(_logs) == 1  # log file exists
     for _ in range(0, 2):
@@ -176,9 +280,9 @@ def test_logger_has_timestep_lines(tmp_path):
     with open(_logs[0], 'r') as _logfile:
         _lines = _logfile.readlines()
         _lines = ' '.join(_lines)  # collapse to a single string
-        assert '---- Timestep 0.0 ----' in _lines
-        assert '---- Timestep 1.0 ----' in _lines
-        assert not '---- Timestep 2.0 ----' in _lines
+        assert '---- Model time 0.0 ----' in _lines
+        assert '---- Model time 300.0 ----' in _lines
+        assert '---- Model time 600.0 ----' not in _lines
 
 
 def test_logger_random_seed_always_recorded(tmp_path):
@@ -239,14 +343,14 @@ def test_save_no_figs_no_grids(tmp_path):
 
     for _t in range(0, 4):
         _delta.update()
-    assert _delta._time == 4.0
+    assert _delta.time_iter == 4.0
     img_glob = glob.glob(os.path.join(_delta.prefix, '*.png'))
     nc_glob = glob.glob(os.path.join(_delta.prefix, '*.nc'))
     assert len(img_glob) == 0
     assert len(nc_glob) == 0
 
     _delta.update()
-    assert _delta._time == 5.0
+    assert _delta.time_iter == 5.0
     img_glob = glob.glob(os.path.join(_delta.prefix, '*.png'))
     nc_glob = glob.glob(os.path.join(_delta.prefix, '*.nc'))
     assert len(img_glob) == 0
@@ -281,7 +385,7 @@ def test_save_one_fig_no_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
 
     exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
     exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
@@ -324,13 +428,13 @@ def test_save_one_fig_one_grid(tmp_path):
     for _ in range(0, 2):
         _delta.update()
     nc_size_middle = os.path.getsize(exp_path_nc)
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     assert nc_size_middle == nc_size_before
 
     # now finalize, and then file size should increase
     _delta.finalize()
     nc_size_after = os.path.getsize(exp_path_nc)
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     assert nc_size_after > nc_size_middle
     assert nc_size_after > nc_size_before
 
@@ -447,7 +551,7 @@ def test_save_eta_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     _delta.finalize()
 
     ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
@@ -478,7 +582,7 @@ def test_save_depth_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     _delta.finalize()
 
     ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
@@ -509,7 +613,7 @@ def test_save_velocity_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     _delta.finalize()
 
     ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
@@ -540,7 +644,7 @@ def test_save_stage_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     _delta.finalize()
 
     ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
@@ -571,7 +675,7 @@ def test_save_discharge_grids(tmp_path):
 
     for _ in range(0, 2):
         _delta.update()
-    assert _delta._time == 2.0
+    assert _delta.time_iter == 2.0
     _delta.finalize()
 
     ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")

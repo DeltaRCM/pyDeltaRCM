@@ -23,7 +23,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         The first operation called by :meth:`update`, this method iterates the
         water surface calculation and sediment parcel routing routines.
 
-        .. note:: Will print the current timestep to stdout, if ``verbose > 0``.
+        .. note:: Will print the current time to stdout, if ``verbose > 0``.
 
         Parameters
         ----------
@@ -33,28 +33,24 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
 
         Raises
         ------
-        RuntimeError 
+        RuntimeError
             If model has already been finalized via :meth:`finalize`.
         """
-        timestep = self._time
-
-        self.logger.info('-' * 4 + ' Timestep ' +
-                         str(self._time) + ' ' + '-' * 4)
+        self.logger.info('-' * 4 + ' Model time ' +
+                         str(self.time) + ' ' + '-' * 4)
         if self.verbose > 0:
             print('-' * 20)
-            print('Timestep: ' + str(self._time))
+            print('Model time: ' + str(self.time))
 
         if self._is_finalized:
             raise RuntimeError('Cannot update model, model already finalized!')
 
         # model operations
         for iteration in range(self.itermax):
-
             self.init_water_iteration()
             self.run_water_iteration()
-
             self.free_surf(iteration)
-            self.finalize_water_iteration(timestep, iteration)
+            self.finalize_water_iteration(self.time, iteration)
 
         self.sed_route()
 
@@ -107,12 +103,12 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
     def record_stratigraphy(self):
         """Save stratigraphy to file.
 
-        Saves the sand fraction of deposited sediment
-        into a sparse array created by init_stratigraphy().
+        Saves the sand fraction of deposited sediment into a sparse array
+        created by :obj:`~pyDeltaRCM.DeltaModel.init_stratigraphy()`.
 
-        Only runs if save_strata is True.
+        Only runs if :obj:`~pyDeltaRCM.DeltaModel.save_strata` is True.
 
-        .. note:: 
+        .. note::
 
             This routine needs a complete description of the algorithm,
             additionally, it should be ported to a routine in DeltaMetrics,
@@ -126,13 +122,10 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         -------
 
         """
-        timestep = self._time
 
-        if self.save_strata and (timestep % self.save_dt == 0):
+        if self.save_strata:
 
-            timestep = int(timestep)
-
-            if self.strata_eta.shape[1] <= timestep:
+            if self.strata_counter >= self.strata_eta.shape[1]:
                 self.expand_stratigraphy()
 
             _msg = 'Storing stratigraphy data'
@@ -177,7 +170,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
                                     shape=(self.L * self.W, 1))
             self.strata_eta[:, self.strata_counter] = eta_sparse
 
-            if self.toggle_subsidence and self.start_subsidence <= timestep:
+            if self.toggle_subsidence and (self.time >= self.start_subsidence):
 
                 sigma_change = (self.strata_eta[:, :self.strata_counter]
                                 - self.sigma.flatten()[:, np.newaxis])
@@ -190,7 +183,13 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         """Apply subsidence pattern.
 
         Apply subsidence to domain if toggle_subsidence is True, and
-        start_subsidence is =< timestep.
+        :obj:`~pyDeltaRCM.DeltaModel.time` is ``>=``
+        ::obj:`~pyDeltaRCM.DeltaModel.start_subsidence`. Note, that the
+        :configuration of the :obj:`~pyDeltaRCM.DeltaModel.update()` method
+        :determines that the subsidence may be applied before the model time
+        :is incremented, such that subsidence will begin on the step
+        :*following* the time step that brings the model to ``time ==
+        :start_subsidence``.
 
         Parameters
         ----------
@@ -201,9 +200,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         """
         if self.toggle_subsidence:
 
-            timestep = self._time
-
-            if self.start_subsidence <= timestep:
+            if self.time >= self.start_subsidence:
 
                 _msg = 'Applying subsidence'
                 self.logger.info(_msg)
@@ -219,6 +216,11 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         ``velocity``, ``depth``, and ``stage``, depending on configuration of
         the relevant flags in the YAML configuration file.
 
+        .. note:
+
+            This method is called often throughout the model, each
+            occurance :obj:`save_dt` is elapsed in model time.
+
         Parameters
         ----------
 
@@ -226,79 +228,80 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         -------
 
         """
-        _timestep = self._time
-        if _timestep % self.save_dt == 0:
+        # ------------------ Figures ------------------
+        if self._save_any_figs:
 
-            _timestep = int(self._time)
+            _msg = 'Saving figures'
+            self.logger.info(_msg)
+            if self.verbose >= 2:
+                print(_msg)
 
-            # ------------------ Figures ------------------
-            if self._save_any_figs:
+            if self.save_eta_figs:
+                _fe = self.make_figure('eta', self.time)
+                self.save_figure(_fe, directory=self.prefix,
+                                 filename_root='eta_',
+                                 timestep=self.save_iter)
 
-                _msg = 'Saving figures'
-                self.logger.info(_msg)
-                if self.verbose >= 2:
-                    print(_msg)
+            if self.save_stage_figs:
+                _fs = self.make_figure('stage', self.time)
+                self.save_figure(_fs, directory=self.prefix,
+                                 filename_root='stage_',
+                                 timestep=self.save_iter)
 
-                if self.save_eta_figs:
-                    _fe = self.make_figure('eta', _timestep)
-                    self.save_figure(_fe, directory=self.prefix,
-                                     filename_root='eta_',
-                                     timestep=_timestep)
+            if self.save_depth_figs:
+                _fh = self.make_figure('depth', self.time)
+                self.save_figure(_fh, directory=self.prefix,
+                                 filename_root='depth_',
+                                 timestep=self.save_iter)
 
-                if self.save_stage_figs:
-                    _fs = self.make_figure('stage', _timestep)
-                    self.save_figure(_fs, directory=self.prefix,
-                                     filename_root='stage_',
-                                     timestep=_timestep)
+            if self.save_discharge_figs:
+                _fq = self.make_figure('qw', self.time)
+                self.save_figure(_fq, directory=self.prefix,
+                                 filename_root='discharge_',
+                                 timestep=self.save_iter)
 
-                if self.save_depth_figs:
-                    _fh = self.make_figure('depth', _timestep)
-                    self.save_figure(_fh, directory=self.prefix,
-                                     filename_root='depth_',
-                                     timestep=_timestep)
+            if self.save_velocity_figs:
+                _fu = self.make_figure('uw', self.time)
+                self.save_figure(_fu, directory=self.prefix,
+                                 filename_root='velocity_',
+                                 timestep=self.save_iter)
 
-                if self.save_discharge_figs:
-                    _fq = self.make_figure('qw', _timestep)
-                    self.save_figure(_fq, directory=self.prefix,
-                                     filename_root='discharge_',
-                                     timestep=_timestep)
+        # ------------------ grids ------------------
+        if self._save_any_grids:
 
-                if self.save_velocity_figs:
-                    _fu = self.make_figure('uw', _timestep)
-                    self.save_figure(_fu, directory=self.prefix,
-                                     filename_root='velocity_',
-                                     timestep=_timestep)
+            shape = self.output_netcdf.variables['time'].shape
+            self.output_netcdf.variables['time'][shape[0]] = self.time
 
-            # ------------------ grids ------------------
-            if self._save_any_grids:
+            _msg = 'Saving grids'
+            self.logger.info(_msg)
+            if self.verbose >= 2:
+                print(_msg)
 
-                shape = self.output_netcdf.variables['time'].shape
-                self.output_netcdf.variables['time'][shape[0]] = _timestep
+            if self.save_eta_grids:
+                self.save_grids('eta', self.eta, shape[0])
 
-                _msg = 'Saving grids'
-                self.logger.info(_msg)
-                if self.verbose >= 2:
-                    print(_msg)
+            if self.save_depth_grids:
+                self.save_grids('depth', self.depth, shape[0])
 
-                if self.save_eta_grids:
-                    self.save_grids('eta', self.eta, shape[0])
+            if self.save_stage_grids:
+                self.save_grids('stage', self.stage, shape[0])
 
-                if self.save_depth_grids:
-                    self.save_grids('depth', self.depth, shape[0])
+            if self.save_discharge_grids:
+                self.save_grids('discharge', self.qw, shape[0])
 
-                if self.save_stage_grids:
-                    self.save_grids('stage', self.stage, shape[0])
-
-                if self.save_discharge_grids:
-                    self.save_grids('discharge', self.qw, shape[0])
-
-                if self.save_velocity_grids:
-                    self.save_grids('velocity', self.uw, shape[0])
+            if self.save_velocity_grids:
+                self.save_grids('velocity', self.uw, shape[0])
 
     def output_strata(self):
         """Save stratigraphy as sparse matrix to file.
 
-        Saves the stratigraphy (sand fraction) sparse matrices into output netcdf file
+        Saves the stratigraphy (sand fraction) sparse matrices into output
+        netcdf file.
+
+        .. note:
+
+            This method is called only once, within the
+            :obj:`pyDeltaRCM.DeltaModel.finalize()` step of model execution.
 
         Parameters
         ----------
@@ -314,13 +317,18 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
             if self.verbose >= 2:
                 print(_msg)
 
+            if not self.strata_counter > 0:
+                _msg = 'Model has no computed stratigraphy. This is likely ' \
+                    'because `delta.time < delta.save_dt`, and the model ' \
+                    'has not computed stratigraphy.'
+                self.logger.error(_msg)
+                if self.verbose > 0:
+                    print(_msg)
+                raise RuntimeError(_msg)
+
             self.strata_eta = self.strata_eta[:, :self.strata_counter]
 
             shape = self.strata_eta.shape
-            if shape[0] < 1:
-                raise RuntimeError('Stratigraphy are empty! '
-                                   'Are you sure you ran the model at least '
-                                   'one timestep with `update()`?')
 
             total_strata_age = self.output_netcdf.createDimension(
                 'total_strata_age',
@@ -329,7 +337,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
             strata_age = self.output_netcdf.createVariable('strata_age',
                                                            np.int32,
                                                            ('total_strata_age'))
-            strata_age.units = 'timesteps'
+            strata_age.units = 'seconds'
             self.output_netcdf.variables['strata_age'][
                 :] = list(range(shape[1] - 1, -1, -1))
 
@@ -381,7 +389,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         fig, ax = plt.subplots()
         pc = ax.pcolor(_data)
         fig.colorbar(pc)
-        ax.set_title(var + ' --- ' + 'time = ' + str(timestep))
+        ax.set_title(var + ' --- ' + 'time = ' + str(round(timestep, 2)))
         ax.axis('equal')
 
         return fig
