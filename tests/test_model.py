@@ -243,3 +243,27 @@ def test_setting_getting_channel_width(test_DeltaModel):
     assert test_DeltaModel.influx_sediment_concentration == 0.1
     test_DeltaModel.influx_sediment_concentration = 2
     assert test_DeltaModel.C0 == 0.02
+
+
+def test_make_checkpoint(tmp_path, test_DeltaModel):
+    """Test setting the checkpoint option to 'True' and saving a checkpoint."""
+    test_DeltaModel.save_checkpoint = True
+    test_DeltaModel.checkpoint_dt = 1
+    test_DeltaModel.save_dt = 1
+    check_DeltaModel = test_DeltaModel
+    test_DeltaModel.update()
+    exp_path_npz = os.path.join(tmp_path / 'out_dir', 'checkpoint.npz')
+    assert os.path.isfile(exp_path_npz)
+    # check loading checkpoint and see if it works
+    check_DeltaModel.load_checkpoint()
+    assert check_DeltaModel._time == test_DeltaModel._time
+    assert np.all(check_DeltaModel.uw == test_DeltaModel.uw)
+    assert np.all(check_DeltaModel.ux == test_DeltaModel.ux)
+    assert np.all(check_DeltaModel.uy == test_DeltaModel.uy)
+    assert np.all(check_DeltaModel.depth == test_DeltaModel.depth)
+    assert np.all(check_DeltaModel.stage == test_DeltaModel.stage)
+    assert np.all(check_DeltaModel.eta == test_DeltaModel.eta)
+    assert np.all(check_DeltaModel.strata_eta.todense() ==
+                  test_DeltaModel.strata_eta.todense())
+    assert np.all(check_DeltaModel.strata_sand_frac.todense() ==
+                  test_DeltaModel.strata_sand_frac.todense())
