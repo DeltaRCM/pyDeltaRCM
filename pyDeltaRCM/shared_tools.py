@@ -29,6 +29,17 @@ def get_random_uniform(N):
 
 
 @njit
+def get_start_indices(inlet, inlet_weights, num_starts):
+    norm_weights = inlet_weights / np.sum(inlet_weights)
+    # idxs = np.zeros(num_starts)
+    idxs = []
+    for x in np.arange(num_starts):
+        idxs.append( random_pick(norm_weights) )
+    idxs = np.array(idxs)
+    return inlet.take(idxs)
+
+
+@njit
 def partition_sand(qs, depoPart, py, px, dist, istep, jstep):
     """Spread sand between two cells."""
     if dist > 0:

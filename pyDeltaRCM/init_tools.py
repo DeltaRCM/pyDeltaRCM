@@ -329,7 +329,7 @@ class init_tools(object):
         self.cell_type[:self.L0, :] = -cell_land
         self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
 
-        self.inlet = list(np.unique(np.where(self.cell_type == 1)[1]))
+        self.inlet = np.array(np.unique(np.where(self.cell_type == 1)[1]))
         self.eta[:] = self.stage - self.depth
 
     def init_stratigraphy(self):
