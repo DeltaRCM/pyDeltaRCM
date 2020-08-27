@@ -345,7 +345,7 @@ def test_Vp_sed(tmp_path):
     assert _delta.Vp_sed == 50000 / 1450
 
 
-def test_itmax_and_size_indices(tmp_path):
+def test_stepmax_and_size_indices(tmp_path):
     p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                  {'Length': 1600,
                                   'Width': 1200,
@@ -353,7 +353,7 @@ def test_itmax_and_size_indices(tmp_path):
     _delta = DeltaModel(input_file=p)
     assert _delta.L == 80
     assert _delta.W == 60
-    assert _delta.itmax == (80 + 60) * 2
+    assert _delta.stepmax == (80 + 60) * 2
     assert _delta.size_indices == (80 + 60)
 
 

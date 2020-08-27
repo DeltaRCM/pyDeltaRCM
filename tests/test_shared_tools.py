@@ -163,39 +163,6 @@ def test_custom_unravel_exceed_error():
         x, y = shared_tools.custom_unravel(99, arr.shape)
 
 
-def test_check_for_loops():
-
-    idxs = np.array(
-        [[0, 11, 12, 13, 23, 22, 12],
-         [0, 1, 2, 3, 4, 5, 16]])
-    nidx = np.array([21, 6])
-    itt = 6
-    free = np.array([1, 1])
-    CTR = 4
-    L0 = 1
-    looped = np.array([0, 0])
-
-    nidx, looped, free = shared_tools.check_for_loops(
-        idxs, nidx, itt, L0, looped, (10, 10), CTR, free)
-
-    assert np.all(nidx == [41, 6])
-    assert np.all(looped == [1, 0])
-    assert np.all(free == [-1, 1])
-
-
-def test_calculate_new_ind():
-
-    cidx = np.array([12, 16, 16])
-    ncel = np.array([6, 1, 4])
-    iwalk = shared_tools.get_iwalk()
-    jwalk = shared_tools.get_jwalk()
-
-    nidx = shared_tools.calculate_new_ind(cidx, ncel, iwalk.flatten(), jwalk.flatten(), (10, 10))
-
-    nidx_exp = np.array([21, 6, 0])
-    assert np.all(nidx == nidx_exp)
-
-
 def test_get_weight_at_cell(test_DeltaModel):
 
     ind = (0, 4)

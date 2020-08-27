@@ -184,7 +184,7 @@ class sed_tools(object):
         it = 0
         sed_continue = 1
 
-        while (sed_continue == 1) and (it < self.itmax):
+        while (sed_continue == 1) and (it < self.stepmax):
             # choose next with weights
 
             it += 1
@@ -200,7 +200,7 @@ class sed_tools(object):
                 (px, py),
                 stage_nbrs.ravel(), depth_ind.ravel(), cell_type_ind.ravel(),
                 self.stage[px, py], self.qx[px, py], self.qy[px, py],
-                self.ivec.ravel(), self.jvec.ravel(), self.distances.ravel(),
+                self.ivec_flat, self.jvec_flat, self.distances_flat,
                 self.dry_depth, self.gamma, theta_sed)
 
             new_cell = shared_tools.random_pick(weights)

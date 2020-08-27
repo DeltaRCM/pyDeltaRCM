@@ -31,10 +31,9 @@ def get_random_uniform(N):
 @njit
 def get_start_indices(inlet, inlet_weights, num_starts):
     norm_weights = inlet_weights / np.sum(inlet_weights)
-    # idxs = np.zeros(num_starts)
     idxs = []
     for x in np.arange(num_starts):
-        idxs.append( random_pick(norm_weights) )
+        idxs.append(random_pick(norm_weights))
     idxs = np.array(idxs)
     return inlet.take(idxs)
 
@@ -116,60 +115,6 @@ def custom_ravel(tup, shape):
     x = tup[0] * shape[1]
     y = tup[1]
     return x + y
-
-
-@njit
-def check_for_loops(indices, inds, it, L0, loopedout, domain_shape, CTR, free_surf_flag):
-
-    looped = typed.List()  # numba typed list for iteration
-    for i in np.arange(len(indices)):
-        row = indices[i, :]
-        v = len(row[row > 0]) != len(set(row[row > 0]))
-        looped.append(v)
-    travel = (0, it)
-
-    for n in range(indices.shape[0]):
-        ind = inds[n]
-        if looped[n] and (ind > 0) and (max(travel) > L0):
-            loopedout[n] += 1
-            px, py = custom_unravel(ind, domain_shape)
-            Fx = px - 1
-            Fy = py - CTR
-
-            Fw = np.sqrt(Fx**2 + Fy**2)
-
-            if Fw != 0:
-                px = px + np.round(Fx / Fw * 5.)
-                py = py + np.round(Fy / Fw * 5.)
-
-            px = max(px, L0)
-            px = int(min(domain_shape[0] - 2, px))
-
-            py = max(1, py)
-            py = int(min(domain_shape[1] - 2, py))
-
-            nind = custom_ravel((px, py), domain_shape)
-
-            inds[n] = nind
-
-            free_surf_flag[n] = -1
-
-    return inds, loopedout, free_surf_flag
-
-
-@njit
-def calculate_new_ind(indices, new_cells, iwalk, jwalk, domain_shape):
-    newbies = []
-    for p, q in zip(indices, new_cells):
-        if q != 4:
-            ind_tuple = custom_unravel(p, domain_shape)
-            new_ind = (ind_tuple[0] + jwalk[q],
-                       ind_tuple[1] + iwalk[q])
-            newbies.append(custom_ravel(new_ind, domain_shape))
-        else:
-            newbies.append(0)
-
-    return np.array(newbies)
 
 
 @njit
