@@ -168,6 +168,11 @@ class init_tools(object):
 
         self.walk_flat = np.array([1, -self.W + 1, -self.W, -self.W - 1,
                                    -1, self.W - 1, self.W, self.W + 1])
+        self.distances_flat = self.distances.flatten()
+        self.ivec_flat = self.ivec.flatten()
+        self.jvec_flat = self.jvec.flatten()
+        self.iwalk_flat = self.iwalk.flatten()
+        self.jwalk_flat = self.jwalk.flatten()
 
         self.kernel1 = np.array([[1, 1, 1],
                                  [1, -8, 1],
@@ -229,8 +234,8 @@ class init_tools(object):
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
         self.Vp_sed = self.dVs / self.Np_sed   # volume of each sediment parcel
 
-        self.itmax = 2 * (self.L + self.W)  # max number of jumps for parcel
-        self.size_indices = int(self.itmax / 2)  # initial width of self.indices
+        self.stepmax = 2 * (self.L + self.W)  # max number of jumps for parcel
+        self.size_indices = int(self.stepmax / 2)  # initial width of self.indices
 
         self._dt = self.dVs / self.Qs0  # time step size
 

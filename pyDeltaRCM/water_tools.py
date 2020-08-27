@@ -1,5 +1,6 @@
 
 import numpy as np
+from numba import njit, jit, typed
 
 from . import shared_tools
 
@@ -26,8 +27,16 @@ class water_tools(object):
         self.pad_cell_type = np.pad(self.cell_type, 1, 'edge')
 
     def run_water_iteration(self):
+        """Run a single iteration of travel paths for all water parcels.
 
-        _iter = 0
+        Runs all water  parcels (`Np_water` parcels) for `stepmax` steps, or
+        until the parcels reach a boundary.
+
+        All parcels are processed in parallel, taking one step for each loop
+        of the ``while`` loop.
+        """
+
+        _step = 0  # the step number of parcels
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
                                                        inlet_weights,
@@ -37,49 +46,45 @@ class water_tools(object):
         self.qwn.flat[start_indices] += self.Qp_water / self.dx / 2
 
         self.indices[:, 0] = start_indices
-        current_inds = np.array(start_indices)
+        current_inds = np.copy(start_indices)
 
         self.looped[:] = 0
 
         self.get_water_weight_array()
+        water_weights_FLAT = self.water_weights.reshape(-1, 9)
 
-        while (sum(current_inds) > 0) & (_iter < self.itmax):
+        while (sum(current_inds) > 0) & (_step < self.stepmax):
 
-            _iter += 1
+            _step += 1
 
-            self.check_size_of_indices_matrix(_iter)
+            self.check_size_of_indices_matrix(_step)
 
-            inds = np.unravel_index(current_inds, self.depth.shape)
-            inds_tuple = list(zip(*inds))
+            # use water weights and random pick to determine d8 direction
+            new_direction = pick_d8_direction(current_inds, water_weights_FLAT)
+            new_direction = new_direction.astype(np.int)
 
-            new_cells = [self.get_new_cell(x)
-                         if x != (0, 0) else 4
-                         for x in inds_tuple]
-
-            new_cells = np.array(new_cells)
-
-            next_index = shared_tools.calculate_new_ind(
+            new_indices = calculate_new_ind(
                 current_inds,
-                new_cells,
-                self.iwalk.ravel(),
-                self.jwalk.ravel(),
+                new_direction,
+                self.iwalk_flat,
+                self.jwalk_flat,
                 self.eta.shape)
 
             dist, istep, jstep, astep = shared_tools.get_steps(
-                new_cells,
-                self.iwalk.flat[:],
-                self.jwalk.flat[:])
+                new_direction,
+                self.iwalk_flat,
+                self.jwalk_flat)
 
-            self.update_Q(dist, current_inds, next_index, astep, jstep, istep)
+            self.update_Q(dist, current_inds, new_indices, astep, jstep, istep)
 
-            current_inds, self.looped, self.free_surf_flag = shared_tools.check_for_loops(
-                self.indices, next_index, _iter, self.L0, self.looped, self.eta.shape,
-                self.CTR, self.free_surf_flag)
+            current_inds, self.looped, self.free_surf_flag = check_for_loops(
+                self.indices, new_indices, _step, self.L0, self.looped,
+                self.eta.shape, self.CTR, self.free_surf_flag)
 
-            current_inds = self.check_for_boundary(current_inds)
-
-            self.indices[:, _iter] = current_inds
-
+            # Parcels that have reached the boundary are updated to
+            # ``ind==0``, effectively ending the routing of these parcels.
+            self.check_for_boundary(current_inds)  # changes `free_surf_flag`
+            self.indices[:, _step] = current_inds  # record indices
             current_inds[self.free_surf_flag > 0] = 0
 
     def free_surf(self, it):
@@ -164,11 +169,11 @@ class water_tools(object):
     def check_size_of_indices_matrix(self, it):
         if it >= self.indices.shape[1]:
             """
-            Initial size of self.indices is half of self.itmax
+            Initial size of self.indices is half of self.stepmax
             because the number of iterations doesn't go beyond
             that for many timesteps.
 
-            Once it reaches it > self.itmax/2 once, make the size
+            Once it reaches it > self.stepmax/2 once, make the size
             self.iter for all further timesteps
             """
             _msg = 'Increasing size of self.indices'
@@ -177,13 +182,13 @@ class water_tools(object):
                 print(_msg)
 
             indices_blank = np.zeros(
-                (np.int(self.Np_water), np.int(self.itmax / 4)), dtype=np.int)
+                (np.int(self.Np_water), np.int(self.stepmax / 4)), dtype=np.int)
 
             self.indices = np.hstack((self.indices, indices_blank))
 
     def get_water_weight_array(self):
 
-        self.water_weights = np.zeros(shape = (self.L, self.W, 9))
+        self.water_weights = np.zeros(shape=(self.L, self.W, 9))
 
         for i in range(self.L):
             for j in range(self.W):
@@ -194,12 +199,8 @@ class water_tools(object):
                     (i, j),
                     stage_nbrs.ravel(), depth_nbrs.ravel(), ct_nbrs.ravel(),
                     self.stage[i, j], self.qx[i, j], self.qy[i, j],
-                    self.ivec.ravel(), self.jvec.ravel(), self.distances.ravel(),
+                    self.ivec_flat, self.jvec_flat, self.distances_flat,
                     self.dry_depth, self.gamma, self.theta_water)
-
-    def get_new_cell(self, ind):
-        weight = self.water_weights[ind[0], ind[1]]
-        return shared_tools.random_pick(weight)
 
     def update_Q(self, dist, current_inds, next_index, astep, jstep, istep):
 
@@ -217,14 +218,25 @@ class water_tools(object):
                                           ).reshape(self.qwn.shape)
 
     def check_for_boundary(self, inds):
+        """Check whether parcels have reached the boundary.
 
+        Checks whether any parcels have reached the model boundaries. If they
+        have, then update the information in :obj:`~pyDeltaRCM.DeltaModel.free_surf_flag`.
+
+        Parameters
+        ----------
+        inds : :obj:`ndarray`
+            Unraveled indicies of parcels.
+        """
+        # where cell type is "edge" and free_surf_flag is currently valid
         self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == 0)] = 1
 
+        # where cell type is "edge" and free_surf_flag is currently valid
         self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == -1)] = 2
 
-        inds[self.free_surf_flag == 2] = 0
-
-        return inds
+        # below is not needed, because of update at end of `iteration`. I'm
+        #   leaving it here for reference.
+        # inds[self.free_surf_flag == 2] = 0
 
     def update_water(self, timestep, itr):
         """Update surface after routing all parcels.
@@ -408,3 +420,105 @@ class water_tools(object):
         self.ux[~mask] = 0
         self.uy[mask] = self.uw[mask] * self.qy[mask] / self.qw[mask]
         self.uy[~mask] = 0
+
+
+@njit
+def pick_d8_direction(inds, water_weights):
+    """Get new cell locations, based on water weights.
+
+    Algorithm is to:
+        1. loop through each parcel, which is described by a pair in the
+           `inds` array.
+        2. determine the water weights for that location (from `water_weights`)
+        3. choose a new cell based on the probabilities of the weights (using
+           the `random_pick` function)
+
+    Parameters
+    ----------
+    inds : :obj:`ndarray`
+        Current unraveled indices of the parcels. ``(N,)  `ndarray` containing
+        the unraveled indices.
+
+    water_weights : :obj:`ndarray`
+        Weights of every water cell. ``(LxW, 9)`` `ndarray`, uses unraveled
+        indicies along 0th dimension; 9 cells represent self and 8 neighboring
+        cells.
+
+    Returns
+    -------
+    new_cells : :obj:`ndarray`
+        The new cell for water parcels, relative to the current location.
+        I.e., this is the D8 direction the parcel is going to travel in the
+        next stage, :obj:`pyDeltaRCM.shared_tools.calculate_new_ind`.
+    """
+    new_cells = []
+    for i in np.arange(inds.shape[0]):
+        ind = inds[i]
+        if ind != 0:
+            weight = water_weights[ind, :]
+            new_cells.append(shared_tools.random_pick(weight))
+        else:
+            new_cells.append(4)
+
+    new_cells = np.array(new_cells)
+    return new_cells
+
+
+@njit
+def calculate_new_ind(indices, new_cells, iwalk, jwalk, domain_shape):
+    """Calculate the new location (indices) of parcels.
+
+    Use the information of the current parcel (`indices`) in conjunction with
+    the D8 direction the parcel needs to travel (`new_cells`) to determine the
+    new indices of each parcel.
+    """
+    newbies = []
+    for p, q in zip(indices, new_cells):
+        if q != 4:
+            ind_tuple = shared_tools.custom_unravel(p, domain_shape)
+            new_ind = (ind_tuple[0] + jwalk[q],
+                       ind_tuple[1] + iwalk[q])
+            newbies.append(shared_tools.custom_ravel(new_ind, domain_shape))
+        else:
+            newbies.append(0)
+
+    return np.array(newbies)
+
+
+@njit
+def check_for_loops(indices, inds, it, L0, loopedout, domain_shape, CTR, free_surf_flag):
+
+    looped = typed.List()  # numba typed list for iteration
+    for i in np.arange(len(indices)):
+        row = indices[i, :]
+        v = len(row[row > 0]) != len(set(row[row > 0]))
+        looped.append(v)
+    travel = (0, it)
+
+    for n in range(indices.shape[0]):
+        ind = inds[n]
+        if looped[n] and (ind > 0) and (max(travel) > L0):
+            loopedout[n] += 1
+            px, py = shared_tools.custom_unravel(ind, domain_shape)
+            Fx = px - 1
+            Fy = py - CTR
+
+            Fw = np.sqrt(Fx**2 + Fy**2)
+
+            if Fw != 0:
+                px = px + np.round(Fx / Fw * 5.)
+                py = py + np.round(Fy / Fw * 5.)
+
+            px = max(px, L0)
+            px = int(min(domain_shape[0] - 2, px))
+
+            py = max(1, py)
+            py = int(min(domain_shape[1] - 2, py))
+
+            nind = shared_tools.custom_ravel((px, py), domain_shape)
+
+            inds[n] = nind
+
+            free_surf_flag[n] = -1
+
+    return inds, loopedout, free_surf_flag
