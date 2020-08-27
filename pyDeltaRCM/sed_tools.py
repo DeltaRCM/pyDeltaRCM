@@ -198,9 +198,9 @@ class sed_tools(object):
 
             weights = shared_tools.get_weight_at_cell(
                 (px, py),
-                stage_nbrs.flatten(), depth_ind.flatten(), cell_type_ind.flatten(),
+                stage_nbrs.ravel(), depth_ind.ravel(), cell_type_ind.ravel(),
                 self.stage[px, py], self.qx[px, py], self.qy[px, py],
-                self.ivec.flatten(), self.jvec.flatten(), self.distances.flatten(),
+                self.ivec.ravel(), self.jvec.ravel(), self.distances.ravel(),
                 self.dry_depth, self.gamma, theta_sed)
 
             new_cell = shared_tools.random_pick(weights)
@@ -235,10 +235,9 @@ class sed_tools(object):
 
         num_starts = int(self.Np_sed * self.f_bedload)
         inlet_weights = np.ones_like(self.inlet)
-        start_indices = [
-            self.inlet[shared_tools.random_pick(
-                inlet_weights / sum(inlet_weights))]
-            for x in range(num_starts)]
+        start_indices = shared_tools.get_start_indices(self.inlet,
+                                                       inlet_weights,
+                                                       num_starts)
 
         for np_sed in range(num_starts):
 
@@ -281,10 +280,9 @@ class sed_tools(object):
 
         num_starts = int(self.Np_sed * (1 - self.f_bedload))
         inlet_weights = np.ones_like(self.inlet)
-        start_indices = [
-            self.inlet[shared_tools.random_pick(
-                inlet_weights / sum(inlet_weights))]
-            for x in range(num_starts)]
+        start_indices = shared_tools.get_start_indices(self.inlet,
+                                                       inlet_weights,
+                                                       num_starts)
 
         for np_sed in range(num_starts):
 

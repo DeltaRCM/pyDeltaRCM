@@ -29,9 +29,9 @@ class water_tools(object):
 
         _iter = 0
         inlet_weights = np.ones_like(self.inlet)
-        start_indices = [
-            self.inlet[shared_tools.random_pick(inlet_weights / sum(inlet_weights))]
-            for x in range(self.Np_water)]
+        start_indices = shared_tools.get_start_indices(self.inlet,
+                                                       inlet_weights,
+                                                       self.Np_water)
 
         self.qxn.flat[start_indices] += 1
         self.qwn.flat[start_indices] += self.Qp_water / self.dx / 2
@@ -61,8 +61,8 @@ class water_tools(object):
             next_index = shared_tools.calculate_new_ind(
                 current_inds,
                 new_cells,
-                self.iwalk.flatten(),
-                self.jwalk.flatten(),
+                self.iwalk.ravel(),
+                self.jwalk.ravel(),
                 self.eta.shape)
 
             dist, istep, jstep, astep = shared_tools.get_steps(
@@ -192,9 +192,9 @@ class water_tools(object):
                 ct_nbrs = self.pad_cell_type[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
                 self.water_weights[i, j] = shared_tools.get_weight_at_cell(
                     (i, j),
-                    stage_nbrs.flatten(), depth_nbrs.flatten(), ct_nbrs.flatten(),
+                    stage_nbrs.ravel(), depth_nbrs.ravel(), ct_nbrs.ravel(),
                     self.stage[i, j], self.qx[i, j], self.qy[i, j],
-                    self.ivec.flatten(), self.jvec.flatten(), self.distances.flatten(),
+                    self.ivec.ravel(), self.jvec.ravel(), self.distances.ravel(),
                     self.dry_depth, self.gamma, self.theta_water)
 
     def get_new_cell(self, ind):
