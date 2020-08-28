@@ -119,6 +119,11 @@ def custom_ravel(tup, shape):
 
 @njit
 def get_weight_sfc_int(stage, stage_nbrs, qx, qy, ivec, jvec, distances):
+    """Determine random walk weight surfaces.
+
+    Determines the surfaces for weighting the random walks based on the stage
+    and discharge fields.
+    """
     weight_sfc = np.maximum(0, (stage - stage_nbrs) / distances)
     weight_int = np.maximum(0, (qx * jvec + qy * ivec) / distances)
     return weight_sfc, weight_int
