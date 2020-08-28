@@ -192,28 +192,18 @@ class water_tools(object):
 
         for i in range(self.L):
             for j in range(self.W):
-                # stage_nbrs = self.pad_stage[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-                # depth_nbrs = self.pad_depth[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-                # ct_nbrs = self.pad_cell_type[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-
-                # weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
-                #     self.stage[i, j], stage_nbrs.ravel(),
-                #     self.qx[i, j], self.qy[i, j], self.ivec_flat, self.jvec_flat,
-                #     self.distances_flat)
-
-                # self.water_weights[i, j] = shared_tools.get_weight_at_cell(
-                #     (i, j), weight_sfc, weight_int,
-                #     depth_nbrs.ravel(), ct_nbrs.ravel(),
-                #     self.dry_depth, self.gamma, self.theta_water)
-
                 stage_nbrs = self.pad_stage[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
                 depth_nbrs = self.pad_depth[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
                 ct_nbrs = self.pad_cell_type[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+
+                weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
+                    self.stage[i, j], stage_nbrs.ravel(),
+                    self.qx[i, j], self.qy[i, j], self.ivec_flat, self.jvec_flat,
+                    self.distances_flat)
+
                 self.water_weights[i, j] = shared_tools.get_weight_at_cell(
-                    (i, j),
-                    stage_nbrs.flatten(), depth_nbrs.flatten(), ct_nbrs.flatten(),
-                    self.stage[i, j], self.qx[i, j], self.qy[i, j],
-                    self.ivec.flatten(), self.jvec.flatten(), self.distances.flatten(),
+                    (i, j), weight_sfc, weight_int,
+                    depth_nbrs.ravel(), ct_nbrs.ravel(),
                     self.dry_depth, self.gamma, self.theta_water)
 
     def update_Q(self, dist, current_inds, next_index, astep, jstep, istep):

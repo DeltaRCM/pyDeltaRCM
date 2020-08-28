@@ -125,12 +125,8 @@ def get_weight_sfc_int(stage, stage_nbrs, qx, qy, ivec, jvec, distances):
 
 
 @njit
-def get_weight_at_cell(ind, stage_nbrs, depth_nbrs, ct_nbrs, stage, qx, qy,
-                       ivec, jvec, distances, dry_depth, gamma, theta):
-
-    weight_sfc = np.maximum(0, (stage - stage_nbrs) / distances)
-
-    weight_int = np.maximum(0, (qx * jvec + qy * ivec) / distances)
+def get_weight_at_cell(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
+                       dry_depth, gamma, theta):
 
     if ind[0] == 0:
         weight_sfc[:3] = np.nan
@@ -159,39 +155,6 @@ def get_weight_at_cell(ind, stage_nbrs, depth_nbrs, ct_nbrs, stage, qx, qy,
         weight[~nanWeight] = 1 / np.maximum(1, len(weight[~nanWeight]))
         weight[nanWeight] = 0
     return weight
-
-
-# @njit
-# def get_weight_at_cell(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
-#                        dry_depth, gamma, theta):
-
-#     if ind[0] == 0:
-#         weight_sfc[:3] = np.nan
-#         weight_int[:3] = np.nan
-
-#     drywall = (depth_nbrs <= dry_depth) | (ct_nbrs == -2)
-#     weight_sfc[drywall] = np.nan
-#     weight_int[drywall] = np.nan
-
-#     if np.nansum(weight_sfc) > 0:
-#         weight_sfc = weight_sfc / np.nansum(weight_sfc)
-
-#     if np.nansum(weight_int) > 0:
-#         weight_int = weight_int / np.nansum(weight_int)
-
-#     weight = gamma * weight_sfc + (1 - gamma) * weight_int
-#     weight = depth_nbrs ** theta * weight
-#     weight[depth_nbrs <= dry_depth] = 0
-
-#     nanWeight = np.isnan(weight)
-
-#     if np.any(weight[~nanWeight] != 0):
-#         weight = weight / np.nansum(weight)
-#         weight[nanWeight] = 0
-#     else:
-#         weight[~nanWeight] = 1 / np.maximum(1, len(weight[~nanWeight]))
-#         weight[nanWeight] = 0
-#     return weight
 
 
 def _get_version():
