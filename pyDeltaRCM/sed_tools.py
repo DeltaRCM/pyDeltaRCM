@@ -187,52 +187,52 @@ class sed_tools(object):
         while (sed_continue == 1) and (it < self.stepmax):
             it += 1
 
-            # def _slice():
-                # choose next location with weights
-            stage_nbrs = self.pad_stage[
-                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-            depth_ind = self.pad_depth[
-                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-            cell_type_ind = self.pad_cell_type[
-                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-                # return stage_nbrs, depth_nbrs, cell_type_ind
+            # # def _slice():
+            #     # choose next location with weights
+            # stage_nbrs = self.pad_stage[
+            #     px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            # depth_ind = self.pad_depth[
+            #     px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            # cell_type_ind = self.pad_cell_type[
+            #     px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            #     # return stage_nbrs, depth_nbrs, cell_type_ind
 
-            # stage_nbrs, depth_nbrs, cell_type_ind = _slice()
+            # # stage_nbrs, depth_nbrs, cell_type_ind = _slice()
 
-            # ind = (px, py)
-            # weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
-            #     self.stage[px, py], stage_nbrs.ravel(), self.qx[px, py],
-            #     self.qy[px, py], self.ivec_flat, self.jvec_flat,
-            #     self.distances_flat)
+            # # ind = (px, py)
+            # # weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
+            # #     self.stage[px, py], stage_nbrs.ravel(), self.qx[px, py],
+            # #     self.qy[px, py], self.ivec_flat, self.jvec_flat,
+            # #     self.distances_flat)
+            # # weights = shared_tools.get_weight_at_cell(
+            # #     ind, weight_sfc, weight_int, depth_nbrs.ravel(),
+            # #     cell_type_ind.ravel(), self.dry_depth,
+            # #     self.gamma, theta_sed)
+
+            # stage_nbrs = self.pad_stage[
+            #     px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            # depth_ind = self.pad_depth[
+            #     px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+            # cell_type_ind = self.pad_cell_type[
+            #     px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+
             # weights = shared_tools.get_weight_at_cell(
-            #     ind, weight_sfc, weight_int, depth_nbrs.ravel(),
-            #     cell_type_ind.ravel(), self.dry_depth,
-            #     self.gamma, theta_sed)
-
-            stage_nbrs = self.pad_stage[
-                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-            depth_ind = self.pad_depth[
-                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-            cell_type_ind = self.pad_cell_type[
-                px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-
-            weights = shared_tools.get_weight_at_cell(
-                (px, py),
-                stage_nbrs.flatten(), depth_ind.flatten(), cell_type_ind.flatten(),
-                self.stage[px, py], self.qx[px, py], self.qy[px, py],
-                self.ivec.flatten(), self.jvec.flatten(), self.distances.flatten(),
-                self.dry_depth, self.gamma, theta_sed)
+            #     (px, py),
+            #     stage_nbrs.flatten(), depth_ind.flatten(), cell_type_ind.flatten(),
+            #     self.stage[px, py], self.qx[px, py], self.qy[px, py],
+            #     self.ivec.flatten(), self.jvec.flatten(), self.distances.flatten(),
+            #     self.dry_depth, self.gamma, theta_sed)
 
 
-            new_cell = shared_tools.random_pick(weights)
-            dist, istep, jstep, _ = shared_tools.get_steps(
-                new_cell, self.iwalk_flat, self.jwalk_flat)
+            # new_cell = shared_tools.random_pick(weights)
+            # dist, istep, jstep, _ = shared_tools.get_steps(
+            #     new_cell, self.iwalk_flat, self.jwalk_flat)
 
-            # weights, new_cell, dist, istep, jstep = choose_next_location(
-            #     px, py, self.pad_stage, self.pad_depth, self.pad_cell_type,
-            #     self.stage, self.qx, self.qy, self.ivec_flat, self.jvec_flat,
-            #     self.distances_flat, self.dry_depth, self.gamma, theta_sed,
-            #     self.iwalk_flat, self.jwalk_flat)
+            weights, new_cell, dist, istep, jstep = choose_next_location(
+                px, py, self.pad_stage, self.pad_depth, self.pad_cell_type,
+                self.stage, self.qx, self.qy, self.ivec_flat, self.jvec_flat,
+                self.distances_flat, self.dry_depth, self.gamma, theta_sed,
+                self.iwalk_flat, self.jwalk_flat)
 
             # deposition and erosion
             if sed == 'sand':  # sand
