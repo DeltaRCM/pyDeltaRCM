@@ -83,7 +83,7 @@ class water_tools(object):
 
             # Parcels that have reached the boundary are updated to
             # ``ind==0``, effectively ending the routing of these parcels.
-            self.check_for_boundary(current_inds)  # changes `free_surf_flag`
+            curent_inds = self.check_for_boundary(current_inds)  # changes `free_surf_flag`
             self.indices[:, _step] = current_inds  # record indices
             current_inds[self.free_surf_flag > 0] = 0
 
@@ -144,11 +144,11 @@ class water_tools(object):
                                 # difference between streamline and
                                 # parcel path
 
-                    Hnew[i, j] = Hnew[ip, jp] + dH
                     # previous cell's surface plus difference in H
+                    Hnew[i, j] = Hnew[ip, jp] + dH
 
-                    self.sfc_visit[i, j] = self.sfc_visit[i, j] + 1
                     # add up # of cell visits
+                    self.sfc_visit[i, j] = self.sfc_visit[i, j] + 1
 
                     # sum of all water surface elevations
                     self.sfc_sum[i, j] = self.sfc_sum[i, j] + Hnew[i, j]
@@ -192,14 +192,28 @@ class water_tools(object):
 
         for i in range(self.L):
             for j in range(self.W):
+                # stage_nbrs = self.pad_stage[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+                # depth_nbrs = self.pad_depth[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+                # ct_nbrs = self.pad_cell_type[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+
+                # weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
+                #     self.stage[i, j], stage_nbrs.ravel(),
+                #     self.qx[i, j], self.qy[i, j], self.ivec_flat, self.jvec_flat,
+                #     self.distances_flat)
+
+                # self.water_weights[i, j] = shared_tools.get_weight_at_cell(
+                #     (i, j), weight_sfc, weight_int,
+                #     depth_nbrs.ravel(), ct_nbrs.ravel(),
+                #     self.dry_depth, self.gamma, self.theta_water)
+
                 stage_nbrs = self.pad_stage[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
                 depth_nbrs = self.pad_depth[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
                 ct_nbrs = self.pad_cell_type[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
                 self.water_weights[i, j] = shared_tools.get_weight_at_cell(
                     (i, j),
-                    stage_nbrs.ravel(), depth_nbrs.ravel(), ct_nbrs.ravel(),
+                    stage_nbrs.flatten(), depth_nbrs.flatten(), ct_nbrs.flatten(),
                     self.stage[i, j], self.qx[i, j], self.qy[i, j],
-                    self.ivec_flat, self.jvec_flat, self.distances_flat,
+                    self.ivec.flatten(), self.jvec.flatten(), self.distances.flatten(),
                     self.dry_depth, self.gamma, self.theta_water)
 
     def update_Q(self, dist, current_inds, next_index, astep, jstep, istep):
@@ -236,7 +250,8 @@ class water_tools(object):
 
         # below is not needed, because of update at end of `iteration`. I'm
         #   leaving it here for reference.
-        # inds[self.free_surf_flag == 2] = 0
+        inds[self.free_surf_flag == 2] = 0
+        return inds
 
     def update_water(self, timestep, itr):
         """Update surface after routing all parcels.
