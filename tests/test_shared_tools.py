@@ -45,10 +45,11 @@ def test_get_steps():
     iwalk = shared_tools.get_iwalk()
     jwalk = shared_tools.get_jwalk()
 
-    d, i, j, a = shared_tools.get_steps(new_cells, iwalk.flatten(), jwalk.flatten())
+    d, i, j, a = shared_tools.get_steps(
+        new_cells, iwalk.flatten(), jwalk.flatten())
 
     d_exp = np.array([1.41421356, 1., 1.41421356, 1., 0.,
-             1., 1.41421356, 1., 1.41421356])
+                      1., 1.41421356, 1., 1.41421356])
     i_exp = np.array([-1,  0,  1, -1,  0,  1, -1,  0,  1])
     j_exp = np.array([-1, -1, -1,  0,  0,  0,  1,  1,  1])
 
@@ -84,7 +85,8 @@ def test_update_absQfield(test_DeltaModel):
     d = np.array([1, np.sqrt(2), 0])
     astep = np.array([True, True, False])
     inds = np.array([3, 4, 5])
-    qwn = shared_tools.update_absQfield(np.copy(qw), d, inds, astep, test_DeltaModel.Qp_water, test_DeltaModel.dx)
+    qwn = shared_tools.update_absQfield(
+        np.copy(qw), d, inds, astep, test_DeltaModel.Qp_water, test_DeltaModel.dx)
     qwdiff = qwn - qw
     diffelem = test_DeltaModel.Qp_water / test_DeltaModel.dx / 2
     qwdiff_exp = np.array([diffelem, diffelem, 0])
@@ -163,6 +165,24 @@ def test_custom_unravel_exceed_error():
         x, y = shared_tools.custom_unravel(99, arr.shape)
 
 
+def test_get_weight_sfc_int(test_DeltaModel):
+
+    np.random.seed(test_DeltaModel.seed)
+    stage = np.random.uniform(0.5, 1, 9)
+    qx = 1
+    qy = 1
+    ivec = test_DeltaModel.ivec_flat
+    jvec = test_DeltaModel.jvec_flat
+    dists = test_DeltaModel.distances_flat
+
+    weight_sfc, weight_int = shared_tools.get_weight_sfc_int(stage, stage,
+                                                             qx, qy,
+                                                             ivec, jvec,
+                                                             dists)
+    assert np.all(weight_sfc == np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]))
+    assert np.all(weight_int == np.array([0, 0, 0, 0, 0, 1, 0, 1, 1]))
+
+
 def test_get_weight_at_cell(test_DeltaModel):
 
     ind = (0, 4)
@@ -180,9 +200,11 @@ def test_get_weight_at_cell(test_DeltaModel):
     dry_thresh = 0.1
     gamma = 0.001962
     theta = 1
+    weight_sfc = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float64)
+    weight_int = np.array([0, 0, 0, 0, 0, 1, 0, 1, 1], dtype=np.float64)
 
-    wts = shared_tools.get_weight_at_cell(ind, stage, depth, celltype, stage, qx, qy,
-                           ivec, jvec, dists, dry_thresh, gamma, theta)
+    wts = shared_tools.get_weight_at_cell(ind, weight_sfc, weight_int, depth,
+                                          celltype, dry_thresh, gamma, theta)
     assert np.all(wts[[0, 1, 2, 5]] == 0)
     assert wts[4] == 0
     assert np.any(wts[[3, 6, 7, 8]] != 0)
