@@ -201,9 +201,11 @@ def test_model_similarity(tmp_path):
     # create and update first model
     ModelA = DeltaModel(input_file=p)
     ModelA.update()
+    ModelA.output_netcdf.close()
     # create and update second model
     ModelB = DeltaModel(input_file=p)
     ModelB.update()
+    ModelB.output_netcdf.close()
 
     # fields should be the same
     assert ModelA.time == ModelB.time
@@ -246,6 +248,7 @@ def test_simple_checkpoint(tmp_path):
 
     for _ in range(0, 3):
         longModel.update()
+    longModel.output_netcdf.close()
 
     # try defining a new model but plan to load checkpoint from longModel
     file_name = 'base_run.yaml'
@@ -271,6 +274,7 @@ def test_simple_checkpoint(tmp_path):
 
     # advance it one step to catch up to longModel
     resumeModel.update()
+    resumeModel.output_netcdf.close()
 
     # the longModel and resumeModel should match
     assert longModel.time == resumeModel.time
@@ -308,6 +312,7 @@ def test_simple_checkpoint(tmp_path):
 
     # advance it one step to catch up to resumeModel
     resumeModel2.update()
+    resumeModel2.output_netcdf.close()
 
     # the two models that resumed from the checkpoint should be the same
     assert resumeModel2.time == resumeModel.time
@@ -347,6 +352,7 @@ def test_longer_checkpoint(tmp_path):
 
     for _ in range(0, 7):
         longModel.update()
+    longModel.output_netcdf.close()
 
     # try defining a new model but plan to load checkpoint from longModel
     file_name = 'base_run.yaml'
@@ -373,6 +379,7 @@ def test_longer_checkpoint(tmp_path):
     # advance it three steps to catch up to longModel
     for _ in range(0, 3):
         resumeModel.update()
+    resumeModel.output_netcdf.close()
 
     # the longModel and resumeModel should match
     assert longModel.time == resumeModel.time
@@ -416,6 +423,7 @@ def test_checkpoint_nc(tmp_path):
 
     for _ in range(0, 4):
         baseModel.update()
+    baseModel.output_netcdf.close()
 
     # try defining a new model but plan to load checkpoint from baseModel
     file_name = 'base_run.yaml'
@@ -445,6 +453,7 @@ def test_checkpoint_nc(tmp_path):
     # advance it six steps
     for _ in range(0, 6):
         resumeModel.update()
+    resumeModel.output_netcdf.close()
 
     # assert that ouput netCDF4 exists
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
