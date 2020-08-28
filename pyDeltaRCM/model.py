@@ -66,7 +66,6 @@ class DeltaModel(Tools):
         self.create_domain()
 
         self.init_subsidence()
-        self.init_stratigraphy()
 
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
@@ -75,6 +74,7 @@ class DeltaModel(Tools):
             self.load_checkpoint()
 
         else:
+            self.init_stratigraphy()
             self.init_output_grids()
 
         self.logger.info('Model initialization complete')

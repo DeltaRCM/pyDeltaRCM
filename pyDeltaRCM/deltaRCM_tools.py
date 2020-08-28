@@ -527,4 +527,6 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
                             sand_data=csr_strata_sand_frac.data,
                             sand_indices=csr_strata_sand_frac.indices,
                             sand_indptr=csr_strata_sand_frac.indptr,
-                            sand_shape=csr_strata_sand_frac.shape)
+                            sand_shape=csr_strata_sand_frac.shape,
+                            n_steps=self.n_steps,
+                            init_eta=self.init_eta)

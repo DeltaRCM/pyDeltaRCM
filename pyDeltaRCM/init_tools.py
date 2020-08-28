@@ -489,6 +489,8 @@ class init_tools(object):
         self.depth = checkpoint['depth']
         self.stage = checkpoint['stage']
         self.eta = checkpoint['eta']
+        self.n_steps = checkpoint['n_steps']
+        self.init_eta = checkpoint['init_eta']
         self.strata_counter = checkpoint['strata_counter']
         # load and set random state to continue as if run hadn't stopped
         rng_state = tuple(checkpoint['rng_state'])
