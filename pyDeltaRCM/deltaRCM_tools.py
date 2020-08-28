@@ -306,17 +306,18 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         -------
 
         """
-        _msg = 'Saving checkpoint'
-        self.logger.info(_msg)
-        self.save_the_checkpoint()
-
-        if self.checkpoint_dt != self.save_dt:
-            _msg = 'Grid save interval and checkpoint interval are not ' \
-                   'identical, this may result in duplicate entries in ' \
-                   'the output NetCDF4 after resuming the model run.'
+        if self._save_checkpoint:
+            _msg = 'Saving checkpoint'
             self.logger.info(_msg)
+            self.save_the_checkpoint()
 
-        self._save_time_since_checkpoint = 0
+            if self.checkpoint_dt != self.save_dt:
+                _msg = 'Grid save interval and checkpoint interval are not ' \
+                       'identical, this may result in duplicate entries in ' \
+                       'the output NetCDF4 after resuming the model run.'
+                self.logger.info(_msg)
+
+            self._save_time_since_checkpoint = 0
 
     def output_strata(self):
         """Save stratigraphy as sparse matrix to file.

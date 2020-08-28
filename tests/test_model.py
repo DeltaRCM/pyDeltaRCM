@@ -248,6 +248,7 @@ def test_setting_getting_channel_width(test_DeltaModel):
 def test_make_checkpoint(tmp_path, test_DeltaModel):
     """Test setting the checkpoint option to 'True' and saving a checkpoint."""
     test_DeltaModel.save_checkpoint = True
+    test_DeltaModel._save_checkpoint = True
     test_DeltaModel.checkpoint_dt = 1
     test_DeltaModel.save_dt = 1
     check_DeltaModel = test_DeltaModel

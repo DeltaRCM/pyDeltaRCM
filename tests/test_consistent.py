@@ -383,8 +383,8 @@ def test_longer_checkpoint(tmp_path):
     assert np.all(longModel.stage == resumeModel.stage)
     assert np.all(longModel.strata_eta.todense() ==
                   resumeModel.strata_eta.todense())
-    # assert np.all(longModel.strata_sand_frac.todense() ==
-    #               resumeModel.strata_sand_frac.todense())
+    assert pytest.approx(longModel.strata_sand_frac.todense() ==
+                         resumeModel.strata_sand_frac.todense())
 
 
 def test_checkpoint_nc(tmp_path):
@@ -461,8 +461,8 @@ def test_checkpoint_nc(tmp_path):
     assert 'depth' in out_vars
     assert 'discharge' in out_vars
     # check attributes of variables
-    assert output['time'][0].tolist() == 300.0
-    assert output['time'][-1].tolist() == 3000.0
+    assert output['time'][0].tolist() == 0.0
+    assert output['time'][-1].tolist() == 2700.0
     assert output['eta'][0].shape == (10, 10)
     assert output['eta'][-1].shape == (10, 10)
     assert output['depth'][-1].shape == (10, 10)
