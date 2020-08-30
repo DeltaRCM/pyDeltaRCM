@@ -249,11 +249,13 @@ class water_tools(object):
         Could divide into 3 functions for cleanliness.
         """
         Hnew = self.eta + self.depth
-        Hnew[Hnew < self.H_SL] = self.H_SL # water surface height not under sea level
 
+        # water surface height not under sea level
+        Hnew[Hnew < self.H_SL] = self.H_SL
+
+        # find average water surface elevation for a cell
         Hnew[self.sfc_visit > 0] = (self.sfc_sum[self.sfc_visit > 0] /
                                     self.sfc_visit[self.sfc_visit > 0])
-        # find average water surface elevation for a cell
 
         Hnew_pad = np.pad(Hnew, 1, 'edge')
 
