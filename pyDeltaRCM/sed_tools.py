@@ -115,6 +115,12 @@ class sed_tools(object):
         Returns
         -------
         """
+        # Compute the changes in the bed elevation, and some flow fields
+        #    The :obj:`_update_helper` function is a jitted routine which
+        #    computes the new values for the bed elevation and then determines
+        #    the updated values of the depth and flow velocity fields. These
+        #    determinations require several comparisons and repeated indexing,
+        #    so we use a jitted "helper" function to do the operations.
         eta, depth, uw = _update_helper(-Vp_ero, self.dx, self.u_max,
                                         self.eta[px, py], self.depth[px, py],
                                         self.stage[px, py], self.qw[px, py],
@@ -134,13 +140,11 @@ class sed_tools(object):
 
         Update velocities after erosion or deposition.
         """
-        if self.qw[px, py] > 0:
-
-            self.ux[px, py] = self.uw[px, py] * \
-                self.qx[px, py] / self.qw[px, py]
-            self.uy[px, py] = self.uw[px, py] * \
-                self.qy[px, py] / self.qw[px, py]
-
+        qw_loc = self.qw[px, py]
+        uw_loc = self.uw[px, py]
+        if qw_loc > 0:
+            self.ux[px, py] = uw_loc * self.qx[px, py] / qw_loc
+            self.uy[px, py] = uw_loc * self.qy[px, py] / qw_loc
         else:
             self.ux[px, py] = 0
             self.uy[px, py] = 0
@@ -247,7 +251,7 @@ class sed_tools(object):
         it = 0
         sed_continue = 1
 
-        while (sed_continue == 1) and (it < self.stepmax):
+        while (it < self.stepmax):
             it += 1
 
             # Choose the next location for the parcel to travel to
@@ -264,23 +268,19 @@ class sed_tools(object):
 
             # deposition and erosion
             if sed == 'sand':  # sand
-
-                depoPart = self.Vp_res / 2 / self.dt / self.dx
-
+                depoPart = self.Vp_res / 2 / self._dt / self.dx
                 px, py, self.qs = shared_tools.partition_sand(
                     self.qs, depoPart, py, px, dist, istep, jstep)
-
                 self.sand_dep_ero(px, py)
 
             if sed == 'mud':  # mud
-
                 px = px + jstep
                 py = py + istep
-
                 self.mud_dep_ero(px, py)
 
+            # check for "edge" cell
             if self.cell_type[px, py] == -1:
-                sed_continue = 0
+                it = float('inf')  # kill the `while` loop
 
     def sand_route(self):
         """Route sand parcels; topo diffusion."""
@@ -300,7 +300,7 @@ class sed_tools(object):
             py = start_indices[np_sed]
 
             self.qs[px, py] = (self.qs[px, py] +
-                               self.Vp_res / 2. / self.dt / self.dx)
+                               self.Vp_res / 2. / self._dt / self.dx)
 
             self.sed_parcel(theta_sed, 'sand', px, py)
 
