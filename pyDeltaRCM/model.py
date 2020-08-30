@@ -50,6 +50,7 @@ class DeltaModel(Tools):
         self._time_iter = int(0)
         self._save_time_since_last = float("inf")  # force save on t==0
         self._save_iter = int(0)
+        self._save_time_since_checkpoint = 0
 
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
@@ -65,8 +66,16 @@ class DeltaModel(Tools):
         self.create_domain()
 
         self.init_subsidence()
-        self.init_stratigraphy()
-        self.init_output_grids()
+
+        # if resume flag set to True, load checkpoint, open netCDF4
+        if self.resume_checkpoint:
+            _msg = 'Loading data from checkpoint and reopening netCDF4 file.'
+            self.logger.info(_msg)
+            self.load_checkpoint()
+
+        else:
+            self.init_stratigraphy()
+            self.init_output_grids()
 
         self.logger.info('Model initialization complete')
 
@@ -103,7 +112,12 @@ class DeltaModel(Tools):
 
         self._time += self.dt
         self._save_time_since_last += self.dt
+        self._save_time_since_checkpoint += self.dt
         self._time_iter += int(1)
+
+        if self._save_time_since_checkpoint >= self.checkpoint_dt:
+            self.output_checkpoint()
+            self._save_time_since_checkpoint = 0
 
     def finalize(self):
         """Finalize the model run.
@@ -124,6 +138,9 @@ class DeltaModel(Tools):
         if self._save_time_since_last >= self.save_dt:
             self.record_stratigraphy()
             self.output_data()
+
+        if self._save_time_since_checkpoint >= self.checkpoint_dt:
+            self.output_checkpoint()
 
         self.output_strata()
 
@@ -187,6 +204,11 @@ class DeltaModel(Tools):
         The number of times the :obj:`update` method has been called.
         """
         return self._save_time_since_last
+
+    @property
+    def save_time_since_checkpoint(self):
+        """Time since last data checkpoint was saved."""
+        return self._save_time_since_checkpoint
 
     @property
     def save_iter(self):

@@ -12,6 +12,7 @@ from .sed_tools import sed_tools
 from .water_tools import water_tools
 from .init_tools import init_tools
 from .debug_tools import debug_tools
+from .shared_tools import get_random_state
 
 
 class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
@@ -292,6 +293,32 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
             if self.save_velocity_grids:
                 self.save_grids('velocity', self.uw, shape[0])
 
+    def output_checkpoint(self):
+        """Save checkpoint.
+
+        Save checkpoint data (including rng state) so that the model can be
+        resumed from this time.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        """
+        if self._save_checkpoint:
+            _msg = 'Saving checkpoint'
+            self.logger.info(_msg)
+            self.save_the_checkpoint()
+
+            if self.checkpoint_dt != self.save_dt:
+                _msg = 'Grid save interval and checkpoint interval are not ' \
+                       'identical, this may result in duplicate entries in ' \
+                       'the output NetCDF4 after resuming the model run.'
+                self.logger.info(_msg)
+
+            self._save_time_since_checkpoint = 0
+
     def output_strata(self):
         """Save stratigraphy as sparse matrix to file.
 
@@ -455,3 +482,51 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         except:
             self.logger.error('Cannot save grid to netCDF file.')
             warnings.warn(UserWarning('Cannot save grid to netCDF file.'))
+
+    def save_the_checkpoint(self):
+        """Save checkpoint files.
+
+        Saves the grids to a .npz file so that the model can be
+        initiated from this point. The timestep of the checkpoint is also
+        saved. The values from the model that are saved to the checkpoint.npz
+        are the following:
+        - Model time
+        - Flow velocity and its components
+        - Water depth
+        - Water stage
+        - Topography
+        - Current random seed state
+        - Stratigraphic 'topography' in 'strata_eta.npz'
+        - Stratigraphic sand fraction in 'strata_sand_frac.npz'
+        If `save_checkpoint` is turned on, checkpoints are re-written
+        with either a frequency of `checkpoint_dt` or `save_dt` if
+        `checkpoint_dt` has not been explicitly defined.
+        """
+        ckp_file = os.path.join(self.prefix, 'checkpoint.npz')
+        # convert sparse arrays to csr type so they are easier to save
+        csr_strata_eta = self.strata_eta.tocsr()
+        csr_strata_sand_frac = self.strata_sand_frac.tocsr()
+        # advance _time_iter since this is before update step fully finishes
+        _time_iter = self._time_iter + int(1)
+        # get rng state
+        rng_state = get_random_state()
+
+        np.savez_compressed(ckp_file, time=self.time, H_SL=self.H_SL,
+                            time_iter=_time_iter,
+                            save_iter=self._save_iter,
+                            save_time_since_last=self._save_time_since_last,
+                            uw=self.uw, ux=self.ux, uy=self.uy,
+                            qw=self.qw, qx=self.qx, qy=self.qy,
+                            depth=self.depth, stage=self.stage,
+                            eta=self.eta, strata_counter=self.strata_counter,
+                            rng_state=rng_state,
+                            eta_data=csr_strata_eta.data,
+                            eta_indices=csr_strata_eta.indices,
+                            eta_indptr=csr_strata_eta.indptr,
+                            eta_shape=csr_strata_eta.shape,
+                            sand_data=csr_strata_sand_frac.data,
+                            sand_indices=csr_strata_sand_frac.indices,
+                            sand_indptr=csr_strata_sand_frac.indptr,
+                            sand_shape=csr_strata_sand_frac.shape,
+                            n_steps=self.n_steps,
+                            init_eta=self.init_eta)

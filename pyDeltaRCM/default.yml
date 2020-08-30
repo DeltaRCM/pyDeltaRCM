@@ -100,9 +100,18 @@ save_velocity_grids:
 save_dt:
   type: 'int'
   default: 86400
+checkpoint_dt:
+  type: ['int', 'None']
+  default: null
 save_strata:
   type: 'bool'
   default: True
+save_checkpoint:
+  type: 'bool'
+  default: False
+resume_checkpoint:
+  type: 'bool'
+  default: False
 omega_sfc:
   type: ['float', 'int']
   default: 0.1
