@@ -120,6 +120,9 @@ class init_tools(object):
         if self.checkpoint_dt is None:
             self.checkpoint_dt = self.save_dt
 
+        if self.save_checkpoint and self.toggle_subsidence:
+            raise NotImplementedError('Cannot handle checkpointing with subsidence.')
+
     def determine_random_seed(self):
         """Set the random seed if given.
 
