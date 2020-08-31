@@ -1,7 +1,9 @@
 
 import numpy as np
-from numba import njit, jit, typed
+from numba import njit, jit, typed, float32, float64, int64
+from numba.experimental import jitclass
 from scipy import ndimage
+import abc
 
 from . import shared_tools
 
@@ -22,267 +24,12 @@ class sed_tools(object):
         self.Vp_dep_sand[:] = 0
         self.Vp_dep_mud[:] = 0
 
-        self.sand_route()
-
-        self.mud_route()
+        self.route_all_sand_parcels()
+        self.route_all_mud_parcels()
 
         self.topo_diffusion()
 
-    def deposit(self, Vp_dep, px, py):
-        """Deposit sand or mud.
-
-        Deposit sediment volume `Vp_dep`. The change in bed elevation depends
-        on the sediment mass conservation (i.e., Exner equation) and in the
-        case of deposition, is equal to:
-
-        .. code::
-
-            Vp_dep / (dx * dx)
-
-        Following the sediment deposition, the new values for flow depth and
-        flow velocity are determined. The `uw` field is updated in this
-        routine, and the components of the flow velocity are then updated in
-        the :obj:`update_u` method.
-
-        Parameters
-        ----------
-        Vp_dep : :obj:`float`
-            Volume of sediment to deposit.
-
-        px : :obj:`int`
-            Index.
-
-        py : :obj:`int`
-            Index.
-
-        Returns
-        -------
-        """
-        # Compute the changes in the bed elevation, and some flow fields
-        #    The :obj:`_update_helper` function is a jitted routine which
-        #    computes the new values for the bed elevation and then determines
-        #    the updated values of the depth and flow velocity fields. These
-        #    determinations require several comparisons and repeated indexing,
-        #    so we use a jitted "helper" function to do the operations.
-        eta, depth, uw = _update_helper(Vp_dep, self.dx, self.u_max,
-                                        self.eta[px, py], self.depth[px, py],
-                                        self.stage[px, py], self.qw[px, py],
-                                        self.uw[px, py])
-
-        # now apply the computed updated values
-        self.eta[px, py] = eta  # update bed
-        self.depth[px, py] = depth  # update depth
-        self.pad_depth[px + 1, py + 1] = depth  # update depth in padded array
-        self.uw[px, py] = uw  # update flow field
-        self.update_u(px, py)  # update velocity fields
-
-        self.Vp_res = self.Vp_res - Vp_dep  # update sed volume left in parcel
-
-    def erode(self, Vp_ero, px, py):
-        """Erode sand or mud.
-
-        Erode sediment volume `Vp_ero`. The change in bed elevation depends
-        on the sediment mass conservation (i.e., Exner equation) and in the
-        case of erosion, is equal to:
-
-        .. code::
-
-            -Vp_ero / (dx * dx)
-
-        Following the sediment erosion, the new values for flow depth and
-        flow velocity are determined. The `uw` field is updated in this
-        routine, and the components of the flow velocity are then updated in
-        the :obj:`update_u` method.
-
-        .. note::
-
-            Total sediment mass is preserved, but individual categories
-            of sand and mud are not. I.e., it is assumed that there is infinite
-            sand and/or mud to erode at any location where erosion is slated to
-            occur.
-
-        Parameters
-        ----------
-        Vp_ero : :obj:`float`
-            Volume of sediment to erode.
-
-        px : :obj:`int`
-            Index.
-
-        py : :obj:`int`
-            Index.
-
-        Returns
-        -------
-        """
-        # Compute the changes in the bed elevation, and some flow fields
-        #    The :obj:`_update_helper` function is a jitted routine which
-        #    computes the new values for the bed elevation and then determines
-        #    the updated values of the depth and flow velocity fields. These
-        #    determinations require several comparisons and repeated indexing,
-        #    so we use a jitted "helper" function to do the operations.
-        eta, depth, uw = _update_helper(-Vp_ero, self.dx, self.u_max,
-                                        self.eta[px, py], self.depth[px, py],
-                                        self.stage[px, py], self.qw[px, py],
-                                        self.uw[px, py])
-
-        # now apply the computed updated values
-        self.eta[px, py] = eta  # update bed
-        self.depth[px, py] = depth  # update depth
-        self.pad_depth[px + 1, py + 1] = depth  # update depth in padded array
-        self.uw[px, py] = uw  # update flow field
-        self.update_u(px, py)  # update velocity fields
-
-        self.Vp_res = self.Vp_res + Vp_ero
-
-    def update_u(self, px, py):
-        """Update velocity.
-
-        Update velocities after erosion or deposition.
-        """
-        qw_loc = self.qw[px, py]
-        uw_loc = self.uw[px, py]
-        if qw_loc > 0:
-            self.ux[px, py] = uw_loc * self.qx[px, py] / qw_loc
-            self.uy[px, py] = uw_loc * self.qy[px, py] / qw_loc
-        else:
-            self.ux[px, py] = 0
-            self.uy[px, py] = 0
-
-    def sand_dep_ero(self, px, py):
-        """Decide if erode or deposit sand.
-
-        .. note:: Volumetric change is limited to 1/4 local cell water volume.
-        """
-        U_loc = self.uw[px, py]
-
-        qs_cap = (self.qs0 * self.f_bedload / self.u0**self.beta *
-                  U_loc**self.beta)
-
-        qs_loc = self.qs[px, py]
-
-        Vp_dep = 0
-        Vp_ero = 0
-
-        if qs_loc > qs_cap:
-            # Sand deposition
-            #     If more sediment is in transport than the determined
-            #     transport capacity of the cell (`qs_cap`), sediment needs to
-            #     deposit on the bed.
-            Vp_dep = _regulate_Vp_change(self.Vp_res, self.stage[px, py],
-                                         self.eta[px, py], self.dx)
-
-            self.deposit(Vp_dep, px, py)
-
-        elif (U_loc > self.U_ero_sand) and (qs_loc < qs_cap):
-            # Sand erosion
-            #     Can only occur if local velocity is greater than the
-            #     critical erosion threshold for sand, *and* if the local
-            #     transport capacity is not yet reached.
-            Vp_ero = get_eroded_volume(self.Vp_sed, U_loc, self.U_ero_sand,
-                                       self.beta, self.stage[px, py],
-                                       self.eta[px, py], self.dx)
-            self.erode(Vp_ero, px, py)
-
-        self.Vp_dep_sand[px, py] = self.Vp_dep_sand[px, py] + Vp_dep
-
-    def mud_dep_ero(self, px, py):
-        """Decide if deposit or erode mud.
-
-        .. note:: Volumetric change is limited to 1/4 local cell water volume.
-        """
-        U_loc = self.uw[px, py]
-
-        Vp_dep = 0
-        Vp_ero = 0
-
-        if U_loc < self.U_dep_mud:
-
-            Vp_dep = (self._lambda * self.Vp_res *
-                      (self.U_dep_mud**self.beta - U_loc**self.beta) /
-                      (self.U_dep_mud**self.beta))
-
-            Vp_dep = _regulate_Vp_change(Vp_dep, self.stage[px, py],
-                                        self.eta[px, py], self.dx)
-
-            self.deposit(Vp_dep, px, py)
-
-        if U_loc > self.U_ero_mud:
-
-            Vp_ero = get_eroded_volume(self.Vp_sed, U_loc, self.U_ero_mud,
-                                       self.beta, self.stage[px, py],
-                                       self.eta[px, py], self.dx)
-
-            self.erode(Vp_ero, px, py)
-
-        self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_dep
-
-    def sed_parcel(self, theta_sed, sed, px, py):
-        """Route one sediment parcel.
-
-        This algorithm is called :obj:`~pyDeltaRCM.DeltaModel.Np_sed` times,
-        and routes each parcel of sediment until the sediment volume has been
-        depleted by deposition, or until the maximum number of steps for the
-        parcel has been reached (`self.stepmax`).
-
-        Algorithm is to:
-          1. As input, receive the type of sediment (:obj:`sed_type`) and the
-          starting location of the parcel as :obj:`px` and :obj:`py`.
-          2. begin a while loop, which counts the number of steps the parcel
-          has taken
-          3. determine, based on the water surface and flow velocity field,
-          which location to travel to next. This determination is wrapped into
-          a jitted function :obj:`choose_next_sed_location`, which utilizes
-          the `shared_tools` methods to pick the next location.
-          4. call the appropriate deposition/erosion method for the
-          `sed_type`, and proceed with deposition or erosion there. This step
-          modifies the bed elevation and flow depth fields, which necessitates
-          finding the new weights for routing on each step. Also, the volume
-          of sediment is either increased or decreased (erosion or
-          deposition).
-          5. repeat from 3, until `stepmax` is reached, or the sediment parcel
-          volume is depleted.
-
-        .. note::
-
-            We are unable to precompute the routing weights, in the way
-            we do in :obj:`~pyDeltaRCM.water_tools.get_water_weight_array`.
-        """
-        it = 0
-        sed_continue = 1
-
-        while (it < self.stepmax):
-            it += 1
-
-            # Choose the next location for the parcel to travel to
-            #     The location of the parcel is determined by ``(px, py)``,
-            #     and we need to determine where the parcel should travel to
-            #     next. The travel of the parcel depends primarily on the
-            #     hydrailics of the delta, determined in the previous
-            #     timestep. The following function is a jitted routine.
-            weights, new_cell, dist, istep, jstep = choose_next_location(
-                px, py, self.pad_stage, self.pad_depth, self.pad_cell_type,
-                self.stage, self.qx, self.qy, self.ivec_flat, self.jvec_flat,
-                self.distances_flat, self.dry_depth, self.gamma, theta_sed,
-                self.iwalk_flat, self.jwalk_flat)
-
-            # deposition and erosion
-            if sed == 'sand':  # sand
-                depoPart = self.Vp_res / 2 / self._dt / self.dx
-                px, py, self.qs = shared_tools.partition_sand(
-                    self.qs, depoPart, py, px, dist, istep, jstep)
-                self.sand_dep_ero(px, py)
-
-            if sed == 'mud':  # mud
-                px = px + jstep
-                py = py + istep
-                self.mud_dep_ero(px, py)
-
-            # check for "edge" cell
-            if self.cell_type[px, py] == -1:
-                it = float('inf')  # kill the `while` loop
-
-    def sand_route(self):
+    def route_all_sand_parcels(self):
         """Route sand parcels; topo diffusion."""
         theta_sed = self.theta_sand
 
@@ -292,17 +39,40 @@ class sed_tools(object):
                                                        inlet_weights,
                                                        num_starts)
 
-        for np_sed in range(num_starts):
+        self._sr.run(start_indices, self.eta, self.stage, self.depth,
+                     self.cell_type, self.uw, self.ux, self.uy,
+                     self.pad_stage, self.pad_depth, self.pad_cell_type,
+                     self.Vp_dep_mud, self.qw, self.qx, self.qy, self.qs)
 
-            self.Vp_res = self.Vp_sed
+        self.Vp_dep_mud = self._sr.Vp_dep_mud
+        self.eta = self._sr.eta  # update bed
+        self.depth = self._sr.depth  # update depth
+        self.pad_depth = self._sr.pad_depth  # update depth in padded array
+        self.uw = self._sr.uw  # update absolute flow field
+        self.ux = self._sr.ux  # update component flow field
+        self.uy = self._sr.uy  # update component flow fielda
+        self.qs = self._sr.qs
 
-            px = 0
-            py = start_indices[np_sed]
+    def route_all_mud_parcels(self):
+        """Route mud parcels."""
+        num_starts = int(self.Np_sed * (1 - self.f_bedload))
+        inlet_weights = np.ones_like(self.inlet)
+        start_indices = shared_tools.get_start_indices(self.inlet,
+                                                       inlet_weights,
+                                                       num_starts)
 
-            self.qs[px, py] = (self.qs[px, py] +
-                               self.Vp_res / 2. / self._dt / self.dx)
+        self._mr.run(start_indices, self.eta, self.stage, self.depth,
+                     self.cell_type, self.uw, self.ux, self.uy,
+                     self.pad_stage, self.pad_depth, self.pad_cell_type,
+                     self.Vp_dep_mud, self.qw, self.qx, self.qy)
 
-            self.sed_parcel(theta_sed, 'sand', px, py)
+        self.Vp_dep_mud = self._mr.Vp_dep_mud
+        self.eta = self._mr.eta  # update bed
+        self.depth = self._mr.depth  # update depth
+        self.pad_depth = self._mr.pad_depth  # update depth in padded array
+        self.uw = self._mr.uw  # update absolute flow field
+        self.ux = self._mr.ux  # update component flow field
+        self.uy = self._mr.uy  # update component flow field
 
     def topo_diffusion(self):
         """Diffuse topography after routing.
@@ -327,16 +97,251 @@ class sed_tools(object):
 
             self.eta += self.cf
 
-    def mud_route(self):
-        """Route mud parcels."""
-        theta_sed = self.theta_mud
 
-        num_starts = int(self.Np_sed * (1 - self.f_bedload))
-        inlet_weights = np.ones_like(self.inlet)
-        start_indices = shared_tools.get_start_indices(self.inlet,
-                                                       inlet_weights,
-                                                       num_starts)
+r_spec = [('_dt', float32), ('dx', float32),
+          ('num_starts', int64), ('start_indices', int64[:]),
+          ('stepmax', float32), ('px', int64), ('py', int64),
+          ('eta', float32[:, :]), ('stage', float32[:, :]),
+          ('depth', float32[:, :]), ('cell_type', int64[:, :]),
+          ('uw', float64[:, :]), ('ux', float64[:, :]), ('uy', float64[:, :]),
+          ('pad_stage', float32[:, :]), ('pad_depth', float32[:, :]),
+          ('pad_cell_type', int64[:, :]), ('qw', float64[:, :]),
+          ('qx', float64[:, :]), ('qy', float64[:, :]), ('qs', float64[:, :]),
+          ('ivec_flat', float32[:]), ('jvec_flat', float32[:]),
+          ('iwalk_flat', int64[:]), ('jwalk_flat', int64[:]),
+          ('distances_flat', float32[:]),
+          ('dry_depth', float32), ('gamma', float32), ('_lambda', float32),
+          ('beta', float32),  ('f_bedload', float32),
+          ('theta_sed', float32), ('u_max', float32),
+          ('qs0', float32), ('u0', float32), ('Vp_sed', float32),
+          ('Vp_res', float32), ('Vp_dep_mud', float64[:, :]),
+          ('U_dep_mud', float32), ('U_ero_mud', float32),
+          ('U_ero_sand', float32)]
 
+
+class BaseRouter(object):
+
+    @abc.abstractmethod
+    def run(self):
+        ...
+
+    @abc.abstractmethod
+    def _route_one_parcel(self):
+        ...
+
+    def _choose_next_location(self, px, py):
+
+        # choose next location with weights
+        stage_nbrs = self.pad_stage[
+            px:px + 3, py:py + 3]
+        depth_nbrs = self.pad_depth[
+            px:px + 3, py:py + 3]
+        cell_type_ind = self.pad_cell_type[
+            px:px + 3, py:py + 3]
+
+        weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
+            self.stage[px, py], stage_nbrs.ravel(), self.qx[px, py],
+            self.qy[px, py], self.ivec_flat, self.jvec_flat,
+            self.distances_flat)
+        weights = shared_tools.get_weight_at_cell(
+            (px, py), weight_sfc, weight_int, depth_nbrs.ravel(),
+            cell_type_ind.ravel(), self.dry_depth,
+            self.gamma, self.theta_sed)
+        new_cell = shared_tools.random_pick(weights)
+        dist, istep, jstep, _ = shared_tools.get_steps(
+            new_cell, self.iwalk_flat, self.jwalk_flat)
+
+        return istep, jstep, dist
+
+    @abc.abstractmethod
+    def deposit_or_erode(self):
+        """Determine whether to erode or deposit.
+
+        This is the decision making component of the routine, and will be
+        different for sand vs mud.
+        """
+        ...
+
+    def _update_fields(self, Vp_change, px, py):
+        """Execute deposit of sand or mud.
+
+        Deposit sediment volume `Vp_change`. The change in bed elevation
+        depends on the sediment mass conservation (i.e., Exner equation) and
+        is equal to:
+
+        .. code::
+
+            Vp_change / (dx * dx)
+
+        Following the sediment deposition/erosion, the new values for flow
+        depth and flow velocity fields are determined.
+
+        .. note::
+
+            Total sediment mass is preserved, but individual categories
+            of sand and mud are not. I.e., it is assumed that there is infinite
+            sand and/or mud to erode at any location where erosion is occuring.
+
+        Parameters
+        ----------
+        Vp_change : :obj:`float`
+            Volume of sediment to deposit / erode. If erosion, `Vp_change`
+            should be negative.
+
+        px : :obj:`int`
+            Index.
+
+        py : :obj:`int`
+            Index.
+
+        Returns
+        -------
+        """
+        # Compute the changes in the bed elevation, and some flow fields
+        #    The :obj:`_update_helper` function is a jitted routine which
+        #    computes the new values for the bed elevation and then determines
+        #    the updated values of the depth and flow velocity fields. These
+        #    determinations require several comparisons and repeated indexing,
+        #    so we use a jitted "helper" function to do the operations.
+        qw0 = self.qw[px, py]
+        eta_change = Vp_change / (self.dx * self.dx)
+
+        eta = self.eta[px, py] + eta_change  # new bed
+        depth = self.stage[px, py] - eta  # new depth
+        depth = np.maximum(0, depth)  # force >=0
+
+        if depth > 0:
+            uw = np.minimum(self.u_max, qw0 / depth)
+        else:
+            uw = self.uw[px, py]
+
+        # now apply the computed updated values
+        self.eta[px, py] = eta  # update bed
+        self.depth[px, py] = depth  # update depth
+        self.pad_depth[px + 1, py + 1] = depth  # update depth in padded array
+        self.uw[px, py] = uw  # update absolute flow field
+        # update component flow fields
+        if qw0 > 0:
+            self.ux[px, py] = uw * self.qx[px, py] / qw0
+            self.uy[px, py] = uw * self.qy[px, py] / qw0
+        else:
+            self.ux[px, py] = 0
+            self.uy[px, py] = 0
+
+    def _compute_Vp_ero(self, Vp_sed, U_loc, U_ero, beta):
+        """Compute volume erorded based on velocity.
+
+        The volume of sediment eroded depends on the local flow velocity
+        (:obj:`U_loc`), the critical velocity for erosion (:obj:`U_ero`), and
+        `beta`.
+
+        Function is used by both sand and mud pathways, but the input value of
+        U_ero depends on the pathway.
+
+        Parameters
+        ----------
+        Vp_sed : :obj:`float`
+            Volume of a sediment parcel.
+
+        U_loc : :obj:`float`
+            Local flow velocity.
+
+        U_ero : :obj:`float`
+            Critical velocity for erosion.
+
+        beta : :obj:`float`
+            ?????
+
+        Returns
+        -------
+        Vp_ero : :obj:`float`
+            Volume of eroded sediment.
+        """
+        return (Vp_sed * (U_loc**beta - U_ero**beta) /
+                U_ero**beta)
+
+    def _limit_Vp_change(self, Vp, stage, eta, dx):
+        """Limit change in volume to 1/4 of a cell volume.
+
+        Function is used by multiple pathways in `mud_dep_ero` and `sand_dep_ero`
+        but with different inputs for the sediment volume (:obj:`Vp`).
+        """
+        fourth = (stage - eta) / 4 * (dx * dx)
+        return np.minimum(Vp, fourth)
+
+
+@jitclass(r_spec)
+class SandRouter(BaseRouter):
+
+    def __init__(self, _dt, dx, Vp_sed, u_max, qs0, u0, U_ero_sand, f_bedload,
+                 ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
+                 dry_depth, gamma, beta, stepmax, theta_sed):
+
+        self._dt = _dt
+        self.dx = dx
+        self.Vp_sed = Vp_sed
+
+        self.u_max = u_max
+        self.qs0 = qs0
+        self.u0 = u0
+        self.U_ero_sand = U_ero_sand
+        self.f_bedload = f_bedload
+
+        self.ivec_flat, self.jvec_flat,  = ivec_flat, jvec_flat
+        self.iwalk_flat, self.jwalk_flat = iwalk_flat, jwalk_flat
+        self.distances_flat = distances_flat
+
+        self.dry_depth = dry_depth
+        self.gamma = gamma
+        self.beta = beta
+        self.stepmax = stepmax
+        self.theta_sed = theta_sed
+
+    def run(self, start_indices, eta, stage, depth, cell_type,
+            uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud,
+            qw, qx, qy, qs):
+        """The main function to route and deposit/erode sand parcels.
+
+        Algorithm is to:
+            1. as input, receive the current status of fields from the model.
+            Additionally, receive a list of the starting points to use to run
+            parcels, as :obj:`px` and :obj:`py`.
+            2. begin a `for` loop to run each parcel in series.
+            3. in the :obj:`SandRouter`, the sediment partitioning from a
+            ghost node is executed. This step is skipped for
+            :obj:`MudRouter`.
+            4. call :obj:`_route_one_parcel` method to run a single parcel of
+            sediment through all iterations.
+            5. repeat from 3, until the correct number of parcels have been
+            routed. Note that the number of *total* parcels is
+            :obj:`~pyDeltaRCM.DeltaModel.Np_sed`, and the number of sand or
+            mud parcels will depend on the value of
+            :obj:`~pyDeltaRCM.DeltaModel.f_bedload`.
+
+        .. note::
+
+            We are unable to precompute the routing weights, in the way
+            we do in :obj:`~pyDeltaRCM.water_tools.get_water_weight_array`,
+            because the weighting changes with each parcel step (i.e.,
+            morphodynamics).
+        """
+        self.eta = eta
+        self.stage = stage
+        self.depth = depth
+        self.cell_type = cell_type
+        self.uw = uw
+        self.ux = ux
+        self.uy = uy
+        self.pad_stage = pad_stage
+        self.pad_depth = pad_depth
+        self.pad_cell_type = pad_cell_type
+        self.Vp_dep_mud = Vp_dep_mud
+        self.qw = qw
+        self.qx = qx
+        self.qy = qy
+        self.qs = qs
+
+        num_starts = start_indices.shape[0]
         for np_sed in range(num_starts):
 
             self.Vp_res = self.Vp_sed
@@ -344,105 +349,213 @@ class sed_tools(object):
             px = 0
             py = start_indices[np_sed]
 
-            self.sed_parcel(theta_sed, 'mud', px, py)
+            self.qs[px, py] = (self.qs[px, py] +
+                               self.Vp_res / 2. / self._dt / self.dx)
+            self._route_one_parcel(px, py)
+
+    def _route_one_parcel(self, px, py):
+        """Route one parcel.
+
+        Algorithm is to:
+
+            1. as input, receive the starting points to use to run a single
+            parcel, as :obj:`px` and :obj:`py`.
+            2. begin a while loop, which counts the number of steps the parcel
+            has taken
+            3. determine, based on the water surface and flow velocity field,
+            which location to travel to next. This determination is named as
+            :obj:`choose_next_location`, which utilizes the `shared_tools`
+            methods to pick the next location.
+            4. call the :obj:`_deposit_or_erode` method to detemine whether to
+            deposit or erode sediment. This method is implemented
+            *differently* for sand and mud routing, and depends on a multitude
+            of different model variables. This step modifies the bed elevation
+            and flow depth fields (in subfunction :obj:`_update_fields`),
+            which necessitates finding the new weights for routing on each
+            step. Also, the volume of sediment is either increased or
+            decreased (erosion or deposition).
+            5. repeat from 3, until `stepmax` is reached, or an "edge" cell is
+            reached.
+        """
+        it = 0
+        sed_continue = True
+
+        while sed_continue:
+
+            px0 = px
+            py0 = py
+
+            # Choose the next location for the parcel to travel
+            istep, jstep, dist = self._choose_next_location(px0, py0)
+
+            px = px0 + jstep
+            py = py0 + istep
+
+            self._partition_sediment(px0, py0, px, py, dist)
+            self._deposit_or_erode(px, py)
+
+            it += 1
+            if self.cell_type[px, py] == -1:  # check for "edge" cell
+                sed_continue = False  # kill the `while` loop
+            if (it == self.stepmax):
+                sed_continue = False
+
+    def _partition_sediment(self, px0, py0, px, py, dist):
+        """Spread sand between two cells.
+        """
+        partition = self.Vp_res / 2. / self._dt / self.dx
+        if dist > 0:
+            self.qs[px0, py0] += partition  # deposition in current cell
+            self.qs[px, py] += partition  # deposition in new cell
+
+    def _deposit_or_erode(self, px, py):
+        """Decide if deposit or erode sand.
+
+        .. note:: Volumetric change is limited to 1/4 local cell water volume.
+        """
+        U_loc = self.uw[px, py]
+        qs_cap = (self.qs0 * self.f_bedload / self.u0**self.beta *
+                  U_loc**self.beta)
+        qs_loc = self.qs[px, py]
+
+        Vp_dep = 0
+        Vp_ero = 0
+        Vp_change = 0
+
+        if qs_loc > qs_cap:
+            # Sand deposition
+            #     If more sediment is in transport than the determined
+            #     transport capacity of the cell (`qs_cap`), sediment needs to
+            #     deposit on the bed.
+            Vp_change = self._limit_Vp_change(self.Vp_res, self.stage[px, py],
+                                         self.eta[px, py], self.dx)
+
+        elif (U_loc > self.U_ero_sand) and (qs_loc < qs_cap):
+            # Sand erosion
+            #     Can only occur if local velocity is greater than the
+            #     critical erosion threshold for sand, *and* if the local
+            #     transport capacity is not yet reached.
+            Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
+                                        self.U_ero_sand, self.beta)
+            Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],
+                                           self.eta[px, py], self.dx)
+
+        if Vp_change > 0:  # if deposition
+            self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change
+
+        self.Vp_res = self.Vp_res - Vp_change  # update sed volume in parcel
+
+        self._update_fields(Vp_change, px, py)  # update other fields as needed
 
 
-@njit
-def choose_next_location(px, py, pad_stage, pad_depth, pad_cell_type, stage,
-                         qx, qy, ivec_flat, jvec_flat, distances_flat,
-                         dry_depth, gamma, theta_sed, iwalk_flat, jwalk_flat):
+@jitclass(r_spec)
+class MudRouter(BaseRouter):
 
-    # choose next location with weights
-    stage_nbrs = pad_stage[
-        px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-    depth_nbrs = pad_depth[
-        px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
-    cell_type_ind = pad_cell_type[
-        px - 1 + 1:px + 2 + 1, py - 1 + 1:py + 2 + 1]
+    def __init__(self, _dt, dx, Vp_sed, u_max, U_dep_mud, U_ero_mud,
+                 ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
+                 dry_depth, gamma, _lambda, beta, stepmax, theta_sed):
 
-    ind = (px, py)
-    weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
-        stage[px, py], stage_nbrs.ravel(), qx[px, py],
-        qy[px, py], ivec_flat, jvec_flat,
-        distances_flat)
-    weights = shared_tools.get_weight_at_cell(
-        ind, weight_sfc, weight_int, depth_nbrs.ravel(),
-        cell_type_ind.ravel(), dry_depth,
-        gamma, theta_sed)
-    new_cell = shared_tools.random_pick(weights)
-    dist, istep, jstep, _ = shared_tools.get_steps(
-        new_cell, iwalk_flat, jwalk_flat)
+        self._dt = _dt
+        self.dx = dx
+        self.Vp_sed = Vp_sed
 
-    return weights, new_cell, dist, istep, jstep
+        self.u_max = u_max
+        self.U_dep_mud = U_dep_mud
+        self.U_ero_mud = U_ero_mud
 
+        self.ivec_flat, self.jvec_flat,  = ivec_flat, jvec_flat
+        self.iwalk_flat, self.jwalk_flat = iwalk_flat, jwalk_flat
+        self.distances_flat = distances_flat
 
-@njit
-def get_eroded_volume(Vp_sed, U_loc, U_ero, beta,
-                      stage, eta, dx):
-    """Get volume of sediment eroded.
-    """
-    Vp_ero = _compute_Vp_ero(Vp_sed, U_loc, U_ero, beta)
-    Vp_ero = _regulate_Vp_change(Vp_ero, stage,
-                                eta, dx)
-    return Vp_ero
+        self.dry_depth = dry_depth
+        self.gamma = gamma
+        self._lambda = _lambda
+        self.beta = beta
+        self.stepmax = stepmax
+        self.theta_sed = theta_sed
 
+    def run(self, start_indices, eta, stage, depth, cell_type,
+            uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud,
+            qw, qx, qy):
+        """The main function to route and deposit/erode mud parcels.
 
-@njit
-def _compute_Vp_ero(Vp_sed, U_loc, U_ero, beta):
-    """Compute volume erorded based on velocity.
+        """
 
-    The volume of sediment eroded depends on the local flow velocity
-    (:obj:`U_loc`), the critical velocity for erosion (:obj:`U_ero`), and
-    `beta`.
+        self.eta = eta
+        self.stage = stage
+        self.depth = depth
+        self.cell_type = cell_type
+        self.uw = uw
+        self.ux = ux
+        self.uy = uy
+        self.pad_stage = pad_stage
+        self.pad_depth = pad_depth
+        self.pad_cell_type = pad_cell_type
+        self.Vp_dep_mud = Vp_dep_mud
+        self.qw = qw
+        self.qx = qx
+        self.qy = qy
 
-    Function is used by both sand and mud pathways, but the input value of
-    U_ero depends on the pathway.
+        num_starts = start_indices.shape[0]
+        for np_sed in range(num_starts):
 
-    Parameters
-    ----------
-    Vp_sed : :obj:`float`
-        Volume of a sediment parcel.
+            self.Vp_res = self.Vp_sed
 
-    U_loc : :obj:`float`
-        Local flow velocity.
+            px = 0
+            py = start_indices[np_sed]
 
-    U_ero : :obj:`float`
-        Critical velocity for erosion.
+            self._route_one_parcel(px, py)
 
-    beta : :obj:`float`
-        ?????
+    def _route_one_parcel(self, px, py):
+        """Route one parcel.
 
-    Returns
-    -------
-    Vp_ero : :obj:`float`
-        Volume of eroded sediment.
-    """
-    return (Vp_sed * (U_loc**beta - U_ero**beta) /
-            U_ero**beta)
+        """
+        it = 0
+        sed_continue = True
 
+        while sed_continue:
 
-@njit
-def _regulate_Vp_change(Vp, stage, eta, dx):
-    """Limit change in volume to 1/4 of a cell volume.
+            # Choose the next location for the parcel to travel
+            istep, jstep, dist = self._choose_next_location(px, py)
 
-    Function is used by multiple pathways in `mud_dep_ero` and `sand_dep_ero`
-    but with different inputs for the sediment volume (:obj:`Vp`).
-    """
-    fourth = (stage - eta) / 4 * (dx*dx)
-    return np.minimum(Vp, fourth)
+            px = px + jstep
+            py = py + istep
 
+            self.deposit_or_erode(px, py)
 
-@njit
-def _update_helper(Vp_dep, dx, u_max, eta0, depth0, stage0, qw0, uw0):
-    eta_change_loc = Vp_dep / (dx*dx)
+            it += 1
+            if self.cell_type[px, py] == -1:  # check for "edge" cell
+                sed_continue = False  # kill the `while` loop
+            if (it == self.stepmax):
+                sed_continue = False
 
-    eta = eta0 + eta_change_loc  # new bed
-    depth = stage0 - eta  # new depth
-    depth = np.maximum(0, depth)  # force >=0
+    def deposit_or_erode(self, px, py):
+        """Decide if deposit or erode mud.
 
-    if depth > 0:
-        uw = np.minimum(u_max, qw0 / depth)
-    else:
-        uw = uw0
+        .. note:: Volumetric change is limited to 1/4 local cell water volume.
+        """
+        U_loc = self.uw[px, py]
 
-    return eta, depth, uw
+        Vp_dep = 0
+        Vp_ero = 0
+        Vp_change = 0
+
+        if U_loc < self.U_dep_mud:
+            Vp_change = (self._lambda * self.Vp_res *
+                         (self.U_dep_mud**self.beta - U_loc**self.beta) /
+                         (self.U_dep_mud**self.beta))
+            Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
+                                         self.eta[px, py], self.dx)
+
+        elif U_loc > self.U_ero_mud:
+            Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
+                                        self.U_ero_mud, self.beta)
+            Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],
+                                           self.eta[px, py], self.dx)
+
+        if Vp_change > 0:  # if deposition
+            self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change
+
+        self.Vp_res = self.Vp_res - Vp_change  # update sed volume in parcel
+
+        self._update_fields(Vp_change, px, py)  # update other fields as needed

@@ -15,6 +15,7 @@ import yaml
 import re
 
 from . import shared_tools
+from . import sed_tools
 
 # tools for initiating deltaRCM model domain
 
@@ -39,7 +40,7 @@ class init_tools(object):
         setting.
         """
         timestamp = time_lib.strftime('%Y%m%d-%H%M%S')
-        self.logger = logging.getLogger(self.prefix_abspath+timestamp)
+        self.logger = logging.getLogger(self.prefix_abspath + timestamp)
         self.logger.setLevel(logging.INFO)
 
         # create the logging file handler
@@ -146,18 +147,18 @@ class init_tools(object):
         sqrt2 = np.sqrt(2)
         self.distances = np.array([[sqrt2, 1, sqrt2],
                                    [1, 1, 1],
-                                   [sqrt2, 1, sqrt2]])
+                                   [sqrt2, 1, sqrt2]]).astype(np.float32)
 
         sqrt05 = np.sqrt(0.5)
         self.ivec = np.array([[-sqrt05, 0, sqrt05],
                               [-1, 0, 1],
-                              [-sqrt05, 0, sqrt05]])
+                              [-sqrt05, 0, sqrt05]]).astype(np.float32)
 
         self.iwalk = shared_tools.get_iwalk()
 
         self.jvec = np.array([[-sqrt05, -1, -sqrt05],
                               [0, 0, 0],
-                              [sqrt05, 1, sqrt05]])
+                              [sqrt05, 1, sqrt05]]).astype(np.float32)
 
         self.jwalk = shared_tools.get_jwalk()
         self.dxn_iwalk = [1, 1, 0, -1, -1, -1, 0, 1]
@@ -208,40 +209,47 @@ class init_tools(object):
         self.W = int(round(self.Width / self.dx))         # num cells in y
 
         # inlet length and width
-        self.L0 = max(1, min(int(round(self.L0_meters / self.dx)), self.L // 4))
-        self.N0 = max(3, min(int(round(self.N0_meters / self.dx)), self.W // 4))
+        self.L0 = max(
+            1, min(int(round(self.L0_meters / self.dx)), self.L // 4))
+        self.N0 = max(
+            3, min(int(round(self.N0_meters / self.dx)), self.W // 4))
 
         self.set_constants()
 
         self.u_max = 2.0 * self.u0  # maximum allowed flow velocity
         self.C0 = self.C0_percent * 1 / 100.  # sediment concentration
 
-        self.dry_depth = min(0.1, 0.1 * self.h0)  # (m) critial depth to switch to "dry" node
+        # (m) critial depth to switch to "dry" node
+        self.dry_depth = min(0.1, 0.1 * self.h0)
         self.CTR = floor(self.W / 2.) - 1
         if self.CTR <= 1:
             self.CTR = floor(self.W / 2.)
 
         self.gamma = self.g * self.S0 * self.dx / (self.u0**2)
 
-        self.V0 = self.h0 * (self.dx**2)  # (m^3) reference volume, volume to fill cell to characteristic depth
+        # (m^3) reference volume, volume to fill cell to characteristic depth
+        self.V0 = self.h0 * (self.dx**2)
         self.Qw0 = self.u0 * self.h0 * self.N0 * self.dx    # const discharge
 
         # at inlet
         self.qw0 = self.u0 * self.h0  # water unit input discharge
         self.Qp_water = self.Qw0 / self.Np_water    # volume each water parcel
         self.qs0 = self.qw0 * self.C0  # sed unit discharge
-        self.dVs = 0.1 * self.N0**2 * self.V0  # total amount of sed added to domain per timestep
+        # total amount of sed added to domain per timestep
+        self.dVs = 0.1 * self.N0**2 * self.V0
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
         self.Vp_sed = self.dVs / self.Np_sed   # volume of each sediment parcel
 
         self.stepmax = 2 * (self.L + self.W)  # max number of jumps for parcel
-        self.size_indices = int(self.stepmax / 2)  # initial width of self.indices
+        # initial width of self.indices
+        self.size_indices = int(self.stepmax / 2)
 
         self._dt = self.dVs / self.Qs0  # time step size
 
         self.omega_flow_iter = 2. / self.itermax
 
-        self.N_crossdiff = int(round(self.dVs / self.V0))  # number of times to repeat topo diffusion
+        # number of times to repeat topo diffusion
+        self.N_crossdiff = int(round(self.dVs / self.V0))
 
         self._lambda = self.sed_lag  # sedimentation lag
 
@@ -336,6 +344,23 @@ class init_tools(object):
 
         self.inlet = np.array(np.unique(np.where(self.cell_type == 1)[1]))
         self.eta[:] = self.stage - self.depth
+
+    def init_sediment_routers(self):
+        self._mr = sed_tools.MudRouter(self._dt, self.dx, self.Vp_sed,
+                                       self.u_max, self.U_dep_mud, self.U_ero_mud,
+                                       self.ivec_flat, self.jvec_flat,
+                                       self.iwalk_flat, self.jwalk_flat,
+                                       self.distances_flat, self.dry_depth, self.gamma,
+                                       self._lambda, self.beta,  self.stepmax,
+                                       self.theta_mud)
+        self._sr = sed_tools.SandRouter(self._dt, self.dx, self.Vp_sed,
+                                        self.u_max, self.qs0, self.u0, self.U_ero_sand,
+                                        self.f_bedload,
+                                        self.ivec_flat, self.jvec_flat,
+                                        self.iwalk_flat, self.jwalk_flat,
+                                        self.distances_flat, self.dry_depth, self.gamma,
+                                        self.beta, self.stepmax,
+                                        self.theta_sand)
 
     def init_stratigraphy(self):
         """Creates sparse array to store stratigraphy data."""
