@@ -21,9 +21,7 @@ class water_tools(object):
         self.sfc_sum[:] = 0
 
         self.pad_stage = np.pad(self.stage, 1, 'edge')
-
         self.pad_depth = np.pad(self.depth, 1, 'edge')
-
         self.pad_cell_type = np.pad(self.cell_type, 1, 'edge')
 
     def run_water_iteration(self):

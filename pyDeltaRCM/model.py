@@ -64,6 +64,8 @@ class DeltaModel(Tools):
         self.determine_random_seed()
         self.create_domain()
 
+        self.init_sediment_routers()
+
         self.init_subsidence()
         self.init_stratigraphy()
         self.init_output_grids()
@@ -202,6 +204,7 @@ class DeltaModel(Tools):
     def channel_flow_velocity(self, new_u0):
         self.u0 = new_u0
         self.create_other_variables()
+        self.init_sediment_routers()
 
     @property
     def channel_width(self):
@@ -212,6 +215,7 @@ class DeltaModel(Tools):
     def channel_width(self, new_N0):
         self.N0_meters = new_N0
         self.create_other_variables()
+        self.init_sediment_routers()
 
     @property
     def channel_flow_depth(self):
@@ -222,6 +226,7 @@ class DeltaModel(Tools):
     def channel_flow_depth(self, new_d):
         self.h0 = new_d
         self.create_other_variables()
+        self.init_sediment_routers()
 
     @property
     def sea_surface_mean_elevation(self):
@@ -259,6 +264,7 @@ class DeltaModel(Tools):
     def influx_sediment_concentration(self, new_u0):
         self.C0_percent = new_u0
         self.create_other_variables()
+        self.init_sediment_routers()
 
     @property
     def sea_surface_elevation(self):
