@@ -291,9 +291,9 @@ class init_tools(object):
         self.Vp_dep_sand = np.zeros((self.L, self.W))
         self.Vp_dep_mud = np.zeros((self.L, self.W))
         self.free_surf_flag = np.zeros((self.Np_water,), dtype=np.int)
-        self.looped = np.zeros((self.Np_water,))
+        self.looped = np.zeros((self.Np_water,), dtype=np.int)
         self.free_surf_walk_indices = np.zeros((self.Np_water, self.size_indices),
-                                dtype=np.int)
+                                               dtype=np.int)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
 
