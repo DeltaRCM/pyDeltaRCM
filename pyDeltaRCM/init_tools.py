@@ -241,7 +241,7 @@ class init_tools(object):
         self.Vp_sed = self.dVs / self.Np_sed   # volume of each sediment parcel
 
         self.stepmax = 2 * (self.L + self.W)  # max number of jumps for parcel
-        # initial width of self.indices
+        # initial width of self.free_surf_walk_indices
         self.size_indices = int(self.stepmax / 2)
 
         self._dt = self.dVs / self.Qs0  # time step size
@@ -292,7 +292,7 @@ class init_tools(object):
         self.Vp_dep_mud = np.zeros((self.L, self.W))
         self.free_surf_flag = np.zeros((self.Np_water,), dtype=np.int)
         self.looped = np.zeros((self.Np_water,))
-        self.indices = np.zeros((self.Np_water, self.size_indices),
+        self.free_surf_walk_indices = np.zeros((self.Np_water, self.size_indices),
                                 dtype=np.int)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)

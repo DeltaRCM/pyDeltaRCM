@@ -49,8 +49,8 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         for iteration in range(self.itermax):
             self.init_water_iteration()
             self.run_water_iteration()
-            self.free_surf(iteration)
-            self.finalize_water_iteration(self.time, iteration)
+            self.compute_free_surface()
+            self.finalize_water_iteration(iteration)
 
         self.sed_route()
 
