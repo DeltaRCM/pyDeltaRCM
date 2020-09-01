@@ -23,20 +23,6 @@ def test_set_random_assignments(test_DeltaModel):
     assert got == pytest.approx(_exp)
 
 
-def test_sand_partition(test_DeltaModel):
-    """
-    Test for function shared_tools.partition_sand
-    """
-    nx, ny, qsn = shared_tools.partition_sand(
-        test_DeltaModel.qs, 1, 4, 4, 1, 0, 1
-    )
-    assert nx == 5
-    assert ny == 4
-    assert qsn[4, 4] == 1
-    assert qsn[5, 4] == 1
-    assert np.all(qsn[qsn != 1] == 0)
-
-
 def test_get_steps():
     """
     Test for function shared_tools.get_steps
@@ -58,39 +44,6 @@ def test_get_steps():
     assert i == pytest.approx(i_exp)
     assert j == pytest.approx(j_exp)
     assert d == pytest.approx(d_exp)
-
-
-def test_update_dirQfield(test_DeltaModel):
-    """
-    Test for function shared_tools.update_dirQfield
-    """
-    np.random.seed(test_DeltaModel.seed)
-    qx = np.random.uniform(0, 10, 9)
-    d = np.array([1, np.sqrt(2), 0])
-    astep = np.array([True, True, False])
-    inds = np.array([3, 4, 5])
-    stepdir = np.array([1, 1, 0])
-    qxn = shared_tools.update_dirQfield(np.copy(qx), d, inds, astep, stepdir)
-    qxdiff = qxn - qx
-    qxdiff_exp = np.array([1, np.sqrt(2) / 2, 0])
-    assert np.all(qxdiff[3:6] == pytest.approx(qxdiff_exp))
-
-
-def test_update_absQfield(test_DeltaModel):
-    """
-    Test for function shared_tools.update_absQfield
-    """
-    np.random.seed(test_DeltaModel.seed)
-    qw = np.random.uniform(0, 10, 9)
-    d = np.array([1, np.sqrt(2), 0])
-    astep = np.array([True, True, False])
-    inds = np.array([3, 4, 5])
-    qwn = shared_tools.update_absQfield(
-        np.copy(qw), d, inds, astep, test_DeltaModel.Qp_water, test_DeltaModel.dx)
-    qwdiff = qwn - qw
-    diffelem = test_DeltaModel.Qp_water / test_DeltaModel.dx / 2
-    qwdiff_exp = np.array([diffelem, diffelem, 0])
-    assert np.all(qwdiff[3:6] == pytest.approx(qwdiff_exp))
 
 
 def test_random_pick():
