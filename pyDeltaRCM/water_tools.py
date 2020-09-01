@@ -16,7 +16,7 @@ class water_tools(object):
         self.qwn[:] = 0
 
         self.free_surf_flag[:] = 0
-        self.indices[:] = 0
+        self.free_surf_walk_indices[:] = 0
         self.sfc_visit[:] = 0
         self.sfc_sum[:] = 0
 
@@ -43,13 +43,13 @@ class water_tools(object):
         self.qxn.flat[start_indices] += 1
         self.qwn.flat[start_indices] += self.Qp_water / self.dx / 2
 
-        self.indices[:, 0] = start_indices
+        self.free_surf_walk_indices[:, 0] = start_indices
         current_inds = np.copy(start_indices)
 
         self.looped[:] = 0
 
         self.get_water_weight_array()
-        water_weights_FLAT = self.water_weights.reshape(-1, 9)
+        water_weights_flat = self.water_weights.reshape(-1, 9)
 
         while (sum(current_inds) > 0) & (_step < self.stepmax):
 
@@ -58,7 +58,7 @@ class water_tools(object):
             self.check_size_of_indices_matrix(_step)
 
             # use water weights and random pick to determine d8 direction
-            new_direction = pick_d8_direction(current_inds, water_weights_FLAT)
+            new_direction = pick_d8_direction(current_inds, water_weights_flat)
             new_direction = new_direction.astype(np.int)
 
             new_indices = calculate_new_ind(
@@ -76,87 +76,30 @@ class water_tools(object):
             self.update_Q(dist, current_inds, new_indices, astep, jstep, istep)
 
             current_inds, self.looped, self.free_surf_flag = check_for_loops(
-                self.indices, new_indices, _step, self.L0, self.looped,
+                self.free_surf_walk_indices, new_indices, _step, self.L0, self.looped,
                 self.eta.shape, self.CTR, self.free_surf_flag)
 
-            # Parcels that have reached the boundary are updated to
-            # ``ind==0``, effectively ending the routing of these parcels.
+            # Record the parcel pathways for computing the free surface
+            #     Parcels that have reached the boundary are updated to
+            #     ``ind==0``, effectively ending the routing of these parcels.
             curent_inds = self.check_for_boundary(current_inds)  # changes `free_surf_flag`
-            self.indices[:, _step] = current_inds  # record indices
+            self.free_surf_walk_indices[:, _step] = current_inds  # record indices
             current_inds[self.free_surf_flag > 0] = 0
 
-    def free_surf(self, it):
+    def compute_free_surface(self):
         """Calculate free surface after routing one water parcel."""
-        Hnew = np.zeros((self.L, self.W))
 
-        for n, i in enumerate(self.indices):
+        self.sfc_visit, self.sfc_sum = _accumulate_free_surface_walks(
+            self.free_surf_walk_indices, self.looped, self.cell_type,
+            self.uw, self.ux, self.uy, self.depth,
+            self.dx, self.u0, self.h0, self.H_SL, self.S0)
 
-            inds = np.unravel_index(i[i > 0], self.depth.shape)
-            xs, ys = inds
-
-            Hnew[:] = 0
-
-            if ((self.cell_type[xs[-1], ys[-1]] == -1) and
-                    (self.looped[n] == 0)):
-
-                Hnew[xs[-1], ys[-1]] = self.H_SL
-                # if cell is in ocean, H = H_SL (downstream boundary condition)
-
-                it0 = 0
-
-                for it in range(len(xs) - 2, -1, -1):
-                    # counting back from last cell visited
-
-                    i = int(xs[it])
-                    ip = int(xs[it + 1])
-                    j = int(ys[it])
-                    jp = int(ys[it + 1])
-                    dist = np.sqrt((ip - i)**2 + (jp - j)**2)
-
-                    if dist > 0:
-
-                        if it0 == 0:
-
-                            if ((self.uw[i, j] > self.u0 * 0.5) or
-                                    (self.depth[i, j] < 0.1 * self.h0)):
-                                # see if it is shoreline
-
-                                it0 = it
-
-                            dH = 0
-
-                        else:
-
-                            if self.uw[i, j] == 0:
-
-                                dH = 0
-                                # if no velocity
-                                # no change in water surface elevation
-
-                            else:
-
-                                dH = (self.S0 *
-                                      (self.ux[i, j] * (ip - i) * self.dx +
-                                       self.uy[i, j] * (jp - j) * self.dx) /
-                                      self.uw[i, j])
-                                # difference between streamline and
-                                # parcel path
-
-                    # previous cell's surface plus difference in H
-                    Hnew[i, j] = Hnew[ip, jp] + dH
-
-                    # add up # of cell visits
-                    self.sfc_visit[i, j] = self.sfc_visit[i, j] + 1
-
-                    # sum of all water surface elevations
-                    self.sfc_sum[i, j] = self.sfc_sum[i, j] + Hnew[i, j]
-
-    def finalize_water_iteration(self, timestep, iteration):
+    def finalize_water_iteration(self, iteration):
         """Finish updating flow fields.
 
         Clean up at end of water iteration
         """
-        self.update_water(timestep, iteration)
+        self.update_water()
 
         self.stage[:] = np.maximum(self.stage, self.H_SL)
         self.depth[:] = np.maximum(self.stage - self.eta, 0)
@@ -165,16 +108,16 @@ class water_tools(object):
         self.update_velocity_field()
 
     def check_size_of_indices_matrix(self, it):
-        if it >= self.indices.shape[1]:
+        if it >= self.free_surf_walk_indices.shape[1]:
             """
-            Initial size of self.indices is half of self.stepmax
+            Initial size of self.free_surf_walk_indices is half of self.stepmax
             because the number of iterations doesn't go beyond
             that for many timesteps.
 
             Once it reaches it > self.stepmax/2 once, make the size
             self.iter for all further timesteps
             """
-            _msg = 'Increasing size of self.indices'
+            _msg = 'Increasing size of self.free_surf_walk_indices'
             self.logger.info(_msg)
             if self.verbose >= 2:
                 print(_msg)
@@ -182,7 +125,7 @@ class water_tools(object):
             indices_blank = np.zeros(
                 (np.int(self.Np_water), np.int(self.stepmax / 4)), dtype=np.int)
 
-            self.indices = np.hstack((self.indices, indices_blank))
+            self.free_surf_walk_indices = np.hstack((self.free_surf_walk_indices, indices_blank))
 
     def get_water_weight_array(self):
 
@@ -203,6 +146,7 @@ class water_tools(object):
                     (i, j), weight_sfc, weight_int,
                     depth_nbrs.ravel(), ct_nbrs.ravel(),
                     self.dry_depth, self.gamma, self.theta_water)
+
 
     def update_Q(self, dist, current_inds, next_index, astep, jstep, istep):
 
@@ -241,7 +185,7 @@ class water_tools(object):
         inds[self.free_surf_flag == 2] = 0
         return inds
 
-    def update_water(self, timestep, itr):
+    def update_water(self):
         """Update surface after routing all parcels.
 
         Could divide into 3 functions for cleanliness.
@@ -255,48 +199,58 @@ class water_tools(object):
         Hnew[self.sfc_visit > 0] = (self.sfc_sum[self.sfc_visit > 0] /
                                     self.sfc_visit[self.sfc_visit > 0])
 
-        Hnew_pad = np.pad(Hnew, 1, 'edge')
-
         # smooth newly calculated free surface
-        Htemp = Hnew
+        Hnew_pad = np.pad(Hnew, 1, 'edge')
+        Hsmth = _smooth_water_surface(
+            Hnew, Hnew_pad, self.cell_type, self.pad_cell_type,
+            self.Nsmooth, self.Csmooth)
 
-        for itsmooth in range(self.Nsmooth):
-
-            Hsmth = Htemp
-
-            for i in range(self.L):
-
-                for j in range(self.W):
-
-                    if self.cell_type[i, j] > -2:
-                        # locate non-boundary cells
-                        sumH = 0
-                        nbcount = 0
-
-                        ct_ind = self.pad_cell_type[
-                            i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-                        Hnew_ind = Hnew_pad[
-                            i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-
-                        Hnew_ind[1, 1] = 0
-                        Hnew_ind[ct_ind == -2] = 0
-
-                        sumH = np.sum(Hnew_ind)
-                        nbcount = np.sum(Hnew_ind > 0)
-
-                        if nbcount > 0:
-
-                            Htemp[i, j] = (self.Csmooth * Hsmth[i, j] +
-                                           (1 - self.Csmooth) * sumH / nbcount)
-                            # smooth if are not wall cells
-
-        Hsmth = Htemp
-
-        if timestep > 0:
+        if self._time_iter > 0:
             self.stage = ((1 - self.omega_sfc) * self.stage +
                           self.omega_sfc * Hsmth)
 
         self.flooding_correction()
+
+    def update_flow_field(self, iteration):
+        """Update water discharge after one water iteration."""
+        dloc = (self.qxn**2 + self.qyn**2)**(0.5)
+
+        qwn_div = np.ones((self.L, self.W))
+        qwn_div[dloc > 0] = self.qwn[dloc > 0] / dloc[dloc > 0]
+
+        self.qxn *= qwn_div
+        self.qyn *= qwn_div
+
+        if self._time_iter > 0:
+
+            omega = self.omega_flow_iter
+            if iteration == 0:
+                omega = self.omega_flow
+
+            self.qx = self.qxn * omega + self.qx * (1 - omega)
+            self.qy = self.qyn * omega + self.qy * (1 - omega)
+
+        else:
+            self.qx = self.qxn.copy()
+            self.qy = self.qyn.copy()
+
+        self.qw = (self.qx**2 + self.qy**2)**(0.5)
+
+        self.qx[0, self.inlet] = self.qw0
+        self.qy[0, self.inlet] = 0
+        self.qw[0, self.inlet] = self.qw0
+
+    def update_velocity_field(self):
+        """Update the flow velocity field after one water iteration."""
+        mask = (self.depth > self.dry_depth) * (self.qw > 0)
+
+        self.uw[mask] = np.minimum(
+            self.u_max, self.qw[mask] / self.depth[mask])
+        self.uw[~mask] = 0
+        self.ux[mask] = self.uw[mask] * self.qx[mask] / self.qw[mask]
+        self.ux[~mask] = 0
+        self.uy[mask] = self.uw[mask] * self.qy[mask] / self.qw[mask]
+        self.uy[~mask] = 0
 
     def flooding_correction(self):
         """Flood dry cells along the shore if necessary.
@@ -322,8 +276,7 @@ class water_tools(object):
         for i in range(len(shore_ind[0])):
 
             # pretends dry neighbor cells have stage zero
-            # so they cannot be > eta_shore[i]
-
+            #    so they cannot be > eta_shore[i]
             stage_nh = wet_mask_nh[:, shore_ind[0][i], shore_ind[1][i]] * \
                 stage_nhs[:, shore_ind[0][i], shore_ind[1][i]]
 
@@ -381,50 +334,6 @@ class water_tools(object):
                 :, a_sum != 0] / a_sum[a_sum != 0]
 
         return wgt_array
-
-    def update_flow_field(self, iteration):
-        """Update water discharge after one water iteration."""
-        timestep = self._time
-
-        dloc = (self.qxn**2 + self.qyn**2)**(0.5)
-
-        qwn_div = np.ones((self.L, self.W))
-        qwn_div[dloc > 0] = self.qwn[dloc > 0] / dloc[dloc > 0]
-
-        self.qxn *= qwn_div
-        self.qyn *= qwn_div
-
-        if timestep > 0:
-
-            omega = self.omega_flow_iter
-
-            if iteration == 0:
-                omega = self.omega_flow
-
-            self.qx = self.qxn * omega + self.qx * (1 - omega)
-            self.qy = self.qyn * omega + self.qy * (1 - omega)
-
-        else:
-            self.qx = self.qxn.copy()
-            self.qy = self.qyn.copy()
-
-        self.qw = (self.qx**2 + self.qy**2)**(0.5)
-
-        self.qx[0, self.inlet] = self.qw0
-        self.qy[0, self.inlet] = 0
-        self.qw[0, self.inlet] = self.qw0
-
-    def update_velocity_field(self):
-        """Update the flow velocity field after one water iteration."""
-        mask = (self.depth > self.dry_depth) * (self.qw > 0)
-
-        self.uw[mask] = np.minimum(
-            self.u_max, self.qw[mask] / self.depth[mask])
-        self.uw[~mask] = 0
-        self.ux[mask] = self.uw[mask] * self.qx[mask] / self.qw[mask]
-        self.ux[~mask] = 0
-        self.uy[mask] = self.uw[mask] * self.qy[mask] / self.qw[mask]
-        self.uy[~mask] = 0
 
 
 @njit
@@ -527,3 +436,110 @@ def check_for_loops(indices, inds, it, L0, loopedout, domain_shape, CTR, free_su
             free_surf_flag[n] = -1
 
     return inds, loopedout, free_surf_flag
+
+
+@njit
+def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
+                      uw, ux, uy, depth,
+                      dx, u0, h0, H_SL, S0):
+
+    _shape = uw.shape
+    Hnew = np.zeros(_shape)
+    sfc_visit = np.zeros(_shape)
+    sfc_sum = np.zeros(_shape)
+
+    # for every parcel, walk the path of the parcel
+    for p, inds in enumerate(free_surf_walk_indices):
+
+        # unravel the indices of the parcel
+        inds_whr = inds[inds > 0]  # where the path has meaningful values
+        xs = np.zeros_like(inds_whr)  # x coordinates
+        ys = np.zeros_like(inds_whr)  # x coordinates
+        for pp, ind_whr in np.ndenumerate(inds_whr):
+            xs[pp], ys[pp] = shared_tools.custom_unravel(ind_whr, _shape)
+
+        # determine whether the pathway contributes to the free surface
+        Hnew[:] = 0
+        if ((cell_type[xs[-1], ys[-1]] == -1) and
+                (looped[p] == 0)):
+
+            # if cell is in ocean, H = H_SL (downstream boundary condition)
+            Hnew[xs[-1], ys[-1]] = H_SL
+
+            # counting back from last cell visited
+            in_ocean = True  # whether we are in the ocean or not
+            dH = 0
+            for it in range(len(xs) - 2, -1, -1):
+
+                i = int(xs[it])
+                ip = int(xs[it + 1])
+                j = int(ys[it])
+                jp = int(ys[it + 1])
+                dist = np.sqrt((ip - i)**2 + (jp - j)**2)
+
+                if dist > 0:
+
+                    # if in the ocean (not reached the shoreline yet)
+                    if in_ocean:
+                        # see if it is shoreline
+                        if ((uw[i, j] > u0 * 0.5) or (depth[i, j] < 0.1 * h0)):
+                            in_ocean = False  # passed the shoreline
+                    # otherwise, in the delta
+                    else:
+                        # if no velocity
+                        if uw[i, j] == 0:
+                            dH = 0  # no change in water surface elevation
+                        else:
+                            # diff between streamline and parcel path
+                            dH = (S0 * (ux[i, j] * (ip - i) * dx +
+                                        uy[i, j] * (jp - j) * dx) / uw[i, j])
+
+                # previous cell's surface plus difference in H
+                Hnew[i, j] = Hnew[ip, jp] + dH
+
+                # add up # of cell visits
+                sfc_visit[i, j] = sfc_visit[i, j] + 1
+
+                # sum of all water surface elevations
+                sfc_sum[i, j] = sfc_sum[i, j] + Hnew[i, j]
+
+    return sfc_visit, sfc_sum
+
+
+@njit
+def _smooth_water_surface(Hnew, Hnew_pad, cell_type, pad_cell_type,
+                          Nsmooth, Csmooth):
+
+    L, W = cell_type.shape
+    Htemp = Hnew
+    for itsmooth in range(Nsmooth):
+
+        Hsmth = Htemp
+        for i in range(L):
+            for j in range(W):
+
+                if cell_type[i, j] > -2:
+                    # locate non-boundary cells
+                    sumH = 0
+                    nbcount = 0
+
+                    ct_ind = pad_cell_type[
+                        i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+                    Hnew_ind = Hnew_pad[
+                        i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+
+                    Hnew_ind[1, 1] = 0
+                    Hnew_ind = Hnew_ind.ravel()
+                    _log = ct_ind.ravel() == -2
+                    Hnew_ind[_log] = 0
+
+                    sumH = np.sum(Hnew_ind)
+                    nbcount = np.sum(Hnew_ind > 0)
+
+                    if nbcount > 0:
+                        # smooth if are not wall cells
+                        Htemp[i, j] = (Csmooth * Hsmth[i, j] +
+                                       (1 - Csmooth) * sumH / nbcount)
+
+    Hsmth = Htemp
+    return Hsmth
