@@ -57,7 +57,7 @@ class water_tools(object):
             self.check_size_of_indices_matrix(_step)
 
             # use water weights and random pick to determine d8 direction
-            new_direction = choose_next_direction(current_inds, water_weights_flat)
+            new_direction = _choose_next_direction(current_inds, water_weights_flat)
             new_direction = new_direction.astype(np.int)
 
             new_indices = _calculate_new_ind(
@@ -362,7 +362,7 @@ class water_tools(object):
 
 
 @njit('int64[:](int64[:], float64[:,:])')
-def choose_next_direction(inds, water_weights):
+def _choose_next_direction(inds, water_weights):
     """Get new cell locations, based on water weights.
 
     Algorithm is to:
@@ -375,8 +375,8 @@ def choose_next_direction(inds, water_weights):
     Parameters
     ----------
     inds : :obj:`ndarray`
-        Current unraveled indices of the parcels. ``(N,)  `ndarray` containing
-        the unraveled indices.
+        Current unraveled indices of the parcels. ``(N,)``  `ndarray`
+        containing the unraveled indices.
 
     water_weights : :obj:`ndarray`
         Weights of every water cell. ``(LxW, 9)`` `ndarray`, uses unraveled
@@ -494,18 +494,22 @@ def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
     This routine comprises the hydrodynamic physics-based computations.
 
     Algorithm is to:
-        1. loop through every parcel's directed random walk in series
+        1. loop through every parcel's directed random walk in series.
+
         2. for a parcel's walk, unravel the indices and determine whether the
         parcel should contribute to the free surface. Parcels are considered
         contributors if they have reached the ocean and if they are not looped
         pathways.
+
         3. then, we begin at the downstream end of the parcel's walk and
         iterate up-walk until, determining the `Hnew` for each location.
         Downstream of the shoreline-ocean boundary, the water surface
         elevation is set to the sea level. Upstream of the shoreline-ocean
         boundary, the water surface is determined according to the land-slope
         (:obj:`S0`) and the parcel pathway.
-        4. repeat from 2 for each parcel.
+
+        4. repeat from 2, for each parcel.
+
     """
     _shape = uw.shape
     Hnew = np.zeros(_shape)
@@ -568,8 +572,8 @@ def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
 
 @njit
 def _smooth_free_surface(Hnew, Hnew_pad, cell_type, pad_cell_type,
-                          Nsmooth, Csmooth):
-
+                         Nsmooth, Csmooth):
+    """Smooth the free surface."""
     L, W = cell_type.shape
     Htemp = Hnew
     for itsmooth in range(Nsmooth):

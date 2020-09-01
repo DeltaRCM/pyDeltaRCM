@@ -1,5 +1,5 @@
-Defaul Model Variable Values
-============================
+Default Model Variable Values
+=============================
 
 Default model values are defined as:
 
