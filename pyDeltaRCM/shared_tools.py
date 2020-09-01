@@ -39,22 +39,6 @@ def get_start_indices(inlet, inlet_weights, num_starts):
 
 
 @njit
-def partition_sand(qs, depoPart, py, px, dist, istep, jstep):
-    """Spread sand between two cells."""
-    if dist > 0:
-        # deposition in current cell
-        qs[px, py] += depoPart
-
-    px = px + jstep
-    py = py + istep
-
-    if dist > 0:
-        # deposition in downstream cell
-        qs[px, py] += depoPart
-    return px, py, qs
-
-
-@njit
 def get_steps(new_cells, iwalk, jwalk):
     """Find the values giving the next step."""
     istep = iwalk[new_cells]
@@ -64,24 +48,6 @@ def get_steps(new_cells, iwalk, jwalk):
     astep = dist != 0
 
     return dist, istep, jstep, astep
-
-
-@njit
-def update_dirQfield(qfield, dist, inds, astep, dirstep):
-    """Update unit vector of water flux in x or y."""
-    for i, ii in enumerate(inds):
-        if astep[i]:
-            qfield[ii] += dirstep[i] / dist[i]
-    return qfield
-
-
-@njit
-def update_absQfield(qfield, dist, inds, astep, Qp_water, dx):
-    """Update norm of water flux vector."""
-    for i, ii in enumerate(inds):
-        if astep[i]:
-            qfield[ii] += Qp_water / dx / 2
-    return qfield
 
 
 @njit

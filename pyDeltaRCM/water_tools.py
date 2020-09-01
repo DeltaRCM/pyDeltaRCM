@@ -33,7 +33,6 @@ class water_tools(object):
         All parcels are processed in parallel, taking one step for each loop
         of the ``while`` loop.
         """
-
         _step = 0  # the step number of parcels
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
@@ -49,7 +48,7 @@ class water_tools(object):
         self.looped[:] = 0
 
         self.get_water_weight_array()
-        water_weights_flat = self.water_weights.reshape(-1, 9)
+        water_weights_flat = self.water_weights.reshape(-1, 9)  # flatten for fast access
 
         while (sum(current_inds) > 0) & (_step < self.stepmax):
 
@@ -58,10 +57,10 @@ class water_tools(object):
             self.check_size_of_indices_matrix(_step)
 
             # use water weights and random pick to determine d8 direction
-            new_direction = pick_d8_direction(current_inds, water_weights_flat)
+            new_direction = choose_next_direction(current_inds, water_weights_flat)
             new_direction = new_direction.astype(np.int)
 
-            new_indices = calculate_new_ind(
+            new_indices = _calculate_new_ind(
                 current_inds,
                 new_direction,
                 self.iwalk_flat,
@@ -75,7 +74,7 @@ class water_tools(object):
 
             self.update_Q(dist, current_inds, new_indices, astep, jstep, istep)
 
-            current_inds, self.looped, self.free_surf_flag = check_for_loops(
+            current_inds, self.looped, self.free_surf_flag = _check_for_loops(
                 self.free_surf_walk_indices, new_indices, _step, self.L0, self.looped,
                 self.eta.shape, self.CTR, self.free_surf_flag)
 
@@ -87,20 +86,28 @@ class water_tools(object):
             current_inds[self.free_surf_flag > 0] = 0
 
     def compute_free_surface(self):
-        """Calculate free surface after routing one water parcel."""
+        """Calculate free surface after routing all water parcels.
 
+        This method uses the `free_surf_walk_indices` matrix accumulated
+        during the routing of the water parcels (in
+        :obj:`run_water_iteration`) to determine the free surface. The
+        operations of the free surface computation are placed in a jitted
+        function :obj:`accumulate_free_surface_walks`. Following this
+        computation, the free surface is smoothed by steps in
+        :obj:`finalize_free_surface`.
+        """
         self.sfc_visit, self.sfc_sum = _accumulate_free_surface_walks(
             self.free_surf_walk_indices, self.looped, self.cell_type,
             self.uw, self.ux, self.uy, self.depth,
             self.dx, self.u0, self.h0, self.H_SL, self.S0)
+
+        self.finalize_free_surface()
 
     def finalize_water_iteration(self, iteration):
         """Finish updating flow fields.
 
         Clean up at end of water iteration
         """
-        self.update_water()
-
         self.stage[:] = np.maximum(self.stage, self.H_SL)
         self.depth[:] = np.maximum(self.stage - self.eta, 0)
 
@@ -147,27 +154,34 @@ class water_tools(object):
                     depth_nbrs.ravel(), ct_nbrs.ravel(),
                     self.dry_depth, self.gamma, self.theta_water)
 
-
     def update_Q(self, dist, current_inds, next_index, astep, jstep, istep):
+        """Update discharge field values after one set of water parcel steps."""
 
-        self.qxn = shared_tools.update_dirQfield(self.qxn.flat[:], dist, current_inds, astep, jstep
-                                          ).reshape(self.qxn.shape)
-        self.qyn = shared_tools.update_dirQfield(self.qyn.flat[:], dist, current_inds, astep, istep
-                                          ).reshape(self.qyn.shape)
-        self.qwn = shared_tools.update_absQfield(self.qwn.flat[:], dist, current_inds, astep, self.Qp_water, self.dx
-                                          ).reshape(self.qwn.shape)
-        self.qxn = shared_tools.update_dirQfield(self.qxn.flat[:], dist, next_index, astep, jstep
-                                          ).reshape(self.qxn.shape)
-        self.qyn = shared_tools.update_dirQfield(self.qyn.flat[:], dist, next_index, astep, istep
-                                          ).reshape(self.qyn.shape)
-        self.qwn = shared_tools.update_absQfield(self.qwn.flat[:], dist, next_index, astep, self.Qp_water, self.dx
-                                          ).reshape(self.qwn.shape)
+        self.qxn = _update_dirQfield(
+            self.qxn.flat[:], dist, current_inds,
+            astep, jstep).reshape(self.qxn.shape)
+        self.qyn = _update_dirQfield(
+            self.qyn.flat[:], dist, current_inds,
+            astep, istep).reshape(self.qyn.shape)
+        self.qwn = _update_absQfield(
+            self.qwn.flat[:], dist, current_inds,
+            astep, self.Qp_water, self.dx).reshape(self.qwn.shape)
+        self.qxn = _update_dirQfield(
+            self.qxn.flat[:], dist, next_index,
+            astep, jstep).reshape(self.qxn.shape)
+        self.qyn = _update_dirQfield(
+            self.qyn.flat[:], dist, next_index,
+            astep, istep).reshape(self.qyn.shape)
+        self.qwn = _update_absQfield(
+            self.qwn.flat[:], dist, next_index,
+            astep, self.Qp_water, self.dx).reshape(self.qwn.shape)
 
     def check_for_boundary(self, inds):
         """Check whether parcels have reached the boundary.
 
         Checks whether any parcels have reached the model boundaries. If they
-        have, then update the information in :obj:`~pyDeltaRCM.DeltaModel.free_surf_flag`.
+        have, then update the information in
+        :obj:`~pyDeltaRCM.DeltaModel.free_surf_flag`.
 
         Parameters
         ----------
@@ -185,10 +199,13 @@ class water_tools(object):
         inds[self.free_surf_flag == 2] = 0
         return inds
 
-    def update_water(self):
-        """Update surface after routing all parcels.
+    def finalize_free_surface(self):
+        """Finalize the water free surface.
 
-        Could divide into 3 functions for cleanliness.
+        This method occurs after the initial computation of the free surface,
+        by accumulating the directed walks of all water parcels. In this
+        method, thresholding is applied to correct for sea level, and a the
+        free surface is smoothed by a jitted function (:obj:`_smooth_free_surface`).
         """
         Hnew = self.eta + self.depth
 
@@ -201,7 +218,7 @@ class water_tools(object):
 
         # smooth newly calculated free surface
         Hnew_pad = np.pad(Hnew, 1, 'edge')
-        Hsmth = _smooth_water_surface(
+        Hsmth = _smooth_free_surface(
             Hnew, Hnew_pad, self.cell_type, self.pad_cell_type,
             self.Nsmooth, self.Csmooth)
 
@@ -212,7 +229,11 @@ class water_tools(object):
         self.flooding_correction()
 
     def update_flow_field(self, iteration):
-        """Update water discharge after one water iteration."""
+        """Update water discharge.
+
+        Update the water discharge field after one set of water parcels
+        iteration.
+        """
         dloc = (self.qxn**2 + self.qyn**2)**(0.5)
 
         qwn_div = np.ones((self.L, self.W))
@@ -241,7 +262,11 @@ class water_tools(object):
         self.qw[0, self.inlet] = self.qw0
 
     def update_velocity_field(self):
-        """Update the flow velocity field after one water iteration."""
+        """Update flow velocity fields.
+
+        Update the flow velocity fields after one set of water parcels
+        iteration.
+        """
         mask = (self.depth > self.dry_depth) * (self.qw > 0)
 
         self.uw[mask] = np.minimum(
@@ -336,8 +361,8 @@ class water_tools(object):
         return wgt_array
 
 
-@njit
-def pick_d8_direction(inds, water_weights):
+@njit('int64[:](int64[:], float64[:,:])')
+def choose_next_direction(inds, water_weights):
     """Get new cell locations, based on water weights.
 
     Algorithm is to:
@@ -363,7 +388,7 @@ def pick_d8_direction(inds, water_weights):
     new_cells : :obj:`ndarray`
         The new cell for water parcels, relative to the current location.
         I.e., this is the D8 direction the parcel is going to travel in the
-        next stage, :obj:`pyDeltaRCM.shared_tools.calculate_new_ind`.
+        next stage, :obj:`pyDeltaRCM.shared_tools._calculate_new_ind`.
     """
     new_cells = []
     for i in np.arange(inds.shape[0]):
@@ -379,7 +404,7 @@ def pick_d8_direction(inds, water_weights):
 
 
 @njit
-def calculate_new_ind(indices, new_cells, iwalk, jwalk, domain_shape):
+def _calculate_new_ind(indices, new_cells, iwalk, jwalk, domain_shape):
     """Calculate the new location (indices) of parcels.
 
     Use the information of the current parcel (`indices`) in conjunction with
@@ -400,49 +425,88 @@ def calculate_new_ind(indices, new_cells, iwalk, jwalk, domain_shape):
 
 
 @njit
-def check_for_loops(indices, inds, it, L0, loopedout, domain_shape, CTR, free_surf_flag):
+def _check_for_loops(free_surf_walk_indices, new_indices, _step,
+                    L0, looped, domain_shape, CTR, free_surf_flag):
+    """Check for loops in water parcel pathways.
 
-    looped = typed.List()  # numba typed list for iteration
-    for i in np.arange(len(indices)):
-        row = indices[i, :]
-        v = len(row[row > 0]) != len(set(row[row > 0]))
-        looped.append(v)
-    travel = (0, it)
+    Look for looping random walks, i.e., where a parcel returns to somewhere
+    it has already been.
+    """
+    nparcels = free_surf_walk_indices.shape[0]
+    domain_min_x = domain_shape[0] - 2
+    domain_min_y = domain_shape[1] - 2
 
-    for n in range(indices.shape[0]):
-        ind = inds[n]
-        if looped[n] and (ind > 0) and (max(travel) > L0):
-            loopedout[n] += 1
-            px, py = shared_tools.custom_unravel(ind, domain_shape)
-            Fx = px - 1
-            Fy = py - CTR
+    # if the _step number is larger than the inlet length
+    if (_step > L0):
+        # loop though every parcel walk
+        for p in np.arange(nparcels):
+            new_ind = new_indices[p]  # the new index of the parcel
+            walk = free_surf_walk_indices[p, :]  # the parcel's walk
+            _walk = walk[walk > 0]
+            if (new_ind > 0):
+                has_repeat_ind = len(_walk) != len(set(_walk))
+                if has_repeat_ind:
+                    # handle when a loop is detected
+                    looped[p] += 1
+                    px, py = shared_tools.custom_unravel(new_ind, domain_shape)
 
-            Fw = np.sqrt(Fx**2 + Fy**2)
+                    Fx = px - 1
+                    Fy = py - CTR
+                    Fw = np.sqrt(Fx**2 + Fy**2)
+                    if Fw != 0:
+                        px = px + int(np.round(Fx / Fw * 5.))
+                        py = py + int(np.round(Fy / Fw * 5.))
 
-            if Fw != 0:
-                px = px + np.round(Fx / Fw * 5.)
-                py = py + np.round(Fy / Fw * 5.)
+                    # limit the new px and py to beyond the inlet, and
+                    #     away from domain edges
+                    px = np.minimum(domain_min_x, np.maximum(px, L0))
+                    py = np.minimum(domain_min_y, np.maximum(1, py))
 
-            px = max(px, L0)
-            px = int(min(domain_shape[0] - 2, px))
+                    nind = shared_tools.custom_ravel((px, py), domain_shape)
+                    new_indices[p] = nind
+                    free_surf_flag[p] = -1
+    return new_indices, looped, free_surf_flag
 
-            py = max(1, py)
-            py = int(min(domain_shape[1] - 2, py))
 
-            nind = shared_tools.custom_ravel((px, py), domain_shape)
+@njit
+def _update_dirQfield(qfield, dist, inds, astep, dirstep):
+    """Update unit vector of water flux in x or y."""
+    for i, ii in enumerate(inds):
+        if astep[i]:
+            qfield[ii] += dirstep[i] / dist[i]
+    return qfield
 
-            inds[n] = nind
 
-            free_surf_flag[n] = -1
-
-    return inds, loopedout, free_surf_flag
+@njit
+def _update_absQfield(qfield, dist, inds, astep, Qp_water, dx):
+    """Update norm of water flux vector."""
+    for i, ii in enumerate(inds):
+        if astep[i]:
+            qfield[ii] += Qp_water / dx / 2
+    return qfield
 
 
 @njit
 def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
-                      uw, ux, uy, depth,
-                      dx, u0, h0, H_SL, S0):
+                                   uw, ux, uy, depth, dx, u0, h0, H_SL, S0):
+    """Accumulate the free surface by walking parcel paths.
 
+    This routine comprises the hydrodynamic physics-based computations.
+
+    Algorithm is to:
+        1. loop through every parcel's directed random walk in series
+        2. for a parcel's walk, unravel the indices and determine whether the
+        parcel should contribute to the free surface. Parcels are considered
+        contributors if they have reached the ocean and if they are not looped
+        pathways.
+        3. then, we begin at the downstream end of the parcel's walk and
+        iterate up-walk until, determining the `Hnew` for each location.
+        Downstream of the shoreline-ocean boundary, the water surface
+        elevation is set to the sea level. Upstream of the shoreline-ocean
+        boundary, the water surface is determined according to the land-slope
+        (:obj:`S0`) and the parcel pathway.
+        4. repeat from 2 for each parcel.
+    """
     _shape = uw.shape
     Hnew = np.zeros(_shape)
     sfc_visit = np.zeros(_shape)
@@ -451,7 +515,7 @@ def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
     # for every parcel, walk the path of the parcel
     for p, inds in enumerate(free_surf_walk_indices):
 
-        # unravel the indices of the parcel
+        # unravel the indices of the parcel into `xs` and `ys`
         inds_whr = inds[inds > 0]  # where the path has meaningful values
         xs = np.zeros_like(inds_whr)  # x coordinates
         ys = np.zeros_like(inds_whr)  # x coordinates
@@ -460,9 +524,7 @@ def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
 
         # determine whether the pathway contributes to the free surface
         Hnew[:] = 0
-        if ((cell_type[xs[-1], ys[-1]] == -1) and
-                (looped[p] == 0)):
-
+        if ((cell_type[xs[-1], ys[-1]] == -1) and (looped[p] == 0)):
             # if cell is in ocean, H = H_SL (downstream boundary condition)
             Hnew[xs[-1], ys[-1]] = H_SL
 
@@ -470,15 +532,13 @@ def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
             in_ocean = True  # whether we are in the ocean or not
             dH = 0
             for it in range(len(xs) - 2, -1, -1):
+                i = xs[it]
+                ip = xs[it + 1]
+                j = ys[it]
+                jp = ys[it + 1]
 
-                i = int(xs[it])
-                ip = int(xs[it + 1])
-                j = int(ys[it])
-                jp = int(ys[it + 1])
-                dist = np.sqrt((ip - i)**2 + (jp - j)**2)
-
-                if dist > 0:
-
+                # if the parcel has moved at all
+                if (i != ip) or (j != jp):
                     # if in the ocean (not reached the shoreline yet)
                     if in_ocean:
                         # see if it is shoreline
@@ -507,7 +567,7 @@ def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
 
 
 @njit
-def _smooth_water_surface(Hnew, Hnew_pad, cell_type, pad_cell_type,
+def _smooth_free_surface(Hnew, Hnew_pad, cell_type, pad_cell_type,
                           Nsmooth, Csmooth):
 
     L, W = cell_type.shape
