@@ -41,6 +41,17 @@ def test_inlet_size_set_to_one_fourth_domain(tmp_path):
     assert delta.L0 == 50
 
 
+@pytest.mark.xfail(raises=NotImplementedError)
+def test_cannot_support_checkpointing_subsidence(tmp_path):
+
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'toggle_subsidence', True)
+    utilities.write_parameter_to_file(f, 'save_checkpoint', True)
+    f.close()
+    delta = DeltaModel(input_file=p)
+
+
 # tests for attrs set during yaml parsing
 
 def test_set_verbose(test_DeltaModel):

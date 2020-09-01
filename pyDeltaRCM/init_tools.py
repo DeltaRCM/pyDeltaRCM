@@ -6,7 +6,7 @@ import warnings
 from math import floor, sqrt, pi
 import numpy as np
 
-from scipy.sparse import lil_matrix
+from scipy.sparse import lil_matrix, csr_matrix
 from scipy import ndimage
 
 from netCDF4 import Dataset
@@ -116,6 +116,13 @@ class init_tools(object):
         # now make each one an attribute of the model object.
         for k, v in list(input_file_vars.items()):
             setattr(self, k, v)
+
+        # if checkpoint_dt is the default value, None, then set it to save_dt
+        if self.checkpoint_dt is None:
+            self.checkpoint_dt = self.save_dt
+
+        if self.save_checkpoint and self.toggle_subsidence:
+            raise NotImplementedError('Cannot handle checkpointing with subsidence.')
 
     def determine_random_seed(self):
         """Set the random seed if given.
@@ -264,6 +271,8 @@ class init_tools(object):
                                self.save_velocity_figs)
         self._save_figs_sequential = self.save_figs_sequential  # copy as private
         self._is_finalized = False
+
+        self._save_checkpoint = self.save_checkpoint  # copy as private
 
     def create_domain(self):
         """
@@ -500,3 +509,44 @@ class init_tools(object):
             self.subsidence_mask[:self.L0, :] = False
 
             self.sigma = self.subsidence_mask * self.sigma_max * self.dt
+
+    def load_checkpoint(self):
+        """Load the checkpoint from the .npz file."""
+        ckp_file = os.path.join(self.prefix, 'checkpoint.npz')
+        checkpoint = np.load(ckp_file, allow_pickle=True)
+        # write saved variables back to the model
+        self._time = float(checkpoint['time'])
+        self.H_SL = checkpoint['H_SL']
+        self._time_iter = int(checkpoint['time_iter'])
+        self._save_iter = int(checkpoint['save_iter'])
+        self._save_time_since_last = int(checkpoint['save_time_since_last'])
+        self.uw = checkpoint['uw']
+        self.ux = checkpoint['ux']
+        self.uy = checkpoint['uy']
+        self.qw = checkpoint['qw']
+        self.qx = checkpoint['qx']
+        self.qy = checkpoint['qy']
+        self.depth = checkpoint['depth']
+        self.stage = checkpoint['stage']
+        self.eta = checkpoint['eta']
+        self.n_steps = checkpoint['n_steps']
+        self.init_eta = checkpoint['init_eta']
+        self.strata_counter = checkpoint['strata_counter']
+        # load and set random state to continue as if run hadn't stopped
+        rng_state = tuple(checkpoint['rng_state'])
+        shared_tools.set_random_state(rng_state)
+        # reconstruct the strata arrays
+        strata_eta_csr = csr_matrix((checkpoint['eta_data'],
+                                    checkpoint['eta_indices'],
+                                    checkpoint['eta_indptr']),
+                                    shape=checkpoint['eta_shape'])
+        self.strata_eta = strata_eta_csr.tolil()
+        # get strata_sand_frac
+        strata_sand_csr = csr_matrix((checkpoint['sand_data'],
+                                     checkpoint['sand_indices'],
+                                     checkpoint['sand_indptr']),
+                                     shape=checkpoint['sand_shape'])
+        self.strata_sand_frac = strata_sand_csr.tolil()
+        # re-open the netCDF4 file
+        file_path = os.path.join(self.prefix, 'pyDeltaRCM_output.nc')
+        self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4_CLASSIC')
