@@ -64,15 +64,15 @@ def test_set_constant_distances(test_DeltaModel):
     """
     check distances
     """
-    assert test_DeltaModel.distances[0, 0] == np.sqrt(2)
+    assert test_DeltaModel.distances[0, 0] == pytest.approx(np.sqrt(2))
 
 
 def test_set_ivec(test_DeltaModel):
-    assert test_DeltaModel.ivec[0, 0] == -np.sqrt(0.5)
+    assert test_DeltaModel.ivec[0, 0] == pytest.approx(-np.sqrt(0.5))
 
 
 def test_set_jvec(test_DeltaModel):
-    assert test_DeltaModel.jvec[0, 0] == -np.sqrt(0.5)
+    assert test_DeltaModel.jvec[0, 0] == pytest.approx(-np.sqrt(0.5))
 
 
 def test_set_iwalk(test_DeltaModel):
@@ -627,7 +627,7 @@ def test_looped(test_DeltaModel):
 
 
 def test_indices(test_DeltaModel):
-    assert np.any(test_DeltaModel.indices) == 0
+    assert np.any(test_DeltaModel.free_surf_walk_indices) == 0
 
 
 def test_sfc_visit(test_DeltaModel):

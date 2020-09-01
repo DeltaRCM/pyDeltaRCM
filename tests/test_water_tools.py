@@ -95,7 +95,7 @@ def test_check_for_loops():
     L0 = 1
     looped = np.array([0, 0])
 
-    nidx, looped, free = water_tools.check_for_loops(
+    nidx, looped, free = water_tools._check_for_loops(
         idxs, nidx, itt, L0, looped, (10, 10), CTR, free)
 
     assert np.all(nidx == [41, 6])
@@ -110,7 +110,40 @@ def test_calculate_new_ind():
     iwalk = shared_tools.get_iwalk()
     jwalk = shared_tools.get_jwalk()
 
-    nidx = water_tools.calculate_new_ind(cidx, ncel, iwalk.flatten(), jwalk.flatten(), (10, 10))
+    nidx = water_tools._calculate_new_ind(cidx, ncel, iwalk.flatten(), jwalk.flatten(), (10, 10))
 
     nidx_exp = np.array([21, 6, 0])
     assert np.all(nidx == nidx_exp)
+
+
+def test_update_dirQfield(test_DeltaModel):
+    """
+    Test for function water_tools._update_dirQfield
+    """
+    np.random.seed(test_DeltaModel.seed)
+    qx = np.random.uniform(0, 10, 9)
+    d = np.array([1, np.sqrt(2), 0])
+    astep = np.array([True, True, False])
+    inds = np.array([3, 4, 5])
+    stepdir = np.array([1, 1, 0])
+    qxn = water_tools._update_dirQfield(np.copy(qx), d, inds, astep, stepdir)
+    qxdiff = qxn - qx
+    qxdiff_exp = np.array([1, np.sqrt(2) / 2, 0])
+    assert np.all(qxdiff[3:6] == pytest.approx(qxdiff_exp))
+
+
+def test_update_absQfield(test_DeltaModel):
+    """
+    Test for function water_tools._update_absQfield
+    """
+    np.random.seed(test_DeltaModel.seed)
+    qw = np.random.uniform(0, 10, 9)
+    d = np.array([1, np.sqrt(2), 0])
+    astep = np.array([True, True, False])
+    inds = np.array([3, 4, 5])
+    qwn = water_tools._update_absQfield(
+        np.copy(qw), d, inds, astep, test_DeltaModel.Qp_water, test_DeltaModel.dx)
+    qwdiff = qwn - qw
+    diffelem = test_DeltaModel.Qp_water / test_DeltaModel.dx / 2
+    qwdiff_exp = np.array([diffelem, diffelem, 0])
+    assert np.all(qwdiff[3:6] == pytest.approx(qwdiff_exp))
