@@ -346,6 +346,12 @@ class init_tools(object):
         self.eta[:] = self.stage - self.depth
 
     def init_sediment_routers(self):
+        """Initialize the sediment router object here.
+
+        These are preinitialized because the "boxing" for jitted functions is
+        expensive, so we avoid boxing up the constants on each iteration.
+        """
+        # initialize the MudRouter object
         self._mr = sed_tools.MudRouter(self._dt, self.dx, self.Vp_sed,
                                        self.u_max, self.U_dep_mud, self.U_ero_mud,
                                        self.ivec_flat, self.jvec_flat,
@@ -353,6 +359,7 @@ class init_tools(object):
                                        self.distances_flat, self.dry_depth, self.gamma,
                                        self._lambda, self.beta,  self.stepmax,
                                        self.theta_mud)
+        # initialize the SandRouter object
         self._sr = sed_tools.SandRouter(self._dt, self.dx, self.Vp_sed,
                                         self.u_max, self.qs0, self.u0, self.U_ero_sand,
                                         self.f_bedload,

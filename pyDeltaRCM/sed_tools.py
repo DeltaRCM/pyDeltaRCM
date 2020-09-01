@@ -154,7 +154,7 @@ class BaseRouter(object):
         return istep, jstep, dist
 
     @abc.abstractmethod
-    def deposit_or_erode(self):
+    def _deposit_or_erode(self):
         """Determine whether to erode or deposit.
 
         This is the decision making component of the routine, and will be
@@ -250,7 +250,7 @@ class BaseRouter(object):
             Critical velocity for erosion.
 
         beta : :obj:`float`
-            ?????
+            unknown.
 
         Returns
         -------
@@ -272,7 +272,21 @@ class BaseRouter(object):
 
 @jitclass(r_spec)
 class SandRouter(BaseRouter):
+    """Jitted class to route sand.
 
+    Initialized in
+    :obj:`~pyDeltaRCM.init_tools.init_tools.init_sediment_routers` with a
+    multitude of constants. The `Router` is then called via the public
+    :obj:`run` method in the :obj:`~pyDeltaRCM.sed_tools.sed_tools.sed_route`
+    method.
+
+    .. important::
+
+        A new Router must be initialized if any constants are changed to the
+        underlying `DeltaModel` object. Convention is to call
+        :obj:`~pyDeltaRCM.init_tools.init_tools.init_sediment_routers` in any
+        property `setter`.
+    """
     def __init__(self, _dt, dx, Vp_sed, u_max, qs0, u0, U_ero_sand, f_bedload,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
                  dry_depth, gamma, beta, stepmax, theta_sed):
@@ -303,15 +317,20 @@ class SandRouter(BaseRouter):
         """The main function to route and deposit/erode sand parcels.
 
         Algorithm is to:
+
             1. as input, receive the current status of fields from the model.
             Additionally, receive a list of the starting points to use to run
             parcels, as :obj:`px` and :obj:`py`.
+
             2. begin a `for` loop to run each parcel in series.
+
             3. in the :obj:`SandRouter`, the sediment partitioning from a
             ghost node is executed. This step is skipped for
             :obj:`MudRouter`.
+
             4. call :obj:`_route_one_parcel` method to run a single parcel of
             sediment through all iterations.
+
             5. repeat from 3, until the correct number of parcels have been
             routed. Note that the number of *total* parcels is
             :obj:`~pyDeltaRCM.DeltaModel.Np_sed`, and the number of sand or
@@ -360,12 +379,15 @@ class SandRouter(BaseRouter):
 
             1. as input, receive the starting points to use to run a single
             parcel, as :obj:`px` and :obj:`py`.
+
             2. begin a while loop, which counts the number of steps the parcel
             has taken
+
             3. determine, based on the water surface and flow velocity field,
             which location to travel to next. This determination is named as
             :obj:`choose_next_location`, which utilizes the `shared_tools`
             methods to pick the next location.
+
             4. call the :obj:`_deposit_or_erode` method to detemine whether to
             deposit or erode sediment. This method is implemented
             *differently* for sand and mud routing, and depends on a multitude
@@ -374,6 +396,7 @@ class SandRouter(BaseRouter):
             which necessitates finding the new weights for routing on each
             step. Also, the volume of sediment is either increased or
             decreased (erosion or deposition).
+
             5. repeat from 3, until `stepmax` is reached, or an "edge" cell is
             reached.
         """
@@ -412,6 +435,16 @@ class SandRouter(BaseRouter):
         """Decide if deposit or erode sand.
 
         .. note:: Volumetric change is limited to 1/4 local cell water volume.
+
+        Sand deposition:
+            If more sediment is in transport (`qs_loc`) than the determined
+            transport capacity of the cell (`qs_cap`), sediment needs to
+            deposit on the bed.
+        Sand erosion:
+            Can only occur if local velocity (`U_loc`) is greater than the
+            critical erosion threshold for sand
+            (:obj:`~pyDeltaRCM.DeltaModel.U_ero_sand`), *and* if the local
+            transport capacity is not yet reached (`qs_loc < qs_cap`).
         """
         U_loc = self.uw[px, py]
         qs_cap = (self.qs0 * self.f_bedload / self.u0**self.beta *
@@ -428,7 +461,7 @@ class SandRouter(BaseRouter):
             #     transport capacity of the cell (`qs_cap`), sediment needs to
             #     deposit on the bed.
             Vp_change = self._limit_Vp_change(self.Vp_res, self.stage[px, py],
-                                         self.eta[px, py], self.dx)
+                                              self.eta[px, py], self.dx)
 
         elif (U_loc > self.U_ero_sand) and (qs_loc < qs_cap):
             # Sand erosion
@@ -436,9 +469,9 @@ class SandRouter(BaseRouter):
             #     critical erosion threshold for sand, *and* if the local
             #     transport capacity is not yet reached.
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
-                                        self.U_ero_sand, self.beta)
+                                             self.U_ero_sand, self.beta)
             Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                           self.eta[px, py], self.dx)
+                                                self.eta[px, py], self.dx)
 
         if Vp_change > 0:  # if deposition
             self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change
@@ -450,7 +483,21 @@ class SandRouter(BaseRouter):
 
 @jitclass(r_spec)
 class MudRouter(BaseRouter):
+    """Jitted class to route mud.
 
+    Initialized in
+    :obj:`~pyDeltaRCM.init_tools.init_tools.init_sediment_routers` with a
+    multitude of constants. The `Router` is then called via the public
+    :obj:`run` method in the :obj:`~pyDeltaRCM.sed_tools.sed_tools.sed_route`
+    method.
+
+    .. important::
+
+        A new Router must be initialized if any constants are changed to the
+        underlying `DeltaModel` object. Convention is to call
+        :obj:`~pyDeltaRCM.init_tools.init_tools.init_sediment_routers` in any
+        property `setter`.
+    """
     def __init__(self, _dt, dx, Vp_sed, u_max, U_dep_mud, U_ero_mud,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
                  dry_depth, gamma, _lambda, beta, stepmax, theta_sed):
@@ -521,7 +568,7 @@ class MudRouter(BaseRouter):
             px = px + jstep
             py = py + istep
 
-            self.deposit_or_erode(px, py)
+            self._deposit_or_erode(px, py)
 
             it += 1
             if self.cell_type[px, py] == -1:  # check for "edge" cell
@@ -529,10 +576,12 @@ class MudRouter(BaseRouter):
             if (it == self.stepmax):
                 sed_continue = False
 
-    def deposit_or_erode(self, px, py):
+    def _deposit_or_erode(self, px, py):
         """Decide if deposit or erode mud.
 
         .. note:: Volumetric change is limited to 1/4 local cell water volume.
+
+        .. important:: TODO: complete description specific for mud transport
         """
         U_loc = self.uw[px, py]
 
@@ -545,13 +594,13 @@ class MudRouter(BaseRouter):
                          (self.U_dep_mud**self.beta - U_loc**self.beta) /
                          (self.U_dep_mud**self.beta))
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                         self.eta[px, py], self.dx)
+                                              self.eta[px, py], self.dx)
 
         elif U_loc > self.U_ero_mud:
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
-                                        self.U_ero_mud, self.beta)
+                                             self.U_ero_mud, self.beta)
             Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                           self.eta[px, py], self.dx)
+                                                self.eta[px, py], self.dx)
 
         if Vp_change > 0:  # if deposition
             self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change

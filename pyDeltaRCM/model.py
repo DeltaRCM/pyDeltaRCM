@@ -1,12 +1,18 @@
 #! /usr/bin/env python
 import warnings
 import logging
-from .deltaRCM_tools import Tools
 import datetime
 import os
 
+from .deltaRCM_tools import iteration_tools
+from .sed_tools import sed_tools
+from .water_tools import water_tools
+from .init_tools import init_tools
+from .debug_tools import debug_tools
 
-class DeltaModel(Tools):
+
+class DeltaModel(iteration_tools, sed_tools, water_tools,
+                 init_tools, debug_tools, object):
     """Main model class.
 
     Instantiating the model class is described in the :meth:`__init__` method

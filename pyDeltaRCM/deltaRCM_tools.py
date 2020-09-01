@@ -8,14 +8,14 @@ import matplotlib.pyplot as plt
 
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 
-from .sed_tools import sed_tools
-from .water_tools import water_tools
-from .init_tools import init_tools
-from .debug_tools import debug_tools
 
+class iteration_tools(object):
+    """Tools relating to the updating of the model and model I/O.
 
-class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
-    """Aggregate all `*_tools` modules into single class, define api methods."""
+    Tools defined in this class include steps to iterate for one timestep,
+    finalize timesteps, and saving output figures, grids, and checkpoints.
+    Additionally, most stratigraphy-related operations are defined here.
+    """
 
     def run_one_timestep(self):
         """Run the timestep once.
