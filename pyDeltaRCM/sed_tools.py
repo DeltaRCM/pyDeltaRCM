@@ -1,6 +1,6 @@
 
 import numpy as np
-from numba import njit, jit, typed, float32, float64, int64
+from numba import float32, float64, int64
 from numba.experimental import jitclass
 from scipy import ndimage
 import abc
@@ -31,8 +31,6 @@ class sed_tools(object):
 
     def route_all_sand_parcels(self):
         """Route sand parcels; topo diffusion."""
-        theta_sed = self.theta_sand
-
         num_starts = int(self.Np_sed * self.f_bedload)
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
@@ -120,9 +118,15 @@ r_spec = [('_dt', float32), ('dx', float32),
 
 
 class BaseRouter(object):
+    """BaseRouter.
 
+    Defines common methods for jitted routers.
+
+    Subclasses need to define `run`, `_route_one_parcel`, and
+    `_deposit_or_erode`.
+    """
     @abc.abstractmethod
-    def run(self):
+    def run(self, *args, **kwargs):
         ...
 
     @abc.abstractmethod
@@ -451,10 +455,7 @@ class SandRouter(BaseRouter):
                   U_loc**self.beta)
         qs_loc = self.qs[px, py]
 
-        Vp_dep = 0
-        Vp_ero = 0
         Vp_change = 0
-
         if qs_loc > qs_cap:
             # Sand deposition
             #     If more sediment is in transport than the determined
@@ -563,7 +564,7 @@ class MudRouter(BaseRouter):
         while sed_continue:
 
             # Choose the next location for the parcel to travel
-            istep, jstep, dist = self._choose_next_location(px, py)
+            istep, jstep, _ = self._choose_next_location(px, py)
 
             px = px + jstep
             py = py + istep
@@ -585,10 +586,7 @@ class MudRouter(BaseRouter):
         """
         U_loc = self.uw[px, py]
 
-        Vp_dep = 0
-        Vp_ero = 0
         Vp_change = 0
-
         if U_loc < self.U_dep_mud:
             Vp_change = (self._lambda * self.Vp_res *
                          (self.U_dep_mud**self.beta - U_loc**self.beta) /

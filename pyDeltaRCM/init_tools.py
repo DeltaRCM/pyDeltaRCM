@@ -516,7 +516,7 @@ class init_tools(object):
         checkpoint = np.load(ckp_file, allow_pickle=True)
         # write saved variables back to the model
         self._time = float(checkpoint['time'])
-        self.H_SL = checkpoint['H_SL']
+        self.H_SL = float(checkpoint['H_SL'])
         self._time_iter = int(checkpoint['time_iter'])
         self._save_iter = int(checkpoint['save_iter'])
         self._save_time_since_last = int(checkpoint['save_time_since_last'])

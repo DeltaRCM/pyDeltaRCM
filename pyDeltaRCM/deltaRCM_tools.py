@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 
+from . import shared_tools
+
+
 class iteration_tools(object):
     """Tools relating to the updating of the model and model I/O.
 
@@ -507,7 +510,7 @@ class iteration_tools(object):
         # advance _time_iter since this is before update step fully finishes
         _time_iter = self._time_iter + int(1)
         # get rng state
-        rng_state = get_random_state()
+        rng_state = shared_tools.get_random_state()
 
         np.savez_compressed(ckp_file, time=self.time, H_SL=self.H_SL,
                             time_iter=_time_iter,

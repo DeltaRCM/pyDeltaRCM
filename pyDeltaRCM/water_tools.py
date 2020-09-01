@@ -1,6 +1,6 @@
 
 import numpy as np
-from numba import njit, jit, typed
+from numba import njit
 
 from . import shared_tools
 
@@ -81,7 +81,7 @@ class water_tools(object):
             # Record the parcel pathways for computing the free surface
             #     Parcels that have reached the boundary are updated to
             #     ``ind==0``, effectively ending the routing of these parcels.
-            curent_inds = self.check_for_boundary(current_inds)  # changes `free_surf_flag`
+            current_inds = self.check_for_boundary(current_inds)  # changes `free_surf_flag`
             self.free_surf_walk_indices[:, _step] = current_inds  # record indices
             current_inds[self.free_surf_flag > 0] = 0
 
@@ -576,7 +576,7 @@ def _smooth_free_surface(Hnew, Hnew_pad, cell_type, pad_cell_type,
     """Smooth the free surface."""
     L, W = cell_type.shape
     Htemp = Hnew
-    for itsmooth in range(Nsmooth):
+    for _ in range(Nsmooth):
 
         Hsmth = Htemp
         for i in range(L):
