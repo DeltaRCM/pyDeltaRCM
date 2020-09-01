@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from numba import njit, jit, typed
+from numba import njit, jit, typed, _helperlib
 
 # tools shared between deltaRCM water and sediment routing
 
@@ -21,6 +21,16 @@ def get_jwalk():
 @njit
 def set_random_seed(_seed):
     np.random.seed(_seed)
+
+
+def get_random_state():
+    ptr = _helperlib.rnd_get_np_state_ptr()
+    return _helperlib.rnd_get_state(ptr)
+
+
+def set_random_state(_state_tuple):
+    ptr = _helperlib.rnd_get_np_state_ptr()
+    _helperlib.rnd_set_state(ptr, _state_tuple)
 
 
 @njit

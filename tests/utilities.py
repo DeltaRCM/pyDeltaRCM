@@ -9,7 +9,10 @@ from pyDeltaRCM.model import DeltaModel
 
 def create_temporary_file(tmp_path, file_name):
     d = tmp_path / 'configs'
-    d.mkdir()
+    try:
+        d.mkdir()
+    except Exception:
+        pass
     p = d / file_name
     f = open(p, "a")
     return p, f
