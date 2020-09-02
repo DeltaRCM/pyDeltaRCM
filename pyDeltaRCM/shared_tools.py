@@ -125,7 +125,7 @@ def get_weight_at_cell(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
 
     weight = gamma * weight_sfc + (1 - gamma) * weight_int
     weight = depth_nbrs ** theta * weight
-    weight[depth_nbrs <= dry_depth] = 0
+    weight[drywall] = np.nan
 
     nanWeight = np.isnan(weight)
 
