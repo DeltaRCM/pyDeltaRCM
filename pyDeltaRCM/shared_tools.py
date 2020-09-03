@@ -145,3 +145,62 @@ def _get_version():
     """
     from . import _version
     return _version.__version__()
+
+
+def scale_model_time(time, If=1):
+    """Scale the model time to "real" time.
+
+    Model time is executed as assumed flooding conditions, and executed at the
+    per-second level, with a multi-second timestep. This model design
+    implicitly assumes that the delta is *always* receiving a large volume of
+    sediment and water at the inlet. This is unrealistic, given that rivers
+    flood only during a small portion of the year, and this is when
+    morphodynamic activity is largest.
+
+    Despite this assumption, it is possible to scale up model time to "real"
+    time, by assuming an *intermittency factor*. This intermittency factor is
+    the fraction of time, scaled to 1 year, when the delta system is assumed
+    to be flooding.
+
+    .. math::
+
+        t_r = \dfrac{t}{I_f \cdot 365.25 \cdot 86400}
+
+    where :math:`t` is the model time (:obj:`~pyDeltaRCM.DeltaModel.time`),
+    :math:`t_r` is the "real" scaled time, and :math:`I_f` is the
+    intermittency factor.
+
+    Parameters
+    ----------
+    time : :obj:`float`
+        The model time, in seconds.
+
+    If : :obj:`float`, optional
+        Intermittency factor, fraction of time represented by morphodynamic
+        activity. Should be in interval (0, 1). Defaults to 1 if not provided,
+        i.e., no scaling is performed.
+
+    Returns
+    -------
+    scaled : :obj:`float`
+        Scaled time, in years, assuming the intermittency factor :obj:`If`.
+
+    Raises
+    ------
+    ValueError
+        if the value for intermittency is not ``0 <= If <= 1``.
+    """
+    if (If < 0) or (If > 1):
+        raise ValueError(
+            'Intermittency `If` is not 0 <= If <= 1: %s' % str(If))
+
+    return time / _scale_factor(If)
+
+
+def _scale_factor(If):
+    """Scaling factor between model time and "real" time.
+
+    The scaling factor relates the model time to a real worl time, by assuming
+    an intermittency factor.
+    """
+    return (If * 365.25 * 86400)

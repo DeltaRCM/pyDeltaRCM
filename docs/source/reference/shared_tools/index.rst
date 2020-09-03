@@ -24,3 +24,10 @@ Shared functions
 .. autofunction:: get_weight_sfc_int
 .. autofunction:: get_weight_at_cell
 .. autofunction:: _get_version
+
+
+Time scaling functions
+----------------------
+
+.. autofunction:: scale_model_time
+.. autofunction:: _scale_factor

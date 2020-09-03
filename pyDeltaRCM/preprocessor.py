@@ -525,6 +525,52 @@ def write_yaml_config_to_file(_config, _path):
     f.close()
 
 
+def scale_relative_sea_level_rise_rate(mmyr, If=1):
+    """Scale a relative sea level rise rate to model time.
+
+    This function scales any relative sea level rise rate (RSLR) (e.g., sea
+    level rise, subsidence) to a rate appropriate for the model time. This is
+    helpful, because most discussion of RSLR uses units of mm/yr, but the
+    model (and model configuration) require units of m/s. Additionally, the
+    model framework needs to assume an "intermittency factor" to convert from
+    real-world time to model time.
+
+    Relative sea level rise (subsidence and/or sea level rise) are scaled from
+    real world dimensions of mm/yr to model input as:
+
+    .. math::
+
+        \widehat{RSLR} = (RSLR / 1000) \cdot \dfrac{1}{I_f \cdot 365.25 \cdot 86400}
+
+    This conversion makes it such that when one real-world year has elapsed
+    (:math:`I_f \cdot 365.25 \cdot 86400` seconds in model time), the relative
+    sea level has changed by the number of millimeters specified in the input
+    :obj:`mmyr`.
+
+    .. note::
+
+        Users should use this function to determine the value to specify in
+        an input YAML configuration file; no scaling is performed
+        internally.
+
+    Parameters
+    ----------
+    mmyr : :obj:`float`
+        Millimeters per year, relative sea level rise rate.
+
+    If : :obj:`float`, optional
+        Intermittency factor, fraction of time represented by morphodynamic
+        activity. Should be in interval (0, 1). Defaults to 1 if not provided,
+        i.e., no scaling is performed.
+
+    Returns
+    -------
+    scaled : :obj:`float`
+        Scaled relative sea level rise rate, in meters per second.
+    """
+    return (mmyr / 1000) * (1 / (shared_tools._scale_factor(If)))
+
+
 if __name__ == '__main__':
 
     preprocessor_wrapper()
