@@ -124,6 +124,16 @@ class BaseRouter(object):
 
     Subclasses need to define `run`, `_route_one_parcel`, and
     `_deposit_or_erode`.
+
+    .. note::
+
+        Although this class is configured with `@abc.abstractmethod` methods,
+        we cannot actually enforce the implementation of this `BaseRouter` as
+        an abstract class, because Numba does not support abstract classes
+        (yet; https://github.com/numba/numba/issues/6033). The classes are
+        included in the base class with abstract decorators to help make it
+        clear that these methods need to be implemented in subclassing
+        `Router`.
     """
     @abc.abstractmethod
     def run(self, *args, **kwargs):
