@@ -361,6 +361,7 @@ class PreprocessorCLI(BasePreprocessor):
             self.input_file = self.args['config']
             self.extract_yaml_config()
         else:
+            self.verbose = 0  # no verbosity by defauly
             self.input_file = None
             self.user_dict = {}
             self._has_matrix = False
