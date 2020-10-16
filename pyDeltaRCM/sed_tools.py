@@ -30,7 +30,17 @@ class sed_tools(abc.ABC):
         self.topo_diffusion()
 
     def route_all_sand_parcels(self):
-        """Route sand parcels; topo diffusion."""
+        """Route sand parcels; topo diffusion.
+
+        This method largely wraps the :obj:`SandRouter`. First, the number of
+        parcels and sand fraction (:obj:`f_bedload`) are used to determine
+        starting locations for sand parcels. Next, these locations are sent to
+        the `SandRouter`, along with many other model state variables.
+
+        Finally, variables are unpacked from the `SandRouter` and updated in
+        the model fields, where they are later used by the `MudRouter` and the
+        water parcel routing.
+        """
         num_starts = int(self.Np_sed * self.f_bedload)
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
@@ -42,6 +52,9 @@ class sed_tools(abc.ABC):
                      self.pad_stage, self.pad_depth, self.pad_cell_type,
                      self.Vp_dep_mud, self.qw, self.qx, self.qy, self.qs)
 
+        # These are the variables updated at the end of the `SandRouter`. If
+        # you attempt to drop in a replacement SandRouter, you will need to
+        # update these fields!!
         self.Vp_dep_mud = self._sr.Vp_dep_mud
         self.eta = self._sr.eta  # update bed
         self.depth = self._sr.depth  # update depth
@@ -52,7 +65,17 @@ class sed_tools(abc.ABC):
         self.qs = self._sr.qs
 
     def route_all_mud_parcels(self):
-        """Route mud parcels."""
+        """Route mud parcels.
+
+        This method largely wraps the :obj:`MudRouter`. First, the number of
+        parcels and sand fraction (:obj:`f_bedload`) are used to determine
+        starting locations for mud parcels. Next, these locations are sent to
+        the `MudRouter`, along with many other model state variables.
+
+        Finally, variables are unpacked from the `MudRouter` and updated in
+        the model fields, where they are later used by the water parcel
+        routing.
+        """
         num_starts = int(self.Np_sed * (1 - self.f_bedload))
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
@@ -64,6 +87,9 @@ class sed_tools(abc.ABC):
                      self.pad_stage, self.pad_depth, self.pad_cell_type,
                      self.Vp_dep_mud, self.qw, self.qx, self.qy)
 
+        # These are the variables updated at the end of the `MudRouter`. If
+        # you attempt to drop in a replacement MudRouter, you will need to
+        # update these fields!!
         self.Vp_dep_mud = self._mr.Vp_dep_mud
         self.eta = self._mr.eta  # update bed
         self.depth = self._mr.depth  # update depth
