@@ -1,13 +1,14 @@
 
 import numpy as np
 from numba import njit
+import abc
 
 from . import shared_tools
 
 # tools for water routing algorithms
 
 
-class water_tools(object):
+class water_tools(abc.ABC):
 
     def init_water_iteration(self):
 

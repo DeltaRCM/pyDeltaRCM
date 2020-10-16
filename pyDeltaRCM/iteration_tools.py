@@ -8,15 +8,18 @@ import matplotlib.pyplot as plt
 
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 
+import abc
+
 from . import shared_tools
 
 
-class iteration_tools(object):
+class iteration_tools(abc.ABC):
     """Tools relating to the updating of the model and model I/O.
 
     Tools defined in this class include steps to iterate for one timestep,
     finalize timesteps, and saving output figures, grids, and checkpoints.
-    Additionally, most stratigraphy-related operations are defined here.
+    Additionally, most stratigraphy-related operations are defined here, since
+    these operations largely occur when saving and updating the model.
     """
 
     def run_one_timestep(self):
