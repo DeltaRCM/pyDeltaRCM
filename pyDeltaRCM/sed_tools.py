@@ -10,7 +10,7 @@ from . import shared_tools
 # tools for sediment routing algorithms and deposition/erosion
 
 
-class sed_tools(object):
+class sed_tools(abc.ABC):
 
     def sed_route(self):
         """Sediment routing main method.

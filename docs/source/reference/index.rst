@@ -13,7 +13,7 @@ methods.
 
    model/index
    preprocessor/index
-   deltaRCM_tools/index
+   iteration_tools/index
    init_tools/index
    water_tools/index
    sed_tools/index

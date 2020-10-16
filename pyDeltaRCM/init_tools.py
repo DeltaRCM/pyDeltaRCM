@@ -13,6 +13,7 @@ from netCDF4 import Dataset
 import time as time_lib
 import yaml
 import re
+import abc
 
 from . import shared_tools
 from . import sed_tools
@@ -20,7 +21,7 @@ from . import sed_tools
 # tools for initiating deltaRCM model domain
 
 
-class init_tools(object):
+class init_tools(abc.ABC):
 
     def init_output_infrastructure(self):
 
