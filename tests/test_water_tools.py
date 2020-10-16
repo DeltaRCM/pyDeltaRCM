@@ -66,23 +66,6 @@ def test_pad_cell_type(test_DeltaModel):
     assert a == 12
 
 
-def test_calculate_new_ind(test_DeltaModel):
-    """
-    Test for function water_tools.calculate_new_ind
-    """
-    # assign old index
-    old_inds = np.array([4, 5])
-    # assign new cell location
-    new_cells = np.array([7, 7])
-    # expect new cell to be in location (1,4) -> 14
-
-    new_inds = water_tools.calculate_new_ind(old_inds, new_cells,
-                                             test_DeltaModel.iwalk.flatten(),
-                                             test_DeltaModel.jwalk.flatten(),
-                                             test_DeltaModel.eta.shape)
-    assert np.all(new_inds == np.array([14, 15]))
-
-
 def test_check_for_loops():
 
     idxs = np.array(
