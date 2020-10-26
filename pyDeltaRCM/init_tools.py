@@ -169,11 +169,15 @@ class init_tools(abc.ABC):
                               [sqrt05, 1, sqrt05]]).astype(np.float32)
 
         self.jwalk = shared_tools.get_jwalk()
-        self.dxn_iwalk = [1, 1, 0, -1, -1, -1, 0, 1]
-        self.dxn_jwalk = [0, 1, 1, 1, 0, -1, -1, -1]
-        self.dxn_dist = \
-            [sqrt(self.dxn_iwalk[i]**2 + self.dxn_jwalk[i]**2)
-             for i in range(8)]
+        # self.dxn_iwalk = [1, 1, 0, -1, -1, -1, 0, 1]
+        # self.dxn_jwalk = [0, 1, 1, 1, 0, -1, -1, -1]
+        # self.dxn_dist = \
+        #     [sqrt(self.dxn_iwalk[i]**2 + self.dxn_jwalk[i]**2)
+        #      for i in range(8)]
+
+        self.dxn_iwalk = np.array([1, 1, 0, -1, -1, -1, 0, 1], dtype=np.int64)
+        self.dxn_jwalk = np.array([0, 1, 1, 1, 0, -1, -1, -1], dtype=np.int64)
+        self.dxn_dist = np.sqrt(self.dxn_iwalk**2 + self.dxn_jwalk**2)
 
         self.walk_flat = np.array([1, -self.W + 1, -self.W, -self.W - 1,
                                    -1, self.W - 1, self.W, self.W + 1])
@@ -185,11 +189,11 @@ class init_tools(abc.ABC):
 
         self.kernel1 = np.array([[1, 1, 1],
                                  [1, -8, 1],
-                                 [1, 1, 1]])
+                                 [1, 1, 1]]).astype(np.int64)
 
         self.kernel2 = np.array([[1, 1, 1],
                                  [1, 0, 1],
-                                 [1, 1, 1]])
+                                 [1, 1, 1]]).astype(np.int64)
 
     def create_other_variables(self):
         """Model implementation variables.
@@ -285,7 +289,7 @@ class init_tools(abc.ABC):
         self.x, self.y = np.meshgrid(
             np.arange(0, self.W), np.arange(0, self.L))
 
-        self.cell_type = np.zeros((self.L, self.W), dtype=np.int)
+        self.cell_type = np.zeros((self.L, self.W), dtype=np.int64)
         self.eta = np.zeros((self.L, self.W)).astype(np.float32)
         self.stage = np.zeros((self.L, self.W)).astype(np.float32)
         self.depth = np.zeros((self.L, self.W)).astype(np.float32)
@@ -300,10 +304,10 @@ class init_tools(abc.ABC):
         self.qs = np.zeros((self.L, self.W))
         self.Vp_dep_sand = np.zeros((self.L, self.W))
         self.Vp_dep_mud = np.zeros((self.L, self.W))
-        self.free_surf_flag = np.zeros((self.Np_water,), dtype=np.int)
-        self.looped = np.zeros((self.Np_water,), dtype=np.int)
+        self.free_surf_flag = np.zeros((self.Np_water,), dtype=np.int64)
+        self.looped = np.zeros((self.Np_water,), dtype=np.int64)
         self.free_surf_walk_indices = np.zeros((self.Np_water, self.size_indices),
-                                               dtype=np.int)
+                                               dtype=np.int64)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
 

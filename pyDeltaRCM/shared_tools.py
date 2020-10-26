@@ -9,13 +9,13 @@ from numba import njit, jit, typed, _helperlib
 def get_iwalk():
     return np.array([[-1, 0, 1],
                      [-1, 0, 1],
-                     [-1, 0, 1]])
+                     [-1, 0, 1]], dtype=np.int64)
 
 
 def get_jwalk():
     return np.array([[-1, -1, -1],
                      [0, 0, 0],
-                     [1, 1, 1]])
+                     [1, 1, 1]], dtype=np.int64)
 
 
 @njit
