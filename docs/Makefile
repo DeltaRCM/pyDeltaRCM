@@ -12,10 +12,10 @@ BUILDDIR      = build
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: help docs clean Makefile
+.PHONY: help docs Makefile
 
 
-docs: test
+docs: test clean html
 
 
 clean :
@@ -25,10 +25,8 @@ clean :
 
 
 test : clean
-	@$(SPHINXBUILD) -b doctest "$(SOURCEDIR)" "$(BUILDDIR)"
-	@$(SPHINXBUILD) -b linkcheck "$(SOURCEDIR)" "$(BUILDDIR)"
-	make clean
-	@$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)"
+	@$(SPHINXBUILD) -b doctest "$(SOURCEDIR)" "$(BUILDDIR)" -E
+	@$(SPHINXBUILD) -b linkcheck "$(SOURCEDIR)" "$(BUILDDIR)" -E
 
 
 # Catch-all target: route all unknown targets to Sphinx using the new

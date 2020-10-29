@@ -12,12 +12,12 @@ methods.
    :maxdepth: 2
 
    model/index
-   deltaRCM_tools/index
+   preprocessor/index
+   iteration_tools/index
    init_tools/index
    water_tools/index
    sed_tools/index
    shared_tools/index
-   preprocessor/index
    debug_tools/index
 
 
