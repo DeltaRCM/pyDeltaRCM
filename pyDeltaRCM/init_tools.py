@@ -411,6 +411,7 @@ class init_tools(abc.ABC):
                 self.save_stage_grids or
                 self.save_discharge_grids or
                 self.save_velocity_grids or
+                self.save_sedflux_grids or
                 self.save_strata):
 
             _msg = 'Generating netCDF file for output grids'
@@ -430,7 +431,7 @@ class init_tools(abc.ABC):
                 os.remove(file_path)
 
             self.output_netcdf = Dataset(file_path, 'w',
-                                         format='NETCDF4_CLASSIC')
+                                         format='NETCDF4')
 
             self.output_netcdf.description = 'Output grids from pyDeltaRCM'
             self.output_netcdf.history = ('Created '
@@ -449,40 +450,40 @@ class init_tools(abc.ABC):
                                                      ('total_time',))
             x.units = 'meters'
             y.units = 'meters'
-            time.units = 'seconds'
+            time.units = 'second'
 
             x[:] = self.x
             y[:] = self.y
 
             if self.save_eta_grids:
-                eta = self.output_netcdf.createVariable('eta',
-                                                        'f4',
+                eta = self.output_netcdf.createVariable('eta', 'f4',
                                                         ('total_time', 'length', 'width'))
                 eta.units = 'meters'
 
             if self.save_stage_grids:
-                stage = self.output_netcdf.createVariable('stage',
-                                                          'f4',
+                stage = self.output_netcdf.createVariable('stage', 'f4',
                                                           ('total_time', 'length', 'width'))
                 stage.units = 'meters'
 
             if self.save_depth_grids:
-                depth = self.output_netcdf.createVariable('depth',
-                                                          'f4',
+                depth = self.output_netcdf.createVariable('depth', 'f4',
                                                           ('total_time', 'length', 'width'))
                 depth.units = 'meters'
 
             if self.save_discharge_grids:
-                discharge = self.output_netcdf.createVariable('discharge',
-                                                              'f4',
+                discharge = self.output_netcdf.createVariable('discharge', 'f4',
                                                               ('total_time', 'length', 'width'))
                 discharge.units = 'cubic meters per second'
 
             if self.save_velocity_grids:
-                velocity = self.output_netcdf.createVariable('velocity',
-                                                             'f4',
+                velocity = self.output_netcdf.createVariable('velocity', 'f4',
                                                              ('total_time', 'length', 'width'))
                 velocity.units = 'meters per second'
+
+            if self.save_sedflux_grids:
+                sedflux = self.output_netcdf.createVariable('sedflux', 'f4',
+                                                            ('total_time', 'length', 'width'))
+                sedflux.units = 'cubic meters per second'
 
             _msg = 'Output netCDF file created'
             self.logger.info(_msg)
