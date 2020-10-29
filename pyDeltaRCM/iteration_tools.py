@@ -271,6 +271,12 @@ class iteration_tools(abc.ABC):
                                  filename_root='velocity_',
                                  timestep=self.save_iter)
 
+            if self.save_sedflux_figs:
+                _fu = self.make_figure('qs', self.time)
+                self.save_figure(_fu, directory=self.prefix,
+                                 filename_root='sedflux_',
+                                 timestep=self.save_iter)
+
         # ------------------ grids ------------------
         if self._save_any_grids:
 
@@ -296,6 +302,9 @@ class iteration_tools(abc.ABC):
 
             if self.save_velocity_grids:
                 self.save_grids('velocity', self.uw, shape[0])
+
+            if self.save_sedflux_grids:
+                self.save_grids('sedflux', self.qs, shape[0])
 
     def output_checkpoint(self):
         """Save checkpoint.
@@ -368,7 +377,7 @@ class iteration_tools(abc.ABC):
             strata_age = self.output_netcdf.createVariable('strata_age',
                                                            np.int32,
                                                            ('total_strata_age'))
-            strata_age.units = 'seconds'
+            strata_age.units = 'second'
             self.output_netcdf.variables['strata_age'][
                 :] = list(range(shape[1] - 1, -1, -1))
 

@@ -429,7 +429,7 @@ def test_save_one_fig_one_grid(tmp_path):
         _delta.update()
     nc_size_middle = os.path.getsize(exp_path_nc)
     assert _delta.time_iter == 2.0
-    assert nc_size_middle == nc_size_before
+    assert nc_size_middle > nc_size_before
 
     # now finalize, and then file size should increase
     _delta.finalize()
@@ -459,6 +459,7 @@ def test_save_all_figures_no_grids(tmp_path):
     utilities.write_parameter_to_file(f, 'save_velocity_figs', True)
     utilities.write_parameter_to_file(f, 'save_stage_figs', True)
     utilities.write_parameter_to_file(f, 'save_depth_figs', True)
+    utilities.write_parameter_to_file(f, 'save_sedflux_figs', True)
     utilities.write_parameter_to_file(f, 'save_dt', 1)
     utilities.write_parameter_to_file(f, 'save_strata', False)
     f.close()
@@ -475,11 +476,13 @@ def test_save_all_figures_no_grids(tmp_path):
     exp_path_png2 = os.path.join(tmp_path / 'out_dir', 'stage_00000.png')
     exp_path_png3 = os.path.join(tmp_path / 'out_dir', 'velocity_00000.png')
     exp_path_png4 = os.path.join(tmp_path / 'out_dir', 'discharge_00000.png')
+    exp_path_png5 = os.path.join(tmp_path / 'out_dir', 'sedflux_00000.png')
     assert os.path.isfile(exp_path_png0)
     assert os.path.isfile(exp_path_png1)
     assert os.path.isfile(exp_path_png2)
     assert os.path.isfile(exp_path_png3)
     assert os.path.isfile(exp_path_png4)
+    assert os.path.isfile(exp_path_png5)
 
 
 def test_save_all_figures_sequential_false(tmp_path):
@@ -682,3 +685,35 @@ def test_save_discharge_grids(tmp_path):
     _arr = ds.variables['discharge']
     assert _arr.shape[1] == _delta.eta.shape[0]
     assert _arr.shape[2] == _delta.eta.shape[1]
+
+
+def test_save_sedflux_grids(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'save_sedflux_grids', True)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc)
+
+    for _ in range(0, 2):
+        _delta.update()
+    assert _delta.time_iter == 2.0
+    _delta.finalize()
+
+    ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+    _arr = ds.variables['sedflux']
+    assert _arr.shape[1] == _delta.eta.shape[0]
+    assert _arr.shape[2] == _delta.eta.shape[1]
+
