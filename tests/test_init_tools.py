@@ -75,15 +75,15 @@ def test_set_constant_distances(test_DeltaModel):
     """
     check distances
     """
-    assert test_DeltaModel.distances[0, 0] == np.sqrt(2)
+    assert test_DeltaModel.distances[0, 0] == pytest.approx(np.sqrt(2))
 
 
 def test_set_ivec(test_DeltaModel):
-    assert test_DeltaModel.ivec[0, 0] == -np.sqrt(0.5)
+    assert test_DeltaModel.ivec[0, 0] == pytest.approx(-np.sqrt(0.5))
 
 
 def test_set_jvec(test_DeltaModel):
-    assert test_DeltaModel.jvec[0, 0] == -np.sqrt(0.5)
+    assert test_DeltaModel.jvec[0, 0] == pytest.approx(-np.sqrt(0.5))
 
 
 def test_set_iwalk(test_DeltaModel):
@@ -356,7 +356,7 @@ def test_Vp_sed(tmp_path):
     assert _delta.Vp_sed == 50000 / 1450
 
 
-def test_itmax_and_size_indices(tmp_path):
+def test_stepmax_and_size_indices(tmp_path):
     p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                  {'Length': 1600,
                                   'Width': 1200,
@@ -364,7 +364,7 @@ def test_itmax_and_size_indices(tmp_path):
     _delta = DeltaModel(input_file=p)
     assert _delta.L == 80
     assert _delta.W == 60
-    assert _delta.itmax == (80 + 60) * 2
+    assert _delta.stepmax == (80 + 60) * 2
     assert _delta.size_indices == (80 + 60)
 
 
@@ -638,7 +638,7 @@ def test_looped(test_DeltaModel):
 
 
 def test_indices(test_DeltaModel):
-    assert np.any(test_DeltaModel.indices) == 0
+    assert np.any(test_DeltaModel.free_surf_walk_indices) == 0
 
 
 def test_sfc_visit(test_DeltaModel):

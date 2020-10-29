@@ -1,12 +1,18 @@
 #! /usr/bin/env python
 import warnings
 import logging
-from .deltaRCM_tools import Tools
 import datetime
 import os
 
+from .iteration_tools import iteration_tools
+from .sed_tools import sed_tools
+from .water_tools import water_tools
+from .init_tools import init_tools
+from .debug_tools import debug_tools
 
-class DeltaModel(Tools):
+
+class DeltaModel(iteration_tools, sed_tools, water_tools,
+                 init_tools, debug_tools, object):
     """Main model class.
 
     Instantiating the model class is described in the :meth:`__init__` method
@@ -64,6 +70,8 @@ class DeltaModel(Tools):
 
         self.determine_random_seed()
         self.create_domain()
+
+        self.init_sediment_routers()
 
         self.init_subsidence()
 
@@ -224,6 +232,7 @@ class DeltaModel(Tools):
     def channel_flow_velocity(self, new_u0):
         self.u0 = new_u0
         self.create_other_variables()
+        self.init_sediment_routers()
 
     @property
     def channel_width(self):
@@ -234,6 +243,7 @@ class DeltaModel(Tools):
     def channel_width(self, new_N0):
         self.N0_meters = new_N0
         self.create_other_variables()
+        self.init_sediment_routers()
 
     @property
     def channel_flow_depth(self):
@@ -244,6 +254,7 @@ class DeltaModel(Tools):
     def channel_flow_depth(self, new_d):
         self.h0 = new_d
         self.create_other_variables()
+        self.init_sediment_routers()
 
     @property
     def sea_surface_mean_elevation(self):
@@ -281,6 +292,7 @@ class DeltaModel(Tools):
     def influx_sediment_concentration(self, new_u0):
         self.C0_percent = new_u0
         self.create_other_variables()
+        self.init_sediment_routers()
 
     @property
     def sea_surface_elevation(self):

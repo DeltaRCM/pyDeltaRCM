@@ -8,15 +8,19 @@ import matplotlib.pyplot as plt
 
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 
-from .sed_tools import sed_tools
-from .water_tools import water_tools
-from .init_tools import init_tools
-from .debug_tools import debug_tools
-from .shared_tools import get_random_state
+import abc
+
+from . import shared_tools
 
 
-class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
-    """Aggregate all `*_tools` modules into single class, define api methods."""
+class iteration_tools(abc.ABC):
+    """Tools relating to the updating of the model and model I/O.
+
+    Tools defined in this class include steps to iterate for one timestep,
+    finalize timesteps, and saving output figures, grids, and checkpoints.
+    Additionally, most stratigraphy-related operations are defined here, since
+    these operations largely occur when saving and updating the model.
+    """
 
     def run_one_timestep(self):
         """Run the timestep once.
@@ -50,8 +54,8 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         for iteration in range(self.itermax):
             self.init_water_iteration()
             self.run_water_iteration()
-            self.free_surf(iteration)
-            self.finalize_water_iteration(self.time, iteration)
+            self.compute_free_surface()
+            self.finalize_water_iteration(iteration)
 
         self.sed_route()
 
@@ -509,7 +513,7 @@ class Tools(sed_tools, water_tools, init_tools, debug_tools, object):
         # advance _time_iter since this is before update step fully finishes
         _time_iter = self._time_iter + int(1)
         # get rng state
-        rng_state = get_random_state()
+        rng_state = shared_tools.get_random_state()
 
         np.savez_compressed(ckp_file, time=self.time, H_SL=self.H_SL,
                             time_iter=_time_iter,

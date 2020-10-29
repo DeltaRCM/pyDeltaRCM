@@ -3,13 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import mpl_toolkits.axes_grid1 as axtk
+import abc
 
 from . import shared_tools
 
 # tools for water routing algorithms
 
 
-class debug_tools(object):
+class debug_tools(abc.ABC):
     """Debugging tools.
 
     These tools can be invoked as part of a script during runtime or in a

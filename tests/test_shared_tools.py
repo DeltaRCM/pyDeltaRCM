@@ -23,20 +23,6 @@ def test_set_random_assignments(test_DeltaModel):
     assert got == pytest.approx(_exp)
 
 
-def test_sand_partition(test_DeltaModel):
-    """
-    Test for function shared_tools.partition_sand
-    """
-    nx, ny, qsn = shared_tools.partition_sand(
-        test_DeltaModel.qs, 1, 4, 4, 1, 0, 1
-    )
-    assert nx == 5
-    assert ny == 4
-    assert qsn[4, 4] == 1
-    assert qsn[5, 4] == 1
-    assert np.all(qsn[qsn != 1] == 0)
-
-
 def test_get_steps():
     """
     Test for function shared_tools.get_steps
@@ -45,10 +31,11 @@ def test_get_steps():
     iwalk = shared_tools.get_iwalk()
     jwalk = shared_tools.get_jwalk()
 
-    d, i, j, a = shared_tools.get_steps(new_cells, iwalk.flatten(), jwalk.flatten())
+    d, i, j, a = shared_tools.get_steps(
+        new_cells, iwalk.flatten(), jwalk.flatten())
 
     d_exp = np.array([1.41421356, 1., 1.41421356, 1., 0.,
-             1., 1.41421356, 1., 1.41421356])
+                      1., 1.41421356, 1., 1.41421356])
     i_exp = np.array([-1,  0,  1, -1,  0,  1, -1,  0,  1])
     j_exp = np.array([-1, -1, -1,  0,  0,  0,  1,  1,  1])
 
@@ -57,38 +44,6 @@ def test_get_steps():
     assert i == pytest.approx(i_exp)
     assert j == pytest.approx(j_exp)
     assert d == pytest.approx(d_exp)
-
-
-def test_update_dirQfield(test_DeltaModel):
-    """
-    Test for function shared_tools.update_dirQfield
-    """
-    np.random.seed(test_DeltaModel.seed)
-    qx = np.random.uniform(0, 10, 9)
-    d = np.array([1, np.sqrt(2), 0])
-    astep = np.array([True, True, False])
-    inds = np.array([3, 4, 5])
-    stepdir = np.array([1, 1, 0])
-    qxn = shared_tools.update_dirQfield(np.copy(qx), d, inds, astep, stepdir)
-    qxdiff = qxn - qx
-    qxdiff_exp = np.array([1, np.sqrt(2) / 2, 0])
-    assert np.all(qxdiff[3:6] == pytest.approx(qxdiff_exp))
-
-
-def test_update_absQfield(test_DeltaModel):
-    """
-    Test for function shared_tools.update_absQfield
-    """
-    np.random.seed(test_DeltaModel.seed)
-    qw = np.random.uniform(0, 10, 9)
-    d = np.array([1, np.sqrt(2), 0])
-    astep = np.array([True, True, False])
-    inds = np.array([3, 4, 5])
-    qwn = shared_tools.update_absQfield(np.copy(qw), d, inds, astep, test_DeltaModel.Qp_water, test_DeltaModel.dx)
-    qwdiff = qwn - qw
-    diffelem = test_DeltaModel.Qp_water / test_DeltaModel.dx / 2
-    qwdiff_exp = np.array([diffelem, diffelem, 0])
-    assert np.all(qwdiff[3:6] == pytest.approx(qwdiff_exp))
 
 
 def test_random_pick():
@@ -163,37 +118,22 @@ def test_custom_unravel_exceed_error():
         x, y = shared_tools.custom_unravel(99, arr.shape)
 
 
-def test_check_for_loops():
+def test_get_weight_sfc_int(test_DeltaModel):
 
-    idxs = np.array(
-        [[0, 11, 12, 13, 23, 22, 12],
-         [0, 1, 2, 3, 4, 5, 16]])
-    nidx = np.array([21, 6])
-    itt = 6
-    free = np.array([1, 1])
-    CTR = 4
-    L0 = 1
-    looped = np.array([0, 0])
+    np.random.seed(test_DeltaModel.seed)
+    stage = np.random.uniform(0.5, 1, 9)
+    qx = 1
+    qy = 1
+    ivec = test_DeltaModel.ivec_flat
+    jvec = test_DeltaModel.jvec_flat
+    dists = test_DeltaModel.distances_flat
 
-    nidx, looped, free = shared_tools.check_for_loops(
-        idxs, nidx, itt, L0, looped, (10, 10), CTR, free)
-
-    assert np.all(nidx == [41, 6])
-    assert np.all(looped == [1, 0])
-    assert np.all(free == [-1, 1])
-
-
-def test_calculate_new_ind():
-
-    cidx = np.array([12, 16, 16])
-    ncel = np.array([6, 1, 4])
-    iwalk = shared_tools.get_iwalk()
-    jwalk = shared_tools.get_jwalk()
-
-    nidx = shared_tools.calculate_new_ind(cidx, ncel, iwalk.flatten(), jwalk.flatten(), (10, 10))
-
-    nidx_exp = np.array([21, 6, 0])
-    assert np.all(nidx == nidx_exp)
+    weight_sfc, weight_int = shared_tools.get_weight_sfc_int(stage, stage,
+                                                             qx, qy,
+                                                             ivec, jvec,
+                                                             dists)
+    assert np.all(weight_sfc == np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]))
+    assert np.all(weight_int == np.array([0, 0, 0, 0, 0, 1, 0, 1, 1]))
 
 
 def test_get_weight_at_cell(test_DeltaModel):
@@ -213,9 +153,11 @@ def test_get_weight_at_cell(test_DeltaModel):
     dry_thresh = 0.1
     gamma = 0.001962
     theta = 1
+    weight_sfc = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float64)
+    weight_int = np.array([0, 0, 0, 0, 0, 1, 0, 1, 1], dtype=np.float64)
 
-    wts = shared_tools.get_weight_at_cell(ind, stage, depth, celltype, stage, qx, qy,
-                           ivec, jvec, dists, dry_thresh, gamma, theta)
+    wts = shared_tools.get_weight_at_cell(ind, weight_sfc, weight_int, depth,
+                                          celltype, dry_thresh, gamma, theta)
     assert np.all(wts[[0, 1, 2, 5]] == 0)
     assert wts[4] == 0
     assert np.any(wts[[3, 6, 7, 8]] != 0)
