@@ -248,7 +248,8 @@ def test_logger_has_initialization_lines(tmp_path):
         assert 'Generating netCDF file for output grids' in _lines
         assert 'Output netCDF file created' in _lines
         assert 'Model initialization complete' in _lines
-    assert not os.path.isfile(os.path.join(tmp_path, 'out_dir', 'discharge_0.0.png'))
+    assert not os.path.isfile(os.path.join(
+        tmp_path, 'out_dir', 'discharge_0.0.png'))
     assert not os.path.isfile(os.path.join(tmp_path, 'out_dir', 'eta_0.0.png'))
 
 
@@ -429,7 +430,7 @@ def test_save_one_fig_one_grid(tmp_path):
         _delta.update()
     nc_size_middle = os.path.getsize(exp_path_nc)
     assert _delta.time_iter == 2.0
-    assert nc_size_middle == nc_size_before
+    assert nc_size_middle > nc_size_before
 
     # now finalize, and then file size should increase
     _delta.finalize()
@@ -505,6 +506,7 @@ def test_save_all_figures_sequential_false(tmp_path):
     utilities.write_parameter_to_file(f, 'save_velocity_figs', True)
     utilities.write_parameter_to_file(f, 'save_stage_figs', True)
     utilities.write_parameter_to_file(f, 'save_depth_figs', True)
+    utilities.write_parameter_to_file(f, 'save_sedflux_figs', True)
     utilities.write_parameter_to_file(f, 'save_figs_sequential', False)
     utilities.write_parameter_to_file(f, 'save_dt', 1)
     utilities.write_parameter_to_file(f, 'save_strata', False)
@@ -519,10 +521,16 @@ def test_save_all_figures_sequential_false(tmp_path):
     exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
     exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'depth_00000.png')
     exp_path_png0_latest = os.path.join(tmp_path / 'out_dir', 'eta_latest.png')
-    exp_path_png1_latest = os.path.join(tmp_path / 'out_dir', 'depth_latest.png')
-    exp_path_png2_latest = os.path.join(tmp_path / 'out_dir', 'stage_latest.png')
-    exp_path_png3_latest = os.path.join(tmp_path / 'out_dir', 'velocity_latest.png')
-    exp_path_png4_latest = os.path.join(tmp_path / 'out_dir', 'discharge_latest.png')
+    exp_path_png1_latest = os.path.join(
+        tmp_path / 'out_dir', 'depth_latest.png')
+    exp_path_png2_latest = os.path.join(
+        tmp_path / 'out_dir', 'stage_latest.png')
+    exp_path_png3_latest = os.path.join(
+        tmp_path / 'out_dir', 'velocity_latest.png')
+    exp_path_png4_latest = os.path.join(
+        tmp_path / 'out_dir', 'discharge_latest.png')
+    exp_path_png5_latest = os.path.join(
+        tmp_path / 'out_dir', 'sedflux_latest.png')
     assert not os.path.isfile(exp_path_png0)
     assert not os.path.isfile(exp_path_png1)
     assert os.path.isfile(exp_path_png0_latest)
@@ -530,6 +538,7 @@ def test_save_all_figures_sequential_false(tmp_path):
     assert os.path.isfile(exp_path_png2_latest)
     assert os.path.isfile(exp_path_png3_latest)
     assert os.path.isfile(exp_path_png4_latest)
+    assert os.path.isfile(exp_path_png5_latest)
 
 
 def test_save_metadata_no_grids(tmp_path):
@@ -627,6 +636,7 @@ def test_save_eta_grids(tmp_path):
     _arr = ds.variables['eta']
     assert _arr.shape[1] == _delta.eta.shape[0]
     assert _arr.shape[2] == _delta.eta.shape[1]
+    assert not ('meta' in ds.groups)
 
 
 def test_save_depth_grids(tmp_path):
@@ -658,6 +668,7 @@ def test_save_depth_grids(tmp_path):
     _arr = ds.variables['depth']
     assert _arr.shape[1] == _delta.depth.shape[0]
     assert _arr.shape[2] == _delta.depth.shape[1]
+    assert not ('meta' in ds.groups)
 
 
 def test_save_velocity_grids(tmp_path):
@@ -689,6 +700,7 @@ def test_save_velocity_grids(tmp_path):
     _arr = ds.variables['velocity']
     assert _arr.shape[1] == _delta.eta.shape[0]
     assert _arr.shape[2] == _delta.eta.shape[1]
+    assert not ('meta' in ds.groups)
 
 
 def test_save_stage_grids(tmp_path):
@@ -720,6 +732,7 @@ def test_save_stage_grids(tmp_path):
     _arr = ds.variables['stage']
     assert _arr.shape[1] == _delta.eta.shape[0]
     assert _arr.shape[2] == _delta.eta.shape[1]
+    assert not ('meta' in ds.groups)
 
 
 def test_save_discharge_grids(tmp_path):
@@ -782,4 +795,3 @@ def test_save_sedflux_grids(tmp_path):
     _arr = ds.variables['sedflux']
     assert _arr.shape[1] == _delta.eta.shape[0]
     assert _arr.shape[2] == _delta.eta.shape[1]
-
