@@ -5,6 +5,7 @@ import warnings
 
 import numpy as np
 import matplotlib.pyplot as plt
+import mpl_toolkits.axes_grid1 as axtk
 
 from scipy.sparse import lil_matrix, csc_matrix, hstack
 
@@ -418,10 +419,17 @@ class iteration_tools(abc.ABC):
         _data = getattr(self, var)
 
         fig, ax = plt.subplots()
-        pc = ax.pcolor(_data)
-        fig.colorbar(pc)
-        ax.set_title(var + ' --- ' + 'time = ' + str(round(timestep, 2)))
-        ax.axis('equal')
+        im = ax.pcolormesh(self.X, self.Y, _data, shading='flat')
+        ax.set_xlim((0, self.Width))
+        ax.set_ylim((0, self.Length))
+        ax.set_aspect('equal', adjustable='box')
+        divider = axtk.axes_divider.make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="2%", pad=0.05)
+        cb = plt.colorbar(im, cax=cax)
+        cb.ax.tick_params(labelsize=7)
+        ax.use_sticky_edges = False
+        ax.margins(y=0.2)
+        ax.set_title(var+'\ntime: '+str(timestep), fontsize=10)
 
         return fig
 
