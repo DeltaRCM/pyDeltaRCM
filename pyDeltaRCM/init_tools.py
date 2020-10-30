@@ -513,7 +513,7 @@ class init_tools(abc.ABC):
                 _v[:] = varvalue
 
             if self.save_metadata:
-                meta = self.output_netcdf.createGroup('meta')
+                self.output_netcdf.createGroup('meta')
                 # fixed metadata
                 _create_meta_variable('L0', self.L0, 'cells')
                 _create_meta_variable('N0', self.N0, 'cells')
