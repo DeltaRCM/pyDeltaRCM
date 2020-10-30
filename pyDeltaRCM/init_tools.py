@@ -512,22 +512,23 @@ class init_tools(abc.ABC):
                 _v.units = varunits
                 _v[:] = varvalue
 
-            meta = self.output_netcdf.createGroup('meta')
-            # fixed metadata
-            _create_meta_variable('L0', self.L0, 'cells')
-            _create_meta_variable('N0', self.N0, 'cells')
-            _create_meta_variable('CTR', self.CTR, 'cells')
-            _create_meta_variable('dx', self.dx, 'meters')
-            _create_meta_variable('h0', self.h0, 'meters')
-            # time-varying metadata
-            _create_meta_variable('H_SL', None, 'meters',
-                                  vardims=('total_time'))
-            _create_meta_variable('f_bedload', None, 'fraction',
-                                  vardims=('total_time'))
-            _create_meta_variable('C0_percent', None, 'percent',
-                                  vardims=('total_time'))
-            _create_meta_variable('u0', None, 'meters per second',
-                                  vardims=('total_time'))
+            if self.save_metadata:
+                meta = self.output_netcdf.createGroup('meta')
+                # fixed metadata
+                _create_meta_variable('L0', self.L0, 'cells')
+                _create_meta_variable('N0', self.N0, 'cells')
+                _create_meta_variable('CTR', self.CTR, 'cells')
+                _create_meta_variable('dx', self.dx, 'meters')
+                _create_meta_variable('h0', self.h0, 'meters')
+                # time-varying metadata
+                _create_meta_variable('H_SL', None, 'meters',
+                                      vardims=('total_time'))
+                _create_meta_variable('f_bedload', None, 'fraction',
+                                      vardims=('total_time'))
+                _create_meta_variable('C0_percent', None, 'percent',
+                                      vardims=('total_time'))
+                _create_meta_variable('u0', None, 'meters per second',
+                                      vardims=('total_time'))
 
             _msg = 'Output netCDF file created'
             self.logger.info(_msg)
