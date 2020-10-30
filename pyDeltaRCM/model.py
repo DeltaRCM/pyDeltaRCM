@@ -66,13 +66,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.init_output_infrastructure()
         self.init_logger()
 
-        self.create_other_variables()
-
+        self.process_input_to_model()
         self.determine_random_seed()
+
+        self.create_other_variables()
         self.create_domain()
 
         self.init_sediment_routers()
-
         self.init_subsidence()
 
         # if resume flag set to True, load checkpoint, open netCDF4
@@ -83,7 +83,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         else:
             self.init_stratigraphy()
-            self.init_output_grids()
+            self.init_output_file()
 
         self.logger.info('Model initialization complete')
 

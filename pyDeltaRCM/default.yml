@@ -81,10 +81,13 @@ save_velocity_figs:
   default: False
 save_sedflux_figs:
   type: 'bool'
-  default: True
+  default: False
 save_figs_sequential:
   type: 'bool'
   default: True
+save_metadata:
+  type: 'bool'
+  default: False
 save_eta_grids:
   type: 'bool'
   default: False
