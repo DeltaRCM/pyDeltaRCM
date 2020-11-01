@@ -534,18 +534,28 @@ class init_tools(abc.ABC):
                 print(_msg)
 
     def init_subsidence(self):
-        """
+        """Initialize subsidence pattern.
+
         Initializes patterns of subsidence if
         toggle_subsidence is True (default False)
 
-        Modify the equations for self.subsidence_mask and self.sigma as desired
+        Uses theta1 and theta2 (defined in yaml) to set the angular bounds for
+        the subsiding region. To create a custom subsidence region, we
+        recommend subclassing the DeltaModel class and defining your own array
+        for self.subsidence_mask (a binary array with 1s in the cells that
+        are subsiding and 0s elswhere), and self.sigma (the subsidence mask
+        multiplied with the vertical rate of subsidence and the timestep size).
+
+        theta1 and theta2 are set in relation to the inlet orientation. The
+        inlet channel is at an angle of 0, if theta1 is -pi/3 radians, this
+        means that the angle to the left of the inlet that will be included
+        in the subsiding region is 30 degrees. theta2 defines the right angular
+        bounds for the subsiding region in a similar fashion.
         """
         if self.toggle_subsidence:
 
             R1 = 0.3 * self.L
             R2 = 1. * self.L  # radial limits (fractions of L)
-            theta1 = -pi / 3
-            theta2 = pi / 3.   # angular limits
 
             Rloc = np.sqrt((self.y - self.L0)**2 + (self.x - self.W / 2.)**2)
 
@@ -554,7 +564,8 @@ class init_tools(abc.ABC):
                 (self.x[self.y > self.L0 - 1] - self.W / 2.)
                 / (self.y[self.y > self.L0 - 1] - self.L0 + 1))
             self.subsidence_mask = ((R1 <= Rloc) & (Rloc <= R2) &
-                                    (theta1 <= thetaloc) & (thetaloc <= theta2))
+                                    (self.theta1 <= thetaloc) &
+                                    (thetaloc <= self.theta2))
             self.subsidence_mask[:self.L0, :] = False
 
             self.sigma = self.subsidence_mask * self.sigma_max * self.dt
