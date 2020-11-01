@@ -58,6 +58,12 @@ Csmooth:
 toggle_subsidence:
   type: 'bool'
   default: False
+theta1:
+  type: ['float', 'int']
+  default: -1.0471975511965976
+theta2:
+  type: ['float', 'int']
+  default: 1.0471975511965976
 sigma_max:
   type: ['float', 'int']
   default: 2e-9
