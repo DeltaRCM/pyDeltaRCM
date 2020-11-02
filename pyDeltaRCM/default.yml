@@ -79,9 +79,15 @@ save_discharge_figs:
 save_velocity_figs:
   type: 'bool'
   default: False
+save_sedflux_figs:
+  type: 'bool'
+  default: False
 save_figs_sequential:
   type: 'bool'
   default: True
+save_metadata:
+  type: 'bool'
+  default: False
 save_eta_grids:
   type: 'bool'
   default: False
@@ -95,6 +101,9 @@ save_discharge_grids:
   type: 'bool'
   default: False
 save_velocity_grids:
+  type: 'bool'
+  default: False
+save_sedflux_grids:
   type: 'bool'
   default: False
 save_dt:

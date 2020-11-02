@@ -233,6 +233,11 @@ class iteration_tools(abc.ABC):
         -------
 
         """
+        save_idx = self.save_iter
+
+        if (self._save_metadata or self._save_any_grids):
+            self.output_netcdf.variables['time'][save_idx] = self.time
+
         # ------------------ Figures ------------------
         if self._save_any_figs:
 
@@ -271,11 +276,14 @@ class iteration_tools(abc.ABC):
                                  filename_root='velocity_',
                                  timestep=self.save_iter)
 
+            if self.save_sedflux_figs:
+                _fu = self.make_figure('qs', self.time)
+                self.save_figure(_fu, directory=self.prefix,
+                                 filename_root='sedflux_',
+                                 timestep=self.save_iter)
+
         # ------------------ grids ------------------
         if self._save_any_grids:
-
-            shape = self.output_netcdf.variables['time'].shape
-            self.output_netcdf.variables['time'][shape[0]] = self.time
 
             _msg = 'Saving grids'
             self.logger.info(_msg)
@@ -283,19 +291,29 @@ class iteration_tools(abc.ABC):
                 print(_msg)
 
             if self.save_eta_grids:
-                self.save_grids('eta', self.eta, shape[0])
+                self.save_grids('eta', self.eta, save_idx)
 
             if self.save_depth_grids:
-                self.save_grids('depth', self.depth, shape[0])
+                self.save_grids('depth', self.depth, save_idx)
 
             if self.save_stage_grids:
-                self.save_grids('stage', self.stage, shape[0])
+                self.save_grids('stage', self.stage, save_idx)
 
             if self.save_discharge_grids:
-                self.save_grids('discharge', self.qw, shape[0])
+                self.save_grids('discharge', self.qw, save_idx)
 
             if self.save_velocity_grids:
-                self.save_grids('velocity', self.uw, shape[0])
+                self.save_grids('velocity', self.uw, save_idx)
+
+            if self.save_sedflux_grids:
+                self.save_grids('sedflux', self.qs, save_idx)
+
+        # ------------------ metadata ------------------
+        if self._save_metadata:
+            self.output_netcdf['meta']['H_SL'][save_idx] = self.H_SL
+            self.output_netcdf['meta']['f_bedload'][save_idx] = self.H_SL
+            self.output_netcdf['meta']['C0_percent'][save_idx] = self.H_SL
+            self.output_netcdf['meta']['u0'][save_idx] = self.H_SL
 
     def output_checkpoint(self):
         """Save checkpoint.
@@ -368,7 +386,7 @@ class iteration_tools(abc.ABC):
             strata_age = self.output_netcdf.createVariable('strata_age',
                                                            np.int32,
                                                            ('total_strata_age'))
-            strata_age.units = 'seconds'
+            strata_age.units = 'second'
             self.output_netcdf.variables['strata_age'][
                 :] = list(range(shape[1] - 1, -1, -1))
 

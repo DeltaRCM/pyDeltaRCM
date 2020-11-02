@@ -66,13 +66,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.init_output_infrastructure()
         self.init_logger()
 
-        self.process_input_to_model()
-        self.determine_random_seed()
-
         self.create_other_variables()
+
+        self.determine_random_seed()
         self.create_domain()
 
         self.init_sediment_routers()
+
         self.init_subsidence()
 
         # if resume flag set to True, load checkpoint, open netCDF4
@@ -83,9 +83,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         else:
             self.init_stratigraphy()
-            self.init_output_file()
+            self.init_output_grids()
+
+        self.after_init()
 
         self.logger.info('Model initialization complete')
+
+    def after_init(self):
+        pass
 
     def update(self):
         """Run the model for one full instance
@@ -162,6 +167,19 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             pass
 
         self._is_finalized = True
+
+    @property
+    def out_dir(self):
+        """
+        Description of out_dir ... 
+
+        Must be a string.
+        """
+        return self._out_dir
+
+    @out_dir.setter
+    def out_dir(self, out_dir):
+        self._out_dir = out_dir
 
     @property
     def time(self):
