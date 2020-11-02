@@ -36,6 +36,7 @@ class init_tools(abc.ABC):
 
     def init_logger(self):
         """Initialize a logger.
+
         The logger is initialized regardless of the value of ``self.verbose``.
         The level of information printed to the log depends on the verbosity
         setting.
@@ -114,16 +115,46 @@ class init_tools(abc.ABC):
             else:
                 input_file_vars[k] = default_dict[k]['default']
 
-        # now make each one an attribute of the model object.
-        for k, v in list(input_file_vars.items()):
+        # save the input file as a hidden attr and grab needed value
+        self._input_file_vars = input_file_vars
+        self.out_dir = self._input_file_vars['out_dir']
+        self.verbose = self._input_file_vars['verbose']
+
+    def process_input_to_model(self):
+        """Process input file to model variables.
+
+        Loop through the items specified in the model configuration and apply
+        them to the model (i.e., ``self``). Additionally, write the input
+        values specified into the log file.
+
+        .. note::
+
+            If ``self.resume_checkpoint == True``, then the input values are
+            *not* written to the log.
+        """
+        _msg = 'Setting up model configuration'
+        self.logger.info(_msg)
+        if self.verbose >= 2:
+            print(_msg)
+
+        # process the input file to attributes of the model
+        for k, v in list(self._input_file_vars.items()):
             setattr(self, k, v)
 
-        # if checkpoint_dt is the default value, None, then set it to save_dt
+        # if checkpoint_dt is the default value (None), then set it to save_dt
         if self.checkpoint_dt is None:
             self.checkpoint_dt = self.save_dt
 
+        # handle a not implemented setup
         if self.save_checkpoint and self.toggle_subsidence:
             raise NotImplementedError('Cannot handle checkpointing with subsidence.')
+
+        # write the input file values to the log
+        if not self.resume_checkpoint:
+            for k, v in list(self._input_file_vars.items()):
+                _msg = 'Configuration variable `{var}`: {val}'.format(
+                    var=k, val=v)
+                self.logger.info(_msg)
 
     def determine_random_seed(self):
         """Set the random seed if given.
@@ -151,34 +182,23 @@ class init_tools(abc.ABC):
         self.logger.info('Setting model constants')
 
         self.g = 9.81   # (gravitation const.)
-
         sqrt2 = np.sqrt(2)
+        sqrt05 = np.sqrt(0.5)
+
         self.distances = np.array([[sqrt2, 1, sqrt2],
                                    [1, 1, 1],
                                    [sqrt2, 1, sqrt2]]).astype(np.float32)
-
-        sqrt05 = np.sqrt(0.5)
         self.ivec = np.array([[-sqrt05, 0, sqrt05],
                               [-1, 0, 1],
                               [-sqrt05, 0, sqrt05]]).astype(np.float32)
-
-        self.iwalk = shared_tools.get_iwalk()
-
         self.jvec = np.array([[-sqrt05, -1, -sqrt05],
                               [0, 0, 0],
                               [sqrt05, 1, sqrt05]]).astype(np.float32)
-
+        self.iwalk = shared_tools.get_iwalk()
         self.jwalk = shared_tools.get_jwalk()
-        # self.dxn_iwalk = [1, 1, 0, -1, -1, -1, 0, 1]
-        # self.dxn_jwalk = [0, 1, 1, 1, 0, -1, -1, -1]
-        # self.dxn_dist = \
-        #     [sqrt(self.dxn_iwalk[i]**2 + self.dxn_jwalk[i]**2)
-        #      for i in range(8)]
-
         self.dxn_iwalk = np.array([1, 1, 0, -1, -1, -1, 0, 1], dtype=np.int64)
         self.dxn_jwalk = np.array([0, 1, 1, 1, 0, -1, -1, -1], dtype=np.int64)
         self.dxn_dist = np.sqrt(self.dxn_iwalk**2 + self.dxn_jwalk**2)
-
         self.walk_flat = np.array([1, -self.W + 1, -self.W, -self.W - 1,
                                    -1, self.W - 1, self.W, self.W + 1])
         self.distances_flat = self.distances.flatten()
@@ -270,11 +290,14 @@ class init_tools(abc.ABC):
 
         self._save_any_grids = (self.save_eta_grids or self.save_depth_grids or
                                 self.save_stage_grids or self.save_discharge_grids or
-                                self.save_velocity_grids)
+                                self.save_velocity_grids or self.save_sedflux_grids)
         self._save_any_figs = (self.save_eta_figs or self.save_depth_figs or
                                self.save_stage_figs or self.save_discharge_figs or
-                               self.save_velocity_figs)
+                               self.save_velocity_figs or self.save_sedflux_figs)
         self._save_figs_sequential = self.save_figs_sequential  # copy as private
+        self._save_metadata = self.save_metadata
+        if self._save_any_grids:  # always save metadata if saving grids
+            self._save_metadata = True
         self._is_finalized = False
 
         self._save_checkpoint = self.save_checkpoint  # copy as private
@@ -398,7 +421,7 @@ class init_tools(abc.ABC):
             self.strata_eta = lil_matrix((self.L * self.W, self.n_steps),
                                          dtype=np.float32)
 
-    def init_output_grids(self):
+    def init_output_file(self):
         """Creates a netCDF file to store output grids.
 
         Fills with default variables.
@@ -406,11 +429,8 @@ class init_tools(abc.ABC):
         .. warning:: Overwrites an existing netcdf file with the same name.
 
         """
-        if (self.save_eta_grids or
-                self.save_depth_grids or
-                self.save_stage_grids or
-                self.save_discharge_grids or
-                self.save_velocity_grids or
+        if (self._save_metadata or
+                self._save_any_grids or
                 self.save_strata):
 
             _msg = 'Generating netCDF file for output grids'
@@ -430,17 +450,19 @@ class init_tools(abc.ABC):
                 os.remove(file_path)
 
             self.output_netcdf = Dataset(file_path, 'w',
-                                         format='NETCDF4_CLASSIC')
+                                         format='NETCDF4')
 
-            self.output_netcdf.description = 'Output grids from pyDeltaRCM'
+            self.output_netcdf.description = 'Output from pyDeltaRCM'
             self.output_netcdf.history = ('Created '
                                           + time_lib.ctime(time_lib.time()))
-            self.output_netcdf.source = 'pyDeltaRCM / CSDMS'
+            self.output_netcdf.source = 'pyDeltaRCM'
 
+            # create master dimensions
             length = self.output_netcdf.createDimension('length', self.L)
             width = self.output_netcdf.createDimension('width', self.W)
             total_time = self.output_netcdf.createDimension('total_time', None)
 
+            # create master coordinates (as netCDF variables)
             x = self.output_netcdf.createVariable(
                 'x', 'f4', ('length', 'width'))
             y = self.output_netcdf.createVariable(
@@ -449,40 +471,60 @@ class init_tools(abc.ABC):
                                                      ('total_time',))
             x.units = 'meters'
             y.units = 'meters'
-            time.units = 'seconds'
-
+            time.units = 'second'
             x[:] = self.x
             y[:] = self.y
 
+            # set up variables for output data grids
             if self.save_eta_grids:
-                eta = self.output_netcdf.createVariable('eta',
-                                                        'f4',
-                                                        ('total_time', 'length', 'width'))
+                eta = self.output_netcdf.createVariable(
+                    'eta', 'f4', ('total_time', 'length', 'width'))
                 eta.units = 'meters'
-
             if self.save_stage_grids:
-                stage = self.output_netcdf.createVariable('stage',
-                                                          'f4',
-                                                          ('total_time', 'length', 'width'))
+                stage = self.output_netcdf.createVariable(
+                    'stage', 'f4', ('total_time', 'length', 'width'))
                 stage.units = 'meters'
-
             if self.save_depth_grids:
-                depth = self.output_netcdf.createVariable('depth',
-                                                          'f4',
-                                                          ('total_time', 'length', 'width'))
+                depth = self.output_netcdf.createVariable(
+                    'depth', 'f4', ('total_time', 'length', 'width'))
                 depth.units = 'meters'
-
             if self.save_discharge_grids:
-                discharge = self.output_netcdf.createVariable('discharge',
-                                                              'f4',
-                                                              ('total_time', 'length', 'width'))
+                discharge = self.output_netcdf.createVariable(
+                    'discharge', 'f4', ('total_time', 'length', 'width'))
                 discharge.units = 'cubic meters per second'
-
             if self.save_velocity_grids:
-                velocity = self.output_netcdf.createVariable('velocity',
-                                                             'f4',
-                                                             ('total_time', 'length', 'width'))
+                velocity = self.output_netcdf.createVariable(
+                    'velocity', 'f4', ('total_time', 'length', 'width'))
                 velocity.units = 'meters per second'
+            if self.save_sedflux_grids:
+                sedflux = self.output_netcdf.createVariable(
+                    'sedflux', 'f4', ('total_time', 'length', 'width'))
+                sedflux.units = 'cubic meters per second'
+
+            # set up metadata group and populate variables
+            def _create_meta_variable(varname, varvalue, varunits,
+                                      vartype='f4', vardims=()):
+                _v = self.output_netcdf.createVariable(
+                    'meta/'+varname, vartype, vardims)
+                _v.units = varunits
+                _v[:] = varvalue
+
+            self.output_netcdf.createGroup('meta')
+            # fixed metadata
+            _create_meta_variable('L0', self.L0, 'cells')
+            _create_meta_variable('N0', self.N0, 'cells')
+            _create_meta_variable('CTR', self.CTR, 'cells')
+            _create_meta_variable('dx', self.dx, 'meters')
+            _create_meta_variable('h0', self.h0, 'meters')
+            # time-varying metadata
+            _create_meta_variable('H_SL', None, 'meters',
+                                  vardims=('total_time'))
+            _create_meta_variable('f_bedload', None, 'fraction',
+                                  vardims=('total_time'))
+            _create_meta_variable('C0_percent', None, 'percent',
+                                  vardims=('total_time'))
+            _create_meta_variable('u0', None, 'meters per second',
+                                  vardims=('total_time'))
 
             _msg = 'Output netCDF file created'
             self.logger.info(_msg)
