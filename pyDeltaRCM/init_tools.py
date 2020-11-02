@@ -288,7 +288,6 @@ class init_tools(abc.ABC):
         self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha
                                      * 0.5 / self.dx**2)
 
-        self._save_metadata = self.save_metadata
         self._save_any_grids = (self.save_eta_grids or self.save_depth_grids or
                                 self.save_stage_grids or self.save_discharge_grids or
                                 self.save_velocity_grids or self.save_sedflux_grids)
@@ -296,6 +295,9 @@ class init_tools(abc.ABC):
                                self.save_stage_figs or self.save_discharge_figs or
                                self.save_velocity_figs or self.save_sedflux_figs)
         self._save_figs_sequential = self.save_figs_sequential  # copy as private
+        self._save_metadata = self.save_metadata
+        if self._save_any_grids:  # always save metadata if saving grids
+            self._save_metadata = True
         self._is_finalized = False
 
         self._save_checkpoint = self.save_checkpoint  # copy as private
@@ -427,13 +429,8 @@ class init_tools(abc.ABC):
         .. warning:: Overwrites an existing netcdf file with the same name.
 
         """
-        if (self.save_metadata or
-                self.save_eta_grids or
-                self.save_depth_grids or
-                self.save_stage_grids or
-                self.save_discharge_grids or
-                self.save_velocity_grids or
-                self.save_sedflux_grids or
+        if (self._save_metadata or
+                self._save_any_grids or
                 self.save_strata):
 
             _msg = 'Generating netCDF file for output grids'
@@ -512,23 +509,22 @@ class init_tools(abc.ABC):
                 _v.units = varunits
                 _v[:] = varvalue
 
-            if self.save_metadata:
-                self.output_netcdf.createGroup('meta')
-                # fixed metadata
-                _create_meta_variable('L0', self.L0, 'cells')
-                _create_meta_variable('N0', self.N0, 'cells')
-                _create_meta_variable('CTR', self.CTR, 'cells')
-                _create_meta_variable('dx', self.dx, 'meters')
-                _create_meta_variable('h0', self.h0, 'meters')
-                # time-varying metadata
-                _create_meta_variable('H_SL', None, 'meters',
-                                      vardims=('total_time'))
-                _create_meta_variable('f_bedload', None, 'fraction',
-                                      vardims=('total_time'))
-                _create_meta_variable('C0_percent', None, 'percent',
-                                      vardims=('total_time'))
-                _create_meta_variable('u0', None, 'meters per second',
-                                      vardims=('total_time'))
+            self.output_netcdf.createGroup('meta')
+            # fixed metadata
+            _create_meta_variable('L0', self.L0, 'cells')
+            _create_meta_variable('N0', self.N0, 'cells')
+            _create_meta_variable('CTR', self.CTR, 'cells')
+            _create_meta_variable('dx', self.dx, 'meters')
+            _create_meta_variable('h0', self.h0, 'meters')
+            # time-varying metadata
+            _create_meta_variable('H_SL', None, 'meters',
+                                  vardims=('total_time'))
+            _create_meta_variable('f_bedload', None, 'fraction',
+                                  vardims=('total_time'))
+            _create_meta_variable('C0_percent', None, 'percent',
+                                  vardims=('total_time'))
+            _create_meta_variable('u0', None, 'meters per second',
+                                  vardims=('total_time'))
 
             _msg = 'Output netCDF file created'
             self.logger.info(_msg)

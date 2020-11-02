@@ -430,7 +430,7 @@ def test_save_one_fig_one_grid(tmp_path):
         _delta.update()
     nc_size_middle = os.path.getsize(exp_path_nc)
     assert _delta.time_iter == 2.0
-    assert nc_size_middle > nc_size_before
+    assert nc_size_middle == nc_size_before
 
     # now finalize, and then file size should increase
     _delta.finalize()
@@ -607,6 +607,40 @@ def test_save_metadata_and_grids(tmp_path):
     assert ds['meta']['L0'][:] == 1
 
 
+def test_save_one_grid_metadata_by_default(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'itermax', 1)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'save_eta_grids', True)
+    utilities.write_parameter_to_file(f, 'save_metadata', False)
+    utilities.write_parameter_to_file(f, 'save_dt', 1)
+    f.close()
+
+    _delta = DeltaModel(input_file=p)
+    exp_path_nc = os.path.join(tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc)
+
+    for _ in range(0, 6):
+        _delta.update()
+    assert _delta.time_iter == 6.0
+    _delta.finalize()
+
+    ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+    _arr = ds.variables['eta']
+    assert _arr.shape[1] == _delta.eta.shape[0]
+    assert _arr.shape[2] == _delta.eta.shape[1]
+    assert ('meta' in ds.groups)  # if any grids, save meta too
+    assert ds.groups['meta']['H_SL'].shape[0] == _arr.shape[0]
+
+
 def test_save_eta_grids(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
@@ -636,7 +670,7 @@ def test_save_eta_grids(tmp_path):
     _arr = ds.variables['eta']
     assert _arr.shape[1] == _delta.eta.shape[0]
     assert _arr.shape[2] == _delta.eta.shape[1]
-    assert not ('meta' in ds.groups)
+    assert ('meta' in ds.groups)  # if any grids, save meta too
 
 
 def test_save_depth_grids(tmp_path):
@@ -668,7 +702,7 @@ def test_save_depth_grids(tmp_path):
     _arr = ds.variables['depth']
     assert _arr.shape[1] == _delta.depth.shape[0]
     assert _arr.shape[2] == _delta.depth.shape[1]
-    assert not ('meta' in ds.groups)
+    assert ('meta' in ds.groups)  # if any grids, save meta too
 
 
 def test_save_velocity_grids(tmp_path):
@@ -700,7 +734,7 @@ def test_save_velocity_grids(tmp_path):
     _arr = ds.variables['velocity']
     assert _arr.shape[1] == _delta.eta.shape[0]
     assert _arr.shape[2] == _delta.eta.shape[1]
-    assert not ('meta' in ds.groups)
+    assert ('meta' in ds.groups)  # if any grids, save meta too
 
 
 def test_save_stage_grids(tmp_path):
@@ -732,7 +766,7 @@ def test_save_stage_grids(tmp_path):
     _arr = ds.variables['stage']
     assert _arr.shape[1] == _delta.eta.shape[0]
     assert _arr.shape[2] == _delta.eta.shape[1]
-    assert not ('meta' in ds.groups)
+    assert ('meta' in ds.groups)  # if any grids, save meta too
 
 
 def test_save_discharge_grids(tmp_path):
@@ -764,6 +798,7 @@ def test_save_discharge_grids(tmp_path):
     _arr = ds.variables['discharge']
     assert _arr.shape[1] == _delta.eta.shape[0]
     assert _arr.shape[2] == _delta.eta.shape[1]
+    assert ('meta' in ds.groups)  # if any grids, save meta too
 
 
 def test_save_sedflux_grids(tmp_path):
@@ -795,3 +830,4 @@ def test_save_sedflux_grids(tmp_path):
     _arr = ds.variables['sedflux']
     assert _arr.shape[1] == _delta.eta.shape[0]
     assert _arr.shape[2] == _delta.eta.shape[1]
+    assert ('meta' in ds.groups)  # if any grids, save meta too
