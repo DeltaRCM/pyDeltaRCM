@@ -38,10 +38,14 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.graphviz',
               'sphinx.ext.imgmath',
               'sphinx.ext.githubpages',
-              'matplotlib.sphinxext.plot_directive']
+              'matplotlib.sphinxext.plot_directive',
+              'sphinx.ext.todo']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+# toggle todo items
+todo_include_todos = True
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
