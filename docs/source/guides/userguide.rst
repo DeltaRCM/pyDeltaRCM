@@ -193,3 +193,6 @@ The ensemble expansion can be applied to configuration files that include a matr
         - 2.0
 
 The above configuration file would produce 6 model runs, 3 with a basin depth (`h0`) of 1.0, and 3 with a basin depth of 2.0.
+
+
+.. include:: subsidenceguide.rst
