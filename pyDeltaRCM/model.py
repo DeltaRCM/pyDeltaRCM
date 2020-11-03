@@ -164,6 +164,612 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._is_finalized = True
 
     @property
+    def out_dir(self):
+        """
+        Description of out_dir ...
+        Must be a string.
+        """
+        return self._out_dir
+
+    @out_dir.setter
+    def out_dir(self, out_dir):
+        self._out_dir = out_dir
+
+    @property
+    def verbose(self):
+        """
+        Desciption of verbose ...
+        """
+        return self._verbose
+
+    @verbose.setter
+    def verbose(self, verbose):
+        self._verbose = verbose
+
+    @property
+    def seed(self):
+        """
+        seed
+        """
+        return self._seed
+
+    @seed.setter
+    def seed(self, seed):
+        self._seed = seed
+
+    @property
+    def Length(self):
+        """
+        Length
+        """
+        return self._Length
+
+    @Length.setter
+    def Length(self, Length):
+        self._Length = Length
+
+    @property
+    def Width(self):
+        """
+        Width
+        """
+        return self._Width
+
+    @Width.setter
+    def Width(self, Width):
+        self._Width = Width
+
+    @property
+    def dx(self):
+        """
+        dx
+        """
+        return self._dx
+
+    @dx.setter
+    def dx(self, dx):
+        self._dx = dx
+
+    @property
+    def L0_meters(self):
+        """
+        L0 meters
+        """
+        return self._L0_meters
+
+    @L0_meters.setter
+    def L0_meters(self, L0_meters):
+        self._L0_meters = L0_meters
+
+    @property
+    def S0(self):
+        """
+        S0
+        """
+        return self._S0
+
+    @S0.setter
+    def S0(self, S0):
+        self._S0 = S0
+
+    @property
+    def itermax(self):
+        """
+        itermax
+        """
+        return self._itermax
+
+    @itermax.setter
+    def itermax(self, itermax):
+        self._itermax = itermax
+
+    @property
+    def Np_water(self):
+        """
+        np water
+        """
+        return self._Np_water
+
+    @Np_water.setter
+    def Np_water(self, Np_water):
+        self._Np_water = Np_water
+
+    @property
+    def u0(self):
+        """
+        u0
+        """
+        return self._u0
+
+    @u0.setter
+    def u0(self, u0):
+        self._u0 = u0
+
+    @property
+    def N0_meters(self):
+        """
+        N0_meters
+        """
+        return self._N0_meters
+
+    @N0_meters.setter
+    def N0_meters(self, N0_meters):
+        self._N0_meters = N0_meters
+
+    @property
+    def h0(self):
+        """
+        h0
+        """
+        return self._h0
+
+    @h0.setter
+    def h0(self, h0):
+        self._h0 = h0
+
+    @property
+    def H_SL(self):
+        """
+        H_SL
+        """
+        return self._H_SL
+
+    @H_SL.setter
+    def H_SL(self, H_SL):
+        self._H_SL = H_SL
+
+    @property
+    def SLR(self):
+        """
+        SLR
+        """
+        return self._SLR
+
+    @SLR.setter
+    def SLR(self, SLR):
+        self._SLR = SLR
+
+    @property
+    def Np_sed(self):
+        """
+        Np_sed
+        """
+        return self._Np_sed
+
+    @Np_sed.setter
+    def Np_sed(self, Np_sed):
+        self._Np_sed = Np_sed
+
+    @property
+    def f_bedload(self):
+        """
+        f_bedload
+        """
+        return self._f_bedload
+
+    @f_bedload.setter
+    def f_bedload(self, f_bedload):
+        self._f_bedload = f_bedload
+
+    @property
+    def C0_percent(self):
+        """
+        C0_percent
+        """
+        return self._C0_percent
+
+    @C0_percent.setter
+    def C0_percent(self, C0_percent):
+        self._C0_percent = C0_percent
+
+    @property
+    def Csmooth(self):
+        """
+        Csmooth
+        """
+        return self._Csmooth
+
+    @Csmooth.setter
+    def Csmooth(self, Csmooth):
+        self._Csmooth = Csmooth
+
+    @property
+    def toggle_subsidence(self):
+        """
+        toggle_subsidence
+        """
+        return self._toggle_subsidence
+
+    @toggle_subsidence.setter
+    def toggle_subsidence(self, toggle_subsidence):
+        self._toggle_subsidence = toggle_subsidence
+
+    @property
+    def theta1(self):
+        """
+        theta1
+        """
+        return self._theta1
+
+    @theta1.setter
+    def theta1(self, theta1):
+        self._theta1 = theta1
+
+    @property
+    def theta2(self):
+        """
+        theta2
+        """
+        return self._theta2
+
+    @theta2.setter
+    def theta2(self, theta2):
+        self._theta2 = theta2
+
+    @property
+    def sigma_max(self):
+        """
+        sigma_max
+        """
+        return self._sigma_max
+
+    @sigma_max.setter
+    def sigma_max(self, sigma_max):
+        self._sigma_max = sigma_max
+
+    @property
+    def start_subsidence(self):
+        """
+        start_subsidence
+        """
+        return self._start_subsidence
+
+    @start_subsidence.setter
+    def start_subsidence(self, start_subsidence):
+        self._start_subsidence = start_subsidence
+
+    @property
+    def save_eta_figs(self):
+        """
+        save_eta_figs
+        """
+        return self._save_eta_figs
+
+    @save_eta_figs.setter
+    def save_eta_figs(self, save_eta_figs):
+        self._save_eta_figs = save_eta_figs
+
+    @property
+    def save_stage_figs(self):
+        """
+        save_stage_figs
+        """
+        return self._save_stage_figs
+
+    @save_stage_figs.setter
+    def save_stage_figs(self, save_stage_figs):
+        self._save_stage_figs = save_stage_figs
+
+    @property
+    def save_depth_figs(self):
+        """
+        save_depth_figs
+        """
+        return self._save_depth_figs
+
+    @save_depth_figs.setter
+    def save_depth_figs(self, save_depth_figs):
+        self._save_depth_figs = save_depth_figs
+
+    @property
+    def save_discharge_figs(self):
+        """
+        save_discharge_figs
+        """
+        return self._save_discharge_figs
+
+    @save_discharge_figs.setter
+    def save_discharge_figs(self, save_discharge_figs):
+        self._save_discharge_figs = save_discharge_figs
+
+    @property
+    def save_velocity_figs(self):
+        """
+        save_velocity_figs
+        """
+        return self._save_velocity_figs
+
+    @save_velocity_figs.setter
+    def save_velocity_figs(self, save_velocity_figs):
+        self._save_velocity_figs = save_velocity_figs
+
+    @property
+    def save_sedflux_figs(self):
+        """
+        save_sedflux_figs
+        """
+        return self._save_sedflux_figs
+
+    @save_sedflux_figs.setter
+    def save_sedflux_figs(self, save_sedflux_figs):
+        self._save_sedflux_figs = save_sedflux_figs
+
+    @property
+    def save_figs_sequential(self):
+        """
+        save_figs_sequential
+        """
+        return self._save_figs_sequential
+
+    @save_figs_sequential.setter
+    def save_figs_sequential(self, save_figs_sequential):
+        self._save_figs_sequential = save_figs_sequential
+
+    @property
+    def save_metadata(self):
+        """
+        save_metadata
+        """
+        return self._save_metadata
+
+    @save_metadata.setter
+    def save_metadata(self, save_metadata):
+        self._save_metadata = save_metadata
+
+    @property
+    def save_eta_grids(self):
+        """
+        save_eta_grids
+        """
+        return self._save_eta_grids
+
+    @save_eta_grids.setter
+    def save_eta_grids(self, save_eta_grids):
+        self._save_eta_grids = save_eta_grids
+
+    @property
+    def save_stage_grids(self):
+        """
+        save_stage_grids
+        """
+        return self._save_stage_grids
+
+    @save_stage_grids.setter
+    def save_stage_grids(self, save_stage_grids):
+        self._save_stage_grids = save_stage_grids
+
+    @property
+    def save_depth_grids(self):
+        """
+        save_depth_grids
+        """
+        return self._save_depth_grids
+
+    @save_depth_grids.setter
+    def save_depth_grids(self, save_depth_grids):
+        self._save_depth_grids = save_depth_grids
+
+    @property
+    def save_discharge_grids(self):
+        """
+        save_discharge_grids
+        """
+        return self._save_discharge_grids
+
+    @save_discharge_grids.setter
+    def save_discharge_grids(self, save_discharge_grids):
+        self._save_discharge_grids = save_discharge_grids
+
+    @property
+    def save_velocity_grids(self):
+        """
+        save_velocity_grids
+        """
+        return self._save_velocity_grids
+
+    @save_velocity_grids.setter
+    def save_velocity_grids(self, save_velocity_grids):
+        self._save_velocity_grids = save_velocity_grids
+
+    @property
+    def save_sedflux_grids(self):
+        """
+        save_sedflux_grids
+        """
+        return self._save_sedflux_grids
+
+    @save_sedflux_grids.setter
+    def save_sedflux_grids(self, save_sedflux_grids):
+        self._save_sedflux_grids = save_sedflux_grids
+
+    @property
+    def save_dt(self):
+        """
+        save_dt
+        """
+        return self._save_dt
+
+    @save_dt.setter
+    def save_dt(self, save_dt):
+        self._save_dt = save_dt
+
+    @property
+    def checkpoint_dt(self):
+        """
+        checkpoint_dt
+        """
+        return self._checkpoint_dt
+
+    @checkpoint_dt.setter
+    def checkpoint_dt(self, checkpoint_dt):
+        self._checkpoint_dt = checkpoint_dt
+
+    @property
+    def save_strata(self):
+        """
+        save_strata
+        """
+        return self._save_strata
+
+    @save_strata.setter
+    def save_strata(self, save_strata):
+        self._save_strata = save_strata
+
+    @property
+    def save_checkpoint(self):
+        """
+        save_checkpoint
+        """
+        return self._save_checkpoint
+
+    @save_checkpoint.setter
+    def save_checkpoint(self, save_checkpoint):
+        self._save_checkpoint = save_checkpoint
+
+    @property
+    def resume_checkpoint(self):
+        """
+        resume_checkpoint
+        """
+        return self._resume_checkpoint
+
+    @resume_checkpoint.setter
+    def resume_checkpoint(self, resume_checkpoint):
+        self._resume_checkpoint = resume_checkpoint
+
+    @property
+    def omega_sfc(self):
+        """
+        omega_sfc
+        """
+        return self._omega_sfc
+
+    @omega_sfc.setter
+    def omega_sfc(self, omega_sfc):
+        self._omega_sfc = omega_sfc
+
+    @property
+    def omega_flow(self):
+        """
+        omega_flow
+        """
+        return self._omega_flow
+
+    @omega_flow.setter
+    def omega_flow(self, omega_flow):
+        self._omega_flow = omega_flow
+
+    @property
+    def Nsmooth(self):
+        """
+        Nsmooth
+        """
+        return self._Nsmooth
+
+    @Nsmooth.setter
+    def Nsmooth(self, Nsmooth):
+        self._Nsmooth = Nsmooth
+
+    @property
+    def theta_water(self):
+        """
+        theta_water
+        """
+        return self._theta_water
+
+    @theta_water.setter
+    def theta_water(self, theta_water):
+        self._theta_water = theta_water
+
+    @property
+    def coeff_theta_sand(self):
+        """
+        coeff_theta_sand
+        """
+        return self._coeff_theta_sand
+
+    @coeff_theta_sand.setter
+    def coeff_theta_sand(self, coeff_theta_sand):
+        self._coeff_theta_sand = coeff_theta_sand
+
+    @property
+    def coeff_theta_mud(self):
+        """
+        coeff_theta_mud
+        """
+        return self._coeff_theta_mud
+
+    @coeff_theta_mud.setter
+    def coeff_theta_mud(self, coeff_theta_mud):
+        self._coeff_theta_mud = coeff_theta_mud
+
+    @property
+    def beta(self):
+        """
+        beta
+        """
+        return self._beta
+
+    @beta.setter
+    def beta(self, beta):
+        self._beta = beta
+
+    @property
+    def sed_lag(self):
+        """
+        sed_lag
+        """
+        return self._sed_lag
+
+    @sed_lag.setter
+    def sed_lag(self, sed_lag):
+        self._sed_lag = sed_lag
+
+    @property
+    def coeff_U_dep_mud(self):
+        """
+        coeff_U_dep_mud
+        """
+        return self._coeff_U_dep_mud
+
+    @coeff_U_dep_mud.setter
+    def coeff_U_dep_mud(self, coeff_U_dep_mud):
+        self._coeff_U_dep_mud = coeff_U_dep_mud
+
+    @property
+    def coeff_U_ero_mud(self):
+        """
+        coeff_U_ero_mud
+        """
+        return self._coeff_U_ero_mud
+
+    @coeff_U_ero_mud.setter
+    def coeff_U_ero_mud(self, coeff_U_ero_mud):
+        self._coeff_U_ero_mud = coeff_U_ero_mud
+
+    @property
+    def coeff_U_ero_sand(self):
+        """
+        coeff_U_ero_sand
+        """
+        return self._coeff_U_ero_sand
+
+    @coeff_U_ero_sand.setter
+    def coeff_U_ero_sand(self, coeff_U_ero_sand):
+        self._coeff_U_ero_sand = coeff_U_ero_sand
+
+    @property
+    def alpha(self):
+        """
+        alpha
+        """
+        return self._alpha
+
+    @alpha.setter
+    def alpha(self, alpha):
+        self._alpha = alpha
+
+    @property
     def time(self):
         """Elapsed model time in seconds.
         """
