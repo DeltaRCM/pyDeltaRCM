@@ -540,6 +540,22 @@ def test_toggle_subsidence(tmp_path):
     assert _delta.toggle_subsidence is True
 
 
+def test_theta1(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'toggle_subsidence': True,
+                                  'theta1': -1.0})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.theta1 == -1
+
+
+def test_theta2(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'toggle_subsidence': True,
+                                  'theta2': 2.0})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.theta2 == 2.0
+
+
 def test_start_subsidence(tmp_path):
     p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                  {'start_subsidence': 12345})
