@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>pyDeltaRCM.preprocessor.Preprocessor &#8212; pyDeltaRCM 1.2.0 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyDeltaRCM.preprocessor.BasePreprocessor" href="pyDeltaRCM.preprocessor.BasePreprocessor.html" />
+    <link rel="prev" title="pyDeltaRCM.preprocessor.PreprocessorCLI" href="pyDeltaRCM.preprocessor.PreprocessorCLI.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="pyDeltaRCM.preprocessor.BasePreprocessor.html" title="pyDeltaRCM.preprocessor.BasePreprocessor"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pyDeltaRCM.preprocessor.PreprocessorCLI.html" title="pyDeltaRCM.preprocessor.PreprocessorCLI"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../reference/preprocessor/index.html" accesskey="U">Preprocessor</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pyDeltaRCM.preprocessor.PreprocessorCLI.html"
+                        title="previous chapter">pyDeltaRCM.preprocessor.PreprocessorCLI</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pyDeltaRCM.preprocessor.BasePreprocessor.html"
+                        title="next chapter">pyDeltaRCM.preprocessor.BasePreprocessor</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/pyDeltaRCM.preprocessor.Preprocessor.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pydeltarcm-preprocessor-preprocessor">
+<h1>pyDeltaRCM.preprocessor.Preprocessor<a class="headerlink" href="#pydeltarcm-preprocessor-preprocessor" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor">
+<em class="property">class </em><code class="descclassname">pyDeltaRCM.preprocessor.</code><code class="descname">Preprocessor</code><span class="sig-paren">(</span><em>input_file=None</em>, <em>timesteps=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Python high level api.</p>
+<p>This is the python high-level API class that is callable from a python
+script. For complete documentation on the API configurations, see
+XXXXXXXXXXXXXX.</p>
+<p>The class gives a way to configure and run multiple jobs from a python
+script.</p>
+<p class="rubric">Examples</p>
+<p>To configure a set of jobs (or a single job), instantiate the python
+preprocessor and then manually run the configured jobs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span> <span class="o">=</span> <span class="n">preprocessor</span><span class="o">.</span><span class="n">Preprocessor</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">timesteps</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="o">.</span><span class="n">run_jobs</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>input_file=None</em>, <em>timesteps=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the python preprocessor.</p>
+<p>The initialization includes the entire configuration of the job list
+(parsing, timesteps, etc.). The jobs are <em>not</em> run automatically
+during instantiation of the class.</p>
+<p>You must specify timesteps in either the YAML configuration file or
+via the <cite>timesteps</cite> parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_file</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – Path to an input YAML configuration file. Must include the
+<cite>timesteps</cite> parameter if you do not specify the <cite>timesteps</cite> as a
+keyword argument.</p></li>
+<li><p><strong>timesteps</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional) – Number of timesteps to run each of the jobs. Must be specified if
+you do not specify the <cite>timesteps</cite> parameter in the input YAML
+file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.__init__" title="pyDeltaRCM.preprocessor.Preprocessor.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([input_file, timesteps])</p></td>
+<td><p>Initialize the python preprocessor.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.construct_job_list" title="pyDeltaRCM.preprocessor.Preprocessor.construct_job_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">construct_job_list</span></code></a>()</p></td>
+<td><p>Construct the job list.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.create_matrix" title="pyDeltaRCM.preprocessor.Preprocessor.create_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_matrix</span></code></a>()</p></td>
+<td><p>Create a matrix if not already in the yaml.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.expand_ensemble" title="pyDeltaRCM.preprocessor.Preprocessor.expand_ensemble"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_ensemble</span></code></a>()</p></td>
+<td><p>Create ensemble random seeds and put into matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.expand_yaml_matrix" title="pyDeltaRCM.preprocessor.Preprocessor.expand_yaml_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_yaml_matrix</span></code></a>()</p></td>
+<td><p>Expand YAML matrix, if given.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.extract_timesteps" title="pyDeltaRCM.preprocessor.Preprocessor.extract_timesteps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_timesteps</span></code></a>()</p></td>
+<td><p>Pull timestep from arg and YAML.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.extract_yaml_config" title="pyDeltaRCM.preprocessor.Preprocessor.extract_yaml_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_yaml_config</span></code></a>()</p></td>
+<td><p>Preliminary YAML parsing.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.run_jobs" title="pyDeltaRCM.preprocessor.Preprocessor.run_jobs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_jobs</span></code></a>()</p></td>
+<td><p>Run the set of jobs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.seed_matrix" title="pyDeltaRCM.preprocessor.Preprocessor.seed_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seed_matrix</span></code></a>(n_ensembles)</p></td>
+<td><p>Generate random integers to be used as seeds for ensemble runs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.write_yaml_config" title="pyDeltaRCM.preprocessor.Preprocessor.write_yaml_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_yaml_config</span></code></a>(i, ith_config, ith_dir, ith_id)</p></td>
+<td><p>Write full config to file in output folder.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>input_file=None</em>, <em>timesteps=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Initialize the python preprocessor.</p>
+<p>The initialization includes the entire configuration of the job list
+(parsing, timesteps, etc.). The jobs are <em>not</em> run automatically
+during instantiation of the class.</p>
+<p>You must specify timesteps in either the YAML configuration file or
+via the <cite>timesteps</cite> parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_file</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – Path to an input YAML configuration file. Must include the
+<cite>timesteps</cite> parameter if you do not specify the <cite>timesteps</cite> as a
+keyword argument.</p></li>
+<li><p><strong>timesteps</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional) – Number of timesteps to run each of the jobs. Must be specified if
+you do not specify the <cite>timesteps</cite> parameter in the input YAML
+file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.construct_job_list">
+<code class="descname">construct_job_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.construct_job_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct the job list.</p>
+<p>The job list is constructed by expanding the <code class="docutils literal notranslate"><span class="pre">.yml</span></code> matrix, and
+forming ensemble runs as needed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.create_matrix">
+<code class="descname">create_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.create_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a matrix if not already in the yaml.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.expand_ensemble">
+<code class="descname">expand_ensemble</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.expand_ensemble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create ensemble random seeds and put into matrix.</p>
+<p>Seed the yaml configuration based on the number of ensembles specified.
+If matrix exists add seeds there, if not, create matrix and add seeds.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.expand_yaml_matrix">
+<code class="descname">expand_yaml_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.expand_yaml_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expand YAML matrix, if given.</p>
+<p>Compute the matrix expansion.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.extract_timesteps">
+<code class="descname">extract_timesteps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.extract_timesteps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pull timestep from arg and YAML.</p>
+<p>Extract the <cite>timesteps</cite> parameter from the arguments line and YAML
+configuration. The arguments line may come from either the command
+line as <code class="docutils literal notranslate"><span class="pre">--timesteps=N</span></code> or in the python API as <code class="docutils literal notranslate"><span class="pre">timesteps=N</span></code>,
+where <code class="docutils literal notranslate"><span class="pre">N</span></code> is the number of timesteps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.extract_yaml_config">
+<code class="descname">extract_yaml_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.extract_yaml_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preliminary YAML parsing.</p>
+<p>Extract <code class="docutils literal notranslate"><span class="pre">.yml</span></code> file (<code class="docutils literal notranslate"><span class="pre">self.input_file</span></code>) into a dictionary, if
+provided. This dictionary provides a few keys used throughout the
+code.</p>
+<p>Here, we check whether the file is valid yaml,
+and place it into a dictionary.</p>
+<p>Additionally, set the <code class="docutils literal notranslate"><span class="pre">self._has_matrix</span></code> flag, which is used in the
+<a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.expand_yaml_matrix" title="pyDeltaRCM.preprocessor.Preprocessor.expand_yaml_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand_yaml_matrix()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.run_jobs">
+<code class="descname">run_jobs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.run_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the set of jobs.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>TODO: implement the parallel pool.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.seed_matrix">
+<code class="descname">seed_matrix</code><span class="sig-paren">(</span><em>n_ensembles</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.seed_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate random integers to be used as seeds for ensemble runs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n_ensembles</strong> (<cite>int</cite>) – Number of ensembles which is the number of seeds to generate.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.write_yaml_config">
+<code class="descname">write_yaml_config</code><span class="sig-paren">(</span><em>i</em>, <em>ith_config</em>, <em>ith_dir</em>, <em>ith_id</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.write_yaml_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write full config to file in output folder.</p>
+<p>Write the entire yaml configuation for the configured job out to a
+file in the job output foler.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="pyDeltaRCM.preprocessor.BasePreprocessor.html" title="pyDeltaRCM.preprocessor.BasePreprocessor"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pyDeltaRCM.preprocessor.PreprocessorCLI.html" title="pyDeltaRCM.preprocessor.PreprocessorCLI"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../reference/preprocessor/index.html" >Preprocessor</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, The DeltaRCM Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

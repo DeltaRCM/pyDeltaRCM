@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>pyDeltaRCM.iteration_tools.iteration_tools &#8212; pyDeltaRCM 1.2.0 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="init_tools" href="../reference/init_tools/index.html" />
+    <link rel="prev" title="iteration_tools" href="../reference/iteration_tools/index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../reference/init_tools/index.html" title="init_tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../reference/iteration_tools/index.html" title="iteration_tools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../reference/iteration_tools/index.html" accesskey="U">iteration_tools</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../reference/iteration_tools/index.html"
+                        title="previous chapter">iteration_tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../reference/init_tools/index.html"
+                        title="next chapter">init_tools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/pyDeltaRCM.iteration_tools.iteration_tools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pydeltarcm-iteration-tools-iteration-tools">
+<h1>pyDeltaRCM.iteration_tools.iteration_tools<a class="headerlink" href="#pydeltarcm-iteration-tools-iteration-tools" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools">
+<em class="property">class </em><code class="descclassname">pyDeltaRCM.iteration_tools.</code><code class="descname">iteration_tools</code><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tools relating to the updating of the model and model I/O.</p>
+<p>Tools defined in this class include steps to iterate for one timestep,
+finalize timesteps, and saving output figures, grids, and checkpoints.
+Additionally, most stratigraphy-related operations are defined here, since
+these operations largely occur when saving and updating the model.</p>
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_subsidence</span></code></a>()</p></td>
+<td><p>Apply subsidence pattern.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.expand_stratigraphy" title="pyDeltaRCM.iteration_tools.iteration_tools.expand_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_stratigraphy</span></code></a>()</p></td>
+<td><p>Expand stratigraphy array sizes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_timestep</span></code></a>()</p></td>
+<td><p>Finalize timestep.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.make_figure" title="pyDeltaRCM.iteration_tools.iteration_tools.make_figure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_figure</span></code></a>(var, timestep)</p></td>
+<td><p>Create a figure.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint" title="pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_checkpoint</span></code></a>()</p></td>
+<td><p>Save checkpoint.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_data" title="pyDeltaRCM.iteration_tools.iteration_tools.output_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_data</span></code></a>()</p></td>
+<td><p>Save grids and figures.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_strata" title="pyDeltaRCM.iteration_tools.iteration_tools.output_strata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_strata</span></code></a>()</p></td>
+<td><p>Save stratigraphy as sparse matrix to file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.record_stratigraphy" title="pyDeltaRCM.iteration_tools.iteration_tools.record_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_stratigraphy</span></code></a>()</p></td>
+<td><p>Save stratigraphy to file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_one_timestep</span></code></a>()</p></td>
+<td><p>Run the timestep once.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_figure" title="pyDeltaRCM.iteration_tools.iteration_tools.save_figure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_figure</span></code></a>(fig, directory, filename_root, …)</p></td>
+<td><p>Save a figure.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids" title="pyDeltaRCM.iteration_tools.iteration_tools.save_grids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_grids</span></code></a>(var_name, var, ts)</p></td>
+<td><p>Save a grid into an existing netCDF file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint" title="pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_the_checkpoint</span></code></a>()</p></td>
+<td><p>Save checkpoint files.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence">
+<code class="descname">apply_subsidence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply subsidence pattern.</p>
+<p>Apply subsidence to domain if toggle_subsidence is True, and
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code> is <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>
+:<code class="xref py py-obj docutils literal notranslate"><span class="pre">start_subsidence</span></code>. Note, that the
+:configuration of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">update()</span></code> method
+:determines that the subsidence may be applied before the model time
+:is incremented, such that subsidence will begin on the step
+:<em>following</em> the time step that brings the model to <code class="docutils literal notranslate"><span class="pre">time</span> <span class="pre">==</span>
+<span class="pre">:start_subsidence</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.expand_stratigraphy">
+<code class="descname">expand_stratigraphy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.expand_stratigraphy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expand stratigraphy array sizes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep">
+<code class="descname">finalize_timestep</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finalize timestep.</p>
+<p>Clean up after sediment routing. This includes a correction for
+flooded cells that are not “wet” (via <code class="xref py py-meth docutils literal notranslate"><span class="pre">flooding_correction()</span></code>).</p>
+<p>Update sea level if baselevel changes between timesteps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.make_figure">
+<code class="descname">make_figure</code><span class="sig-paren">(</span><em>var</em>, <em>timestep</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.make_figure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a figure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>var</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – Which variable to plot into the figure. Specified as a string and
+looked up via <cite>getattr</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>fig</strong> – The created figure object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.figure</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint">
+<code class="descname">output_checkpoint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save checkpoint.</p>
+<p>Save checkpoint data (including rng state) so that the model can be
+resumed from this time.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.output_data">
+<code class="descname">output_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save grids and figures.</p>
+<p>Save grids and/or plots of specified variables (<code class="docutils literal notranslate"><span class="pre">eta</span></code>, <cite>discharge`</cite>,
+<code class="docutils literal notranslate"><span class="pre">velocity</span></code>, <code class="docutils literal notranslate"><span class="pre">depth</span></code>, and <code class="docutils literal notranslate"><span class="pre">stage</span></code>, depending on configuration of
+the relevant flags in the YAML configuration file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.output_strata">
+<code class="descname">output_strata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_strata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save stratigraphy as sparse matrix to file.</p>
+<p>Saves the stratigraphy (sand fraction) sparse matrices into output
+netcdf file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.record_stratigraphy">
+<code class="descname">record_stratigraphy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.record_stratigraphy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save stratigraphy to file.</p>
+<p>Saves the sand fraction of deposited sediment into a sparse array
+created by <code class="xref py py-obj docutils literal notranslate"><span class="pre">init_stratigraphy()</span></code>.</p>
+<p>Only runs if <code class="xref py py-obj docutils literal notranslate"><span class="pre">save_strata</span></code> is True.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This routine needs a complete description of the algorithm,
+additionally, it should be ported to a routine in DeltaMetrics,
+probably the new and preferred method of computing and storing
+straitgraphy cubes.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep">
+<code class="descname">run_one_timestep</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the timestep once.</p>
+<p>The first operation called by <code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code>, this method iterates the
+water surface calculation and sediment parcel routing routines.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Will print the current time to stdout, if <code class="docutils literal notranslate"><span class="pre">verbose</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If model has already been finalized via <code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.save_figure">
+<code class="descname">save_figure</code><span class="sig-paren">(</span><em>fig</em>, <em>directory</em>, <em>filename_root</em>, <em>timestep</em>, <em>ext='.png'</em>, <em>close=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_figure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a figure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – The path (and filename without extension) to save the figure to.</p></li>
+<li><p><strong>ext</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – The file extension (default=’.png’). This must be supported by the
+active matplotlib backend (see matplotlib.backends module). Most
+backends support ‘.png’, ‘.pdf’, ‘.ps’, ‘.eps’, and ‘.svg’. Be
+sure to include the ‘.’ before the extension.</p></li>
+<li><p><strong>close</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Whether to close the file after saving.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.save_grids">
+<code class="descname">save_grids</code><span class="sig-paren">(</span><em>var_name</em>, <em>var</em>, <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a grid into an existing netCDF file.</p>
+<p>File should already be open (by <code class="xref py py-meth docutils literal notranslate"><span class="pre">init_output_grid()</span></code>) as
+<code class="docutils literal notranslate"><span class="pre">self.output_netcdf</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var_name</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – The name of the variable to be saved</p></li>
+<li><p><strong>var</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code>) – The numpy array to be saved.</p></li>
+<li><p><strong>ts</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – The current timestep (+1, so human readable)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint">
+<code class="descname">save_the_checkpoint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save checkpoint files.</p>
+<p>Saves the grids to a .npz file so that the model can be
+initiated from this point. The timestep of the checkpoint is also
+saved. The values from the model that are saved to the checkpoint.npz
+are the following:
+- Model time
+- Flow velocity and its components
+- Water depth
+- Water stage
+- Topography
+- Current random seed state
+- Stratigraphic ‘topography’ in ‘strata_eta.npz’
+- Stratigraphic sand fraction in ‘strata_sand_frac.npz’
+If <cite>save_checkpoint</cite> is turned on, checkpoints are re-written
+with either a frequency of <cite>checkpoint_dt</cite> or <cite>save_dt</cite> if
+<cite>checkpoint_dt</cite> has not been explicitly defined.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../reference/init_tools/index.html" title="init_tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../reference/iteration_tools/index.html" title="iteration_tools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../reference/iteration_tools/index.html" >iteration_tools</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, The DeltaRCM Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>water_tools &#8212; pyDeltaRCM 1.2.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pyDeltaRCM.water_tools.water_tools" href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html" />
+    <link rel="prev" title="pyDeltaRCM.init_tools.init_tools" href="../../_autosummary/pyDeltaRCM.init_tools.init_tools.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html" title="pyDeltaRCM.water_tools.water_tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../_autosummary/pyDeltaRCM.init_tools.init_tools.html" title="pyDeltaRCM.init_tools.init_tools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">API reference</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">water_tools</a><ul>
+<li><a class="reference internal" href="#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
+<li><a class="reference internal" href="#water-tools-helper-functions">water_tools helper functions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../_autosummary/pyDeltaRCM.init_tools.init_tools.html"
+                        title="previous chapter">pyDeltaRCM.init_tools.init_tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html"
+                        title="next chapter">pyDeltaRCM.water_tools.water_tools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/reference/water_tools/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="water-tools">
+<h1>water_tools<a class="headerlink" href="#water-tools" title="Permalink to this headline">¶</a></h1>
+<p>The tools are defined in <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.water_tools</span></code>.</p>
+<div class="section" id="public-api-methods-attached-to-model">
+<h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html#pyDeltaRCM.water_tools.water_tools" title="pyDeltaRCM.water_tools.water_tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">water_tools</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="water-tools-helper-functions">
+<h2>water_tools helper functions<a class="headerlink" href="#water-tools-helper-functions" title="Permalink to this headline">¶</a></h2>
+<p>Note that these routines are jitted for speed. They generally take a large
+number of arrays and constants and return a new array(s) to continue with the
+model progression.</p>
+<dl class="function">
+<dt id="pyDeltaRCM.water_tools._choose_next_direction">
+<code class="descclassname">pyDeltaRCM.water_tools.</code><code class="descname">_choose_next_direction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._choose_next_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get new cell locations, based on water weights.</p>
+<dl class="simple">
+<dt>Algorithm is to:</dt><dd><ol class="arabic simple">
+<li><p>loop through each parcel, which is described by a pair in the
+<cite>inds</cite> array.</p></li>
+<li><p>determine the water weights for that location (from <cite>water_weights</cite>)</p></li>
+<li><p>choose a new cell based on the probabilities of the weights (using
+the <cite>random_pick</cite> function)</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inds</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code>) – Current unraveled indices of the parcels. <code class="docutils literal notranslate"><span class="pre">(N,)</span></code>  <cite>ndarray</cite>
+containing the unraveled indices.</p></li>
+<li><p><strong>water_weights</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code>) – Weights of every water cell. <code class="docutils literal notranslate"><span class="pre">(LxW,</span> <span class="pre">9)</span></code> <cite>ndarray</cite>, uses unraveled
+indicies along 0th dimension; 9 cells represent self and 8 neighboring
+cells.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>new_cells</strong> – The new cell for water parcels, relative to the current location.
+I.e., this is the D8 direction the parcel is going to travel in the
+next stage, <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyDeltaRCM.shared_tools._calculate_new_ind</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyDeltaRCM.water_tools._calculate_new_ind">
+<code class="descclassname">pyDeltaRCM.water_tools.</code><code class="descname">_calculate_new_ind</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._calculate_new_ind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the new location (indices) of parcels.</p>
+<p>Use the information of the current parcel (<cite>indices</cite>) in conjunction with
+the D8 direction the parcel needs to travel (<cite>new_cells</cite>) to determine the
+new indices of each parcel.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyDeltaRCM.water_tools._check_for_loops">
+<code class="descclassname">pyDeltaRCM.water_tools.</code><code class="descname">_check_for_loops</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._check_for_loops" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for loops in water parcel pathways.</p>
+<p>Look for looping random walks, i.e., where a parcel returns to somewhere
+it has already been.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyDeltaRCM.water_tools._update_dirQfield">
+<code class="descclassname">pyDeltaRCM.water_tools.</code><code class="descname">_update_dirQfield</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._update_dirQfield" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update unit vector of water flux in x or y.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyDeltaRCM.water_tools._update_absQfield">
+<code class="descclassname">pyDeltaRCM.water_tools.</code><code class="descname">_update_absQfield</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._update_absQfield" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update norm of water flux vector.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyDeltaRCM.water_tools._accumulate_free_surface_walks">
+<code class="descclassname">pyDeltaRCM.water_tools.</code><code class="descname">_accumulate_free_surface_walks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._accumulate_free_surface_walks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accumulate the free surface by walking parcel paths.</p>
+<p>This routine comprises the hydrodynamic physics-based computations.</p>
+<dl>
+<dt>Algorithm is to:</dt><dd><ol class="arabic simple">
+<li><p>loop through every parcel’s directed random walk in series.</p></li>
+</ol>
+<p>2. for a parcel’s walk, unravel the indices and determine whether the
+parcel should contribute to the free surface. Parcels are considered
+contributors if they have reached the ocean and if they are not looped
+pathways.</p>
+<p>3. then, we begin at the downstream end of the parcel’s walk and
+iterate up-walk until, determining the <cite>Hnew</cite> for each location.
+Downstream of the shoreline-ocean boundary, the water surface
+elevation is set to the sea level. Upstream of the shoreline-ocean
+boundary, the water surface is determined according to the land-slope
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">S0</span></code>) and the parcel pathway.</p>
+<ol class="arabic simple" start="4">
+<li><p>repeat from 2, for each parcel.</p></li>
+</ol>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyDeltaRCM.water_tools._smooth_free_surface">
+<code class="descclassname">pyDeltaRCM.water_tools.</code><code class="descname">_smooth_free_surface</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._smooth_free_surface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooth the free surface.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html" title="pyDeltaRCM.water_tools.water_tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../../_autosummary/pyDeltaRCM.init_tools.init_tools.html" title="pyDeltaRCM.init_tools.init_tools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, The DeltaRCM Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,436 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Default Model Variable Values &#8212; pyDeltaRCM 1.2.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Preprocessor" href="../preprocessor/index.html" />
+    <link rel="prev" title="pyDeltaRCM.model.DeltaModel" href="../../_autosummary/pyDeltaRCM.model.DeltaModel.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../preprocessor/index.html" title="Preprocessor"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../_autosummary/pyDeltaRCM.model.DeltaModel.html" title="pyDeltaRCM.model.DeltaModel"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">model</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../_autosummary/pyDeltaRCM.model.DeltaModel.html"
+                        title="previous chapter">pyDeltaRCM.model.DeltaModel</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../preprocessor/index.html"
+                        title="next chapter">Preprocessor</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/reference/model/yaml_defaults.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="default-model-variable-values">
+<h1>Default Model Variable Values<a class="headerlink" href="#default-model-variable-values" title="Permalink to this headline">¶</a></h1>
+<p>Default model values are defined as:</p>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;str&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="s">&#39;deltaRCM_Output&#39;</span>
+<span class="nt">verbose</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;int&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="nt">seed</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;int&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;None&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="nt">Length</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1000.</span>
+<span class="nt">Width</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2000.</span>
+<span class="nt">dx</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50.</span>
+<span class="nt">L0_meters</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">150.0</span>
+<span class="nt">S0</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0002</span>
+<span class="nt">itermax</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;int&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="nt">Np_water</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;int&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2000</span>
+<span class="nt">u0</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="nt">N0_meters</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">200.0</span>
+<span class="nt">h0</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5.0</span>
+<span class="nt">H_SL</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">SLR</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">Np_sed</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;int&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1000</span>
+<span class="nt">f_bedload</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<span class="nt">C0_percent</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="nt">Csmooth</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.9</span>
+<span class="nt">toggle_subsidence</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">theta1</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">-1.0471975511965976</span>
+<span class="nt">theta2</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0471975511965976</span>
+<span class="nt">sigma_max</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2e-9</span>
+<span class="nt">start_subsidence</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">216000</span>
+<span class="nt">save_eta_figs</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_stage_figs</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_depth_figs</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_discharge_figs</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_velocity_figs</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_sedflux_figs</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_figs_sequential</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="nt">save_metadata</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_eta_grids</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_stage_grids</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_depth_grids</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_discharge_grids</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_velocity_grids</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_sedflux_grids</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_dt</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;int&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">86400</span>
+<span class="nt">checkpoint_dt</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;int&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;None&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="nt">save_strata</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="nt">save_checkpoint</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">resume_checkpoint</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">omega_sfc</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="nt">omega_flow</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.9</span>
+<span class="nt">Nsmooth</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;int&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="nt">theta_water</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="nt">coeff_theta_sand</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="nt">coeff_theta_mud</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="nt">beta</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;int&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="nt">sed_lag</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="nt">coeff_U_dep_mud</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.3</span>
+<span class="nt">coeff_U_ero_mud</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.5</span>
+<span class="nt">coeff_U_ero_sand</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.05</span>
+<span class="nt">alpha</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../preprocessor/index.html" title="Preprocessor"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../../_autosummary/pyDeltaRCM.model.DeltaModel.html" title="pyDeltaRCM.model.DeltaModel"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >model</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, The DeltaRCM Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

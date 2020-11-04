@@ -1,0 +1,22 @@
+pyDeltaRCM.sed\_tools.BaseRouter
+================================
+
+.. currentmodule:: pyDeltaRCM.sed_tools
+
+.. autoclass:: BaseRouter
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BaseRouter.run
+   
+   
+
+   
+   
+   

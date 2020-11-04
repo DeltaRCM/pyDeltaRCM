@@ -1,0 +1,23 @@
+pyDeltaRCM.debug\_tools.debug\_tools
+====================================
+
+.. currentmodule:: pyDeltaRCM.debug_tools
+
+.. autoclass:: debug_tools
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~debug_tools.show_attribute
+      ~debug_tools.show_ind
+   
+   
+
+   
+   
+   

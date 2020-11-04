@@ -1,0 +1,91 @@
+pyDeltaRCM.model.DeltaModel
+===========================
+
+.. currentmodule:: pyDeltaRCM.model
+
+.. autoclass:: DeltaModel
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DeltaModel.__init__
+      ~DeltaModel.apply_subsidence
+      ~DeltaModel.build_weight_array
+      ~DeltaModel.check_for_boundary
+      ~DeltaModel.check_size_of_indices_matrix
+      ~DeltaModel.compute_free_surface
+      ~DeltaModel.create_domain
+      ~DeltaModel.create_other_variables
+      ~DeltaModel.determine_random_seed
+      ~DeltaModel.expand_stratigraphy
+      ~DeltaModel.finalize
+      ~DeltaModel.finalize_free_surface
+      ~DeltaModel.finalize_timestep
+      ~DeltaModel.finalize_water_iteration
+      ~DeltaModel.flooding_correction
+      ~DeltaModel.get_water_weight_array
+      ~DeltaModel.get_wet_mask_nh
+      ~DeltaModel.import_files
+      ~DeltaModel.init_logger
+      ~DeltaModel.init_output_file
+      ~DeltaModel.init_output_infrastructure
+      ~DeltaModel.init_sediment_routers
+      ~DeltaModel.init_stratigraphy
+      ~DeltaModel.init_subsidence
+      ~DeltaModel.init_water_iteration
+      ~DeltaModel.load_checkpoint
+      ~DeltaModel.make_figure
+      ~DeltaModel.output_checkpoint
+      ~DeltaModel.output_data
+      ~DeltaModel.output_strata
+      ~DeltaModel.process_input_to_model
+      ~DeltaModel.record_stratigraphy
+      ~DeltaModel.route_all_mud_parcels
+      ~DeltaModel.route_all_sand_parcels
+      ~DeltaModel.run_one_timestep
+      ~DeltaModel.run_water_iteration
+      ~DeltaModel.save_figure
+      ~DeltaModel.save_grids
+      ~DeltaModel.save_the_checkpoint
+      ~DeltaModel.sed_route
+      ~DeltaModel.set_constants
+      ~DeltaModel.show_attribute
+      ~DeltaModel.show_ind
+      ~DeltaModel.topo_diffusion
+      ~DeltaModel.update
+      ~DeltaModel.update_Q
+      ~DeltaModel.update_flow_field
+      ~DeltaModel.update_velocity_field
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DeltaModel.bed_elevation
+      ~DeltaModel.bedload_fraction
+      ~DeltaModel.channel_flow_depth
+      ~DeltaModel.channel_flow_velocity
+      ~DeltaModel.channel_width
+      ~DeltaModel.dt
+      ~DeltaModel.influx_sediment_concentration
+      ~DeltaModel.save_iter
+      ~DeltaModel.save_time_since_checkpoint
+      ~DeltaModel.save_time_since_last
+      ~DeltaModel.sea_surface_elevation
+      ~DeltaModel.sea_surface_elevation_change
+      ~DeltaModel.sea_surface_mean_elevation
+      ~DeltaModel.time
+      ~DeltaModel.time_iter
+      ~DeltaModel.time_step
+      ~DeltaModel.water_depth
+   
+   

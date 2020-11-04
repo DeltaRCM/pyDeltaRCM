@@ -1,0 +1,29 @@
+pyDeltaRCM.sed\_tools.MudRouter
+===============================
+
+.. currentmodule:: pyDeltaRCM.sed_tools
+
+.. autoclass:: MudRouter
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MudRouter.__init__
+      ~MudRouter.run
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MudRouter.class_type
+   
+   

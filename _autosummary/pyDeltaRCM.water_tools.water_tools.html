@@ -1,0 +1,268 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>pyDeltaRCM.water_tools.water_tools &#8212; pyDeltaRCM 1.2.0 documentation</title>
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="sed_tools" href="../reference/sed_tools/index.html" />
+    <link rel="prev" title="water_tools" href="../reference/water_tools/index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../reference/sed_tools/index.html" title="sed_tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../reference/water_tools/index.html" title="water_tools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../reference/water_tools/index.html" accesskey="U">water_tools</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../reference/water_tools/index.html"
+                        title="previous chapter">water_tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../reference/sed_tools/index.html"
+                        title="next chapter">sed_tools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/pyDeltaRCM.water_tools.water_tools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pydeltarcm-water-tools-water-tools">
+<h1>pyDeltaRCM.water_tools.water_tools<a class="headerlink" href="#pydeltarcm-water-tools-water-tools" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pyDeltaRCM.water_tools.water_tools">
+<em class="property">class </em><code class="descclassname">pyDeltaRCM.water_tools.</code><code class="descname">water_tools</code><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.build_weight_array" title="pyDeltaRCM.water_tools.water_tools.build_weight_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_weight_array</span></code></a>(array[, fix_edges, normalize])</p></td>
+<td><p>Weighting array of neighbors.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.check_for_boundary" title="pyDeltaRCM.water_tools.water_tools.check_for_boundary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_for_boundary</span></code></a>(inds)</p></td>
+<td><p>Check whether parcels have reached the boundary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_size_of_indices_matrix</span></code>(it)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="pyDeltaRCM.water_tools.water_tools.compute_free_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_free_surface</span></code></a>()</p></td>
+<td><p>Calculate free surface after routing all water parcels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.finalize_free_surface" title="pyDeltaRCM.water_tools.water_tools.finalize_free_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_free_surface</span></code></a>()</p></td>
+<td><p>Finalize the water free surface.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.finalize_water_iteration" title="pyDeltaRCM.water_tools.water_tools.finalize_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_water_iteration</span></code></a>(iteration)</p></td>
+<td><p>Finish updating flow fields.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.flooding_correction" title="pyDeltaRCM.water_tools.water_tools.flooding_correction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flooding_correction</span></code></a>()</p></td>
+<td><p>Flood dry cells along the shore if necessary.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_water_weight_array</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.get_wet_mask_nh" title="pyDeltaRCM.water_tools.water_tools.get_wet_mask_nh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_wet_mask_nh</span></code></a>()</p></td>
+<td><p>Get wet mask.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_water_iteration</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="pyDeltaRCM.water_tools.water_tools.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>()</p></td>
+<td><p>Run a single iteration of travel paths for all water parcels.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.update_Q" title="pyDeltaRCM.water_tools.water_tools.update_Q"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_Q</span></code></a>(dist, current_inds, next_index, …)</p></td>
+<td><p>Update discharge field values after one set of water parcel steps.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.update_flow_field" title="pyDeltaRCM.water_tools.water_tools.update_flow_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_flow_field</span></code></a>(iteration)</p></td>
+<td><p>Update water discharge.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.update_velocity_field" title="pyDeltaRCM.water_tools.water_tools.update_velocity_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_velocity_field</span></code></a>()</p></td>
+<td><p>Update flow velocity fields.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.build_weight_array">
+<code class="descname">build_weight_array</code><span class="sig-paren">(</span><em>array</em>, <em>fix_edges=False</em>, <em>normalize=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.build_weight_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weighting array of neighbors.</p>
+<p>Create np.array((8,L,W)) of quantity a
+in each of the neighbors to a cell</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.check_for_boundary">
+<code class="descname">check_for_boundary</code><span class="sig-paren">(</span><em>inds</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.check_for_boundary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether parcels have reached the boundary.</p>
+<p>Checks whether any parcels have reached the model boundaries. If they
+have, then update the information in
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">free_surf_flag</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inds</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code>) – Unraveled indicies of parcels.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.compute_free_surface">
+<code class="descname">compute_free_surface</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate free surface after routing all water parcels.</p>
+<p>This method uses the <cite>free_surf_walk_indices</cite> matrix accumulated
+during the routing of the water parcels (in
+<a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="pyDeltaRCM.water_tools.water_tools.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>) to determine the free surface. The
+operations of the free surface computation are placed in a jitted
+function <code class="xref py py-obj docutils literal notranslate"><span class="pre">accumulate_free_surface_walks</span></code>. Following this
+computation, the free surface is smoothed by steps in
+<a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.finalize_free_surface" title="pyDeltaRCM.water_tools.water_tools.finalize_free_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_free_surface</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.finalize_free_surface">
+<code class="descname">finalize_free_surface</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.finalize_free_surface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finalize the water free surface.</p>
+<p>This method occurs after the initial computation of the free surface,
+by accumulating the directed walks of all water parcels. In this
+method, thresholding is applied to correct for sea level, and a the
+free surface is smoothed by a jitted function (<a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools._smooth_free_surface" title="pyDeltaRCM.water_tools._smooth_free_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_smooth_free_surface</span></code></a>).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.finalize_water_iteration">
+<code class="descname">finalize_water_iteration</code><span class="sig-paren">(</span><em>iteration</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.finalize_water_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finish updating flow fields.</p>
+<p>Clean up at end of water iteration</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.flooding_correction">
+<code class="descname">flooding_correction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.flooding_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flood dry cells along the shore if necessary.</p>
+<p>Check the neighbors of all dry cells. If any dry cells have wet
+neighbors, check that their stage is not higher than the bed elevation
+of the center cell.
+If it is, flood the dry cell.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.get_wet_mask_nh">
+<code class="descname">get_wet_mask_nh</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.get_wet_mask_nh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get wet mask.</p>
+<p>Returns np.array((8,L,W)), for each neighbor around a cell
+with 1 if the neighbor is wet and 0 if dry</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.run_water_iteration">
+<code class="descname">run_water_iteration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a single iteration of travel paths for all water parcels.</p>
+<p>Runs all water  parcels (<cite>Np_water</cite> parcels) for <cite>stepmax</cite> steps, or
+until the parcels reach a boundary.</p>
+<p>All parcels are processed in parallel, taking one step for each loop
+of the <code class="docutils literal notranslate"><span class="pre">while</span></code> loop.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.update_Q">
+<code class="descname">update_Q</code><span class="sig-paren">(</span><em>dist</em>, <em>current_inds</em>, <em>next_index</em>, <em>astep</em>, <em>jstep</em>, <em>istep</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.update_Q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update discharge field values after one set of water parcel steps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.update_flow_field">
+<code class="descname">update_flow_field</code><span class="sig-paren">(</span><em>iteration</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.update_flow_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update water discharge.</p>
+<p>Update the water discharge field after one set of water parcels
+iteration.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDeltaRCM.water_tools.water_tools.update_velocity_field">
+<code class="descname">update_velocity_field</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.update_velocity_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update flow velocity fields.</p>
+<p>Update the flow velocity fields after one set of water parcels
+iteration.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../reference/sed_tools/index.html" title="sed_tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../reference/water_tools/index.html" title="water_tools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../reference/water_tools/index.html" >water_tools</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, The DeltaRCM Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

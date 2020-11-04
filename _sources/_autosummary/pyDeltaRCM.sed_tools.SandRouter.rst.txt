@@ -1,0 +1,29 @@
+pyDeltaRCM.sed\_tools.SandRouter
+================================
+
+.. currentmodule:: pyDeltaRCM.sed_tools
+
+.. autoclass:: SandRouter
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SandRouter.__init__
+      ~SandRouter.run
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SandRouter.class_type
+   
+   
