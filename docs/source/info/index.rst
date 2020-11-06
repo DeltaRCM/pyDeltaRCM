@@ -15,6 +15,7 @@ All of these questions and more are answered here!
    :maxdepth: 1
 
    yamlparameters
+   modeltime
    hydrodynamics
    morphodynamics
    outputfile

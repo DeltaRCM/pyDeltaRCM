@@ -166,6 +166,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def out_dir(self):
         """
+        out_dir sets the output directory for the simulation results.
+
         out_dir is a *string* type parameter, specifying the name of the output
         directory in which the model outputs should be saved.
         """
@@ -178,6 +180,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def verbose(self):
         """
+        verbose controls whether or not logger text should be printed.
+
         verbose is an *integer* type parameter, which when set to 1 will
         generate a full log of messages and warnings as the model is run.
         When set to 0 (the default), many of the model messages and warnings
@@ -192,6 +196,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def seed(self):
         """
+        seed defines the random number seed used for the simulation.
+
         seed is an *integer* type parameter specifying the random seed value to
         be used for this model run. If unspecified, a random seed is generated
         and used.
@@ -205,6 +211,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def Length(self):
         """
+        Length sets the total length of the domain.
+
         Length is either an *integer* or a *float*.
         This is the length of the domain (dimension parallel to the inlet
         channel), in **meters**.
@@ -220,6 +228,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def Width(self):
         """
+        Width sets the total width of the domain.
+
         Width is either an *integer* or a *float*.
         This is the width of the domain (dimension perpendicular to the inlet
         channel), in **meters**.
@@ -235,6 +245,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def dx(self):
         """
+        dx is the length of the individual cell faces.
+
         dx is either an *integer* or a *float*.
         This parameter specifies the length of the cell faces in the grid in
         **meters**.
@@ -251,21 +263,25 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def L0_meters(self):
         """
+        L0_meters defines the thickness of the land along the coast.
+
         L0 meters is either an *integer* or a *float*.
-        Length of the land adjacent to the inlet in **meters**.
+        Thickness of the land adjacent to the inlet in **meters**.
         This can also be thought of as the length of the inlet channel.
         """
         return self._L0_meters
 
     @L0_meters.setter
     def L0_meters(self, L0_meters):
-        if L0_meters <= 0:
-            raise ValueError('L0_meters must be a positive number.')
+        if L0_meters < 0:
+            raise ValueError('L0_meters must be a greater than or equal to 0.')
         self._L0_meters = L0_meters
 
     @property
     def S0(self):
         """
+        S0 is the characteristic slope for the delta.
+
         S0 is either an *integer* or a *float*.
         This sets the characteristic slope for the delta topset.
         This parameter is dimensionless.
@@ -292,6 +308,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def Np_water(self):
         """
+        Np_water is the number of water parcels simulated.
+
         Np_water represents the number of "parcels" to split the input water
         discharge into for the reduced-complexity flow routing.
         This parameter must be an *integer*
@@ -307,7 +325,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def u0(self):
         """
-        u0
+        u0 is a reference velocity value.
+
+        u0 is the characteristic or reference velocity value in units of m/s.
+        u0 influences the values of other model parameters such as the maximum
+        flow velocity, gamma, and the velocities at which sediments deposit and
+        erode. This parameter must be an *integer* or a *float*.
         """
         return self._u0
 
@@ -318,7 +341,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def N0_meters(self):
         """
-        N0_meters
+        N0_meters defines the width of the inlet channel in meters.
+
+        N0_meters defines the width of the inlet channel in meters. Therefore,
+        this parameter must be a positive *integer* or *float*.
         """
         return self._N0_meters
 
@@ -331,7 +357,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def h0(self):
         """
-        h0
+        h0 is the reference or characteristic water depth in meters.
+
+        h0 is the reference or characteristic water depth in meters. This
+        parameter must be an *integer* or *float*. h0 defines
+        the depth of water in the inlet channel. One-tenth of the value of h0
+        defines the "dry-depth" or the depth at which cells are considered to
+        be non-wet (dry).
         """
         return self._h0
 
@@ -342,7 +374,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def H_SL(self):
         """
-        H_SL
+        H_SL sets the sea level elevation in meters.
         """
         return self._H_SL
 
@@ -353,7 +385,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def SLR(self):
         """
-        SLR
+        SLR is the sea level rise rate.
+
+        SLR is a parameter for defining the sea level rise rate. SLR is
+        specified in units of m/s. When prescribing a SLR rate, it is important
+        to remember that pyDeltaRCM simulates bankfull discharge conditions.
+        Depending on the flood intermittancy intervals you assume, the
+        conversion from "model time" into "real time simulated" may vary.
         """
         return self._SLR
 
@@ -364,6 +402,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def Np_sed(self):
         """
+        Np_sed is the number of sediment parcels simulated.
+
         Np_sed represents the number of "parcels" to split the input sediment
         discharge into for the reduced-complexity sediment routing.
         This parameter must be an *integer*
@@ -379,7 +419,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def f_bedload(self):
         """
-        f_bedload
+        f_bedload is the bedload fraction of the input sediment.
+
+        f_bedload is the fraction of input sediment that is bedload material.
+        In pyDeltaRCM, bedload material is coarse grained "sand", and
+        suspended load material is fine grained "mud". This parameter must be
+        a value between 0 and 1, inclusive.
         """
         return self._f_bedload
 
@@ -393,7 +438,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def C0_percent(self):
         """
-        C0_percent
+        C0_percent is the sediment concentration in the input water supply.
 
         C0_percent is the prescribed sediment concentration in the input water
         as a percentage (must be equal to or greater than 0).
@@ -422,7 +467,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def toggle_subsidence(self):
         """
-        toggle_subsidence
+        toggle_subsidence controls whether subsidence is turned on or off.
         """
         return self._toggle_subsidence
 
@@ -433,7 +478,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def theta1(self):
         """
-        theta1
+        theta1 defines the left radial bound for the subsiding region.
         """
         return self._theta1
 
@@ -444,7 +489,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def theta2(self):
         """
-        theta2
+        theta2 defines the right radial bound for the subsiding region.
         """
         return self._theta2
 
@@ -455,7 +500,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def sigma_max(self):
         """
-        sigma_max
+        sigma_max defines the maximum rate of subsidence.
         """
         return self._sigma_max
 
@@ -466,7 +511,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def start_subsidence(self):
         """
-        start_subsidence
+        start_subsidence defines the start time at which subsidence begins.
         """
         return self._start_subsidence
 
@@ -477,7 +522,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_eta_figs(self):
         """
-        save_eta_figs
+        save_eta_figs controls whether or not figures of topography are saved.
         """
         return self._save_eta_figs
 
@@ -488,7 +533,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_stage_figs(self):
         """
-        save_stage_figs
+        save_stage_figs controls whether or not stage figures are saved.
         """
         return self._save_stage_figs
 
@@ -499,7 +544,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_depth_figs(self):
         """
-        save_depth_figs
+        save_depth_figs controls saving of water depth figures.
         """
         return self._save_depth_figs
 
@@ -510,7 +555,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_discharge_figs(self):
         """
-        save_discharge_figs
+        save_discharge_figs controls saving of water discharge figures.
         """
         return self._save_discharge_figs
 
@@ -521,7 +566,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_velocity_figs(self):
         """
-        save_velocity_figs
+        save_velocity_figs controls saving of water velocity figures.
         """
         return self._save_velocity_figs
 
@@ -532,7 +577,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_sedflux_figs(self):
         """
-        save_sedflux_figs
+        save_sedflux_figs controls saving of sediment flux figures.
         """
         return self._save_sedflux_figs
 
@@ -543,7 +588,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_figs_sequential(self):
         """
-        save_figs_sequential
+        save_figs_sequential sets how figures are to be saved.
         """
         return self._save_figs_sequential
 
@@ -554,7 +599,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_metadata(self):
         """
-        save_metadata
+        save_metadata explicit control on whether or not metadata is saved.
         """
         return self._save_metadata
 
@@ -565,7 +610,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_eta_grids(self):
         """
-        save_eta_grids
+        save_eta_grids controls whether or not topography information is saved.
         """
         return self._save_eta_grids
 
@@ -576,7 +621,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_stage_grids(self):
         """
-        save_stage_grids
+        save_stage_grids controls whether or not stage information is saved.
         """
         return self._save_stage_grids
 
@@ -587,7 +632,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_depth_grids(self):
         """
-        save_depth_grids
+        save_depth_grids controls whether or not depth information is saved.
         """
         return self._save_depth_grids
 
@@ -598,7 +643,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_discharge_grids(self):
         """
-        save_discharge_grids
+        save_discharge_grids controls saving of water discharge information.
         """
         return self._save_discharge_grids
 
@@ -609,7 +654,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_velocity_grids(self):
         """
-        save_velocity_grids
+        save_velocity_grids controls saving of water velocity information.
         """
         return self._save_velocity_grids
 
@@ -620,7 +665,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_sedflux_grids(self):
         """
-        save_sedflux_grids
+        save_sedflux_grids controls saving of sediment discharge information.
         """
         return self._save_sedflux_grids
 
@@ -631,7 +676,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_dt(self):
         """
-        save_dt
+        save_dt defines the saving interval in seconds.
         """
         return self._save_dt
 
@@ -642,7 +687,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def checkpoint_dt(self):
         """
-        checkpoint_dt
+        checkpoint_dt defines the interval to create checkpoint information.
         """
         return self._checkpoint_dt
 
@@ -653,7 +698,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_strata(self):
         """
-        save_strata
+        save_strata controls whether or not stratigraphy information is saved.
         """
         return self._save_strata
 
@@ -664,7 +709,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def save_checkpoint(self):
         """
-        save_checkpoint
+        save_checkpoint controls saving of model checkpoint information.
         """
         return self._save_checkpoint
 
@@ -675,7 +720,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def resume_checkpoint(self):
         """
-        resume_checkpoint
+        resume_checkpoint controls loading of a checkpoint if run is resuming.
         """
         return self._resume_checkpoint
 
@@ -708,7 +753,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def Nsmooth(self):
         """
-        Nsmooth
+        Nsmooth defines the number of times the water surface is smoothed.
         """
         return self._Nsmooth
 
@@ -719,7 +764,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def theta_water(self):
         """
-        theta_water
+        theta_water is the exponent of depth dependence for weighted routing.
         """
         return self._theta_water
 
@@ -807,7 +852,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def alpha(self):
         """
-        alpha
+        alpha is the topographic diffusion coefficient.
         """
         return self._alpha
 
