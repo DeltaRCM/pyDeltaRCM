@@ -43,6 +43,7 @@ def test_subsidence_in_update(tmp_path):
     _delta.update()
     assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
     assert _delta.eta[17, 6] == pytest.approx(-_delta.h0 - 0.0002)
+    _delta.output_netcdf.close()
 
 
 def test_subsidence_in_update_delayed_start(tmp_path):
@@ -65,6 +66,7 @@ def test_subsidence_in_update_delayed_start(tmp_path):
     assert _delta.time == 40000
     assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
     assert _delta.eta[17, 6] == pytest.approx(-_delta.h0 - 0.0002)
+    _delta.output_netcdf.close()
 
 
 def test_subsidence_changed_with_timestep(tmp_path):
@@ -76,7 +78,8 @@ def test_subsidence_changed_with_timestep(tmp_path):
     assert _delta.sigma[17, 6] == 0.0002
     _delta.time_step = 86400
     assert _delta.sigma[17, 6] == 0.000864
-
+    _delta.output_netcdf.close()
+    
 
 def test_expand_stratigraphy(tmp_path):
     file_name = 'user_parameters.yaml'
