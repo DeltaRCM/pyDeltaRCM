@@ -166,8 +166,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def out_dir(self):
         """
-        Description of out_dir ...
-        Must be a string.
+        out_dir is a *string* type parameter, specifying the name of the output
+        directory in which the model outputs should be saved.
         """
         return self._out_dir
 
@@ -178,7 +178,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def verbose(self):
         """
-        Desciption of verbose ...
+        verbose is an *integer* type parameter, which when set to 1 will
+        generate a full log of messages and warnings as the model is run.
+        When set to 0 (the default), many of the model messages and warnings
+        are suppressed.
         """
         return self._verbose
 
@@ -189,7 +192,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def seed(self):
         """
-        seed
+        seed is an *integer* type parameter specifying the random seed value to
+        be used for this model run. If unspecified, a random seed is generated
+        and used.
         """
         return self._seed
 
@@ -200,7 +205,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def Length(self):
         """
-        Length
+        Length is either an *integer* or a *float*.
+        This is the length of the domain (dimension parallel to the inlet
+        channel), in **meters**.
         """
         return self._Length
 
@@ -213,7 +220,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def Width(self):
         """
-        Width
+        Width is either an *integer* or a *float*.
+        This is the width of the domain (dimension perpendicular to the inlet
+        channel), in **meters**.
         """
         return self._Width
 
@@ -226,7 +235,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def dx(self):
         """
-        dx
+        dx is either an *integer* or a *float*.
+        This parameter specifies the length of the cell faces in the grid in
+        **meters**.
         """
         return self._dx
 
@@ -240,7 +251,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def L0_meters(self):
         """
-        L0 meters
+        L0 meters is either an *integer* or a *float*.
+        Length of the land adjacent to the inlet in **meters**.
+        This can also be thought of as the length of the inlet channel.
         """
         return self._L0_meters
 
@@ -253,7 +266,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def S0(self):
         """
-        S0
+        S0 is either an *integer* or a *float*.
+        This sets the characteristic slope for the delta topset.
+        This parameter is dimensionless.
         """
         return self._S0
 
@@ -277,7 +292,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def Np_water(self):
         """
-        np water
+        Np_water represents the number of "parcels" to split the input water
+        discharge into for the reduced-complexity flow routing.
+        This parameter must be an *integer*
         """
         return self._Np_water
 
@@ -347,7 +364,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def Np_sed(self):
         """
-        Np_sed
+        Np_sed represents the number of "parcels" to split the input sediment
+        discharge into for the reduced-complexity sediment routing.
+        This parameter must be an *integer*
         """
         return self._Np_sed
 
@@ -375,13 +394,16 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def C0_percent(self):
         """
         C0_percent
+
+        C0_percent is the prescribed sediment concentration in the input water
+        as a percentage (must be equal to or greater than 0).
         """
         return self._C0_percent
 
     @C0_percent.setter
     def C0_percent(self, C0_percent):
         if C0_percent < 0:
-            raise ValueError('C0_percent must be greater than or equal to 0.')
+            raise ValueError('C0_percent must be greater than 0.')
         self._C0_percent = C0_percent
 
     @property

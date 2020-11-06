@@ -190,12 +190,12 @@ class iteration_tools(abc.ABC):
 
         Apply subsidence to domain if toggle_subsidence is True, and
         :obj:`~pyDeltaRCM.DeltaModel.time` is ``>=``
-        ::obj:`~pyDeltaRCM.DeltaModel.start_subsidence`. Note, that the
-        :configuration of the :obj:`~pyDeltaRCM.DeltaModel.update()` method
-        :determines that the subsidence may be applied before the model time
-        :is incremented, such that subsidence will begin on the step
-        :*following* the time step that brings the model to ``time ==
-        :start_subsidence``.
+        :obj:`~pyDeltaRCM.DeltaModel.start_subsidence`. Note, that the
+        configuration of the :obj:`~pyDeltaRCM.DeltaModel.update()` method
+        determines that the subsidence may be applied before the model time
+        is incremented, such that subsidence will begin on the step
+        *following* the time step that brings the model to ``time ==
+        start_subsidence``.
 
         Parameters
         ----------
