@@ -295,7 +295,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def itermax(self):
         """
-        itermax
+        itermax sets the number of flow routing/free surface iterations.
         """
         return self._itermax
 
@@ -454,7 +454,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def Csmooth(self):
         """
-        Csmooth
+        Csmooth is a free surface smoothing parameter.
         """
         return self._Csmooth
 
@@ -468,6 +468,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def toggle_subsidence(self):
         """
         toggle_subsidence controls whether subsidence is turned on or off.
+
+        If toggle_subsidence is set to `True` then subsidence is turned on.
+        Otherwise if toggle_subsidence is set to `False` (the default) then no
+        subsidence will occur.
         """
         return self._toggle_subsidence
 
@@ -479,6 +483,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def theta1(self):
         """
         theta1 defines the left radial bound for the subsiding region.
+
+        For more information on *theta1* and defining the subsidence pattern,
+        refer to :meth:`init_subsidence`
         """
         return self._theta1
 
@@ -490,6 +497,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def theta2(self):
         """
         theta2 defines the right radial bound for the subsiding region.
+
+        For more information on *theta2* and defining the subsidence pattern,
+        refer to :meth:`init_subsidence`
         """
         return self._theta2
 
@@ -589,6 +599,15 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def save_figs_sequential(self):
         """
         save_figs_sequential sets how figures are to be saved.
+
+        save_figs_sequential is a *boolean* parameter that can be set to True
+        or False. If True, then for each figure saving parameter set to True
+        (e.g. :attr:`save_velocity_figs`) a new figure will be saved at an
+        inteval of :attr:`save_dt`. The file names of the figures will
+        correspond to the model timestep at which they were saved. If instead,
+        the save_figs_sequential parameter is set to False, then only the
+        latest figure will be kept, and at each *save_dt* time, the figure file
+        will be overwritten using the current model status.
         """
         return self._save_figs_sequential
 
@@ -600,6 +619,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def save_metadata(self):
         """
         save_metadata explicit control on whether or not metadata is saved.
+
+        save_metadata is a boolean that can be manually togged on (True) to
+        ensure metadata is saved to disk even if no other output information is
+        being saved. If any grids or strata are being saved, then metadata
+        saving will be turned on automatically, even if this parameter is set
+        to False. Metadata associated with pyDeltaRCM are single dimensional
+        arrays (floats) primarily containing information about the domain and
+        the inlet conditions for a given model run.
         """
         return self._save_metadata
 
@@ -731,7 +758,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def omega_sfc(self):
         """
-        omega_sfc
+        omega_sfc is a water surface underrelaxation parameter.
         """
         return self._omega_sfc
 
@@ -742,7 +769,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def omega_flow(self):
         """
-        omega_flow
+        omega_flow is a flow velocity underrelaxation parameter.
         """
         return self._omega_flow
 
@@ -765,6 +792,17 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def theta_water(self):
         """
         theta_water is the exponent of depth dependence for weighted routing.
+
+        For the routing of the water parcels, the dependence of the random walk
+        on local water depth can be modulated by varying this parameter value.
+        As theta_water gets larger, the importance of the water depth to the
+        weighting scheme grows.
+
+        .. note::
+           The value of *theta_water* also influences the values of
+           :attr:`coeff_theta_sand` and :attr:`coeff_theta_mud` which are
+           coefficients that are multiplied by *theta_water* to set the theta
+           values for the sand and mud routing respectively.
         """
         return self._theta_water
 
@@ -775,7 +813,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def coeff_theta_sand(self):
         """
-        coeff_theta_sand
+        coeff_theta_sand is the coefficient applied to theta for sand routing.
+
+        coeff_theta_sand is a coefficient applied to the :attr:`theta_water`
+        attribute to define the value of theta for sand routing. Theta is
+        the exponent applied to the local water depth and is used to weight
+        the random walk. For mud and sand these weighting rules vary, which is
+        why the :attr:`theta_water` term is multiplied by these coefficients:
+        :attr:`coeff_theta_mud` and :attr:`coeff_theta_sand`.
         """
         return self._coeff_theta_sand
 
@@ -786,7 +831,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def coeff_theta_mud(self):
         """
-        coeff_theta_mud
+        coeff_theta_mud is the coefficient applied to theta for mud routing.
+
+        coeff_theta_mud is a coefficient applied to the :attr:`theta_water`
+        attribute to define the value of theta for mud routing. Theta is
+        the exponent applied to the local water depth and is used to weight
+        the random walk. For mud and sand these weighting rules vary, which is
+        why the :attr:`theta_water` term is multiplied by these coefficients:
+        :attr:`coeff_theta_mud` and :attr:`coeff_theta_sand`.
         """
         return self._coeff_theta_mud
 
@@ -797,7 +849,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def beta(self):
         """
-        beta
+        beta is the bedload transport capacity exponent.
+
+        beta is an exponent on the bedload transport terms that is applied to
+        the local velocity and threshold velocity terms.
         """
         return self._beta
 
@@ -808,7 +863,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def sed_lag(self):
         """
-        sed_lag
+        sed_lag is a "sedimentation lag" parameter.
+
+        sed_lag influences the properties of mud deposition by controlling how
+        much mud is deposited when the flow velocity is below the threshold
+        for mud deposition (:attr:`coeff_U_dep_mud`).
         """
         return self._sed_lag
 
@@ -819,7 +878,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def coeff_U_dep_mud(self):
         """
-        coeff_U_dep_mud
+        coeff_U_dep_mud is the threshold velocity for mud sediment deposition.
+
+        coeff_U_dep_mud sets the threshold velocity for mud to be depoisted.
+        The smaller this parameter is, the longer a mud parcel can travel
+        before losing all of its mud volume.
         """
         return self._coeff_U_dep_mud
 
@@ -830,7 +893,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def coeff_U_ero_mud(self):
         """
-        coeff_U_ero_mud
+        coeff_U_ero_mud is the mud erosion velocity threshold coefficient.
+
+        coeff_U_ero_mud sets the threshold velocity for erosion of the mud
+        (suspended load) sediment. The higher this value is, the more difficult
+        it is to erode mud deposits.
         """
         return self._coeff_U_ero_mud
 
@@ -841,7 +908,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def coeff_U_ero_sand(self):
         """
-        coeff_U_ero_sand
+        coeff_U_ero_sand is the sand erosion velocity threshold coefficient.
+
+        coeff_U_ero_sand sets the threshold velocity for sediment erosion of
+        the sand (bedload) sediment. The higher this value is, the more
+        difficult it is to erode the bed.
         """
         return self._coeff_U_ero_sand
 
@@ -853,6 +924,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def alpha(self):
         """
         alpha is the topographic diffusion coefficient.
+
+        alpha is the coefficient used for topographic diffusion. It controls
+        both the cross-slope sediment flux as well as bank erodability.
         """
         return self._alpha
 
