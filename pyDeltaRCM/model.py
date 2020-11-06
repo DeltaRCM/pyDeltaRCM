@@ -206,6 +206,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @Length.setter
     def Length(self, Length):
+        if Length <= 0:
+            raise ValueError('Length must be a positive number.')
         self._Length = Length
 
     @property
@@ -217,6 +219,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @Width.setter
     def Width(self, Width):
+        if Width <= 0:
+            raise ValueError('Width must be a positive number.')
         self._Width = Width
 
     @property
@@ -228,6 +232,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @dx.setter
     def dx(self, dx):
+        if (dx <= 0) or (dx > self._Length) or (dx > self._Width):
+            raise ValueError('dx must be positive and smaller than the' +
+                             ' Length and Width parameters.')
         self._dx = dx
 
     @property
@@ -239,6 +246,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @L0_meters.setter
     def L0_meters(self, L0_meters):
+        if L0_meters <= 0:
+            raise ValueError('L0_meters must be a positive number.')
         self._L0_meters = L0_meters
 
     @property
@@ -261,6 +270,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @itermax.setter
     def itermax(self, itermax):
+        if itermax < 0:
+            raise ValueError('itermax must be greater than or equal to 0.')
         self._itermax = itermax
 
     @property
@@ -272,6 +283,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @Np_water.setter
     def Np_water(self, Np_water):
+        if Np_water <= 0:
+            raise ValueError('Np_water must be a positive number.')
         self._Np_water = Np_water
 
     @property
@@ -294,6 +307,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @N0_meters.setter
     def N0_meters(self, N0_meters):
+        if N0_meters <= 0:
+            raise ValueError('N0_meters must be a positive number.')
         self._N0_meters = N0_meters
 
     @property
@@ -338,6 +353,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @Np_sed.setter
     def Np_sed(self, Np_sed):
+        if Np_sed <= 0:
+            raise ValueError('Np_sed must be a positive number.')
         self._Np_sed = Np_sed
 
     @property
@@ -349,6 +366,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @f_bedload.setter
     def f_bedload(self, f_bedload):
+        if (f_bedload < 0) or (f_bedload > 1):
+            raise ValueError('Value for f_bedload must be between 0 and 1,'
+                             ' inclusive.')
         self._f_bedload = f_bedload
 
     @property
@@ -360,6 +380,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @C0_percent.setter
     def C0_percent(self, C0_percent):
+        if C0_percent < 0:
+            raise ValueError('C0_percent must be greater than or equal to 0.')
         self._C0_percent = C0_percent
 
     @property
@@ -371,6 +393,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @Csmooth.setter
     def Csmooth(self, Csmooth):
+        if Csmooth < 0:
+            raise ValueError('Csmooth must be greater than or equal to 0.')
         self._Csmooth = Csmooth
 
     @property
