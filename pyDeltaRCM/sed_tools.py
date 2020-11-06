@@ -50,12 +50,14 @@ class sed_tools(abc.ABC):
         self._sr.run(start_indices, self.eta, self.stage, self.depth,
                      self.cell_type, self.uw, self.ux, self.uy,
                      self.pad_stage, self.pad_depth, self.pad_cell_type,
-                     self.Vp_dep_mud, self.qw, self.qx, self.qy, self.qs)
+                     self.Vp_dep_mud, self.Vp_dep_sand,
+                     self.qw, self.qx, self.qy, self.qs)
 
         # These are the variables updated at the end of the `SandRouter`. If
         # you attempt to drop in a replacement SandRouter, you will need to
         # update these fields!!
         self.Vp_dep_mud = self._sr.Vp_dep_mud
+        self.Vp_dep_sand = self._sr.Vp_dep_sand
         self.eta = self._sr.eta  # update bed
         self.depth = self._sr.depth  # update depth
         self.pad_depth = self._sr.pad_depth  # update depth in padded array
@@ -85,12 +87,14 @@ class sed_tools(abc.ABC):
         self._mr.run(start_indices, self.eta, self.stage, self.depth,
                      self.cell_type, self.uw, self.ux, self.uy,
                      self.pad_stage, self.pad_depth, self.pad_cell_type,
-                     self.Vp_dep_mud, self.qw, self.qx, self.qy)
+                     self.Vp_dep_mud, self.Vp_dep_sand,
+                     self.qw, self.qx, self.qy)
 
         # These are the variables updated at the end of the `MudRouter`. If
         # you attempt to drop in a replacement MudRouter, you will need to
         # update these fields!!
         self.Vp_dep_mud = self._mr.Vp_dep_mud
+        self.Vp_dep_sand = self._mr.Vp_dep_sand
         self.eta = self._mr.eta  # update bed
         self.depth = self._mr.depth  # update depth
         self.pad_depth = self._mr.pad_depth  # update depth in padded array
@@ -139,6 +143,7 @@ r_spec = [('_dt', float32), ('dx', float32),
           ('theta_sed', float32), ('u_max', float32),
           ('qs0', float32), ('u0', float32), ('Vp_sed', float32),
           ('Vp_res', float32), ('Vp_dep_mud', float64[:, :]),
+          ('Vp_dep_sand', float64[:, :]),
           ('U_dep_mud', float32), ('U_ero_mud', float32),
           ('U_ero_sand', float32)]
 
@@ -352,7 +357,7 @@ class SandRouter(BaseRouter):
         self.theta_sed = theta_sed
 
     def run(self, start_indices, eta, stage, depth, cell_type,
-            uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud,
+            uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud, Vp_dep_sand,
             qw, qx, qy, qs):
         """The main function to route and deposit/erode sand parcels.
 
@@ -395,6 +400,7 @@ class SandRouter(BaseRouter):
         self.pad_depth = pad_depth
         self.pad_cell_type = pad_cell_type
         self.Vp_dep_mud = Vp_dep_mud
+        self.Vp_dep_sand = Vp_dep_sand
         self.qw = qw
         self.qx = qx
         self.qy = qy
@@ -511,7 +517,7 @@ class SandRouter(BaseRouter):
                                                 self.eta[px, py], self.dx)
 
         if Vp_change > 0:  # if deposition
-            self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change
+            self.Vp_dep_sand[px, py] = self.Vp_dep_sand[px, py] + Vp_change
 
         self.Vp_res = self.Vp_res - Vp_change  # update sed volume in parcel
 
@@ -559,7 +565,7 @@ class MudRouter(BaseRouter):
         self.theta_sed = theta_sed
 
     def run(self, start_indices, eta, stage, depth, cell_type,
-            uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud,
+            uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud, Vp_dep_sand,
             qw, qx, qy):
         """The main function to route and deposit/erode mud parcels.
 
@@ -576,6 +582,7 @@ class MudRouter(BaseRouter):
         self.pad_depth = pad_depth
         self.pad_cell_type = pad_cell_type
         self.Vp_dep_mud = Vp_dep_mud
+        self.Vp_dep_sand = Vp_dep_sand
         self.qw = qw
         self.qx = qx
         self.qy = qy
