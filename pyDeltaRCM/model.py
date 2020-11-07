@@ -625,8 +625,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         being saved. If any grids or strata are being saved, then metadata
         saving will be turned on automatically, even if this parameter is set
         to False. Metadata associated with pyDeltaRCM are 1-D arrays
-        (vectors) primarily containing information about the domain and
-        the inlet conditions for a given model run.
+        (vectors) and 0-D arrays (floats and integers) primarily containing
+        information about the domain and the inlet conditions for a given model
+        run.
         """
         return self._save_metadata
 
