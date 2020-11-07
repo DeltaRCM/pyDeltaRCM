@@ -180,12 +180,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def verbose(self):
         """
-        verbose controls whether or not logger text should be printed.
+        verbose controls the degree of information printed to the log.
 
-        verbose is an *integer* type parameter, which when set to 1 will
-        generate a full log of messages and warnings as the model is run.
-        When set to 0 (the default), many of the model messages and warnings
-        are suppressed.
+        verbose is an *integer* type parameter, which controls the verbosity
+        of the information saved in the log file. A value of 0, the default,
+        is the least informative. A value of 1 saves and prints a bit of
+        information, and a value of 2 increases the verbosity further.
         """
         return self._verbose
 
@@ -624,8 +624,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         ensure metadata is saved to disk even if no other output information is
         being saved. If any grids or strata are being saved, then metadata
         saving will be turned on automatically, even if this parameter is set
-        to False. Metadata associated with pyDeltaRCM are single dimensional
-        arrays (floats) primarily containing information about the domain and
+        to False. Metadata associated with pyDeltaRCM are 1-D arrays
+        (vectors) primarily containing information about the domain and
         the inlet conditions for a given model run.
         """
         return self._save_metadata
