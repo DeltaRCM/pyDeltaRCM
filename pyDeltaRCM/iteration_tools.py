@@ -43,16 +43,16 @@ class iteration_tools(abc.ABC):
             If model has already been finalized via :meth:`finalize`.
         """
         self.logger.info('-' * 4 + ' Model time ' +
-                         str(self.time) + ' ' + '-' * 4)
-        if self.verbose > 0:
+                         str(self._time) + ' ' + '-' * 4)
+        if self._verbose > 0:
             print('-' * 20)
-            print('Model time: ' + str(self.time))
+            print('Model time: ' + str(self._time))
 
         if self._is_finalized:
             raise RuntimeError('Cannot update model, model already finalized!')
 
         # model operations
-        for iteration in range(self.itermax):
+        for iteration in range(self._itermax):
             self.init_water_iteration()
             self.run_water_iteration()
             self.compute_free_surface()
@@ -76,13 +76,13 @@ class iteration_tools(abc.ABC):
 
         """
         self.flooding_correction()
-        self.stage[:] = np.maximum(self.stage, self.H_SL)
+        self.stage[:] = np.maximum(self.stage, self._H_SL)
         self.depth[:] = np.maximum(self.stage - self.eta, 0)
 
-        self.eta[0, self.inlet] = self.stage[0, self.inlet] - self.h0
-        self.depth[0, self.inlet] = self.h0
+        self.eta[0, self.inlet] = self.stage[0, self.inlet] - self._h0
+        self.depth[0, self.inlet] = self._h0
 
-        self.H_SL = self.H_SL + self.SLR * self.dt
+        self.H_SL = self._H_SL + self._SLR * self._dt
 
     def expand_stratigraphy(self):
         """Expand stratigraphy array sizes.
@@ -96,7 +96,7 @@ class iteration_tools(abc.ABC):
         """
         _msg = 'Expanding stratigraphy arrays'
         self.logger.info(_msg)
-        if self.verbose >= 2:
+        if self._verbose >= 2:
             print(_msg)
 
         lil_blank = lil_matrix((self.L * self.W, self.n_steps),
@@ -136,7 +136,7 @@ class iteration_tools(abc.ABC):
 
             _msg = 'Storing stratigraphy data'
             self.logger.info(_msg)
-            if self.verbose >= 2:
+            if self._verbose >= 2:
                 print(_msg)
 
             # ------------------ sand frac ------------------
@@ -176,7 +176,7 @@ class iteration_tools(abc.ABC):
                                     shape=(self.L * self.W, 1))
             self.strata_eta[:, self.strata_counter] = eta_sparse
 
-            if self.toggle_subsidence and (self.time >= self.start_subsidence):
+            if self._toggle_subsidence and (self._time >= self._start_subsidence):
 
                 sigma_change = (self.strata_eta[:, :self.strata_counter]
                                 - self.sigma.flatten()[:, np.newaxis])
@@ -204,13 +204,13 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        if self.toggle_subsidence:
+        if self._toggle_subsidence:
 
-            if self.time >= self.start_subsidence:
+            if self._time >= self._start_subsidence:
 
                 _msg = 'Applying subsidence'
                 self.logger.info(_msg)
-                if self.verbose >= 2:
+                if self._verbose >= 2:
                     print(_msg)
 
                 self.eta[:] = self.eta - self.sigma
@@ -237,48 +237,48 @@ class iteration_tools(abc.ABC):
         save_idx = self.save_iter
 
         if (self._save_metadata or self._save_any_grids):
-            self.output_netcdf.variables['time'][save_idx] = self.time
+            self.output_netcdf.variables['time'][save_idx] = self._time
 
         # ------------------ Figures ------------------
         if self._save_any_figs:
 
             _msg = 'Saving figures'
             self.logger.info(_msg)
-            if self.verbose >= 2:
+            if self._verbose >= 2:
                 print(_msg)
 
-            if self.save_eta_figs:
-                _fe = self.make_figure('eta', self.time)
+            if self._save_eta_figs:
+                _fe = self.make_figure('eta', self._time)
                 self.save_figure(_fe, directory=self.prefix,
                                  filename_root='eta_',
                                  timestep=self.save_iter)
 
-            if self.save_stage_figs:
-                _fs = self.make_figure('stage', self.time)
+            if self._save_stage_figs:
+                _fs = self.make_figure('stage', self._time)
                 self.save_figure(_fs, directory=self.prefix,
                                  filename_root='stage_',
                                  timestep=self.save_iter)
 
-            if self.save_depth_figs:
-                _fh = self.make_figure('depth', self.time)
+            if self._save_depth_figs:
+                _fh = self.make_figure('depth', self._time)
                 self.save_figure(_fh, directory=self.prefix,
                                  filename_root='depth_',
                                  timestep=self.save_iter)
 
-            if self.save_discharge_figs:
-                _fq = self.make_figure('qw', self.time)
+            if self._save_discharge_figs:
+                _fq = self.make_figure('qw', self._time)
                 self.save_figure(_fq, directory=self.prefix,
                                  filename_root='discharge_',
                                  timestep=self.save_iter)
 
-            if self.save_velocity_figs:
-                _fu = self.make_figure('uw', self.time)
+            if self._save_velocity_figs:
+                _fu = self.make_figure('uw', self._time)
                 self.save_figure(_fu, directory=self.prefix,
                                  filename_root='velocity_',
                                  timestep=self.save_iter)
 
-            if self.save_sedflux_figs:
-                _fu = self.make_figure('qs', self.time)
+            if self._save_sedflux_figs:
+                _fu = self.make_figure('qs', self._time)
                 self.save_figure(_fu, directory=self.prefix,
                                  filename_root='sedflux_',
                                  timestep=self.save_iter)
@@ -288,33 +288,33 @@ class iteration_tools(abc.ABC):
 
             _msg = 'Saving grids'
             self.logger.info(_msg)
-            if self.verbose >= 2:
+            if self._verbose >= 2:
                 print(_msg)
 
-            if self.save_eta_grids:
+            if self._save_eta_grids:
                 self.save_grids('eta', self.eta, save_idx)
 
-            if self.save_depth_grids:
+            if self._save_depth_grids:
                 self.save_grids('depth', self.depth, save_idx)
 
-            if self.save_stage_grids:
+            if self._save_stage_grids:
                 self.save_grids('stage', self.stage, save_idx)
 
-            if self.save_discharge_grids:
+            if self._save_discharge_grids:
                 self.save_grids('discharge', self.qw, save_idx)
 
-            if self.save_velocity_grids:
+            if self._save_velocity_grids:
                 self.save_grids('velocity', self.uw, save_idx)
 
-            if self.save_sedflux_grids:
+            if self._save_sedflux_grids:
                 self.save_grids('sedflux', self.qs, save_idx)
 
         # ------------------ metadata ------------------
         if self._save_metadata:
-            self.output_netcdf['meta']['H_SL'][save_idx] = self.H_SL
-            self.output_netcdf['meta']['f_bedload'][save_idx] = self.H_SL
-            self.output_netcdf['meta']['C0_percent'][save_idx] = self.H_SL
-            self.output_netcdf['meta']['u0'][save_idx] = self.H_SL
+            self.output_netcdf['meta']['H_SL'][save_idx] = self._H_SL
+            self.output_netcdf['meta']['f_bedload'][save_idx] = self._f_bedload
+            self.output_netcdf['meta']['C0_percent'][save_idx] = self._C0_percent
+            self.output_netcdf['meta']['u0'][save_idx] = self._u0
 
     def output_checkpoint(self):
         """Save checkpoint.
@@ -334,7 +334,7 @@ class iteration_tools(abc.ABC):
             self.logger.info(_msg)
             self.save_the_checkpoint()
 
-            if self.checkpoint_dt != self.save_dt:
+            if self._checkpoint_dt != self._save_dt:
                 _msg = 'Grid save interval and checkpoint interval are not ' \
                        'identical, this may result in duplicate entries in ' \
                        'the output NetCDF4 after resuming the model run.'
@@ -360,11 +360,11 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        if self.save_strata:
+        if self._save_strata:
 
             _msg = 'Saving final stratigraphy to netCDF file'
             self.logger.info(_msg)
-            if self.verbose >= 2:
+            if self._verbose >= 2:
                 print(_msg)
 
             if not self.strata_counter > 0:
@@ -372,7 +372,7 @@ class iteration_tools(abc.ABC):
                     'because `delta.time < delta.save_dt`, and the model ' \
                     'has not computed stratigraphy.'
                 self.logger.error(_msg)
-                if self.verbose > 0:
+                if self._verbose > 0:
                     print(_msg)
                 raise RuntimeError(_msg)
 
@@ -416,7 +416,7 @@ class iteration_tools(abc.ABC):
 
             _msg = 'Stratigraphy data saved.'
             self.logger.info(_msg)
-            if self.verbose >= 2:
+            if self._verbose >= 2:
                 print(_msg)
 
     def make_figure(self, var, timestep):
@@ -438,8 +438,8 @@ class iteration_tools(abc.ABC):
 
         fig, ax = plt.subplots()
         im = ax.pcolormesh(self.X, self.Y, _data, shading='flat')
-        ax.set_xlim((0, self.Width))
-        ax.set_ylim((0, self.Length))
+        ax.set_xlim((0, self._Width))
+        ax.set_ylim((0, self._Length))
         ax.set_aspect('equal', adjustable='box')
         divider = axtk.axes_divider.make_axes_locatable(ax)
         cax = divider.append_axes("right", size="2%", pad=0.05)
@@ -541,7 +541,7 @@ class iteration_tools(abc.ABC):
         # get rng state
         rng_state = shared_tools.get_random_state()
 
-        np.savez_compressed(ckp_file, time=self.time, H_SL=self.H_SL,
+        np.savez_compressed(ckp_file, time=self.time, H_SL=self._H_SL,
                             time_iter=_time_iter,
                             save_iter=self._save_iter,
                             save_time_since_last=self._save_time_since_last,
