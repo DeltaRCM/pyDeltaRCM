@@ -512,11 +512,13 @@ class init_tools(abc.ABC):
 
             self.output_netcdf.createGroup('meta')
             # fixed metadata
-            _create_meta_variable('L0', self.L0, 'cells')
-            _create_meta_variable('N0', self.N0, 'cells')
-            _create_meta_variable('CTR', self.CTR, 'cells')
-            _create_meta_variable('dx', self._dx, 'meters')
+            _create_meta_variable('L0', self.L0, 'cells', vartype='i8')
+            _create_meta_variable('N0', self.N0, 'cells', vartype='i8')
+            _create_meta_variable('CTR', self.CTR, 'cells', vartype='i8')
+            _create_meta_variable('dx', self.dx, 'meters')
             _create_meta_variable('h0', self.h0, 'meters')
+            _create_meta_variable('cell_type', self.cell_type, 'type',
+                                  vartype='i8', vardims=('length', 'width'))
             # time-varying metadata
             _create_meta_variable('H_SL', None, 'meters',
                                   vardims=('total_time'))
