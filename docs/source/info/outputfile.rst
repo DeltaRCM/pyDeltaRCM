@@ -26,7 +26,7 @@ values in seconds, associated with each set of saved output data.
 Model Metadata
 --------------
 In addition to the grid coordinates, model metadata is saved as a group of
-single dimension arrays (floats). The values that are saved as metadata are the
+1-D arrays (vectors). The values that are saved as metadata are the
 the following:
 
 - Length of the land surface: `L0`
