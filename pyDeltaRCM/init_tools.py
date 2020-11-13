@@ -291,7 +291,9 @@ class init_tools(abc.ABC):
         self._save_any_grids = (self._save_eta_grids or
                                 self._save_depth_grids or
                                 self._save_stage_grids or self._save_discharge_grids or
-                                self._save_velocity_grids or self._save_sedflux_grids)
+                                self._save_velocity_grids or self._save_sedflux_grids or
+                                self._save_discharge_components or
+                                self._save_velocity_components)
         self._save_any_figs = (self._save_eta_figs or
                                self._save_depth_figs or
                                self._save_stage_figs or self._save_discharge_figs or
@@ -501,6 +503,20 @@ class init_tools(abc.ABC):
                 sedflux = self.output_netcdf.createVariable(
                     'sedflux', 'f4', ('total_time', 'length', 'width'))
                 sedflux.units = 'cubic meters per second'
+            if self.save_discharge_components:
+                discharge_x = self.output_netcdf.createVariable(
+                    'discharge_x', 'f4', ('total_time', 'length', 'width'))
+                discharge_x.units = 'cubic meters per second'
+                discharge_y = self.output_netcdf.createVariable(
+                    'discharge_y', 'f4', ('total_time', 'length', 'width'))
+                discharge_y.units = 'cubic meters per second'
+            if self.save_velocity_components:
+                velocity_x = self.output_netcdf.createVariable(
+                    'velocity_x', 'f4', ('total_time', 'length', 'width'))
+                velocity_x.units = 'meters per second'
+                velocity_y = self.output_netcdf.createVariable(
+                    'velocity_y', 'f4', ('total_time', 'length', 'width'))
+                velocity_y.units = 'meters per second'
 
             # set up metadata group and populate variables
             def _create_meta_variable(varname, varvalue, varunits,
