@@ -309,6 +309,14 @@ class iteration_tools(abc.ABC):
             if self._save_sedflux_grids:
                 self.save_grids('sedflux', self.qs, save_idx)
 
+            if self._save_discharge_components:
+                self.save_grids('discharge_x', self.qx, save_idx)
+                self.save_grids('discharge_y', self.qy, save_idx)
+
+            if self._save_velocity_components:
+                self.save_grids('velocity_x', self.ux, save_idx)
+                self.save_grids('velocity_y', self.uy, save_idx)
+
         # ------------------ metadata ------------------
         if self._save_metadata:
             self.output_netcdf['meta']['H_SL'][save_idx] = self._H_SL
