@@ -164,6 +164,778 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._is_finalized = True
 
     @property
+    def out_dir(self):
+        """
+        out_dir sets the output directory for the simulation results.
+
+        out_dir is a *string* type parameter, specifying the name of the output
+        directory in which the model outputs should be saved.
+        """
+        return self._out_dir
+
+    @out_dir.setter
+    def out_dir(self, out_dir):
+        self._out_dir = out_dir
+
+    @property
+    def verbose(self):
+        """
+        verbose controls the degree of information printed to the log.
+
+        verbose is an *integer* type parameter, which controls the verbosity
+        of the information saved in the log file. A value of 0, the default,
+        is the least informative. A value of 1 saves and prints a bit of
+        information, and a value of 2 increases the verbosity further.
+        """
+        return self._verbose
+
+    @verbose.setter
+    def verbose(self, verbose):
+        self._verbose = verbose
+
+    @property
+    def seed(self):
+        """
+        seed defines the random number seed used for the simulation.
+
+        seed is an *integer* type parameter specifying the random seed value to
+        be used for this model run. If unspecified, a random seed is generated
+        and used.
+        """
+        return self._seed
+
+    @seed.setter
+    def seed(self, seed):
+        self._seed = seed
+
+    @property
+    def Length(self):
+        """
+        Length sets the total length of the domain.
+
+        Length is either an *integer* or a *float*.
+        This is the length of the domain (dimension parallel to the inlet
+        channel), in **meters**.
+        """
+        return self._Length
+
+    @Length.setter
+    def Length(self, Length):
+        if Length <= 0:
+            raise ValueError('Length must be a positive number.')
+        self._Length = Length
+
+    @property
+    def Width(self):
+        """
+        Width sets the total width of the domain.
+
+        Width is either an *integer* or a *float*.
+        This is the width of the domain (dimension perpendicular to the inlet
+        channel), in **meters**.
+        """
+        return self._Width
+
+    @Width.setter
+    def Width(self, Width):
+        if Width <= 0:
+            raise ValueError('Width must be a positive number.')
+        self._Width = Width
+
+    @property
+    def dx(self):
+        """
+        dx is the length of the individual cell faces.
+
+        dx is either an *integer* or a *float*.
+        This parameter specifies the length of the cell faces in the grid in
+        **meters**.
+        """
+        return self._dx
+
+    @dx.setter
+    def dx(self, dx):
+        if (dx <= 0) or (dx > self._Length) or (dx > self._Width):
+            raise ValueError('dx must be positive and smaller than the' +
+                             ' Length and Width parameters.')
+        self._dx = dx
+
+    @property
+    def L0_meters(self):
+        """
+        L0_meters defines the thickness of the land along the coast.
+
+        L0 meters is either an *integer* or a *float*.
+        Thickness of the land adjacent to the inlet in **meters**.
+        This can also be thought of as the length of the inlet channel.
+        """
+        return self._L0_meters
+
+    @L0_meters.setter
+    def L0_meters(self, L0_meters):
+        if L0_meters < 0:
+            raise ValueError('L0_meters must be a greater than or equal to 0.')
+        self._L0_meters = L0_meters
+
+    @property
+    def S0(self):
+        """
+        S0 is the characteristic slope for the delta.
+
+        S0 is either an *integer* or a *float*.
+        This sets the characteristic slope for the delta topset.
+        This parameter is dimensionless.
+        """
+        return self._S0
+
+    @S0.setter
+    def S0(self, S0):
+        self._S0 = S0
+
+    @property
+    def itermax(self):
+        """
+        itermax sets the number of flow routing/free surface iterations.
+        """
+        return self._itermax
+
+    @itermax.setter
+    def itermax(self, itermax):
+        if itermax < 0:
+            raise ValueError('itermax must be greater than or equal to 0.')
+        self._itermax = itermax
+
+    @property
+    def Np_water(self):
+        """
+        Np_water is the number of water parcels simulated.
+
+        Np_water represents the number of "parcels" to split the input water
+        discharge into for the reduced-complexity flow routing.
+        This parameter must be an *integer*
+        """
+        return self._Np_water
+
+    @Np_water.setter
+    def Np_water(self, Np_water):
+        if Np_water <= 0:
+            raise ValueError('Np_water must be a positive number.')
+        self._Np_water = Np_water
+
+    @property
+    def u0(self):
+        """
+        u0 is a reference velocity value.
+
+        u0 is the characteristic or reference velocity value in units of m/s.
+        u0 influences the values of other model parameters such as the maximum
+        flow velocity, gamma, and the velocities at which sediments deposit and
+        erode. This parameter must be an *integer* or a *float*.
+        """
+        return self._u0
+
+    @u0.setter
+    def u0(self, u0):
+        self._u0 = u0
+
+    @property
+    def N0_meters(self):
+        """
+        N0_meters defines the width of the inlet channel in meters.
+
+        N0_meters defines the width of the inlet channel in meters. Therefore,
+        this parameter must be a positive *integer* or *float*.
+        """
+        return self._N0_meters
+
+    @N0_meters.setter
+    def N0_meters(self, N0_meters):
+        if N0_meters <= 0:
+            raise ValueError('N0_meters must be a positive number.')
+        self._N0_meters = N0_meters
+
+    @property
+    def h0(self):
+        """
+        h0 is the reference or characteristic water depth in meters.
+
+        h0 is the reference or characteristic water depth in meters. This
+        parameter must be an *integer* or *float*. h0 defines
+        the depth of water in the inlet channel. One-tenth of the value of h0
+        defines the "dry-depth" or the depth at which cells are considered to
+        be non-wet (dry).
+        """
+        return self._h0
+
+    @h0.setter
+    def h0(self, h0):
+        self._h0 = h0
+
+    @property
+    def H_SL(self):
+        """
+        H_SL sets the sea level elevation in meters.
+        """
+        return self._H_SL
+
+    @H_SL.setter
+    def H_SL(self, H_SL):
+        self._H_SL = H_SL
+
+    @property
+    def SLR(self):
+        """
+        SLR is the sea level rise rate.
+
+        SLR is a parameter for defining the sea level rise rate. SLR is
+        specified in units of m/s. When prescribing a SLR rate, it is important
+        to remember that pyDeltaRCM simulates bankfull discharge conditions.
+        Depending on the flood intermittancy intervals you assume, the
+        conversion from "model time" into "real time simulated" may vary.
+        """
+        return self._SLR
+
+    @SLR.setter
+    def SLR(self, SLR):
+        self._SLR = SLR
+
+    @property
+    def Np_sed(self):
+        """
+        Np_sed is the number of sediment parcels simulated.
+
+        Np_sed represents the number of "parcels" to split the input sediment
+        discharge into for the reduced-complexity sediment routing.
+        This parameter must be an *integer*
+        """
+        return self._Np_sed
+
+    @Np_sed.setter
+    def Np_sed(self, Np_sed):
+        if Np_sed <= 0:
+            raise ValueError('Np_sed must be a positive number.')
+        self._Np_sed = Np_sed
+
+    @property
+    def f_bedload(self):
+        """
+        f_bedload is the bedload fraction of the input sediment.
+
+        f_bedload is the fraction of input sediment that is bedload material.
+        In pyDeltaRCM, bedload material is coarse grained "sand", and
+        suspended load material is fine grained "mud". This parameter must be
+        a value between 0 and 1, inclusive.
+        """
+        return self._f_bedload
+
+    @f_bedload.setter
+    def f_bedload(self, f_bedload):
+        if (f_bedload < 0) or (f_bedload > 1):
+            raise ValueError('Value for f_bedload must be between 0 and 1,'
+                             ' inclusive.')
+        self._f_bedload = f_bedload
+
+    @property
+    def C0_percent(self):
+        """
+        C0_percent is the sediment concentration in the input water supply.
+
+        C0_percent is the prescribed sediment concentration in the input water
+        as a percentage (must be equal to or greater than 0).
+        """
+        return self._C0_percent
+
+    @C0_percent.setter
+    def C0_percent(self, C0_percent):
+        if C0_percent < 0:
+            raise ValueError('C0_percent must be greater than 0.')
+        self._C0_percent = C0_percent
+
+    @property
+    def Csmooth(self):
+        """
+        Csmooth is a free surface smoothing parameter.
+        """
+        return self._Csmooth
+
+    @Csmooth.setter
+    def Csmooth(self, Csmooth):
+        if Csmooth < 0:
+            raise ValueError('Csmooth must be greater than or equal to 0.')
+        self._Csmooth = Csmooth
+
+    @property
+    def toggle_subsidence(self):
+        """
+        toggle_subsidence controls whether subsidence is turned on or off.
+
+        If toggle_subsidence is set to `True` then subsidence is turned on.
+        Otherwise if toggle_subsidence is set to `False` (the default) then no
+        subsidence will occur.
+        """
+        return self._toggle_subsidence
+
+    @toggle_subsidence.setter
+    def toggle_subsidence(self, toggle_subsidence):
+        self._toggle_subsidence = toggle_subsidence
+
+    @property
+    def theta1(self):
+        """
+        theta1 defines the left radial bound for the subsiding region.
+
+        For more information on *theta1* and defining the subsidence pattern,
+        refer to :meth:`init_subsidence`
+        """
+        return self._theta1
+
+    @theta1.setter
+    def theta1(self, theta1):
+        self._theta1 = theta1
+
+    @property
+    def theta2(self):
+        """
+        theta2 defines the right radial bound for the subsiding region.
+
+        For more information on *theta2* and defining the subsidence pattern,
+        refer to :meth:`init_subsidence`
+        """
+        return self._theta2
+
+    @theta2.setter
+    def theta2(self, theta2):
+        self._theta2 = theta2
+
+    @property
+    def sigma_max(self):
+        """
+        sigma_max defines the maximum rate of subsidence.
+        """
+        return self._sigma_max
+
+    @sigma_max.setter
+    def sigma_max(self, sigma_max):
+        self._sigma_max = sigma_max
+
+    @property
+    def start_subsidence(self):
+        """
+        start_subsidence defines the start time at which subsidence begins.
+        """
+        return self._start_subsidence
+
+    @start_subsidence.setter
+    def start_subsidence(self, start_subsidence):
+        self._start_subsidence = start_subsidence
+
+    @property
+    def save_eta_figs(self):
+        """
+        save_eta_figs controls whether or not figures of topography are saved.
+        """
+        return self._save_eta_figs
+
+    @save_eta_figs.setter
+    def save_eta_figs(self, save_eta_figs):
+        self._save_eta_figs = save_eta_figs
+
+    @property
+    def save_stage_figs(self):
+        """
+        save_stage_figs controls whether or not stage figures are saved.
+        """
+        return self._save_stage_figs
+
+    @save_stage_figs.setter
+    def save_stage_figs(self, save_stage_figs):
+        self._save_stage_figs = save_stage_figs
+
+    @property
+    def save_depth_figs(self):
+        """
+        save_depth_figs controls saving of water depth figures.
+        """
+        return self._save_depth_figs
+
+    @save_depth_figs.setter
+    def save_depth_figs(self, save_depth_figs):
+        self._save_depth_figs = save_depth_figs
+
+    @property
+    def save_discharge_figs(self):
+        """
+        save_discharge_figs controls saving of water discharge figures.
+        """
+        return self._save_discharge_figs
+
+    @save_discharge_figs.setter
+    def save_discharge_figs(self, save_discharge_figs):
+        self._save_discharge_figs = save_discharge_figs
+
+    @property
+    def save_velocity_figs(self):
+        """
+        save_velocity_figs controls saving of water velocity figures.
+        """
+        return self._save_velocity_figs
+
+    @save_velocity_figs.setter
+    def save_velocity_figs(self, save_velocity_figs):
+        self._save_velocity_figs = save_velocity_figs
+
+    @property
+    def save_sedflux_figs(self):
+        """
+        save_sedflux_figs controls saving of sediment flux figures.
+        """
+        return self._save_sedflux_figs
+
+    @save_sedflux_figs.setter
+    def save_sedflux_figs(self, save_sedflux_figs):
+        self._save_sedflux_figs = save_sedflux_figs
+
+    @property
+    def save_figs_sequential(self):
+        """
+        save_figs_sequential sets how figures are to be saved.
+
+        save_figs_sequential is a *boolean* parameter that can be set to True
+        or False. If True, then for each figure saving parameter set to True
+        (e.g. :attr:`save_velocity_figs`) a new figure will be saved at an
+        inteval of :attr:`save_dt`. The file names of the figures will
+        correspond to the model timestep at which they were saved. If instead,
+        the save_figs_sequential parameter is set to False, then only the
+        latest figure will be kept, and at each *save_dt* time, the figure file
+        will be overwritten using the current model status.
+        """
+        return self._save_figs_sequential
+
+    @save_figs_sequential.setter
+    def save_figs_sequential(self, save_figs_sequential):
+        self._save_figs_sequential = save_figs_sequential
+
+    @property
+    def save_metadata(self):
+        """
+        save_metadata explicit control on whether or not metadata is saved.
+
+        save_metadata is a boolean that can be manually togged on (True) to
+        ensure metadata is saved to disk even if no other output information is
+        being saved. If any grids or strata are being saved, then metadata
+        saving will be turned on automatically, even if this parameter is set
+        to False. Metadata associated with pyDeltaRCM are 1-D arrays
+        (vectors) and 0-D arrays (floats and integers) primarily containing
+        information about the domain and the inlet conditions for a given model
+        run.
+        """
+        return self._save_metadata
+
+    @save_metadata.setter
+    def save_metadata(self, save_metadata):
+        self._save_metadata = save_metadata
+
+    @property
+    def save_eta_grids(self):
+        """
+        save_eta_grids controls whether or not topography information is saved.
+        """
+        return self._save_eta_grids
+
+    @save_eta_grids.setter
+    def save_eta_grids(self, save_eta_grids):
+        self._save_eta_grids = save_eta_grids
+
+    @property
+    def save_stage_grids(self):
+        """
+        save_stage_grids controls whether or not stage information is saved.
+        """
+        return self._save_stage_grids
+
+    @save_stage_grids.setter
+    def save_stage_grids(self, save_stage_grids):
+        self._save_stage_grids = save_stage_grids
+
+    @property
+    def save_depth_grids(self):
+        """
+        save_depth_grids controls whether or not depth information is saved.
+        """
+        return self._save_depth_grids
+
+    @save_depth_grids.setter
+    def save_depth_grids(self, save_depth_grids):
+        self._save_depth_grids = save_depth_grids
+
+    @property
+    def save_discharge_grids(self):
+        """
+        save_discharge_grids controls saving of water discharge information.
+        """
+        return self._save_discharge_grids
+
+    @save_discharge_grids.setter
+    def save_discharge_grids(self, save_discharge_grids):
+        self._save_discharge_grids = save_discharge_grids
+
+    @property
+    def save_velocity_grids(self):
+        """
+        save_velocity_grids controls saving of water velocity information.
+        """
+        return self._save_velocity_grids
+
+    @save_velocity_grids.setter
+    def save_velocity_grids(self, save_velocity_grids):
+        self._save_velocity_grids = save_velocity_grids
+
+    @property
+    def save_sedflux_grids(self):
+        """
+        save_sedflux_grids controls saving of sediment discharge information.
+        """
+        return self._save_sedflux_grids
+
+    @save_sedflux_grids.setter
+    def save_sedflux_grids(self, save_sedflux_grids):
+        self._save_sedflux_grids = save_sedflux_grids
+
+    @property
+    def save_dt(self):
+        """
+        save_dt defines the saving interval in seconds.
+        """
+        return self._save_dt
+
+    @save_dt.setter
+    def save_dt(self, save_dt):
+        self._save_dt = save_dt
+
+    @property
+    def checkpoint_dt(self):
+        """
+        checkpoint_dt defines the interval to create checkpoint information.
+        """
+        return self._checkpoint_dt
+
+    @checkpoint_dt.setter
+    def checkpoint_dt(self, checkpoint_dt):
+        self._checkpoint_dt = checkpoint_dt
+
+    @property
+    def save_strata(self):
+        """
+        save_strata controls whether or not stratigraphy information is saved.
+        """
+        return self._save_strata
+
+    @save_strata.setter
+    def save_strata(self, save_strata):
+        self._save_strata = save_strata
+
+    @property
+    def save_checkpoint(self):
+        """
+        save_checkpoint controls saving of model checkpoint information.
+        """
+        return self._save_checkpoint
+
+    @save_checkpoint.setter
+    def save_checkpoint(self, save_checkpoint):
+        self._save_checkpoint = save_checkpoint
+
+    @property
+    def resume_checkpoint(self):
+        """
+        resume_checkpoint controls loading of a checkpoint if run is resuming.
+        """
+        return self._resume_checkpoint
+
+    @resume_checkpoint.setter
+    def resume_checkpoint(self, resume_checkpoint):
+        self._resume_checkpoint = resume_checkpoint
+
+    @property
+    def omega_sfc(self):
+        """
+        omega_sfc is a water surface underrelaxation parameter.
+        """
+        return self._omega_sfc
+
+    @omega_sfc.setter
+    def omega_sfc(self, omega_sfc):
+        self._omega_sfc = omega_sfc
+
+    @property
+    def omega_flow(self):
+        """
+        omega_flow is a flow velocity underrelaxation parameter.
+        """
+        return self._omega_flow
+
+    @omega_flow.setter
+    def omega_flow(self, omega_flow):
+        self._omega_flow = omega_flow
+
+    @property
+    def Nsmooth(self):
+        """
+        Nsmooth defines the number of times the water surface is smoothed.
+        """
+        return self._Nsmooth
+
+    @Nsmooth.setter
+    def Nsmooth(self, Nsmooth):
+        self._Nsmooth = Nsmooth
+
+    @property
+    def theta_water(self):
+        """
+        theta_water is the exponent of depth dependence for weighted routing.
+
+        For the routing of the water parcels, the dependence of the random walk
+        on local water depth can be modulated by varying this parameter value.
+        As theta_water gets larger, the importance of the water depth to the
+        weighting scheme grows.
+
+        .. note::
+           The value of *theta_water* also influences the values of
+           :attr:`coeff_theta_sand` and :attr:`coeff_theta_mud` which are
+           coefficients that are multiplied by *theta_water* to set the theta
+           values for the sand and mud routing respectively.
+        """
+        return self._theta_water
+
+    @theta_water.setter
+    def theta_water(self, theta_water):
+        self._theta_water = theta_water
+
+    @property
+    def coeff_theta_sand(self):
+        """
+        coeff_theta_sand is the coefficient applied to theta for sand routing.
+
+        coeff_theta_sand is a coefficient applied to the :attr:`theta_water`
+        attribute to define the value of theta for sand routing. Theta is
+        the exponent applied to the local water depth and is used to weight
+        the random walk. For mud and sand these weighting rules vary, which is
+        why the :attr:`theta_water` term is multiplied by these coefficients:
+        :attr:`coeff_theta_mud` and :attr:`coeff_theta_sand`.
+        """
+        return self._coeff_theta_sand
+
+    @coeff_theta_sand.setter
+    def coeff_theta_sand(self, coeff_theta_sand):
+        self._coeff_theta_sand = coeff_theta_sand
+
+    @property
+    def coeff_theta_mud(self):
+        """
+        coeff_theta_mud is the coefficient applied to theta for mud routing.
+
+        coeff_theta_mud is a coefficient applied to the :attr:`theta_water`
+        attribute to define the value of theta for mud routing. Theta is
+        the exponent applied to the local water depth and is used to weight
+        the random walk. For mud and sand these weighting rules vary, which is
+        why the :attr:`theta_water` term is multiplied by these coefficients:
+        :attr:`coeff_theta_mud` and :attr:`coeff_theta_sand`.
+        """
+        return self._coeff_theta_mud
+
+    @coeff_theta_mud.setter
+    def coeff_theta_mud(self, coeff_theta_mud):
+        self._coeff_theta_mud = coeff_theta_mud
+
+    @property
+    def beta(self):
+        """
+        beta is the bedload transport capacity exponent.
+
+        beta is an exponent on the bedload transport terms that is applied to
+        the local velocity and threshold velocity terms.
+        """
+        return self._beta
+
+    @beta.setter
+    def beta(self, beta):
+        self._beta = beta
+
+    @property
+    def sed_lag(self):
+        """
+        sed_lag is a "sedimentation lag" parameter.
+
+        sed_lag influences the properties of mud deposition by controlling how
+        much mud is deposited when the flow velocity is below the threshold
+        for mud deposition (:attr:`coeff_U_dep_mud`).
+        """
+        return self._sed_lag
+
+    @sed_lag.setter
+    def sed_lag(self, sed_lag):
+        self._sed_lag = sed_lag
+
+    @property
+    def coeff_U_dep_mud(self):
+        """
+        coeff_U_dep_mud is the threshold velocity for mud sediment deposition.
+
+        coeff_U_dep_mud sets the threshold velocity for mud to be depoisted.
+        The smaller this parameter is, the longer a mud parcel can travel
+        before losing all of its mud volume.
+        """
+        return self._coeff_U_dep_mud
+
+    @coeff_U_dep_mud.setter
+    def coeff_U_dep_mud(self, coeff_U_dep_mud):
+        self._coeff_U_dep_mud = coeff_U_dep_mud
+
+    @property
+    def coeff_U_ero_mud(self):
+        """
+        coeff_U_ero_mud is the mud erosion velocity threshold coefficient.
+
+        coeff_U_ero_mud sets the threshold velocity for erosion of the mud
+        (suspended load) sediment. The higher this value is, the more difficult
+        it is to erode mud deposits.
+        """
+        return self._coeff_U_ero_mud
+
+    @coeff_U_ero_mud.setter
+    def coeff_U_ero_mud(self, coeff_U_ero_mud):
+        self._coeff_U_ero_mud = coeff_U_ero_mud
+
+    @property
+    def coeff_U_ero_sand(self):
+        """
+        coeff_U_ero_sand is the sand erosion velocity threshold coefficient.
+
+        coeff_U_ero_sand sets the threshold velocity for sediment erosion of
+        the sand (bedload) sediment. The higher this value is, the more
+        difficult it is to erode the bed.
+        """
+        return self._coeff_U_ero_sand
+
+    @coeff_U_ero_sand.setter
+    def coeff_U_ero_sand(self, coeff_U_ero_sand):
+        self._coeff_U_ero_sand = coeff_U_ero_sand
+
+    @property
+    def alpha(self):
+        """
+        alpha is the topographic diffusion coefficient.
+
+        alpha is the coefficient used for topographic diffusion. It controls
+        both the cross-slope sediment flux as well as bank erodability.
+        """
+        return self._alpha
+
+    @alpha.setter
+    def alpha(self, alpha):
+        self._alpha = alpha
+
+    @property
     def time(self):
         """Elapsed model time in seconds.
         """

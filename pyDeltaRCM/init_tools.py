@@ -134,7 +134,7 @@ class init_tools(abc.ABC):
         """
         _msg = 'Setting up model configuration'
         self.logger.info(_msg)
-        if self.verbose >= 2:
+        if self._verbose >= 2:
             print(_msg)
 
         # process the input file to attributes of the model
@@ -143,14 +143,14 @@ class init_tools(abc.ABC):
 
         # if checkpoint_dt is the default value (None), then set it to save_dt
         if self.checkpoint_dt is None:
-            self.checkpoint_dt = self.save_dt
+            self.checkpoint_dt = self._save_dt
 
         # handle a not implemented setup
-        if self.save_checkpoint and self.toggle_subsidence:
+        if self.save_checkpoint and self._toggle_subsidence:
             raise NotImplementedError('Cannot handle checkpointing with subsidence.')
 
         # write the input file values to the log
-        if not self.resume_checkpoint:
+        if not self._resume_checkpoint:
             for k, v in list(self._input_file_vars.items()):
                 _msg = 'Configuration variable `{var}`: {val}'.format(
                     var=k, val=v)
@@ -163,19 +163,19 @@ class init_tools(abc.ABC):
 
         Writes the seed to the log for record.
         """
-        if self.seed is None:
+        if self._seed is None:
             # generate a random seed for reproducibility
             self.seed = np.random.randint((2**32) - 1, dtype='u8')
 
-        _msg = 'Setting random seed to: %s ' % str(self.seed)
+        _msg = 'Setting random seed to: %s ' % str(self._seed)
         self.logger.info(_msg)
-        if self.verbose >= 2:
+        if self._verbose >= 2:
             print(_msg)
 
-        shared_tools.set_random_seed(self.seed)
+        shared_tools.set_random_seed(self._seed)
 
         # always write the seed to file for record and reproducability
-        self.logger.info('Random seed is: %s ' % str(self.seed))
+        self.logger.info('Random seed is: %s ' % str(self._seed))
 
     def set_constants(self):
 
@@ -225,52 +225,52 @@ class init_tools(abc.ABC):
         `channel_width`, `channel_flow_depth`, and
         `influx_sediment_concentration`.
         """
-        self.init_Np_water = self.Np_water
-        self.init_Np_sed = self.Np_sed
+        self.init_Np_water = self._Np_water
+        self.init_Np_sed = self._Np_sed
 
-        self.dx = float(self.dx)
+        self.dx = float(self._dx)
 
-        self.theta_sand = self.coeff_theta_sand * self.theta_water
-        self.theta_mud = self.coeff_theta_mud * self.theta_water
+        self.theta_sand = self._coeff_theta_sand * self._theta_water
+        self.theta_mud = self._coeff_theta_mud * self._theta_water
 
-        self.U_dep_mud = self.coeff_U_dep_mud * self.u0
-        self.U_ero_sand = self.coeff_U_ero_sand * self.u0
-        self.U_ero_mud = self.coeff_U_ero_mud * self.u0
+        self.U_dep_mud = self._coeff_U_dep_mud * self._u0
+        self.U_ero_sand = self._coeff_U_ero_sand * self._u0
+        self.U_ero_mud = self._coeff_U_ero_mud * self._u0
 
-        self.L = int(round(self.Length / self.dx))        # num cells in x
-        self.W = int(round(self.Width / self.dx))         # num cells in y
+        self.L = int(round(self._Length / self._dx))        # num cells in x
+        self.W = int(round(self._Width / self._dx))         # num cells in y
 
         # inlet length and width
         self.L0 = max(
-            1, min(int(round(self.L0_meters / self.dx)), self.L // 4))
+            1, min(int(round(self._L0_meters / self._dx)), self.L // 4))
         self.N0 = max(
-            3, min(int(round(self.N0_meters / self.dx)), self.W // 4))
+            3, min(int(round(self._N0_meters / self._dx)), self.W // 4))
 
         self.set_constants()
 
-        self.u_max = 2.0 * self.u0  # maximum allowed flow velocity
-        self.C0 = self.C0_percent * 1 / 100.  # sediment concentration
+        self.u_max = 2.0 * self._u0  # maximum allowed flow velocity
+        self.C0 = self._C0_percent * 1 / 100.  # sediment concentration
 
         # (m) critial depth to switch to "dry" node
-        self.dry_depth = min(0.1, 0.1 * self.h0)
+        self.dry_depth = min(0.1, 0.1 * self._h0)
         self.CTR = floor(self.W / 2.) - 1
         if self.CTR <= 1:
             self.CTR = floor(self.W / 2.)
 
-        self.gamma = self.g * self.S0 * self.dx / (self.u0**2)
+        self.gamma = self.g * self._S0 * self._dx / (self._u0**2)
 
         # (m^3) reference volume, volume to fill cell to characteristic depth
-        self.V0 = self.h0 * (self.dx**2)
-        self.Qw0 = self.u0 * self.h0 * self.N0 * self.dx    # const discharge
+        self.V0 = self.h0 * (self._dx**2)
+        self.Qw0 = self._u0 * self.h0 * self.N0 * self._dx    # const discharge
 
         # at inlet
-        self.qw0 = self.u0 * self.h0  # water unit input discharge
-        self.Qp_water = self.Qw0 / self.Np_water    # volume each water parcel
+        self.qw0 = self._u0 * self.h0  # water unit input discharge
+        self.Qp_water = self.Qw0 / self._Np_water    # volume each water parcel
         self.qs0 = self.qw0 * self.C0  # sed unit discharge
         # total amount of sed added to domain per timestep
         self.dVs = 0.1 * self.N0**2 * self.V0
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
-        self.Vp_sed = self.dVs / self.Np_sed   # volume of each sediment parcel
+        self.Vp_sed = self.dVs / self._Np_sed   # volume of each sediment parcel
 
         self.stepmax = 2 * (self.L + self.W)  # max number of jumps for parcel
         # initial width of self.free_surf_walk_indices
@@ -278,29 +278,28 @@ class init_tools(abc.ABC):
 
         self._dt = self.dVs / self.Qs0  # time step size
 
-        self.omega_flow_iter = 2. / self.itermax
+        self.omega_flow_iter = 2. / self._itermax
 
         # number of times to repeat topo diffusion
         self.N_crossdiff = int(round(self.dVs / self.V0))
 
-        self._lambda = self.sed_lag  # sedimentation lag
+        self._lambda = self._sed_lag  # sedimentation lag
 
-        self.diffusion_multiplier = (self.dt / self.N_crossdiff * self.alpha
-                                     * 0.5 / self.dx**2)
+        self.diffusion_multiplier = (self._dt / self.N_crossdiff * self._alpha
+                                     * 0.5 / self._dx**2)
 
-        self._save_any_grids = (self.save_eta_grids or self.save_depth_grids or
-                                self.save_stage_grids or self.save_discharge_grids or
-                                self.save_velocity_grids or self.save_sedflux_grids)
-        self._save_any_figs = (self.save_eta_figs or self.save_depth_figs or
-                               self.save_stage_figs or self.save_discharge_figs or
-                               self.save_velocity_figs or self.save_sedflux_figs)
-        self._save_figs_sequential = self.save_figs_sequential  # copy as private
-        self._save_metadata = self.save_metadata
+        self._save_any_grids = (self._save_eta_grids or
+                                self._save_depth_grids or
+                                self._save_stage_grids or self._save_discharge_grids or
+                                self._save_velocity_grids or self._save_sedflux_grids)
+        self._save_any_figs = (self._save_eta_figs or
+                               self._save_depth_figs or
+                               self._save_stage_figs or self._save_discharge_figs or
+                               self._save_velocity_figs or self._save_sedflux_figs)
         if self._save_any_grids:  # always save metadata if saving grids
             self._save_metadata = True
         self._is_finalized = False
 
-        self._save_checkpoint = self.save_checkpoint  # copy as private
 
     def create_domain(self):
         """
@@ -311,8 +310,8 @@ class init_tools(abc.ABC):
         # ---- empty arrays ----
         self.x, self.y = np.meshgrid(np.arange(0, self.W),
                                      np.arange(0, self.L))
-        self.X, self.Y = np.meshgrid(np.arange(0, self.W+1)*self.dx,
-                                     np.arange(0, self.L+1)*self.dx)
+        self.X, self.Y = np.meshgrid(np.arange(0, self.W+1)*self._dx,
+                                     np.arange(0, self.L+1)*self._dx)
 
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int64)
         self.eta = np.zeros((self.L, self.W)).astype(np.float32)
@@ -329,9 +328,9 @@ class init_tools(abc.ABC):
         self.qs = np.zeros((self.L, self.W))
         self.Vp_dep_sand = np.zeros((self.L, self.W))
         self.Vp_dep_mud = np.zeros((self.L, self.W))
-        self.free_surf_flag = np.zeros((self.Np_water,), dtype=np.int64)
-        self.looped = np.zeros((self.Np_water,), dtype=np.int64)
-        self.free_surf_walk_indices = np.zeros((self.Np_water, self.size_indices),
+        self.free_surf_flag = np.zeros((self._Np_water,), dtype=np.int64)
+        self.looped = np.zeros((self._Np_water,), dtype=np.int64)
+        self.free_surf_walk_indices = np.zeros((self._Np_water, self.size_indices),
                                                dtype=np.int64)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
@@ -348,7 +347,7 @@ class init_tools(abc.ABC):
         y_channel_max = channel_inds + self.N0
         self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
 
-        self.stage[:] = np.maximum(0, self.L0 - self.y - 1) * self.dx * self.S0
+        self.stage[:] = np.maximum(0, self.L0 - self.y - 1) * self._dx * self._S0
         self.stage[self.cell_type == cell_ocean] = 0.
 
         self.depth[self.cell_type == cell_ocean] = self.h0
@@ -391,21 +390,21 @@ class init_tools(abc.ABC):
         expensive, so we avoid boxing up the constants on each iteration.
         """
         # initialize the MudRouter object
-        self._mr = sed_tools.MudRouter(self._dt, self.dx, self.Vp_sed,
+        self._mr = sed_tools.MudRouter(self._dt, self._dx, self.Vp_sed,
                                        self.u_max, self.U_dep_mud, self.U_ero_mud,
                                        self.ivec_flat, self.jvec_flat,
                                        self.iwalk_flat, self.jwalk_flat,
                                        self.distances_flat, self.dry_depth, self.gamma,
-                                       self._lambda, self.beta,  self.stepmax,
+                                       self._lambda, self._beta,  self.stepmax,
                                        self.theta_mud)
         # initialize the SandRouter object
-        self._sr = sed_tools.SandRouter(self._dt, self.dx, self.Vp_sed,
-                                        self.u_max, self.qs0, self.u0, self.U_ero_sand,
-                                        self.f_bedload,
+        self._sr = sed_tools.SandRouter(self._dt, self._dx, self.Vp_sed,
+                                        self.u_max, self.qs0, self._u0, self.U_ero_sand,
+                                        self._f_bedload,
                                         self.ivec_flat, self.jvec_flat,
                                         self.iwalk_flat, self.jwalk_flat,
                                         self.distances_flat, self.dry_depth, self.gamma,
-                                        self.beta, self.stepmax,
+                                        self._beta, self.stepmax,
                                         self.theta_sand)
 
     def init_stratigraphy(self):
@@ -414,7 +413,7 @@ class init_tools(abc.ABC):
 
             self.strata_counter = 0
 
-            self.n_steps = int(max(1, 5 * int(self.save_dt / self.dt)))
+            self.n_steps = int(max(1, 5 * int(self._save_dt / self.dt)))
 
             self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps),
                                                dtype=np.float32)
@@ -437,7 +436,7 @@ class init_tools(abc.ABC):
 
             _msg = 'Generating netCDF file for output grids'
             self.logger.info(_msg)
-            if self.verbose >= 2:
+            if self._verbose >= 2:
                 print(_msg)
 
             directory = self.prefix
@@ -447,7 +446,7 @@ class init_tools(abc.ABC):
             if os.path.exists(file_path):
                 _msg = 'Replacing existing netCDF file'
                 self.logger.warning(_msg)
-                if self.verbose >= 2:
+                if self._verbose >= 2:
                     warnings.warn(UserWarning(_msg))
                 os.remove(file_path)
 
@@ -532,7 +531,7 @@ class init_tools(abc.ABC):
 
             _msg = 'Output netCDF file created'
             self.logger.info(_msg)
-            if self.verbose >= 2:
+            if self._verbose >= 2:
                 print(_msg)
 
     def init_subsidence(self):
@@ -554,7 +553,7 @@ class init_tools(abc.ABC):
         in the subsiding region is 30 degrees. theta2 defines the right angular
         bounds for the subsiding region in a similar fashion.
         """
-        if self.toggle_subsidence:
+        if self._toggle_subsidence:
 
             R1 = 0.3 * self.L
             R2 = 1. * self.L  # radial limits (fractions of L)
@@ -566,11 +565,11 @@ class init_tools(abc.ABC):
                 (self.x[self.y > self.L0 - 1] - self.W / 2.)
                 / (self.y[self.y > self.L0 - 1] - self.L0 + 1))
             self.subsidence_mask = ((R1 <= Rloc) & (Rloc <= R2) &
-                                    (self.theta1 <= thetaloc) &
-                                    (thetaloc <= self.theta2))
+                                    (self._theta1 <= thetaloc) &
+                                    (thetaloc <= self._theta2))
             self.subsidence_mask[:self.L0, :] = False
 
-            self.sigma = self.subsidence_mask * self.sigma_max * self.dt
+            self.sigma = self.subsidence_mask * self._sigma_max * self.dt
 
     def load_checkpoint(self):
         """Load the checkpoint from the .npz file."""
