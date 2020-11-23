@@ -843,3 +843,147 @@ def test_subsidence_bounds(tmp_path):
     # check specific regions
     assert np.all(delta.subsidence_mask[75:, 60:] == 1)
     assert np.all(delta.subsidence_mask[:, :55] == 0)
+
+
+# test private variable setters for valid values
+
+def test_negative_length(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Length', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_negative_width(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Width', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_negative_dx(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'dx', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_bigger_than_Width_dx(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Width', 10)
+    utilities.write_parameter_to_file(f, 'dx', 100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_bigger_than_Length_dx(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Length', 10)
+    utilities.write_parameter_to_file(f, 'dx', 100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_negative_L0_meters(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'L0_meters', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_negative_itermax(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'itermax', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_negative_Np_water(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Np_water', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_negative_N0_meters(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'N0_meters', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_negative_Np_sed(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Np_sed', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_negative_f_bedload(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'f_bedload', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_big_f_bedload(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'f_bedload', 2)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_negative_C0_percent(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'C0_percent', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
+def test_negative_Csmooth(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'Csmooth', -100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)

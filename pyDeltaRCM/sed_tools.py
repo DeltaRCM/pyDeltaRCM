@@ -41,7 +41,7 @@ class sed_tools(abc.ABC):
         the model fields, where they are later used by the `MudRouter` and the
         water parcel routing.
         """
-        num_starts = int(self.Np_sed * self.f_bedload)
+        num_starts = int(self._Np_sed * self._f_bedload)
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
                                                        inlet_weights,
@@ -78,7 +78,7 @@ class sed_tools(abc.ABC):
         the model fields, where they are later used by the water parcel
         routing.
         """
-        num_starts = int(self.Np_sed * (1 - self.f_bedload))
+        num_starts = int(self._Np_sed * (1 - self._f_bedload))
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
                                                        inlet_weights,
@@ -126,7 +126,7 @@ class sed_tools(abc.ABC):
             self.eta += self.cf
 
 
-r_spec = [('_dt', float32), ('dx', float32),
+r_spec = [('_dt', float32), ('_dx', float32),
           ('num_starts', int64), ('start_indices', int64[:]),
           ('stepmax', float32), ('px', int64), ('py', int64),
           ('eta', float32[:, :]), ('stage', float32[:, :]),
@@ -139,9 +139,9 @@ r_spec = [('_dt', float32), ('dx', float32),
           ('iwalk_flat', int64[:]), ('jwalk_flat', int64[:]),
           ('distances_flat', float32[:]),
           ('dry_depth', float32), ('gamma', float32), ('_lambda', float32),
-          ('beta', float32),  ('f_bedload', float32),
+          ('_beta', float32),  ('_f_bedload', float32),
           ('theta_sed', float32), ('u_max', float32),
-          ('qs0', float32), ('u0', float32), ('Vp_sed', float32),
+          ('qs0', float32), ('_u0', float32), ('Vp_sed', float32),
           ('Vp_res', float32), ('Vp_dep_mud', float64[:, :]),
           ('Vp_dep_sand', float64[:, :]),
           ('U_dep_mud', float32), ('U_ero_mud', float32),
@@ -249,7 +249,7 @@ class BaseRouter(object):
         #    determinations require several comparisons and repeated indexing,
         #    so we use a jitted "helper" function to do the operations.
         qw0 = self.qw[px, py]
-        eta_change = Vp_change / (self.dx * self.dx)
+        eta_change = Vp_change / (self._dx * self._dx)
 
         eta = self.eta[px, py] + eta_change  # new bed
         depth = self.stage[px, py] - eta  # new depth
@@ -337,14 +337,14 @@ class SandRouter(BaseRouter):
                  dry_depth, gamma, beta, stepmax, theta_sed):
 
         self._dt = _dt
-        self.dx = dx
+        self._dx = dx
         self.Vp_sed = Vp_sed
 
         self.u_max = u_max
         self.qs0 = qs0
-        self.u0 = u0
+        self._u0 = u0
         self.U_ero_sand = U_ero_sand
-        self.f_bedload = f_bedload
+        self._f_bedload = f_bedload
 
         self.ivec_flat, self.jvec_flat,  = ivec_flat, jvec_flat
         self.iwalk_flat, self.jwalk_flat = iwalk_flat, jwalk_flat
@@ -352,7 +352,7 @@ class SandRouter(BaseRouter):
 
         self.dry_depth = dry_depth
         self.gamma = gamma
-        self.beta = beta
+        self._beta = beta
         self.stepmax = stepmax
         self.theta_sed = theta_sed
 
@@ -415,7 +415,7 @@ class SandRouter(BaseRouter):
             py = start_indices[np_sed]
 
             self.qs[px, py] = (self.qs[px, py] +
-                               self.Vp_res / 2. / self._dt / self.dx)
+                               self.Vp_res / 2. / self._dt / self._dx)
             self._route_one_parcel(px, py)
 
     def _route_one_parcel(self, px, py):
@@ -472,7 +472,7 @@ class SandRouter(BaseRouter):
     def _partition_sediment(self, px0, py0, px, py, dist):
         """Spread sand between two cells.
         """
-        partition = self.Vp_res / 2. / self._dt / self.dx
+        partition = self.Vp_res / 2. / self._dt / self._dx
         if dist > 0:
             self.qs[px0, py0] += partition  # deposition in current cell
             self.qs[px, py] += partition  # deposition in new cell
@@ -493,8 +493,8 @@ class SandRouter(BaseRouter):
             transport capacity is not yet reached (`qs_loc < qs_cap`).
         """
         U_loc = self.uw[px, py]
-        qs_cap = (self.qs0 * self.f_bedload / self.u0**self.beta *
-                  U_loc**self.beta)
+        qs_cap = (self.qs0 * self._f_bedload / self._u0**self._beta *
+                  U_loc**self._beta)
         qs_loc = self.qs[px, py]
 
         Vp_change = 0
@@ -504,7 +504,7 @@ class SandRouter(BaseRouter):
             #     transport capacity of the cell (`qs_cap`), sediment needs to
             #     deposit on the bed.
             Vp_change = self._limit_Vp_change(self.Vp_res, self.stage[px, py],
-                                              self.eta[px, py], self.dx)
+                                              self.eta[px, py], self._dx)
 
         elif (U_loc > self.U_ero_sand) and (qs_loc < qs_cap):
             # Sand erosion
@@ -512,9 +512,9 @@ class SandRouter(BaseRouter):
             #     critical erosion threshold for sand, *and* if the local
             #     transport capacity is not yet reached.
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
-                                             self.U_ero_sand, self.beta)
+                                             self.U_ero_sand, self._beta)
             Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                                self.eta[px, py], self.dx)
+                                                self.eta[px, py], self._dx)
 
         if Vp_change > 0:  # if deposition
             self.Vp_dep_sand[px, py] = self.Vp_dep_sand[px, py] + Vp_change
@@ -546,7 +546,7 @@ class MudRouter(BaseRouter):
                  dry_depth, gamma, _lambda, beta, stepmax, theta_sed):
 
         self._dt = _dt
-        self.dx = dx
+        self._dx = dx
         self.Vp_sed = Vp_sed
 
         self.u_max = u_max
@@ -560,7 +560,7 @@ class MudRouter(BaseRouter):
         self.dry_depth = dry_depth
         self.gamma = gamma
         self._lambda = _lambda
-        self.beta = beta
+        self._beta = beta
         self.stepmax = stepmax
         self.theta_sed = theta_sed
 
@@ -632,16 +632,16 @@ class MudRouter(BaseRouter):
         Vp_change = 0
         if U_loc < self.U_dep_mud:
             Vp_change = (self._lambda * self.Vp_res *
-                         (self.U_dep_mud**self.beta - U_loc**self.beta) /
-                         (self.U_dep_mud**self.beta))
+                         (self.U_dep_mud**self._beta - U_loc**self._beta) /
+                         (self.U_dep_mud**self._beta))
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                              self.eta[px, py], self.dx)
+                                              self.eta[px, py], self._dx)
 
         elif U_loc > self.U_ero_mud:
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
-                                             self.U_ero_mud, self.beta)
+                                             self.U_ero_mud, self._beta)
             Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                                self.eta[px, py], self.dx)
+                                                self.eta[px, py], self._dx)
 
         if Vp_change > 0:  # if deposition
             self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change

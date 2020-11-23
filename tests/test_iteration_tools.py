@@ -43,6 +43,7 @@ def test_subsidence_in_update(tmp_path):
     _delta.update()
     assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
     assert _delta.eta[17, 6] == pytest.approx(-_delta.h0 - 0.0002)
+    _delta.output_netcdf.close()
 
 
 def test_subsidence_in_update_delayed_start(tmp_path):
@@ -65,6 +66,7 @@ def test_subsidence_in_update_delayed_start(tmp_path):
     assert _delta.time == 40000
     assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
     assert _delta.eta[17, 6] == pytest.approx(-_delta.h0 - 0.0002)
+    _delta.output_netcdf.close()
 
 
 def test_subsidence_changed_with_timestep(tmp_path):
@@ -76,6 +78,7 @@ def test_subsidence_changed_with_timestep(tmp_path):
     assert _delta.sigma[17, 6] == 0.0002
     _delta.time_step = 86400
     assert _delta.sigma[17, 6] == 0.000864
+    _delta.output_netcdf.close()
 
 
 def test_expand_stratigraphy(tmp_path):
@@ -589,6 +592,7 @@ def test_save_metadata_and_grids(tmp_path):
     utilities.write_parameter_to_file(f, 'save_eta_grids', True)
     utilities.write_parameter_to_file(f, 'save_velocity_grids', True)
     utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'f_bedload', 0.25)
     f.close()
 
     _delta = DeltaModel(input_file=p)
@@ -605,6 +609,7 @@ def test_save_metadata_and_grids(tmp_path):
     assert ('velocity' in ds.variables)
     assert ds['meta']['H_SL'].shape[0] == 3
     assert ds['meta']['L0'][:] == 1
+    assert np.all(ds['meta']['f_bedload'][:] == 0.25)
 
 
 def test_save_one_grid_metadata_by_default(tmp_path):
@@ -622,6 +627,7 @@ def test_save_one_grid_metadata_by_default(tmp_path):
     utilities.write_parameter_to_file(f, 'save_eta_grids', True)
     utilities.write_parameter_to_file(f, 'save_metadata', False)
     utilities.write_parameter_to_file(f, 'save_dt', 1)
+    utilities.write_parameter_to_file(f, 'C0_percent', 0.2)
     f.close()
 
     _delta = DeltaModel(input_file=p)
@@ -639,6 +645,8 @@ def test_save_one_grid_metadata_by_default(tmp_path):
     assert _arr.shape[2] == _delta.eta.shape[1]
     assert ('meta' in ds.groups)  # if any grids, save meta too
     assert ds.groups['meta']['H_SL'].shape[0] == _arr.shape[0]
+    assert np.all(ds.groups['meta']['C0_percent'][:] == 0.2)
+    assert np.all(ds.groups['meta']['f_bedload'][:] == 0.5)
 
 
 def test_save_eta_grids(tmp_path):

@@ -38,10 +38,10 @@ class water_tools(abc.ABC):
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
                                                        inlet_weights,
-                                                       self.Np_water)
+                                                       self._Np_water)
 
         self.qxn.flat[start_indices] += 1
-        self.qwn.flat[start_indices] += self.Qp_water / self.dx / 2
+        self.qwn.flat[start_indices] += self.Qp_water / self._dx / 2
 
         self.free_surf_walk_indices[:, 0] = start_indices
         current_inds = np.copy(start_indices)
@@ -100,7 +100,7 @@ class water_tools(abc.ABC):
         self.sfc_visit, self.sfc_sum = _accumulate_free_surface_walks(
             self.free_surf_walk_indices, self.looped, self.cell_type,
             self.uw, self.ux, self.uy, self.depth,
-            self.dx, self.u0, self.h0, self.H_SL, self.S0)
+            self._dx, self._u0, self.h0, self._H_SL, self._S0)
 
         self.finalize_free_surface()
 
@@ -109,7 +109,7 @@ class water_tools(abc.ABC):
 
         Clean up at end of water iteration
         """
-        self.stage[:] = np.maximum(self.stage, self.H_SL)
+        self.stage[:] = np.maximum(self.stage, self._H_SL)
         self.depth[:] = np.maximum(self.stage - self.eta, 0)
 
         self.update_flow_field(iteration)
@@ -127,11 +127,11 @@ class water_tools(abc.ABC):
             """
             _msg = 'Increasing size of self.free_surf_walk_indices'
             self.logger.info(_msg)
-            if self.verbose >= 2:
+            if self._verbose >= 2:
                 print(_msg)
 
             indices_blank = np.zeros(
-                (np.int(self.Np_water), np.int(self.stepmax / 4)), dtype=np.int)
+                (np.int(self._Np_water), np.int(self.stepmax / 4)), dtype=np.int)
 
             self.free_surf_walk_indices = np.hstack((self.free_surf_walk_indices, indices_blank))
 
@@ -153,7 +153,7 @@ class water_tools(abc.ABC):
                 self.water_weights[i, j] = shared_tools.get_weight_at_cell(
                     (i, j), weight_sfc, weight_int,
                     depth_nbrs.ravel(), ct_nbrs.ravel(),
-                    self.dry_depth, self.gamma, self.theta_water)
+                    self.dry_depth, self.gamma, self._theta_water)
 
     def update_Q(self, dist, current_inds, next_index, astep, jstep, istep):
         """Update discharge field values after one set of water parcel steps."""
@@ -166,7 +166,7 @@ class water_tools(abc.ABC):
             astep, istep).reshape(self.qyn.shape)
         self.qwn = _update_absQfield(
             self.qwn.flat[:], dist, current_inds,
-            astep, self.Qp_water, self.dx).reshape(self.qwn.shape)
+            astep, self.Qp_water, self._dx).reshape(self.qwn.shape)
         self.qxn = _update_dirQfield(
             self.qxn.flat[:], dist, next_index,
             astep, jstep).reshape(self.qxn.shape)
@@ -175,7 +175,7 @@ class water_tools(abc.ABC):
             astep, istep).reshape(self.qyn.shape)
         self.qwn = _update_absQfield(
             self.qwn.flat[:], dist, next_index,
-            astep, self.Qp_water, self.dx).reshape(self.qwn.shape)
+            astep, self.Qp_water, self._dx).reshape(self.qwn.shape)
 
     def check_for_boundary(self, inds):
         """Check whether parcels have reached the boundary.
@@ -211,7 +211,7 @@ class water_tools(abc.ABC):
         Hnew = self.eta + self.depth
 
         # water surface height not under sea level
-        Hnew[Hnew < self.H_SL] = self.H_SL
+        Hnew[Hnew < self._H_SL] = self._H_SL
 
         # find average water surface elevation for a cell
         Hnew[self.sfc_visit > 0] = (self.sfc_sum[self.sfc_visit > 0] /
@@ -221,11 +221,11 @@ class water_tools(abc.ABC):
         Hnew_pad = np.pad(Hnew, 1, 'edge')
         Hsmth = _smooth_free_surface(
             Hnew, Hnew_pad, self.cell_type, self.pad_cell_type,
-            self.Nsmooth, self.Csmooth)
+            self._Nsmooth, self._Csmooth)
 
         if self._time_iter > 0:
-            self.stage = ((1 - self.omega_sfc) * self.stage +
-                          self.omega_sfc * Hsmth)
+            self.stage = ((1 - self._omega_sfc) * self.stage +
+                          self._omega_sfc * Hsmth)
 
         self.flooding_correction()
 
@@ -247,7 +247,7 @@ class water_tools(abc.ABC):
 
             omega = self.omega_flow_iter
             if iteration == 0:
-                omega = self.omega_flow
+                omega = self._omega_flow
 
             self.qx = self.qxn * omega + self.qx * (1 - omega)
             self.qy = self.qyn * omega + self.qy * (1 - omega)
