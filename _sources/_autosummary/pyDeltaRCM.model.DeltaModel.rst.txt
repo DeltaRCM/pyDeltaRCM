@@ -70,22 +70,77 @@ pyDeltaRCM.model.DeltaModel
 
    .. autosummary::
    
+      ~DeltaModel.C0_percent
+      ~DeltaModel.Csmooth
+      ~DeltaModel.H_SL
+      ~DeltaModel.L0_meters
+      ~DeltaModel.Length
+      ~DeltaModel.N0_meters
+      ~DeltaModel.Np_sed
+      ~DeltaModel.Np_water
+      ~DeltaModel.Nsmooth
+      ~DeltaModel.S0
+      ~DeltaModel.SLR
+      ~DeltaModel.Width
+      ~DeltaModel.alpha
       ~DeltaModel.bed_elevation
       ~DeltaModel.bedload_fraction
+      ~DeltaModel.beta
       ~DeltaModel.channel_flow_depth
       ~DeltaModel.channel_flow_velocity
       ~DeltaModel.channel_width
+      ~DeltaModel.checkpoint_dt
+      ~DeltaModel.coeff_U_dep_mud
+      ~DeltaModel.coeff_U_ero_mud
+      ~DeltaModel.coeff_U_ero_sand
+      ~DeltaModel.coeff_theta_mud
+      ~DeltaModel.coeff_theta_sand
       ~DeltaModel.dt
+      ~DeltaModel.dx
+      ~DeltaModel.f_bedload
+      ~DeltaModel.h0
       ~DeltaModel.influx_sediment_concentration
+      ~DeltaModel.itermax
+      ~DeltaModel.omega_flow
+      ~DeltaModel.omega_sfc
+      ~DeltaModel.out_dir
+      ~DeltaModel.resume_checkpoint
+      ~DeltaModel.save_checkpoint
+      ~DeltaModel.save_depth_figs
+      ~DeltaModel.save_depth_grids
+      ~DeltaModel.save_discharge_figs
+      ~DeltaModel.save_discharge_grids
+      ~DeltaModel.save_dt
+      ~DeltaModel.save_eta_figs
+      ~DeltaModel.save_eta_grids
+      ~DeltaModel.save_figs_sequential
       ~DeltaModel.save_iter
+      ~DeltaModel.save_metadata
+      ~DeltaModel.save_sedflux_figs
+      ~DeltaModel.save_sedflux_grids
+      ~DeltaModel.save_stage_figs
+      ~DeltaModel.save_stage_grids
+      ~DeltaModel.save_strata
       ~DeltaModel.save_time_since_checkpoint
       ~DeltaModel.save_time_since_last
+      ~DeltaModel.save_velocity_figs
+      ~DeltaModel.save_velocity_grids
       ~DeltaModel.sea_surface_elevation
       ~DeltaModel.sea_surface_elevation_change
       ~DeltaModel.sea_surface_mean_elevation
+      ~DeltaModel.sed_lag
+      ~DeltaModel.seed
+      ~DeltaModel.sigma_max
+      ~DeltaModel.start_subsidence
+      ~DeltaModel.theta1
+      ~DeltaModel.theta2
+      ~DeltaModel.theta_water
       ~DeltaModel.time
       ~DeltaModel.time_iter
       ~DeltaModel.time_step
+      ~DeltaModel.toggle_subsidence
+      ~DeltaModel.u0
+      ~DeltaModel.verbose
       ~DeltaModel.water_depth
    
    

@@ -20,13 +20,14 @@ User documentation
 
    guides/getting_started
    guides/userguide
-   
+   info/index
+
 
 Developer documentation
 #######################
 
 .. toctree::
    :maxdepth: 2
-   
+
    guides/devguide
    reference/index
