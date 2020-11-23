@@ -169,3 +169,6 @@ coeff_U_ero_sand:
 alpha:
   type: ['float', 'int']
   default: 0.1
+stepmax:
+  type: ['float', 'int', 'None']
+  default: null

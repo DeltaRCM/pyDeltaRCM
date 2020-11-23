@@ -129,3 +129,5 @@ Reduced-Complexity Routing Parameters
 :attr:`pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand`
 
 :attr:`pyDeltaRCM.model.DeltaModel.alpha`
+
+:attr:`pyDeltaRCM.model.DeltaModel.stepmax`
