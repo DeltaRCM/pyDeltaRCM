@@ -702,6 +702,28 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_sedflux_grids = save_sedflux_grids
 
     @property
+    def save_discharge_components(self):
+        """
+        save_discharge_components controls saving of x-y discharge components.
+        """
+        return self._save_discharge_components
+
+    @save_discharge_components.setter
+    def save_discharge_components(self, save_discharge_components):
+        self._save_discharge_components = save_discharge_components
+
+    @property
+    def save_velocity_components(self):
+        """
+        save_velocity_components controls saving of x-y velocity components.
+        """
+        return self._save_velocity_components
+
+    @save_velocity_components.setter
+    def save_velocity_components(self, save_velocity_components):
+        self._save_velocity_components = save_velocity_components
+
+    @property
     def save_dt(self):
         """
         save_dt defines the saving interval in seconds.

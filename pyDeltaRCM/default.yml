@@ -112,6 +112,12 @@ save_velocity_grids:
 save_sedflux_grids:
   type: 'bool'
   default: False
+save_discharge_components:
+  type: 'bool'
+  default: False
+save_velocity_components:
+  type: 'bool'
+  default: False
 save_dt:
   type: 'int'
   default: 86400

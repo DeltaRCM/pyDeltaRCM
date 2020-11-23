@@ -88,6 +88,10 @@ Output Settings
 
 :attr:`pyDeltaRCM.model.DeltaModel.save_velocity_grids`
 
+:attr:`pyDeltaRCM.model.DeltaModel.save_discharge_components`
+
+:attr:`pyDeltaRCM.model.DeltaModel.save_velocity_components`
+
 :attr:`pyDeltaRCM.model.DeltaModel.save_dt`
 
 :attr:`pyDeltaRCM.model.DeltaModel.checkpoint_dt`
