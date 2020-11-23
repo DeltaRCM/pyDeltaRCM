@@ -433,7 +433,7 @@ def test_save_one_fig_one_grid(tmp_path):
         _delta.update()
     nc_size_middle = os.path.getsize(exp_path_nc)
     assert _delta.time_iter == 2.0
-    assert nc_size_middle == nc_size_before
+    assert nc_size_middle > nc_size_before
 
     # now finalize, and then file size should increase
     _delta.finalize()
