@@ -424,6 +424,27 @@ def test_alpha(tmp_path):
     assert _delta.alpha == 0.25
 
 
+def test_stepmax_default(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'alpha': 0.25})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.stepmax == 2 * (_delta.L + _delta.W)
+
+
+def test_stepmax_integer(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'stepmax': 10})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.stepmax == 10
+
+
+def test_stepmax_float(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'stepmax': 11.0})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.stepmax == 11
+
+
 def test_diffusion_multiplier(tmp_path):
     p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                  {'u0': 0.8,
