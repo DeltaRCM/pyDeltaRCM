@@ -316,6 +316,10 @@ class iteration_tools(abc.ABC):
             self.output_netcdf['meta']['C0_percent'][save_idx] = self.H_SL
             self.output_netcdf['meta']['u0'][save_idx] = self.H_SL
 
+        # -------------------- sync --------------------
+        if (self._save_metadata or self._save_any_grids):
+            self.output_netcdf.sync()
+
     def output_checkpoint(self):
         """Save checkpoint.
 
