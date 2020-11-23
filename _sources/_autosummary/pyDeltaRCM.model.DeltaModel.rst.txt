@@ -108,6 +108,7 @@ pyDeltaRCM.model.DeltaModel
       ~DeltaModel.save_checkpoint
       ~DeltaModel.save_depth_figs
       ~DeltaModel.save_depth_grids
+      ~DeltaModel.save_discharge_components
       ~DeltaModel.save_discharge_figs
       ~DeltaModel.save_discharge_grids
       ~DeltaModel.save_dt
@@ -123,6 +124,7 @@ pyDeltaRCM.model.DeltaModel
       ~DeltaModel.save_strata
       ~DeltaModel.save_time_since_checkpoint
       ~DeltaModel.save_time_since_last
+      ~DeltaModel.save_velocity_components
       ~DeltaModel.save_velocity_figs
       ~DeltaModel.save_velocity_grids
       ~DeltaModel.sea_surface_elevation
