@@ -272,7 +272,12 @@ class init_tools(abc.ABC):
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
         self.Vp_sed = self.dVs / self._Np_sed   # volume of each sediment parcel
 
-        self.stepmax = 2 * (self.L + self.W)  # max number of jumps for parcel
+        # max number of jumps for parcel
+        if self.stepmax is None:
+            self.stepmax = 2 * (self.L + self.W)
+        else:
+            self.stepmax = int(self.stepmax)
+
         # initial width of self.free_surf_walk_indices
         self.size_indices = int(self.stepmax / 2)
 
@@ -290,18 +295,21 @@ class init_tools(abc.ABC):
 
         self._save_any_grids = (self._save_eta_grids or
                                 self._save_depth_grids or
-                                self._save_stage_grids or self._save_discharge_grids or
-                                self._save_velocity_grids or self._save_sedflux_grids or
+                                self._save_stage_grids or
+                                self._save_discharge_grids or
+                                self._save_velocity_grids or
+                                self._save_sedflux_grids or
                                 self._save_discharge_components or
                                 self._save_velocity_components)
         self._save_any_figs = (self._save_eta_figs or
                                self._save_depth_figs or
-                               self._save_stage_figs or self._save_discharge_figs or
-                               self._save_velocity_figs or self._save_sedflux_figs)
+                               self._save_stage_figs or
+                               self._save_discharge_figs or
+                               self._save_velocity_figs or
+                               self._save_sedflux_figs)
         if self._save_any_grids:  # always save metadata if saving grids
             self._save_metadata = True
         self._is_finalized = False
-
 
     def create_domain(self):
         """
@@ -332,7 +340,8 @@ class init_tools(abc.ABC):
         self.Vp_dep_mud = np.zeros((self.L, self.W))
         self.free_surf_flag = np.zeros((self._Np_water,), dtype=np.int64)
         self.looped = np.zeros((self._Np_water,), dtype=np.int64)
-        self.free_surf_walk_indices = np.zeros((self._Np_water, self.size_indices),
+        self.free_surf_walk_indices = np.zeros((self._Np_water,
+                                                self.size_indices),
                                                dtype=np.int64)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
