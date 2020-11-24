@@ -400,6 +400,24 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._SLR = SLR
 
     @property
+    def If(self):
+        """
+        Intermittency factor converting model time to real-world time.
+
+        .. important::
+
+            This parameter has no effect on model operations. It is used in
+            determining model run duration.
+        """
+        return self._If
+
+    @If.setter
+    def If(self, If):
+        if (If <= 0) or (If > 1):
+            raise ValueError('If must in interval (0, 1].')
+        self._If = If
+
+    @property
     def Np_sed(self):
         """
         Np_sed is the number of sediment parcels simulated.
