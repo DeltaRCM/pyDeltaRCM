@@ -134,6 +134,7 @@ pyDeltaRCM.model.DeltaModel
       ~DeltaModel.seed
       ~DeltaModel.sigma_max
       ~DeltaModel.start_subsidence
+      ~DeltaModel.stepmax
       ~DeltaModel.theta1
       ~DeltaModel.theta2
       ~DeltaModel.theta_water
