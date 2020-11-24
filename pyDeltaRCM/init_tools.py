@@ -275,7 +275,7 @@ class init_tools(abc.ABC):
         # max number of jumps for parcel
         if self.stepmax is None:
             self.stepmax = 2 * (self.L + self.W)
-        elif type(self.stepmax) == float:
+        else:
             self.stepmax = int(self.stepmax)
 
         # initial width of self.free_surf_walk_indices
