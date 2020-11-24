@@ -277,6 +277,62 @@ def test_error_if_no_timesteps(tmp_path):
                                  '--config', str(p)])
 
 
+def test_entry_point_timesteps(tmp_path):
+    """
+    test calling the command line feature with a config file.
+    """
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+    f.close()
+    subprocess.check_output(['pyDeltaRCM',
+                             '--config', str(p), '--timesteps', '2'])
+    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
+    exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+    assert os.path.isfile(exp_path_nc)
+    assert os.path.isfile(exp_path_png0)
+    assert os.path.isfile(exp_path_png1)
+
+
+def test_entry_point_time(tmp_path):
+    """
+    test calling the command line feature with a config file.
+    """
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'seed', 0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+    f.close()
+    subprocess.check_output(['pyDeltaRCM',
+                             '--config', str(p), '--time', '1000'])
+    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
+    exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
+    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+    assert os.path.isfile(exp_path_nc)
+    assert os.path.isfile(exp_path_png0)
+    assert os.path.isfile(exp_path_png1)
+
+
 import pyDeltaRCM as _pyimportedalias
 
 
@@ -344,6 +400,96 @@ def test_py_hlvl_tsteps_yml_runjobs_sngle(tmp_path):
     assert pp.job_list[0]._is_completed is False
     pp.run_jobs()
     assert pp.job_list[0]._is_completed is True
+
+
+def test_py_hlvl_time_yml_runjobs_sngle(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'time', 1000)
+    f.close()
+    pp = preprocessor.Preprocessor(p)
+    assert len(pp.job_list) == 1
+    assert pp.job_list[0]._is_completed is False
+    pp.run_jobs()
+    assert pp.job_list[0]._is_completed is True
+    assert pp.job_list[0].deltamodel.time == 1200
+
+
+def test_py_hlvl_time_If_yml_runjobs_sngle(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'time', 10000)
+    utilities.write_parameter_to_file(f, 'If', 0.1)
+    f.close()
+    pp = preprocessor.Preprocessor(p)
+    assert len(pp.job_list) == 1
+    assert pp.job_list[0]._is_completed is False
+    pp.run_jobs()
+    assert pp.job_list[0]._is_completed is True
+    assert pp.job_list[0].deltamodel.time == 1200
+
+
+def test_py_hlvl_timeyears_yml_runjobs_sngle(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'time_years', 3.16880878140e-05)
+    f.close()
+    pp = preprocessor.Preprocessor(p)
+    assert len(pp.job_list) == 1
+    assert pp.job_list[0]._is_completed is False
+    pp.run_jobs()
+    assert pp.job_list[0]._is_completed is True
+    assert pp.job_list[0].deltamodel.time == 1200
+
+
+def test_py_hlvl_timeyears_If_yml_runjobs_sngle(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'time_years', 0.00031688087814)
+    utilities.write_parameter_to_file(f, 'If', 0.1)
+    f.close()
+    pp = preprocessor.Preprocessor(p)
+    assert len(pp.job_list) == 1
+    assert pp.job_list[0]._is_completed is False
+    pp.run_jobs()
+    assert pp.job_list[0]._is_completed is True
+    assert pp.job_list[0].deltamodel.time == 1200
 
 
 def test_py_hlvl_args(tmp_path):
@@ -549,6 +695,30 @@ def test_python_highlevelapi_matrix_expansion_scientificnotation(tmp_path):
     SLR_list = [j.deltamodel.SLR for j in pp.job_list]
     assert sum([j == 4e-5 for j in SLR_list]) == 3
     assert sum([j == 0.000001 for j in SLR_list]) == 3
+
+
+def test_python_highlevelapi_matrix_expansion_one_list_time_config(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'time', 1000)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload'],
+                                   [[0.2, 0.6]])
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p)
+    pp.run_jobs()
+    assert pp.job_list[0]._is_completed is True
+    assert pp.job_list[0].deltamodel.time == 1200.0
+    assert pp.job_list[1].deltamodel.time == 1200.0
 
 
 def test_python_highlevelapi_matrix_needs_out_dir(tmp_path):
