@@ -279,7 +279,8 @@ class BasePreprocessor(abc.ABC):
 
             The various model run duration parameters are passed from the
             `cli_dict` and `yaml_dict` arguments, and are processed into a
-            single value for the run time. Precedence is given to values specified in the 
+            single value for the run time. Precedence is given to values
+            specified in the command line interface.
             """
             self.deltamodel = DeltaModel(input_file=input_file)
 
@@ -621,7 +622,8 @@ def scale_relative_sea_level_rise_rate(mmyr, If=1):
     scaled : :obj:`float`
         Scaled relative sea level rise rate, in meters per second.
     """
-    return (mmyr / 1000) * (1 / (shared_tools._scale_factor(If)))
+    return (mmyr / 1000) * (1 / (shared_tools._scale_factor(
+        If, units='years')))
 
 
 if __name__ == '__main__':
