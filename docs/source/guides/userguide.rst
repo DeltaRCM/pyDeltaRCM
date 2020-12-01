@@ -37,7 +37,7 @@ The "low-level" API consists of creating a model instance from a YAML configurat
 High-level model API
 ====================
 
-The high-level API is accessed via either a shell prompt or python script, and is invoked directly if a YAML configuration file includes the ``timesteps`` variable.
+The high-level API is accessed via either a shell prompt or python script, and handles setting up the model configuration and running the model a specified duration.
 
 For the following high-level API demonstrations, consider a YAML input file named ``model_configuration.yml`` which looks like:
 
@@ -64,7 +64,7 @@ or equivalently:
 
     python -m pyDeltaRCM --config model_configuration.yml
 
-These invokations will run the pyDeltaRCM :obj:`preprocessor <pyDeltaRCM.preprocessor.PreprocessorCLI>` with the parameters specified in the ``model_configuration.yml`` file.
+These invocations will run the pyDeltaRCM :obj:`preprocessor <pyDeltaRCM.preprocessor.PreprocessorCLI>` with the parameters specified in the ``model_configuration.yml`` file.
 If the YAML configuration indicates multiple jobs (:ref:`via matrix expansion or ensemble specification <configuring_multiple_jobs>`), the jobs will each be run automatically by calling :obj:`~pyDeltaRCM.DeltaModel.update` on the model 500 times.
 
 
@@ -85,6 +85,15 @@ Jobs are then run with:
 .. code::
 
     >>> pp.run_jobs()
+
+Model simulation duration in the high-level API
+-----------------------------------------------
+
+The duration of a model run configured with the high-level API can be set up with a number of different configuration parameters.
+For more information on "time" in the model, see the complete description at :doc:`../info/modeltime`.
+
+FINISH THIS
+
 
 
 
