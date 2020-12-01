@@ -155,9 +155,9 @@ def scale_model_time(time, If=1, units='seconds'):
     implicitly assumes that the delta is *always* receiving a large volume of
     sediment and water at the inlet. This is unrealistic, given that rivers
     flood only during a small portion of the year, and this is when
-    morphodynamic activity is largest. See :doc:`modeltime` for a complete
-    description of this assumption, and how to work with the assumption in
-    configuring the model.
+    morphodynamic activity is largest. See :doc:`../../info/modeltime` for a
+    complete description of this assumption, and how to work with the
+    assumption in configuring the model.
 
     Using this assumption, it is possible to scale up model time to "real"
     time, by assuming an *intermittency factor*. This intermittency factor is
@@ -170,7 +170,8 @@ def scale_model_time(time, If=1, units='seconds'):
     where :math:`t` is the model time (:obj:`~pyDeltaRCM.DeltaModel.time`),
     :math:`t_r` is the "real" scaled time, :math:`I_f` is the
     intermittency factor, and :math:`S_f` is the scale factor to convert base
-    units of seconds to units specified as an input argument.
+    units of seconds to units specified as an input argument. Note that this
+    function uses :obj:`_scale_factor` internally for this conversion.
 
     Parameters
     ----------
@@ -179,7 +180,7 @@ def scale_model_time(time, If=1, units='seconds'):
 
     If : :obj:`float`, optional
         Intermittency factor, fraction of time represented by morphodynamic
-        activity. Should be in interval (0, 1). Defaults to 1 if not provided,
+        activity. Should be in interval (0, 1]. Defaults to 1 if not provided,
         i.e., no scaling is performed.
 
     units : :obj:`str`, optional
@@ -208,8 +209,19 @@ def scale_model_time(time, If=1, units='seconds'):
 def _scale_factor(If, units):
     """Scaling factor between model time and "real" time.
 
-    The scaling factor relates the model time to a real worl time, by assuming
-    an intermittency factor.
+    The scaling factor relates the model time to a real worl time, by the
+    assumed intermittency factor and the user-specified units for output.
+
+    Parameters
+    ----------
+    If : :obj:`float`
+        Intermittency factor, fraction of time represented by morphodynamic
+        activity. **Must** be in interval (0, 1].
+
+    units : :obj:`str`
+        The units to convert the scaled time to. Must be a string in
+        `['seconds', 'days', 'years']`.
+
     """
     sec_in_day = 86400
     day_in_yr = 365.25
