@@ -124,7 +124,8 @@ See :doc:`../info/modeltime` for complete information on the scaling between mod
 Low-level model API
 ===================
 
-iinteract with the model by creating your own script, and manipulating model outputs at the desired level. The simplest case is to do
+Interact with the model by creating your own script, and manipulating model outputs at the desired level.
+The simplest case to use the low-level API is to do
 
 .. code::
 
