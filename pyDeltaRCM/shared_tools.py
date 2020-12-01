@@ -147,7 +147,7 @@ def _get_version():
     return _version.__version__()
 
 
-def scale_model_time(time, If=1):
+def scale_model_time(time, If=1, units='seconds'):
     """Scale the model time to "real" time.
 
     Model time is executed as assumed flooding conditions, and executed at the
@@ -155,20 +155,22 @@ def scale_model_time(time, If=1):
     implicitly assumes that the delta is *always* receiving a large volume of
     sediment and water at the inlet. This is unrealistic, given that rivers
     flood only during a small portion of the year, and this is when
-    morphodynamic activity is largest.
+    morphodynamic activity is largest. See :doc:`modeltime` for a complete
+    description of this assumption, and how to work with the assumption in
+    configuring the model.
 
-    Despite this assumption, it is possible to scale up model time to "real"
+    Using this assumption, it is possible to scale up model time to "real"
     time, by assuming an *intermittency factor*. This intermittency factor is
-    the fraction of time, scaled to 1 year, when the delta system is assumed
-    to be flooding.
+    the fraction of unit-time that a river is assumed to be flooding.
 
     .. math::
 
-        t_r = \dfrac{t}{I_f \cdot 365.25 \cdot 86400}
+        t_r = \dfrac{t}{I_f \cdot S_f}
 
     where :math:`t` is the model time (:obj:`~pyDeltaRCM.DeltaModel.time`),
-    :math:`t_r` is the "real" scaled time, and :math:`I_f` is the
-    intermittency factor.
+    :math:`t_r` is the "real" scaled time, :math:`I_f` is the
+    intermittency factor, and :math:`S_f` is the scale factor to convert base
+    units of seconds to units specified as an input argument.
 
     Parameters
     ----------
@@ -180,27 +182,43 @@ def scale_model_time(time, If=1):
         activity. Should be in interval (0, 1). Defaults to 1 if not provided,
         i.e., no scaling is performed.
 
+    units : :obj:`str`, optional
+        The units to convert the scaled time to. Default is to return the
+        scaled time in seconds (`seconds`), but optionally supply argument
+        `days` or `years` for unit conversion.
+
     Returns
     -------
     scaled : :obj:`float`
-        Scaled time, in years, assuming the intermittency factor :obj:`If`.
+        Scaled time, in :obj:`units`, assuming the intermittency factor
+        :obj:`If`.
 
     Raises
     ------
     ValueError
-        if the value for intermittency is not ``0 <= If <= 1``.
+        if the value for intermittency is not ``0 < If <= 1``.
     """
-    if (If < 0) or (If > 1):
+    if (If <= 0) or (If > 1):
         raise ValueError(
-            'Intermittency `If` is not 0 <= If <= 1: %s' % str(If))
+            'Intermittency `If` is not 0 < If <= 1: %s' % str(If))
 
-    return time / _scale_factor(If)
+    return time / _scale_factor(If, units)
 
 
-def _scale_factor(If):
+def _scale_factor(If, units):
     """Scaling factor between model time and "real" time.
 
     The scaling factor relates the model time to a real worl time, by assuming
     an intermittency factor.
     """
-    return (If * 365.25 * 86400)
+    sec_in_day = 86400
+    day_in_yr = 365.25
+    if units == 'seconds':
+        S_f = 1
+    elif units == 'days':
+        S_f = sec_in_day
+    elif units == 'years':
+        S_f = sec_in_day * day_in_yr
+    else:
+        raise ValueError('Bad value for `units`: %s' % str(units))
+    return (If * S_f)
