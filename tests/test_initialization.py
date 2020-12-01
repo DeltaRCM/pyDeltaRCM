@@ -1157,3 +1157,14 @@ def test_negative_Csmooth(tmp_path):
     f.close()
     with pytest.raises(ValueError):
         delta = DeltaModel(input_file=p)
+
+
+class TestScaleRelativeSeaLeveLRiseRate():
+
+    def test_scale_If_1(self):
+        scaled = preprocessor.scale_relative_sea_level_rise_rate(5, If=1)
+        assert scaled == 5 / 1000 / 365.25 / 86400
+
+    def test_scale_If_0p1(self):
+        scaled = preprocessor.scale_relative_sea_level_rise_rate(5, If=0.1)
+        assert scaled == 5 / 1000 / 365.25 / 86400 * 10
