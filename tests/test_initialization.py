@@ -447,6 +447,72 @@ def test_py_hlvl_time_If_yml_runjobs_sngle(tmp_path):
     assert pp.job_list[0].deltamodel.time == 1200
 
 
+def test_py_hlvl_timeargs_precedence_tstepsovertime(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'time', 10000)
+    utilities.write_parameter_to_file(f, 'timesteps', 2)
+    f.close()
+    pp = preprocessor.Preprocessor(p)
+    pp.run_jobs()
+    assert pp.job_list[0]._is_completed is True
+    assert pp.job_list[0].deltamodel.time == 600
+    assert pp.job_list[0].deltamodel.time_iter == 2
+
+
+def test_py_hlvl_timeargs_precedence_tstepsovertimeyears(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'time_years', 10000)
+    utilities.write_parameter_to_file(f, 'timesteps', 2)
+    f.close()
+    pp = preprocessor.Preprocessor(p)
+    pp.run_jobs()
+    assert pp.job_list[0]._is_completed is True
+    assert pp.job_list[0].deltamodel.time == 600
+    assert pp.job_list[0].deltamodel.time_iter == 2
+
+
+def test_py_hlvl_timeargs_precedence_timeovertimeyears(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'time', 900)
+    utilities.write_parameter_to_file(f, 'time_years', 10000)
+    f.close()
+    pp = preprocessor.Preprocessor(p)
+    pp.run_jobs()
+    assert pp.job_list[0]._is_completed is True
+    assert pp.job_list[0].deltamodel.time == 900
+    assert pp.job_list[0].deltamodel.time_iter == 3
+
+
 def test_py_hlvl_timeyears_yml_runjobs_sngle(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
