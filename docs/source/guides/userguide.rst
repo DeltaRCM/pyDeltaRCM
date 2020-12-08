@@ -34,6 +34,9 @@ There is a "high-level" model API, which takes as argument a YAML configuration 
 The "low-level" API consists of creating a model instance from a YAML configuration file and manually handling the timestepping, or optionally, augmenting operations of the model to implement new features.
 
 
+
+.. _high_level_api: 
+
 High-level model API
 ====================
 
@@ -91,11 +94,12 @@ Model simulation duration in the high-level API
 -----------------------------------------------
 
 The duration of a model run configured with the high-level API can be set up with a number of different configuration parameters.
-For more information on "time" in the model, see the complete description at :doc:`../info/modeltime`.
 
-In the high-level API, you can specify the duration to run the model by two mechanisms: 1) the number of timesteps to run the model, or 2) the duration of time to run the model.
+.. note:: see the complete description of "time" in the model: :doc:`../info/modeltime`.
 
-The former case is straightforward, insofar that the model determines the timestep duration and the high-level API simply iterates the model for the specified number of timestep iterations.
+Using the high-level API, you can specify the duration to run the model by two mechanisms: 1) the number of timesteps to run the model, or 2) the duration of time to run the model.
+
+The former case is straightforward, insofar that the model determines the timestep duration and the high-level API simply iterates for the specified number of timestep iterations.
 To specify the number of timesteps to run the model, use the argument ``--timesteps`` at the command line (or ``timesteps:`` in the configuration YAML file).
 
 .. code:: bash
@@ -103,6 +107,10 @@ To specify the number of timesteps to run the model, use the argument ``--timest
     pyDeltaRCM --config model_configuration.yml --timesteps 5000
 
 The second case is more complicated, because the time specification is converted to model time according to a set of additional parameters.
+In this case, the model run end condition is that the elapsed model time is *equal to or greater than* the specified input time. 
+Importantly, this means that the duration of the model run is unlikely to exactly match the input condition, because the model timestep is unlikely to be a factor of the specified time.
+Again, refer to the complete description of model time :doc:`../info/modeltime` for more information.
+
 To specify the duration of time to run the model in *seconds*, simply use the argument ``--time`` at the command line (or ``time:`` in the configuration YAML file).
 It is also possible to specify the input run duration in units of years with the similarly named argument ``--time_years`` (``time_years:``).
 
