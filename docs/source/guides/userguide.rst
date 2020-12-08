@@ -34,10 +34,13 @@ There is a "high-level" model API, which takes as argument a YAML configuration 
 The "low-level" API consists of creating a model instance from a YAML configuration file and manually handling the timestepping, or optionally, augmenting operations of the model to implement new features.
 
 
+
+.. _high_level_api: 
+
 High-level model API
 ====================
 
-The high-level API is accessed via either a shell prompt or python script, and is invoked directly if a YAML configuration file includes the ``timesteps`` variable.
+The high-level API is accessed via either a shell prompt or python script, and handles setting up the model configuration and running the model a specified duration.
 
 For the following high-level API demonstrations, consider a YAML input file named ``model_configuration.yml`` which looks like:
 
@@ -64,7 +67,7 @@ or equivalently:
 
     python -m pyDeltaRCM --config model_configuration.yml
 
-These invokations will run the pyDeltaRCM :obj:`preprocessor <pyDeltaRCM.preprocessor.PreprocessorCLI>` with the parameters specified in the ``model_configuration.yml`` file.
+These invocations will run the pyDeltaRCM :obj:`preprocessor <pyDeltaRCM.preprocessor.PreprocessorCLI>` with the parameters specified in the ``model_configuration.yml`` file.
 If the YAML configuration indicates multiple jobs (:ref:`via matrix expansion or ensemble specification <configuring_multiple_jobs>`), the jobs will each be run automatically by calling :obj:`~pyDeltaRCM.DeltaModel.update` on the model 500 times.
 
 
@@ -87,11 +90,53 @@ Jobs are then run with:
     >>> pp.run_jobs()
 
 
+Model simulation duration in the high-level API
+-----------------------------------------------
+
+The duration of a model run configured with the high-level API can be set up with a number of different configuration parameters.
+
+.. note:: see the complete description of "time" in the model: :doc:`../info/modeltime`.
+
+Using the high-level API, you can specify the duration to run the model by two mechanisms: 1) the number of timesteps to run the model, or 2) the duration of time to run the model.
+
+The former case is straightforward, insofar that the model determines the timestep duration and the high-level API simply iterates for the specified number of timestep iterations.
+To specify the number of timesteps to run the model, use the argument ``--timesteps`` at the command line (or ``timesteps:`` in the configuration YAML file).
+
+.. code:: bash
+    
+    pyDeltaRCM --config model_configuration.yml --timesteps 5000
+
+The second case is more complicated, because the time specification is converted to model time according to a set of additional parameters.
+In this case, the model run end condition is that the elapsed model time is *equal to or greater than* the specified input time. 
+Importantly, this means that the duration of the model run is unlikely to exactly match the input condition, because the model timestep is unlikely to be a factor of the specified time.
+Again, refer to the complete description of model time :doc:`../info/modeltime` for more information.
+
+To specify the duration of time to run the model in *seconds*, simply use the argument ``--time`` at the command line (or ``time:`` in the configuration YAML file).
+It is also possible to specify the input run duration in units of years with the similarly named argument ``--time_years`` (``time_years:``).
+
+.. code:: bash
+    
+    pyDeltaRCM --config model_configuration.yml --time 31557600
+    pyDeltaRCM --config model_configuration.yml --time_years 1
+
+would each run a simulation for :math:`(86400 * 365.25)` seconds, or 1 year.
+
+.. important::
+
+    Do not specify both time arguments, or specify time arguments with the timesteps argument.
+    In the case of multiple argument specification, precedence is given in the order `timesteps` > `time` > `time_years`.
+
+When specifying the time to run the simulation, an additional parameter determining the intermittency factor (:math:`I_f`) may be specified ``--If`` at the command line (or ``If:`` in the YAML configuration file).
+This argument will scale the specified time-to-model-time, such that the *scaled time* is equal to the input argument time.
+Specifying the :math:`I_f`  value is essential when using the model duration run specifications.
+See :doc:`../info/modeltime` for complete information on the scaling between model time and elapsed simulation time.
+
 
 Low-level model API
 ===================
 
-iinteract with the model by creating your own script, and manipulating model outputs at the desired level. The simplest case is to do
+Interact with the model by creating your own script, and manipulating model outputs at the desired level.
+The simplest case to use the low-level API is to do
 
 .. code::
 
