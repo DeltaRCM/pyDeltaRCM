@@ -3,8 +3,14 @@ Time in pyDeltaRCM
 ******************
 
 Time in the pyDeltaRCM model is simulated in units of seconds.
-The duration of a timestep is determined during initialization to maintain numerical stability; the calculation is based on model domain and configuration parameters.
-The model is then iterated timestep by timestep, until and end-run condition is reached (see :doc:`../guides/userguide` for more information).
+The duration of a timestep is determined during model initialization to maintain numerical stability; the calculation is based on model domain and configuration parameters.
+The model is then iterated timestep by timestep, until an end-run condition is reached 
+
+.. note:: 
+    
+    If you are using the :ref:`high-level API <high_level_api>`, the model run end condition is that the elapsed model time is *equal to or greater than* the specified input time. As a result, the model run duration is unlikely to exactly match the input time specification, because the model timestep is unlikely to be a factor of the specified time. 
+
+    Please keep this in mind when evaluating model results, and especially when comparing  between different model runs.
 
 Over the duration of the model, the water discharge (and thus sediment discharge) are assumed to be at bankfull.
 This assumption is based on the concept of geomorphic work [WM60]_ and the strongly nonlinear relationship between water discharge and sediment transport.
