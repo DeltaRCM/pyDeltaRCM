@@ -91,7 +91,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.preprocessor.PreprocessorCLI.html#pyDeltaRCM.preprocessor.PreprocessorCLI" title="pyDeltaRCM.preprocessor.PreprocessorCLI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PreprocessorCLI</span></code></a>()</p></td>
 <td><p>Command line preprocessor.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.preprocessor.Preprocessor.html#pyDeltaRCM.preprocessor.Preprocessor" title="pyDeltaRCM.preprocessor.Preprocessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code></a>([input_file, timesteps])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.preprocessor.Preprocessor.html#pyDeltaRCM.preprocessor.Preprocessor" title="pyDeltaRCM.preprocessor.Preprocessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code></a>([input_file])</p></td>
 <td><p>Python high level api.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.preprocessor.BasePreprocessor.html#pyDeltaRCM.preprocessor.BasePreprocessor" title="pyDeltaRCM.preprocessor.BasePreprocessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BasePreprocessor</span></code></a></p></td>
@@ -125,6 +125,48 @@ file in the job output foler.</p>
 <p>This fuinction is utilized by the BMI implementation of pyDeltaRCM as
 well.</p>
 </div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate">
+<code class="descclassname">pyDeltaRCM.preprocessor.</code><code class="descname">scale_relative_sea_level_rise_rate</code><span class="sig-paren">(</span><em>mmyr</em>, <em>If=1</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale a relative sea level rise rate to model time.</p>
+<p>This function scales any relative sea level rise rate (RSLR) (e.g., sea
+level rise, subsidence) to a rate appropriate for the model time. This is
+helpful, because most discussion of RSLR uses units of mm/yr, but the
+model (and model configuration) require units of m/s. Additionally, the
+model framework needs to assume an “intermittency factor” to convert from
+real-world time to model time.</p>
+<p>Relative sea level rise (subsidence and/or sea level rise) are scaled from
+real world dimensions of mm/yr to model input as:</p>
+<div class="math">
+<p><img src="../../_images/math/bb6dfce61f57f0000e72aede3894f152e5a0b380.png" alt="\widehat{RSLR} = (RSLR / 1000) \cdot \dfrac{1}{I_f \cdot 365.25 \cdot 86400}"/></p>
+</div><p>This conversion makes it such that when one real-world year has elapsed
+(<img class="math" src="../../_images/math/5babda140bdf558cf3a65ddf2d7d11e5ad452f60.png" alt="I_f \cdot 365.25 \cdot 86400"/> seconds in model time), the relative
+sea level has changed by the number of millimeters specified in the input
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">mmyr</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Users should use this function to determine the value to specify in
+an input YAML configuration file; no scaling is performed
+internally.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mmyr</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Millimeters per year, relative sea level rise rate.</p></li>
+<li><p><strong>If</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, optional) – Intermittency factor, fraction of time represented by morphodynamic
+activity. Should be in interval (0, 1). Defaults to 1 if not provided,
+i.e., no scaling is performed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>scaled</strong> – Scaled relative sea level rise rate, in meters per second.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

@@ -41,6 +41,7 @@
   <ul>
 <li><a class="reference internal" href="#">shared_tools</a><ul>
 <li><a class="reference internal" href="#shared-functions">Shared functions</a></li>
+<li><a class="reference internal" href="#time-scaling-functions">Time scaling functions</a></li>
 </ul>
 </li>
 </ul>
@@ -152,6 +153,74 @@ and discharge fields.</p>
 <code class="descclassname">pyDeltaRCM.shared_tools.</code><code class="descname">_get_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools._get_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract version from file.</p>
 <p>Extract version number from single file, and make it availabe everywhere.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="time-scaling-functions">
+<h2>Time scaling functions<a class="headerlink" href="#time-scaling-functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyDeltaRCM.shared_tools.scale_model_time">
+<code class="descclassname">pyDeltaRCM.shared_tools.</code><code class="descname">scale_model_time</code><span class="sig-paren">(</span><em>time</em>, <em>If=1</em>, <em>units='seconds'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.scale_model_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale the model time to “real” time.</p>
+<p>Model time is executed as assumed flooding conditions, and executed at the
+per-second level, with a multi-second timestep. This model design
+implicitly assumes that the delta is <em>always</em> receiving a large volume of
+sediment and water at the inlet. This is unrealistic, given that rivers
+flood only during a small portion of the year, and this is when
+morphodynamic activity is largest. See <a class="reference internal" href="../../info/modeltime.html"><span class="doc">Time in pyDeltaRCM</span></a> for a
+complete description of this assumption, and how to work with the
+assumption in configuring the model.</p>
+<p>Using this assumption, it is possible to scale up model time to “real”
+time, by assuming an <em>intermittency factor</em>. This intermittency factor is
+the fraction of unit-time that a river is assumed to be flooding.</p>
+<div class="math">
+<p><img src="../../_images/math/6dde2721278087a7c551b20c8843648723335b6c.png" alt="t_r = \dfrac{t}{I_f \cdot S_f}"/></p>
+</div><p>where <img class="math" src="../../_images/math/5ec053cf70dc1c98cc297322250569eda193e7a4.png" alt="t"/> is the model time (<code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code>),
+<img class="math" src="../../_images/math/2daa41ae829a419cc886b80d38b7be52d089a6e3.png" alt="t_r"/> is the “real” scaled time, <img class="math" src="../../_images/math/8dfe9f65f28c336068909e07a36766e799a02da5.png" alt="I_f"/> is the
+intermittency factor, and <img class="math" src="../../_images/math/c9ec1b847accb7ff01521c1608346b6fc8e35e39.png" alt="S_f"/> is the scale factor to convert base
+units of seconds to units specified as an input argument. Note that this
+function uses <a class="reference internal" href="#pyDeltaRCM.shared_tools._scale_factor" title="pyDeltaRCM.shared_tools._scale_factor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_scale_factor</span></code></a> internally for this conversion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – The model time, in seconds.</p></li>
+<li><p><strong>If</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, optional) – Intermittency factor, fraction of time represented by morphodynamic
+activity. Should be in interval (0, 1]. Defaults to 1 if not provided,
+i.e., no scaling is performed.</p></li>
+<li><p><strong>units</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – The units to convert the scaled time to. Default is to return the
+scaled time in seconds (<cite>seconds</cite>), but optionally supply argument
+<cite>days</cite> or <cite>years</cite> for unit conversion.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>scaled</strong> – Scaled time, in <code class="xref py py-obj docutils literal notranslate"><span class="pre">units</span></code>, assuming the intermittency factor
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">If</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if the value for intermittency is not <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;</span> <span class="pre">If</span> <span class="pre">&lt;=</span> <span class="pre">1</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyDeltaRCM.shared_tools._scale_factor">
+<code class="descclassname">pyDeltaRCM.shared_tools.</code><code class="descname">_scale_factor</code><span class="sig-paren">(</span><em>If</em>, <em>units</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools._scale_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scaling factor between model time and “real” time.</p>
+<p>The scaling factor relates the model time to a real worl time, by the
+assumed intermittency factor and the user-specified units for output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>If</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Intermittency factor, fraction of time represented by morphodynamic
+activity. <strong>Must</strong> be in interval (0, 1].</p></li>
+<li><p><strong>units</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – The units to convert the scaled time to. Must be a string in
+<cite>[‘seconds’, ‘days’, ‘years’]</cite>.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

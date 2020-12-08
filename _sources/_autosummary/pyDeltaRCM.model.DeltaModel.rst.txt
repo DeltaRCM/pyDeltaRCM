@@ -73,6 +73,7 @@ pyDeltaRCM.model.DeltaModel
       ~DeltaModel.C0_percent
       ~DeltaModel.Csmooth
       ~DeltaModel.H_SL
+      ~DeltaModel.If
       ~DeltaModel.L0_meters
       ~DeltaModel.Length
       ~DeltaModel.N0_meters
