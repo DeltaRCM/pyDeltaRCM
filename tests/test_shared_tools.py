@@ -168,3 +168,48 @@ def test_version_is_valid():
     assert type(v) is str
     dots = [i for i, c in enumerate(v) if c == '.']
     assert len(dots) == 2
+
+
+class TestScaleModelTime():
+
+    def test_defaults(self):
+        scaled = shared_tools.scale_model_time(86400)
+        assert scaled == 86400
+
+    def test_If(self):
+        scaled = shared_tools.scale_model_time(86400, 0.1)
+        assert scaled == 86400 / 0.1
+        scaled = shared_tools.scale_model_time(86400, 0.5)
+        assert scaled == 86400 / 0.5
+        scaled = shared_tools.scale_model_time(86400, 0.9)
+        assert scaled == 86400 / 0.9
+        scaled = shared_tools.scale_model_time(86400, 1)
+        assert scaled == 86400
+        scaled = shared_tools.scale_model_time(86400, 1e-15)
+        assert scaled == 86400 / 1e-15
+        with pytest.raises(ValueError, match='Intermittency `If` .*'):
+            scaled = shared_tools.scale_model_time(86400, 0)
+        with pytest.raises(ValueError, match='Intermittency `If` .*'):
+            scaled = shared_tools.scale_model_time(86400, 1.01)
+
+    def test_units(self):
+        scaled = shared_tools.scale_model_time(86400, units='seconds')
+        assert scaled == 86400
+        scaled = shared_tools.scale_model_time(86400, units='days')
+        assert scaled == 1
+        scaled = shared_tools.scale_model_time(86400, units='years')
+        assert scaled == (1 / 365.25)
+        with pytest.raises(ValueError):
+            scaled = shared_tools.scale_model_time(86400, units='badstr')
+
+    def test_combinations(self):
+        scaled = shared_tools.scale_model_time(86400, If=0.1, units='days')
+        assert scaled == 10
+        scaled = shared_tools.scale_model_time(2 * 86400, If=0.1, units='days')
+        assert scaled == 20
+        scaled = shared_tools.scale_model_time(
+            365.25 * 86400, If=1, units='years')
+        assert scaled == 1
+        scaled = shared_tools.scale_model_time(
+            365.25 * 86400, If=0.1, units='years')
+        assert scaled == 10
