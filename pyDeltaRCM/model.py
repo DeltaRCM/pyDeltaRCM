@@ -414,7 +414,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @If.setter
     def If(self, If):
         if (If <= 0) or (If > 1):
-            raise ValueError('If must in interval (0, 1].')
+            raise ValueError('If must be in interval (0, 1].')
         self._If = If
 
     @property
