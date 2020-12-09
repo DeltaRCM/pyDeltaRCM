@@ -76,6 +76,9 @@ bedrock:
 bedrock_depth:
   type: ['float', 'int']
   default: -5
+lithification:
+  type: 'bool'
+  default: False
 save_eta_figs:
   type: 'bool'
   default: False

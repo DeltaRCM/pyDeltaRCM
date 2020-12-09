@@ -329,7 +329,7 @@ class BaseRouter(object):
             # if new bed elev is below bedrock eroded volume must change
             # cannot be greater than 0 as this is erosion
             Vp_change = ((eta - bedrock_depth) / (dx * dx))
-            return np.minimum(Vp_change, 0)
+        return np.minimum(Vp_change, 0)
 
 
 @jitclass(r_spec)
@@ -351,7 +351,8 @@ class SandRouter(BaseRouter):
     """
     def __init__(self, _dt, dx, Vp_sed, u_max, qs0, u0, U_ero_sand, f_bedload,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
-                 dry_depth, gamma, beta, stepmax, theta_sed):
+                 dry_depth, gamma, beta, stepmax, theta_sed,
+                 _bedrock, _bedrock_depth):
 
         self._dt = _dt
         self._dx = dx
@@ -372,6 +373,9 @@ class SandRouter(BaseRouter):
         self._beta = beta
         self.stepmax = stepmax
         self.theta_sed = theta_sed
+
+        self._bedrock = _bedrock
+        self._bedrock_depth = _bedrock_depth
 
     def run(self, start_indices, eta, stage, depth, cell_type,
             uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud, Vp_dep_sand,
@@ -565,7 +569,8 @@ class MudRouter(BaseRouter):
     """
     def __init__(self, _dt, dx, Vp_sed, u_max, U_dep_mud, U_ero_mud,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
-                 dry_depth, gamma, _lambda, beta, stepmax, theta_sed):
+                 dry_depth, gamma, _lambda, beta, stepmax, theta_sed,
+                 _bedrock, _bedrock_depth):
 
         self._dt = _dt
         self._dx = dx
@@ -585,6 +590,9 @@ class MudRouter(BaseRouter):
         self._beta = beta
         self.stepmax = stepmax
         self.theta_sed = theta_sed
+
+        self._bedrock = _bedrock
+        self._bedrock_depth = _bedrock_depth
 
     def run(self, start_indices, eta, stage, depth, cell_type,
             uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud, Vp_dep_sand,

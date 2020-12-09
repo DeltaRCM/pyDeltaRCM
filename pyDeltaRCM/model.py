@@ -570,6 +570,22 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._bedrock_depth = float(bedrock_depth)
 
     @property
+    def lithification(self):
+        """
+        Allows bedrock depth to vary with SLR.
+
+        If set to True, then `bedrock_depth` is updated as sea level rises
+        such that bedrock is updated to begin at `H_SL - bedrock_depth` as
+        opposed to being the static value of `bedrock_depth` relative to the
+        initial sea level.
+        """
+        return self._lithification
+
+    @lithification.setter
+    def lithification(self, lithification):
+        self._lithification = lithification
+
+    @property
     def save_eta_figs(self):
         """
         save_eta_figs controls whether or not figures of topography are saved.
