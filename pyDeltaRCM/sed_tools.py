@@ -1,6 +1,6 @@
 
 import numpy as np
-from numba import float32, float64, int64
+from numba import float32, float64, int64, boolean
 from numba.experimental import jitclass
 from scipy import ndimage
 import abc
@@ -145,7 +145,8 @@ r_spec = [('_dt', float32), ('_dx', float32),
           ('Vp_res', float32), ('Vp_dep_mud', float64[:, :]),
           ('Vp_dep_sand', float64[:, :]),
           ('U_dep_mud', float32), ('U_ero_mud', float32),
-          ('U_ero_sand', float32)]
+          ('U_ero_sand', float32),
+          ('_bedrock', boolean), ('_bedrock_depth', float64)]
 
 
 class BaseRouter(object):
@@ -313,6 +314,22 @@ class BaseRouter(object):
         """
         fourth = (stage - eta) / 4 * (dx * dx)
         return np.minimum(Vp, fourth)
+
+    def _bedrock_correction(self, Vp, eta, dx, bedrock_depth):
+        """Limit volume of erosion at a cell based on bedrock depth.
+
+        Function is used to cap erosion based on the bedrock depth. Eroded
+        volume is stopped at the bedrock depth. Only called if the optional
+        bedrock parameter is on. eta is the bed elevation at a specific cell.
+        """
+        # calculate potential new bed elevation
+        potential_eta = eta + (Vp / (dx * dx))
+        # if this potential new bed erosion goes below bedrock adjust it
+        if potential_eta < bedrock_depth:
+            # if new bed elev is below bedrock eroded volume must change
+            # cannot be greater than 0 as this is erosion
+            Vp_change = ((eta - bedrock_depth) / (dx * dx))
+            return np.minimum(Vp_change, 0)
 
 
 @jitclass(r_spec)
@@ -519,6 +536,11 @@ class SandRouter(BaseRouter):
         if Vp_change > 0:  # if deposition
             self.Vp_dep_sand[px, py] = self.Vp_dep_sand[px, py] + Vp_change
 
+        if (self._bedrock is True) and (Vp_change < 0):  # check for bedrock
+            # apply bedrock correction to limit erosion if needed
+            Vp_change = self._bedrock_correction(Vp_change, self.eta[px, py],
+                                                 self._dx, self._bedrock_depth)
+
         self.Vp_res = self.Vp_res - Vp_change  # update sed volume in parcel
 
         self._update_fields(Vp_change, px, py)  # update other fields as needed
@@ -645,6 +667,11 @@ class MudRouter(BaseRouter):
 
         if Vp_change > 0:  # if deposition
             self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change
+
+        if (self._bedrock is True) and (Vp_change < 0):  # check for bedrock
+            # apply bedrock correction to limit erosion if needed
+            Vp_change = self._bedrock_correction(Vp_change, self.eta[px, py],
+                                                 self._dx, self._bedrock_depth)
 
         self.Vp_res = self.Vp_res - Vp_change  # update sed volume in parcel
 

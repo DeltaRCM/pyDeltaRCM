@@ -548,6 +548,28 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._start_subsidence = start_subsidence
 
     @property
+    def bedrock(self):
+        """
+        defines whether or not bedrock exists.
+        """
+        return self._bedrock
+
+    @bedrock.setter
+    def bedrock(self, bedrock):
+        self._bedrock = bedrock
+
+    @property
+    def bedrock_depth(self):
+        """
+        sets the depth of bedrock
+        """
+        return self._bedrock_depth
+
+    @bedrock_depth.setter
+    def bedrock_depth(self, bedrock_depth):
+        self._bedrock_depth = float(bedrock_depth)
+
+    @property
     def save_eta_figs(self):
         """
         save_eta_figs controls whether or not figures of topography are saved.
