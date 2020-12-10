@@ -554,8 +554,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         Default is False, meaning that there is no bedrock (or basement) to the
         basin and erosion can continue unbounded. If set to True, then the
-        value of `bedrock_depth` defines the basement (or bedrock) depth below
-        which no erosion will be allowed to occur.
+        value of :attr:`bedrock_depth` defines the basement (or bedrock) depth
+        below which no erosion will be allowed to occur.
         """
         return self._bedrock
 
@@ -568,9 +568,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         """
         Set depth of bedrock.
 
-        If default value of `None` is used and `bedrock` is set to True, then
-        the bedrock depth will be set as 2x the characteristic water depth,
-        `h0`.
+        If default value of `None` is used and :attr:`bedrock` is set to True,
+        then the bedrock depth will be set as 2x the characteristic water
+        depth, :attr:`h0`.
         """
         return self._bedrock_depth
 
@@ -586,10 +586,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         """
         Allow bedrock depth to vary with SLR.
 
-        If set to True, then `bedrock_depth` is updated as sea level rises
-        such that bedrock is updated to remain at `H_SL - bedrock_depth` as
-        opposed to being the static value of `bedrock_depth` relative to the
-        initial sea level.
+        If set to True, then :attr:`bedrock_depth` is updated as sea level
+        rises such that bedrock is updated to remain at a depth of
+        :attr:`H_SL` - :attr:`bedrock_depth` as
+        opposed to being the static value of :attr:`bedrock_depth` relative
+        to the initial sea level.
         """
         return self._lithification
 
