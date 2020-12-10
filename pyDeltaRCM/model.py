@@ -550,7 +550,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def bedrock(self):
         """
-        defines whether or not bedrock exists.
+        Define whether or not bedrock exists.
+
+        Default is False, meaning that there is no bedrock (or basement) to the
+        basin and erosion can continue unbounded. If set to True, then the
+        value of `bedrock_depth` defines the basement (or bedrock) depth below
+        which no erosion will be allowed to occur.
         """
         return self._bedrock
 
@@ -561,21 +566,28 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def bedrock_depth(self):
         """
-        sets the depth of bedrock
+        Set depth of bedrock.
+
+        If default value of `None` is used and `bedrock` is set to True, then
+        the bedrock depth will be set as 2x the characteristic water depth,
+        `h0`.
         """
         return self._bedrock_depth
 
     @bedrock_depth.setter
     def bedrock_depth(self, bedrock_depth):
-        self._bedrock_depth = float(bedrock_depth)
+        if bedrock_depth is None:
+            self._bedrock_depth = float(2 * self._h0)
+        else:
+            self._bedrock_depth = float(bedrock_depth)
 
     @property
     def lithification(self):
         """
-        Allows bedrock depth to vary with SLR.
+        Allow bedrock depth to vary with SLR.
 
         If set to True, then `bedrock_depth` is updated as sea level rises
-        such that bedrock is updated to begin at `H_SL - bedrock_depth` as
+        such that bedrock is updated to remain at `H_SL - bedrock_depth` as
         opposed to being the static value of `bedrock_depth` relative to the
         initial sea level.
         """

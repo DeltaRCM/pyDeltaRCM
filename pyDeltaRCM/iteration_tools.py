@@ -84,7 +84,8 @@ class iteration_tools(abc.ABC):
         self.depth[0, self.inlet] = self._h0
 
         self.H_SL = self._H_SL + self._SLR * self._dt
-        self._bedrock_depth = self._bedrock_depth + self._SLR * self._dt
+        if self._lithification is True:
+            self._bedrock_depth = self._bedrock_depth + self._SLR * self._dt
 
     def expand_stratigraphy(self):
         """Expand stratigraphy array sizes.

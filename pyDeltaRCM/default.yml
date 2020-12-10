@@ -74,8 +74,8 @@ bedrock:
   type: 'bool'
   default: False
 bedrock_depth:
-  type: ['float', 'int']
-  default: -5
+  type: ['float', 'int', 'None']
+  default: null
 lithification:
   type: 'bool'
   default: False
