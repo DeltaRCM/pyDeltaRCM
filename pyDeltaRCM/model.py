@@ -568,18 +568,23 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         """
         Set depth of bedrock.
 
-        If default value of `None` is used and :attr:`bedrock` is set to True,
-        then the bedrock depth will be set as 2x the characteristic water
-        depth, :attr:`h0`.
+        If default value of `None` is used, then the bedrock depth will be set
+        as 2x the characteristic water depth, :attr:`h0`. If the value assigned
+        to the bedrock depth is above the initial basement floor of the basin,
+        then an error is raised.
         """
         return self._bedrock_depth
 
     @bedrock_depth.setter
     def bedrock_depth(self, bedrock_depth):
         if bedrock_depth is None:
-            self._bedrock_depth = float(2 * self._h0)
-        else:
+            self._bedrock_depth = float(-1 * 2 * self._h0)
+        elif bedrock_depth < self._h0:
             self._bedrock_depth = float(bedrock_depth)
+        else:
+            raise ValueError('Invalid bedrock depth provided, must be' +
+                             ' less than or equal to the initial basement' +
+                             ' the basin')
 
     @property
     def lithification(self):

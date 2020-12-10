@@ -1249,6 +1249,16 @@ def test_negative_Csmooth(tmp_path):
         delta = DeltaModel(input_file=p)
 
 
+def test_invalid_bedrock_depth(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+    utilities.write_parameter_to_file(f, 'bedrock_depth', 100)
+    f.close()
+    with pytest.raises(ValueError):
+        delta = DeltaModel(input_file=p)
+
+
 class TestScaleRelativeSeaLeveLRiseRate():
 
     def test_scale_If_1(self):

@@ -28,6 +28,23 @@ def test_finalize_timestep(test_DeltaModel):
     assert test_DeltaModel.H_SL == 0.3
 
 
+def test_finalize_timestep_lithification(test_DeltaModel):
+    # assert lithification is initially off
+    assert test_DeltaModel.lithification is False
+    # turn it on and assert that both lithification and bedrock are on
+    test_DeltaModel.lithification = True
+    assert test_DeltaModel.lithification is True
+    assert test_DeltaModel.bedrock is True
+    # assert initial bedrock depth
+    assert test_DeltaModel.bedrock_depth == -1 * 2 * test_DeltaModel.h0
+    # finalize where SL rises and so does bedrock boundary
+    test_DeltaModel.finalize_timestep()
+    # check that sea level rose as expected
+    assert test_DeltaModel.H_SL == 0.3
+    # check that bedrock boundary rose as expected too
+    assert test_DeltaModel.bedrock_depth == -1 * 2 * test_DeltaModel.h0 + 0.3
+
+
 def test_subsidence_in_update(tmp_path):
     p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                  {'toggle_subsidence': True,

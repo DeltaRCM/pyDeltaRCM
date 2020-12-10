@@ -476,3 +476,39 @@ def test_checkpoint_nc(tmp_path):
     assert output['eta'][-1].shape == (10, 10)
     assert output['depth'][-1].shape == (10, 10)
     assert output['discharge'][-1].shape == (10, 10)
+
+
+def test_model_bedrock(tmp_path):
+    """Test bedrock depth using two models with otherwise identical params."""
+    file_name = 'base_run.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'seed', 10)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 3.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 3)
+    utilities.write_parameter_to_file(f, 'u0', 100.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(f, 'h0', 10.0)
+    utilities.write_parameter_to_file(f, 'SLR', 0.00)
+    utilities.write_parameter_to_file(f, 'Np_sed', 3)
+    f.close()
+
+    # create and update first model - turn on and assign bedrock values
+    ModelA = DeltaModel(input_file=p)
+    ModelA.bedrock = True
+    ModelA.bedrock_depth = -1 * ModelA.h0
+    ModelA.init_sediment_routers()  # re-init routers w/ bedrock values
+    ModelA.update()
+    ModelA.output_netcdf.close()
+    # create and update second model - no bedrock
+    ModelB = DeltaModel(input_file=p)
+    ModelB.update()
+    ModelB.output_netcdf.close()
+
+    # ModelA should not have any elevations below bedrock
+    assert np.all(ModelA.eta >= ModelA.bedrock_depth)
+    # ModelB can erode deeper (and has)
+    assert np.any(ModelB.eta < ModelA.bedrock_depth)
+    # this means the bedrock worked

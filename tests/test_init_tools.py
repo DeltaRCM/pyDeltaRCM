@@ -610,6 +610,31 @@ def test_sigma_max(tmp_path):
     assert np.all(_delta.sigma <= (1e-9 * _delta.dt))
 
 
+def test_bedrock(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'bedrock': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.bedrock is True
+    assert _delta.bedrock_depth == -1 * 2 * _delta._h0
+
+
+def test_bedrock_depth(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'bedrock': True,
+                                  'bedrock_depth': -15.0})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.bedrock is True
+    assert _delta.bedrock_depth == -15.0
+
+
+def test_lithification(tmp_path):
+    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                 {'lithification': True})
+    _delta = DeltaModel(input_file=p)
+    assert _delta.bedrock is True
+    assert _delta.bedrock_depth == -1 * 2 * _delta._h0
+    assert _delta.lithification is True
+
 # test definition of the model domain
 
 def test_x(test_DeltaModel):
