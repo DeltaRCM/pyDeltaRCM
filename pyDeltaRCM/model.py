@@ -597,6 +597,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @lithification.setter
     def lithification(self, lithification):
         self._lithification = lithification
+        # force bedrock to be turned on if lithification is on
+        if lithification is True:
+            self.bedrock = True
 
     @property
     def save_eta_figs(self):
