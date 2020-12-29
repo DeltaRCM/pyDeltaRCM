@@ -368,6 +368,7 @@ def test_py_hlvl_wo_timesteps(tmp_path):
     with pytest.raises(ValueError, match=r'You must specify a run duration *.'):
         pp.run_jobs()
 
+
 def test_py_hlvl_tsteps_yml_runjobs_sngle(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
@@ -593,15 +594,16 @@ def test_py_hlvl_args(tmp_path):
     pp = preprocessor.Preprocessor(input_file=p, timesteps=2)
     assert type(pp.file_list) is list
     assert len(pp.file_list) == 1
-    assert pp.file_list[0].deltamodel.Length == 10.0
-    assert pp.file_list[0].deltamodel.Width == 10.0
-    assert pp.file_list[0].deltamodel.dx == 1.0
-    assert pp.file_list[0].deltamodel.seed == 0
     assert pp._is_completed is False
     pp.run_jobs()
     assert type(pp.job_list[0].deltamodel) is DeltaModel
+    assert pp.job_list[0].deltamodel.Length == 10.0
+    assert pp.job_list[0].deltamodel.Width == 10.0
+    assert pp.job_list[0].deltamodel.dx == 1.0
+    assert pp.job_list[0].deltamodel.seed == 0
     assert type(pp.job_list[0]) is preprocessor._Job
     assert len(pp.file_list) == 1
+    assert len(pp.job_list) == 1
     assert pp._is_completed is True
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
@@ -614,7 +616,7 @@ def test_py_hlvl_args(tmp_path):
     assert not os.path.isfile(exp_path_png3)
 
 
-def test_python_highlevelapi_matrix_expansion_one_list_timesteps_argument(tmp_path):
+def test_py_hlvl_mtrx_1list_timesteps_arg(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -641,8 +643,10 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_argument(tmp_pa
     f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
     assert sum([j == 0.2 for j in f_bedload_list]) == 1
     assert sum([j == 0.6 for j in f_bedload_list]) == 1
-    end_time_000 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
-    end_time_001 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
+    end_time_000 = utilities.read_endtime_from_log(
+        tmp_path / 'test' / 'job_000')
+    end_time_001 = utilities.read_endtime_from_log(
+        tmp_path / 'test' / 'job_000')
     assert end_time_000 == 900.0
     assert end_time_001 == 900.0
     assert pp.job_list[1].deltamodel.dt == 300.0
@@ -663,11 +667,11 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_argument(tmp_pa
         assert '---- Model time 0.0 ----' in _lines
         assert '---- Model time 300.0 ----' in _lines
         assert '---- Model time 600.0 ----' in _lines
-        assert '---- Model time 900.0 ----' not in _lines
+        assert '---- Model time 900.0 ----' in _lines
         assert '---- Model time 1200.0 ----' not in _lines
 
 
-def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path):
+def test_py_hlvl_mtrx_1list_tsteps_cfg(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -696,8 +700,10 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path
     f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
     assert sum([j == 0.2 for j in f_bedload_list]) == 1
     assert sum([j == 0.6 for j in f_bedload_list]) == 1
-    end_time_000 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
-    end_time_001 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_001')
+    end_time_000 = utilities.read_endtime_from_log(
+        tmp_path / 'test' / 'job_000')
+    end_time_001 = utilities.read_endtime_from_log(
+        tmp_path / 'test' / 'job_001')
     assert end_time_000 == 900.0
     assert end_time_001 == 900.0
     exp_path_nc0 = os.path.join(
@@ -712,7 +718,7 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path
     assert ds.variables['strata_age'].shape == (4,)
 
 
-def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
+def test_py_hlvl_mtrx_2list(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -744,7 +750,8 @@ def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
     assert (0.5, 1.0) in comb_list
     assert not (0.5, 0.2) in comb_list
     assert pp.job_list[0].deltamodel.dt == 300.0
-    end_time_000 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
+    end_time_000 = utilities.read_endtime_from_log(
+        tmp_path / 'test' / 'job_000')
     assert end_time_000 == 900.0
     assert len(pp.file_list) == 9
     assert pp._is_completed is True
@@ -759,7 +766,7 @@ def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
     assert os.path.isfile(exp_path_nc8)
 
 
-def test_python_highlevelapi_matrix_expansion_scientificnotation(tmp_path):
+def test_py_hlvl_mtrx_scientificnotation(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -781,7 +788,7 @@ def test_python_highlevelapi_matrix_expansion_scientificnotation(tmp_path):
     assert sum([j == 0.000001 for j in SLR_list]) == 3
 
 
-def test_python_highlevelapi_matrix_expansion_one_list_time_config(tmp_path):
+def test_py_hlvl_mtrx_one_list_time_config(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -802,8 +809,10 @@ def test_python_highlevelapi_matrix_expansion_one_list_time_config(tmp_path):
     assert pp._is_completed is False
     pp.run_jobs()
     assert pp._is_completed is True
-    end_time_000 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
-    end_time_001 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_001')
+    end_time_000 = utilities.read_endtime_from_log(
+        tmp_path / 'test' / 'job_000')
+    end_time_001 = utilities.read_endtime_from_log(
+        tmp_path / 'test' / 'job_001')
     assert end_time_000 == 1200.0
     assert end_time_001 == 1200.0
 
@@ -839,6 +848,7 @@ def test_py_hlvl_mtrx_bad_type(tmp_path):
     pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
     with pytest.raises(TypeError, match='Input for "u0" not of the right type .*'):
         pp.run_jobs()
+
 
 def test_py_hlvl_mtrx_bad_len1(tmp_path):
     file_name = 'user_parameters.yaml'
@@ -1091,7 +1101,7 @@ def test_subsidence_bounds(tmp_path):
     utilities.write_parameter_to_file(f, 'Width', 600.)
     utilities.write_parameter_to_file(f, 'dx', 5)
     utilities.write_parameter_to_file(f, 'toggle_subsidence', True)
-    utilities.write_parameter_to_file(f, 'theta1', -np.pi/2)
+    utilities.write_parameter_to_file(f, 'theta1', -np.pi / 2)
     utilities.write_parameter_to_file(f, 'theta1', 0)
     f.close()
     delta = DeltaModel(input_file=p)
