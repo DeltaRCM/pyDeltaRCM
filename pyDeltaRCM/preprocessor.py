@@ -317,7 +317,7 @@ class _Job(multiprocessing.Process):
         self.sema = sema  # semaphore for limited multiprocessing
         self.input_file = input_file
 
-        self.deltamodel = DeltaModel(input_file=input_file)
+        self.deltamodel = DeltaModel(input_file=input_file, defer_output=True)
         _curr_time = self.deltamodel._time
 
         self.timesteps = ('timesteps', cli_dict, yaml_dict)
@@ -348,6 +348,7 @@ class _Job(multiprocessing.Process):
         self.queue.put({'job': self.i, 'stage': 0, 'code': 0})
         try:
             try:
+                self.deltamodel.init_output_file()
                 while self.deltamodel._time < self._job_end_time:
                     self.deltamodel.update()
             except (RuntimeError, ValueError) as e:
