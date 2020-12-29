@@ -8,6 +8,7 @@ import numpy as np
 import subprocess
 import glob
 import netCDF4
+import time
 
 from pyDeltaRCM.model import DeltaModel
 from pyDeltaRCM import shared_tools
@@ -239,7 +240,7 @@ def test_entry_point_python_main_call_dryrun(tmp_path):
                              '--dryrun'])
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
-    assert os.path.isfile(exp_path_nc)
+    assert not os.path.isfile(exp_path_nc)   # does not exist because --dryrun
     assert not os.path.isfile(exp_path_png)  # does not exist because --dryrun
 
 
@@ -363,23 +364,9 @@ def test_py_hlvl_wo_timesteps(tmp_path):
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     f.close()
-    with pytest.raises(ValueError):
-        pp = preprocessor.Preprocessor(p)
-
-
-def test_py_hlvl_tsteps_yml_init_types(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'timesteps', 2)
-    f.close()
     pp = preprocessor.Preprocessor(p)
-    assert type(pp.job_list) is list
-    assert len(pp.job_list) == 1
-    assert type(pp.job_list[0]) is preprocessor.Preprocessor._Job
-    assert type(pp.job_list[0].deltamodel) is DeltaModel
-    assert pp.job_list[0]._is_completed is False
-
+    with pytest.raises(ValueError, match=r'You must specify a run duration *.'):
+        pp.run_jobs()
 
 def test_py_hlvl_tsteps_yml_runjobs_sngle(tmp_path):
     file_name = 'user_parameters.yaml'
@@ -393,13 +380,15 @@ def test_py_hlvl_tsteps_yml_runjobs_sngle(tmp_path):
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'timesteps', 2)
+    utilities.write_parameter_to_file(f, 'timesteps', 50)
     f.close()
     pp = preprocessor.Preprocessor(p)
-    assert len(pp.job_list) == 1
-    assert pp.job_list[0]._is_completed is False
+    assert len(pp.file_list) == 1
+    assert pp._is_completed is False
     pp.run_jobs()
-    assert pp.job_list[0]._is_completed is True
+    assert pp._is_completed is True
+    end_time = utilities.read_endtime_from_log(tmp_path / 'test')
+    assert end_time == 15000
 
 
 def test_py_hlvl_time_yml_runjobs_sngle(tmp_path):
@@ -417,11 +406,11 @@ def test_py_hlvl_time_yml_runjobs_sngle(tmp_path):
     utilities.write_parameter_to_file(f, 'time', 1000)
     f.close()
     pp = preprocessor.Preprocessor(p)
-    assert len(pp.job_list) == 1
-    assert pp.job_list[0]._is_completed is False
+    assert len(pp.file_list) == 1
     pp.run_jobs()
-    assert pp.job_list[0]._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 1200
+    assert pp._is_completed is True
+    end_time = utilities.read_endtime_from_log(tmp_path / 'test')
+    assert end_time == 1200
 
 
 def test_py_hlvl_time_If_yml_runjobs_sngle(tmp_path):
@@ -440,11 +429,11 @@ def test_py_hlvl_time_If_yml_runjobs_sngle(tmp_path):
     utilities.write_parameter_to_file(f, 'If', 0.1)
     f.close()
     pp = preprocessor.Preprocessor(p)
-    assert len(pp.job_list) == 1
-    assert pp.job_list[0]._is_completed is False
+    assert len(pp.file_list) == 1
     pp.run_jobs()
-    assert pp.job_list[0]._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 1200
+    assert pp._is_completed is True
+    end_time = utilities.read_endtime_from_log(tmp_path / 'test')
+    assert end_time == 1200
 
 
 def test_py_hlvl_timeargs_precedence_tstepsovertime(tmp_path):
@@ -552,11 +541,11 @@ def test_py_hlvl_timeyears_yml_runjobs_sngle(tmp_path):
     utilities.write_parameter_to_file(f, 'time_years', 3.16880878140e-05)
     f.close()
     pp = preprocessor.Preprocessor(p)
-    assert len(pp.job_list) == 1
-    assert pp.job_list[0]._is_completed is False
+    assert len(pp.file_list) == 1
     pp.run_jobs()
-    assert pp.job_list[0]._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 1200
+    assert pp._is_completed is True
+    end_time = utilities.read_endtime_from_log(tmp_path / 'test')
+    assert end_time == 1200
 
 
 def test_py_hlvl_timeyears_If_yml_runjobs_sngle(tmp_path):
@@ -575,11 +564,12 @@ def test_py_hlvl_timeyears_If_yml_runjobs_sngle(tmp_path):
     utilities.write_parameter_to_file(f, 'If', 0.1)
     f.close()
     pp = preprocessor.Preprocessor(p)
-    assert len(pp.job_list) == 1
-    assert pp.job_list[0]._is_completed is False
+    assert len(pp.file_list) == 1
+    assert pp._is_completed is False
     pp.run_jobs()
-    assert pp.job_list[0]._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 1200
+    assert pp._is_completed is True
+    end_time = utilities.read_endtime_from_log(tmp_path / 'test')
+    assert end_time == 1200
 
 
 def test_py_hlvl_args(tmp_path):
@@ -601,18 +591,18 @@ def test_py_hlvl_args(tmp_path):
     utilities.write_parameter_to_file(f, 'save_eta_figs', True)
     f.close()
     pp = preprocessor.Preprocessor(input_file=p, timesteps=2)
-    assert type(pp.job_list) is list
-    assert len(pp.job_list) == 1
-    assert type(pp.job_list[0]) is preprocessor.Preprocessor._Job
-    assert type(pp.job_list[0].deltamodel) is DeltaModel
-    assert pp.job_list[0].deltamodel.Length == 10.0
-    assert pp.job_list[0].deltamodel.Width == 10.0
-    assert pp.job_list[0].deltamodel.dx == 1.0
-    assert pp.job_list[0].deltamodel.seed == 0
-    assert pp.job_list[0]._is_completed is False
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 1
+    assert pp.file_list[0].deltamodel.Length == 10.0
+    assert pp.file_list[0].deltamodel.Width == 10.0
+    assert pp.file_list[0].deltamodel.dx == 1.0
+    assert pp.file_list[0].deltamodel.seed == 0
+    assert pp._is_completed is False
     pp.run_jobs()
-    assert len(pp.job_list) == 1
-    assert pp.job_list[0]._is_completed is True
+    assert type(pp.job_list[0].deltamodel) is DeltaModel
+    assert type(pp.job_list[0]) is preprocessor._Job
+    assert len(pp.file_list) == 1
+    assert pp._is_completed is True
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
     exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
     exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
@@ -642,27 +632,29 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_argument(tmp_pa
     f.close()
     pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
     assert pp._has_matrix is True
-    assert type(pp.job_list) is list
-    assert len(pp.job_list) == 2
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is False
+    pp.run_jobs()
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is True
     f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
     assert sum([j == 0.2 for j in f_bedload_list]) == 1
     assert sum([j == 0.6 for j in f_bedload_list]) == 1
-
-    assert pp.job_list[0]._is_completed is False
-    pp.run_jobs()
-    assert len(pp.job_list) == 2
-    assert pp.job_list[0]._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 900.0
-    assert pp.job_list[1].deltamodel.time == 900.0
+    end_time_000 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
+    end_time_001 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
+    assert end_time_000 == 900.0
+    assert end_time_001 == 900.0
     assert pp.job_list[1].deltamodel.dt == 300.0
-    assert pp.job_list[1].deltamodel.time == pp.job_list[1].deltamodel.dt * 3
+    assert pp._is_completed is True
+    end_time = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
+    assert end_time == pp.job_list[1].deltamodel.dt * 3
     exp_path_nc0 = os.path.join(
         tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
     exp_path_nc1 = os.path.join(
         tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
     assert os.path.isfile(exp_path_nc0)
     assert os.path.isfile(exp_path_nc1)
-
     _logs = glob.glob(os.path.join(pp.job_list[0].deltamodel.prefix, '*.log'))
     assert len(_logs) == 1  # log file exists
     with open(_logs[0], 'r') as _logfile:
@@ -687,6 +679,7 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'timesteps', 3)
     utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'save_strata', True)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     utilities.write_matrix_to_file(f,
                                    ['f_bedload'],
@@ -694,18 +687,19 @@ def test_python_highlevelapi_matrix_expansion_one_list_timesteps_config(tmp_path
     f.close()
     pp = preprocessor.Preprocessor(input_file=p)
     assert pp._has_matrix is True
-    assert type(pp.job_list) is list
-    assert len(pp.job_list) == 2
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is False
+    pp.run_jobs()
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is True
     f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
     assert sum([j == 0.2 for j in f_bedload_list]) == 1
     assert sum([j == 0.6 for j in f_bedload_list]) == 1
-
-    assert pp.job_list[0]._is_completed is False
-    pp.run_jobs()
-    assert len(pp.job_list) == 2
-    assert pp.job_list[0]._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 900.0
-    assert pp.job_list[1].deltamodel.time == 900.0
+    end_time_000 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
+    end_time_001 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_001')
+    assert end_time_000 == 900.0
+    assert end_time_001 == 900.0
     exp_path_nc0 = os.path.join(
         tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
     exp_path_nc1 = os.path.join(
@@ -736,8 +730,10 @@ def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
     f.close()
     pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
     assert pp._has_matrix is True
-    assert type(pp.job_list) is list
-    assert len(pp.job_list) == 9
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 9
+    assert pp._is_completed is False
+    pp.run_jobs()
     f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
     assert sum([j == 0.2 for j in f_bedload_list]) == 3
     assert sum([j == 0.5 for j in f_bedload_list]) == 3
@@ -748,13 +744,10 @@ def test_python_highlevelapi_matrix_expansion_two_lists(tmp_path):
     assert (0.5, 1.0) in comb_list
     assert not (0.5, 0.2) in comb_list
     assert pp.job_list[0].deltamodel.dt == 300.0
-    assert pp.job_list[0].deltamodel.time == 0.0
-
-    assert pp.job_list[0]._is_completed is False
-    pp.run_jobs()
-    assert pp.job_list[0].deltamodel.time == 900.0
-    assert len(pp.job_list) == 9
-    assert pp.job_list[0]._is_completed is True
+    end_time_000 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
+    assert end_time_000 == 900.0
+    assert len(pp.file_list) == 9
+    assert pp._is_completed is True
     exp_path_nc0 = os.path.join(
         tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
     exp_path_nc5 = os.path.join(
@@ -781,7 +774,8 @@ def test_python_highlevelapi_matrix_expansion_scientificnotation(tmp_path):
                                    ['f_bedload', 'SLR'],
                                    [[0.2, 0.5, 0.6], [0.00004, 1e-6]])
     f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3, dry_run=True)
+    pp.run_jobs()
     SLR_list = [j.deltamodel.SLR for j in pp.job_list]
     assert sum([j == 4e-5 for j in SLR_list]) == 3
     assert sum([j == 0.000001 for j in SLR_list]) == 3
@@ -805,10 +799,13 @@ def test_python_highlevelapi_matrix_expansion_one_list_time_config(tmp_path):
                                    [[0.2, 0.6]])
     f.close()
     pp = preprocessor.Preprocessor(input_file=p)
+    assert pp._is_completed is False
     pp.run_jobs()
-    assert pp.job_list[0]._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 1200.0
-    assert pp.job_list[1].deltamodel.time == 1200.0
+    assert pp._is_completed is True
+    end_time_000 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
+    end_time_001 = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_001')
+    assert end_time_000 == 1200.0
+    assert end_time_001 == 1200.0
 
 
 def test_python_highlevelapi_matrix_needs_out_dir(tmp_path):
@@ -839,9 +836,9 @@ def test_py_hlvl_mtrx_bad_type(tmp_path):
                                    ['f_bedload', 'u0'],
                                    [[0.2, 0.5, 0.6], ['badstr1', 'badstr2']])
     f.close()
-    with pytest.raises(TypeError, match='During job instantiation, one of the model .*'):
-        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    with pytest.raises(TypeError, match='Input for "u0" not of the right type .*'):
+        pp.run_jobs()
 
 def test_py_hlvl_mtrx_bad_len1(tmp_path):
     file_name = 'user_parameters.yaml'
@@ -969,13 +966,13 @@ def test_py_hlvl_ensemble(tmp_path):
     pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
     # assertions for job creation
     assert pp._has_matrix is True
-    assert type(pp.job_list) is list
-    assert len(pp.job_list) == 2
-    assert pp.job_list[0]._is_completed is False
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is False
     pp.run_jobs()
     # assertions after running jobs
-    assert len(pp.job_list) == 2
-    assert pp.job_list[0]._is_completed is True
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is True
     exp_path_nc0 = os.path.join(
         tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
     exp_path_nc1 = os.path.join(
@@ -1003,13 +1000,13 @@ def test_py_hlvl_ensemble_with_matrix(tmp_path):
     pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
     # assertions for job creation
     assert pp._has_matrix is True
-    assert type(pp.job_list) is list
-    assert len(pp.job_list) == 6
-    assert pp.job_list[0]._is_completed is False
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 6
+    assert pp._is_completed is False
     pp.run_jobs()
     # assertions after running jobs
-    assert len(pp.job_list) == 6
-    assert pp.job_list[0]._is_completed is True
+    assert len(pp.file_list) == 6
+    assert pp._is_completed is True
     exp_path_nc0 = os.path.join(
         tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
     exp_path_nc5 = os.path.join(

@@ -286,7 +286,8 @@ def test_logger_has_timestep_lines(tmp_path):
         _lines = ' '.join(_lines)  # collapse to a single string
         assert '---- Model time 0.0 ----' in _lines
         assert '---- Model time 300.0 ----' in _lines
-        assert '---- Model time 600.0 ----' not in _lines
+        assert '---- Model time 600.0 ----' in _lines
+        assert '---- Model time 900.0 ----' not in _lines
 
 
 def test_logger_random_seed_always_recorded(tmp_path):

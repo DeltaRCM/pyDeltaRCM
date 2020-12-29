@@ -86,6 +86,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             self.init_output_file()
 
         self.logger.info('Model initialization complete')
+        self.log_model_time()
 
     def update(self):
         """Run the model for one full instance
@@ -122,6 +123,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_time_since_last += self.dt
         self._save_time_since_checkpoint += self.dt
         self._time_iter += int(1)
+
+        self.log_model_time()
 
         if self._save_time_since_checkpoint >= self.checkpoint_dt:
             self.output_checkpoint()
