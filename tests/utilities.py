@@ -1,5 +1,6 @@
 import sys
 import os
+import glob
 
 import pytest
 from pyDeltaRCM.model import DeltaModel
@@ -78,3 +79,15 @@ def test_DeltaModel(tmp_path):
     f.close()
     _delta = DeltaModel(input_file=p)
     return _delta
+
+
+def read_endtime_from_log(log_folder):
+    _logs = glob.glob(os.path.join(log_folder, '*.log'))
+    assert len(_logs) == 1  # log file exists
+    with open(_logs[0], 'r') as _logfile:
+        _lines = _logfile.readlines()
+        _t = 0
+        for i, _line in enumerate(_lines):
+            if '---- Model time' in _line:
+                _t = _line.split(' ')[8]
+        return float(_t)

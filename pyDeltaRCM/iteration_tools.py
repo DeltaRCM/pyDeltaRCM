@@ -42,12 +42,6 @@ class iteration_tools(abc.ABC):
         RuntimeError
             If model has already been finalized via :meth:`finalize`.
         """
-        self.logger.info('-' * 4 + ' Model time ' +
-                         str(self._time) + ' ' + '-' * 4)
-        if self._verbose > 0:
-            print('-' * 20)
-            print('Model time: ' + str(self._time))
-
         if self._is_finalized:
             raise RuntimeError('Cannot update model, model already finalized!')
 
@@ -83,6 +77,18 @@ class iteration_tools(abc.ABC):
         self.depth[0, self.inlet] = self._h0
 
         self.H_SL = self._H_SL + self._SLR * self._dt
+
+    def log_model_time(self):
+        """Log the time of the model.
+
+        Reports the time to the log file, and depending on verbosity, will
+        report it to stdout.
+        """
+        self.logger.info('-' * 4 + ' Model time ' +
+                         str(self._time) + ' ' + '-' * 4)
+        if self._verbose > 0:
+            print('-' * 20)
+            print('Model time: ' + str(self._time))
 
     def expand_stratigraphy(self):
         """Expand stratigraphy array sizes.
