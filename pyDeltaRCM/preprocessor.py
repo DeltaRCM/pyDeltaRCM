@@ -33,6 +33,10 @@ class BasePreprocessor(abc.ABC):
         out the Python API.
 
     """
+    def __init__(self):
+        """Initialize the base preprocessor.
+        """
+        self._is_completed = False
 
     def preliminary_yaml_parsing(self):
         """Preliminary YAML parsing.
@@ -271,6 +275,10 @@ class BasePreprocessor(abc.ABC):
             self.job_list.append(p)
             p.start()
 
+        # join processes to prevent ending the jobs before moving forward
+        for i in self.job_list:
+            i.join()
+
         # read from the queue and report (asynchronous...buggy...)
         time.sleep(1)
         while not q.empty():
@@ -280,6 +288,8 @@ class BasePreprocessor(abc.ABC):
             else:
                 print("Job {job} returned code {code} "
                       "for stage {stage}.".format_map(gotq))
+
+        self._is_completed = True
 
 
 class _Job(multiprocessing.Process):
@@ -329,8 +339,6 @@ class _Job(multiprocessing.Process):
                 'You must specify a run duration configuration in either '
                 'the input YAML file or via input arguments.')
 
-        self._is_completed = False
-
     def run(self):
         """Loop the model.
 
@@ -339,25 +347,22 @@ class _Job(multiprocessing.Process):
         """
         self.queue.put({'job': self.i, 'stage': 0, 'code': 0})
         try:
-            while self.deltamodel._time < self._job_end_time:
-                self.deltamodel.update()
-            _end_safe = True
-        except (RuntimeError, ValueError) as e:
-            self.queue.put({'job': self.i, 'stage': 1, 'code': 1, 'msg': e})
-        else:
-            self.queue.put({'job': self.i, 'stage': 1, 'code': 0})
+            try:
+                while self.deltamodel._time < self._job_end_time:
+                    self.deltamodel.update()
+            except (RuntimeError, ValueError) as e:
+                self.queue.put({'job': self.i, 'stage': 1, 'code': 1, 'msg': e})
+            else:
+                self.queue.put({'job': self.i, 'stage': 1, 'code': 0})
 
-        if _end_safe:
             try:
                 self.deltamodel.finalize()
             except (RuntimeError, ValueError) as e:
                 self.queue.put({'job': self.i, 'stage': 2, 'code': 1, 'msg': e})
             else:
                 self.queue.put({'job': self.i, 'stage': 2, 'code': 0})
-        else:
-            self.queue.put({'job': self.i, 'stage': 2, 'code': 1})
-
-        self.sema.release()
+        finally:
+            self.sema.release()
 
     @property
     def timesteps(self):
