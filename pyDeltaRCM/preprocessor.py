@@ -283,6 +283,7 @@ class BasePreprocessor(abc.ABC):
             specified in the command line interface.
             """
             self.deltamodel = DeltaModel(input_file=input_file)
+            _curr_time = self.deltamodel._time
 
             self.timesteps = ('timesteps', cli_dict, yaml_dict)
             self.time = ('time', cli_dict, yaml_dict)
@@ -291,11 +292,13 @@ class BasePreprocessor(abc.ABC):
 
             # determine job end time, *in model time*
             if not (self.timesteps is None):
-                self._job_end_time = (self.timesteps * self.deltamodel._dt)
+                self._job_end_time = _curr_time + \
+                    ((self.timesteps * self.deltamodel._dt))
             elif not (self.time is None):
-                self._job_end_time = (self.time) * self.If
+                self._job_end_time = _curr_time + ((self.time) * self.If)
             elif not (self.time_years is None):
-                self._job_end_time = (self.time_years) * self.If * 86400 * 365.25
+                self._job_end_time = _curr_time + \
+                    ((self.time_years) * self.If * 86400 * 365.25)
             else:
                 raise ValueError(
                     'You must specify a run duration configuration in either '
