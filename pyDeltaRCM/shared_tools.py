@@ -69,8 +69,11 @@ def random_pick(prob):
     Takes a numpy array that is the precalculated cumulative probability
     around the cell flattened to 1D.
     """
-    arr = np.arange(len(prob))
-    return arr[np.searchsorted(np.cumsum(prob), get_random_uniform(1))]
+    len_prob = len(prob)
+    arr = np.arange(len_prob)
+    idx = np.searchsorted(np.cumsum(prob), get_random_uniform(1))
+    idx = np.minimum(idx, len_prob-1)
+    return arr[idx]
 
 
 @njit

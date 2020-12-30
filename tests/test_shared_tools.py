@@ -80,6 +80,29 @@ def test_random_pick_anybut_first(test_DeltaModel):
     assert np.sum(_rets == 8) > 0
 
 
+@pytest.mark.xfail(strict=True, reason='cannot mock a jitted function')
+def test_random_pick_edgecase(mocker):
+    """
+    This test PASSES if `export NUMBA_DISABLE_JIT=1` is declared.
+    I.e., if the mock can work...
+    """
+    mocked = mocker.patch('pyDeltaRCM.shared_tools.get_random_uniform')
+
+    probs = np.array([0, 0,          0.23647638,
+                      0, 0,          0.49098423,
+                      0, 0.01803146, 0.2545079])
+    mocked.return_value = 0
+    assert shared_tools.random_pick(probs.flatten()) == 0
+    mocked.return_value = 0.1
+    assert shared_tools.random_pick(probs.flatten()) == 2
+    mocked.return_value = 0.9999
+    assert shared_tools.random_pick(probs.flatten()) == 8
+    mocked.return_value = 0.9999999
+    assert shared_tools.random_pick(probs.flatten()) == 8
+    mocked.return_value = 1
+    assert shared_tools.random_pick(probs.flatten()) == 8
+
+
 def test_custom_unravel_square():
     arr = np.arange(9).reshape((3, 3))
     # test upper left corner
