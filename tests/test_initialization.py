@@ -454,7 +454,7 @@ def test_py_hlvl_timeargs_precedence_tstepsovertime(tmp_path):
     f.close()
     pp = preprocessor.Preprocessor(p)
     pp.run_jobs()
-    assert pp.job_list[0]._is_completed is True
+    assert pp._is_completed is True
     assert pp.job_list[0].deltamodel.time == 600
     assert pp.job_list[0].deltamodel.time_iter == 2
 
@@ -476,7 +476,7 @@ def test_py_hlvl_timeargs_precedence_tstepsovertimeyears(tmp_path):
     f.close()
     pp = preprocessor.Preprocessor(p)
     pp.run_jobs()
-    assert pp.job_list[0]._is_completed is True
+    assert pp._is_completed is True
     assert pp.job_list[0].deltamodel.time == 600
     assert pp.job_list[0].deltamodel.time_iter == 2
 
@@ -498,7 +498,7 @@ def test_py_hlvl_timeargs_precedence_timeovertimeyears(tmp_path):
     f.close()
     pp = preprocessor.Preprocessor(p)
     pp.run_jobs()
-    assert pp.job_list[0]._is_completed is True
+    assert pp._is_completed is True
     assert pp.job_list[0].deltamodel.time == 900
     assert pp.job_list[0].deltamodel.time_iter == 3
 
@@ -522,7 +522,7 @@ def test_py_hlvl_time_timestep_mismatch_endtime_check(tmp_path):
     # timestep will have been 300, so should have run 4 iterations, and time
     # will equal 1200. I.e., more than specified, this is the expected
     # behavior
-    assert pp.job_list[0]._is_completed is True
+    assert pp._is_completed is True
     assert pp.job_list[0].deltamodel.time == 1200
     assert pp.job_list[0].deltamodel.time_iter == 4
 
