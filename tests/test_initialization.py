@@ -601,7 +601,7 @@ def test_py_hlvl_args(tmp_path):
     assert pp.job_list[0].deltamodel.Width == 10.0
     assert pp.job_list[0].deltamodel.dx == 1.0
     assert pp.job_list[0].deltamodel.seed == 0
-    assert type(pp.job_list[0]) is preprocessor._Job
+    assert issubclass(type(pp.job_list[0]), preprocessor._BaseJob)
     assert len(pp.file_list) == 1
     assert len(pp.job_list) == 1
     assert pp._is_completed is True
