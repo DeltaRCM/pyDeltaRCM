@@ -2,9 +2,11 @@ import os
 import argparse
 import abc
 import time
+import platform
 
 import itertools
 from pathlib import Path
+import warnings
 
 import multiprocessing
 
@@ -231,76 +233,105 @@ class BasePreprocessor(abc.ABC):
 
         This will run jobs in parallel if `--parallel` is specified in the
         command line or YAML.
-
         """
         if self._dryrun:
             return
-
-        # NOTE: we always use the multiprocessing infrastructure, regardless
-        # of number of jobs, or whether running in serial or parallel.
-        _parallel_flag = _optional_input(
-            'parallel', cli_dict=self.cli_dict, yaml_dict=self.yaml_dict,
-            default=False)
-        if isinstance(_parallel_flag, bool):
-            if (_parallel_flag is True):
-                # (number cores avail - 1), or 1 and never 0
-                num_parallel_processes = (multiprocessing.cpu_count() - 1) or 1
-            else:
-                # serial jobs
-                num_parallel_processes = 1
-        elif (isinstance(_parallel_flag, int)):
-            num_parallel_processes = _parallel_flag
-        else:
-            num_parallel_processes = 1
-
-        _msg = 'Running %g parallel jobs' % num_parallel_processes
-        if self.verbose >= 1:
-            print(_msg)
-
-        # use Semaphore to limit number of concurrent Job
-        s = multiprocessing.Semaphore(num_parallel_processes)
 
         # initialize empty list to maintain reference to all Job instances
         num_total_processes = len(self.file_list)
         self.job_list = list()
 
-        # start a Queue for all Jobs
-        q = multiprocessing.Queue()
+        # NOTE: multiprocessing infrastructure is only available on linux.
+        #       We only use parallel approach if the --parallel flag is given and linux.
+        _parallel_flag = _optional_input(
+            'parallel', cli_dict=self.cli_dict, yaml_dict=self.yaml_dict,
+            default=False)
+        _os = platform.system()
 
-        # loop and create and start all jobs
-        for i in range(0, num_total_processes):
-            s.acquire()  # aquire resource from Semaphore
-            p = _Job(i=i, queue=q, sema=s, input_file=self.file_list[i],
-                     cli_dict=self.cli_dict, yaml_dict=self.yaml_dict)
-            self.job_list.append(p)
-            p.start()
+        # if the parallel flag is given use the parallel infrastructure
+        #   NOTE: the following evaluates to true for boolean `True` or
+        #         any `int` > 0
+        if _parallel_flag:
+            # validate that os is Linux, otherwise error
+            if _os != 'Linux':
+                raise NotImplementedError(
+                    'Parallel simulations only implemented on Linux.')
 
-        # join processes to prevent ending the jobs before moving forward
-        for i in self.job_list:
-            i.join()
-
-        # read from the queue and report (asynchronous...buggy...)
-        time.sleep(1)
-        while not q.empty():
-            gotq = q.get()
-            if gotq['code'] == 1:
-                print("Job {job} ended in error:\n {msg}".format_map(gotq))
+            # determine the number of processors to use
+            if (_parallel_flag is True):
+                # (number cores avail - 1), or 1 and never 0
+                num_parallel_processes = (multiprocessing.cpu_count() - 1) or 1
+            elif (isinstance(_parallel_flag, int)):
+                num_parallel_processes = _parallel_flag
             else:
-                print("Job {job} returned code {code} "
-                      "for stage {stage}.".format_map(gotq))
+                num_parallel_processes = 1
+
+            _msg = 'Running %g parallel jobs' % num_parallel_processes
+            if self.verbose >= 1:
+                print(_msg)
+
+            # use Semaphore to limit number of concurrent Job
+            s = multiprocessing.Semaphore(num_parallel_processes)
+
+            # start a Queue for all Jobs
+            q = multiprocessing.Queue()
+
+            # loop and create and start all jobs
+            for i in range(0, num_total_processes):
+                s.acquire()  # aquire resource from Semaphore
+                p = _ParallelJob(i=i, queue=q, sema=s,
+                                 input_file=self.file_list[i],
+                                 cli_dict=self.cli_dict,
+                                 yaml_dict=self.yaml_dict)
+                self.job_list.append(p)
+                p.start()
+
+            # join processes to prevent ending the jobs before moving forward
+            for i in self.job_list:
+                i.join()
+
+            # read from the queue and report (asynchronous...buggy...)
+            time.sleep(1)
+            while not q.empty():
+                gotq = q.get()
+                if gotq['code'] == 1:
+                    print("Job {job} ended in error:\n {msg}".format_map(gotq))
+                else:
+                    print("Job {job} returned code {code} "
+                          "for stage {stage}.".format_map(gotq))
+
+        # if the parallel flag is False (default)
+        elif (_parallel_flag is False):
+
+            # loop and create all jobs
+            for i in range(0, num_total_processes):
+                p = _SerialJob(i=i,
+                               input_file=self.file_list[i],
+                               cli_dict=self.cli_dict,
+                               yaml_dict=self.yaml_dict)
+                self.job_list.append(p)
+
+            # run the job(s)
+            for i, job in enumerate(self.job_list):
+                if self.verbose > 0:
+                    print("Starting job %s" % str(i))
+                job.run()
+
+        # if the parallel flag is a junk value
+        else:
+            raise ValueError
 
         self._is_completed = True
 
 
-class _Job(multiprocessing.Process):
+class _BaseJob(object):
     """Class for individual jobs to run.
 
     This class handles setting options for its own run time duration.
 
     You probably don't need to interact with this class directly.
     """
-
-    def __init__(self, i, queue, sema, input_file, cli_dict, yaml_dict):
+    def __init__(self, i, input_file, cli_dict, yaml_dict, defer_output=False):
         """Initialize a job.
 
         The `input_file` argument is passed to the DeltaModel for
@@ -311,13 +342,11 @@ class _Job(multiprocessing.Process):
         single value for the run time. Precedence is given to values
         specified in the command line interface.
         """
-        super(_Job, self).__init__()
         self.i = i
-        self.queue = queue
-        self.sema = sema  # semaphore for limited multiprocessing
         self.input_file = input_file
 
-        self.deltamodel = DeltaModel(input_file=input_file, defer_output=True)
+        self.deltamodel = DeltaModel(input_file=input_file,
+                                     defer_output=defer_output)
 
         self.timesteps = ('timesteps', cli_dict, yaml_dict)
         self.time = ('time', cli_dict, yaml_dict)
@@ -336,31 +365,11 @@ class _Job(multiprocessing.Process):
                 'You must specify a run duration configuration in either '
                 'the input YAML file or via input arguments.')
 
+    @abc.abstractmethod
     def run(self):
-        """Loop the model.
-
-        Iterate the timestep ``update`` routine for the specified number of
-        iterations.
+        """Implementation to run the jobs as needed.
         """
-        self.queue.put({'job': self.i, 'stage': 0, 'code': 0})
-        try:
-            try:
-                self.deltamodel.init_output_file()
-                while self.deltamodel._time < self._job_end_time:
-                    self.deltamodel.update()
-            except (RuntimeError, ValueError) as e:
-                self.queue.put({'job': self.i, 'stage': 1, 'code': 1, 'msg': e})
-            else:
-                self.queue.put({'job': self.i, 'stage': 1, 'code': 0})
-
-            try:
-                self.deltamodel.finalize()
-            except (RuntimeError, ValueError) as e:
-                self.queue.put({'job': self.i, 'stage': 2, 'code': 1, 'msg': e})
-            else:
-                self.queue.put({'job': self.i, 'stage': 2, 'code': 0})
-        finally:
-            self.sema.release()
+        pass
 
     @property
     def timesteps(self):
@@ -405,6 +414,132 @@ class _Job(multiprocessing.Process):
             arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2],
             default=1, type_func=float)
         self._If = _If
+
+
+class _SerialJob(_BaseJob):
+    def __init__(self, i, input_file, cli_dict, yaml_dict):
+        """Initialize a parallel job.
+
+        The `input_file` argument is passed to the DeltaModel for
+        instantiation.
+
+        The various model run duration parameters are passed from the
+        `cli_dict` and `yaml_dict` arguments, and are processed into a
+        single value for the run time. Precedence is given to values
+        specified in the command line interface.
+        """
+        super().__init__(i, input_file, cli_dict, yaml_dict,
+                         defer_output=False)
+
+    def run(self):
+        """Loop the model.
+
+        Iterate the timestep ``update`` routine for the specified number of
+        iterations.
+        """
+        # try to initialize and run the model
+        try:
+            # run the simualtion
+            while self.deltamodel._time < self._job_end_time:
+                self.deltamodel.update()
+
+        # if the model run fails
+        except (RuntimeError, ValueError) as e:
+            _msg = ','.join(['job:', str(self.i), 'stage:', '1',
+                             'code:', '1', 'msg:', e])
+            self.deltamodel.logger.error(_msg)
+            warnings.warn(UserWarning(_msg))
+
+        # if the model run succeeds
+        else:
+            _msg = ','.join(['job:', str(self.i), 'stage:', '1',
+                             'code:', '0'])
+            self.deltamodel.logger.info(_msg)
+
+        # try to finalize the model
+        try:
+            self.deltamodel.finalize()
+
+        # if the model finalization fails
+        except (RuntimeError, ValueError) as e:
+            _msg = ','.join(['job:', str(self.i), 'stage:', '2',
+                             'code:', '1', 'msg:', e])
+            self.deltamodel.logger.error(_msg)
+            warnings.warn(UserWarning(_msg))
+
+        # if the finalization succeeds
+        else:
+            _msg = ','.join(['job:', str(self.i), 'stage:', '2',
+                             'code:', '0'])
+            self.deltamodel.logger.info(_msg)
+
+
+class _ParallelJob(_BaseJob, multiprocessing.Process):
+    def __init__(self, i, queue, sema, input_file, cli_dict, yaml_dict):
+        """Initialize a parallel job.
+
+        The `input_file` argument is passed to the DeltaModel for
+        instantiation.
+
+        The various model run duration parameters are passed from the
+        `cli_dict` and `yaml_dict` arguments, and are processed into a
+        single value for the run time. Precedence is given to values
+        specified in the command line interface.
+        """
+        # super().__init__()
+        _BaseJob.__init__(self, i, input_file, cli_dict, yaml_dict,
+                          defer_output=True)
+        multiprocessing.Process.__init__(self)
+
+        self.queue = queue
+        self.sema = sema  # semaphore for limited multiprocessing
+
+    def run(self):
+        """Run the model, with infrastructure for parallel.
+
+        Iterate the timestep ``update`` routine for the specified number of
+        iterations.
+        """
+        self.queue.put({'job': self.i, 'stage': 0, 'code': 0})
+
+        # overall wrapped in try to ensure sema is safely released
+        try:
+            # try to initialize and run the model
+            try:
+                # initialize the output files (defer_output=True above)
+                self.deltamodel.init_output_file()
+
+                # run the simualtion
+                while self.deltamodel._time < self._job_end_time:
+                    self.deltamodel.update()
+
+            # if the model run fails
+            except (RuntimeError, ValueError) as e:
+                self.queue.put({'job': self.i, 'stage': 1,
+                                'code': 1, 'msg': e})
+
+            # if the model run succeeds
+            else:
+                self.queue.put({'job': self.i, 'stage': 1,
+                                'code': 0})
+
+            # try to finalize the model
+            try:
+                self.deltamodel.finalize()
+
+            # if the model finalization fails
+            except (RuntimeError, ValueError) as e:
+                self.queue.put({'job': self.i, 'stage': 2,
+                                'code': 1, 'msg': e})
+
+            # if the finalization succeeds
+            else:
+                self.queue.put({'job': self.i, 'stage': 2,
+                                'code': 0})
+
+        # ALWAYS release the semaphore, so other runs can continue
+        finally:
+            self.sema.release()
 
 
 def _optional_input(argument, cli_dict=None, yaml_dict=None,
