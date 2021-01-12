@@ -43,6 +43,15 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         input_file : `str`, `os.PathLike`, optional
             User model run configuration file.
 
+        defer_output : `bool`, optional
+            Whether to create the output netCDF file during initialization. In
+            most cases, this can be ignored and left to default value `False`.
+            However, for parallel simulations it may be necessary to defer the
+            NetCDF file creation unitl the simualtion is assigned to the core
+            it will compute on, so that the DeltaModel object remains
+            pickle-able. Note, you will need to manually trigger the
+            :obj:`init_output_file` method if `defer_output` is `True`.
+
         Returns
         -------
 

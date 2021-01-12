@@ -131,6 +131,20 @@ This argument will scale the specified time-to-model-time, such that the *scaled
 Specifying the :math:`I_f`  value is essential when using the model duration run specifications.
 See :doc:`../info/modeltime` for complete information on the scaling between model time and elapsed simulation time.
 
+Running simulations in parallel
+-------------------------------
+
+The high-level API provides the ability to run simulations in parallel on Linux environments. 
+This option is only useful in the case where you are running multiple jobs with the :ref:`matrix expansion <matrix_expansion_tag>` or :ref:`ensemble expansion <ensemble_expansion_tag>` tools.
+
+To run jobs in parallel simply specify the `--parallel` flag to the command line interface.
+Optionally, you can specify the number of simulations to run at once by following the flag with a number.
+
+.. code:: bash
+    
+    pyDeltaRCM --config model_configuration.yml --timesteps 5000 --parallel
+    pyDeltaRCM --config model_configuration.yml --timesteps 5000 --parallel 6
+
 
 Low-level model API
 ===================
@@ -160,6 +174,8 @@ Configuring multiple model runs from a single YAML file
 ==============================================================
 
 Multiple model runs (referred to as "jobs") can be configured by a single `.yml` configuration file, by using the `matrix` and `ensemble` configuration keys.
+
+.. _matrix_expansion_tag:
 
 Matrix expansion
 ----------------
@@ -207,6 +223,8 @@ Multiple dimensional matrix expansion is additionally supported. For example, th
         - 1
         - 5
 
+
+.. _ensemble_expansion_tag:
 
 Ensemble expansion
 ------------------
