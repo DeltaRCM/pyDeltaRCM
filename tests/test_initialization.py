@@ -10,15 +10,16 @@ import glob
 import netCDF4
 import time
 
+import pyDeltaRCM as _pyimportedalias
 from pyDeltaRCM.model import DeltaModel
 from pyDeltaRCM import shared_tools
+from pyDeltaRCM import preprocessor
 
 import utilities
 from utilities import test_DeltaModel
 
 
 # test yaml parsing
-
 def test_override_from_testfile(test_DeltaModel):
     out_path = test_DeltaModel.out_dir.split(os.path.sep)
     assert out_path[-1] == 'out_dir'
@@ -160,7 +161,6 @@ def test_no_outputs_save_strata_false(tmp_path):
 
 
 # test the entry points
-
 def test_entry_point_installed_call(tmp_path):
     """
     test calling the command line feature with a config file.
@@ -334,9 +334,6 @@ def test_entry_point_time(tmp_path):
     assert os.path.isfile(exp_path_png1)
 
 
-import pyDeltaRCM as _pyimportedalias
-
-
 def test_version_call():
     """
     test calling the command line feature to query the version.
@@ -344,16 +341,16 @@ def test_version_call():
     encoding = locale.getpreferredencoding()
     printed1 = subprocess.run(['pyDeltaRCM', '--version'],
                               stdout=subprocess.PIPE, encoding=encoding)
-    assert printed1.stdout == 'pyDeltaRCM ' + _pyimportedalias.__version__ + '\n'
+    _exp_str1 = 'pyDeltaRCM ' + _pyimportedalias.__version__ + '\n'
+    assert printed1.stdout == _exp_str1
     printed2 = subprocess.run(
-        ['python', '-m', 'pyDeltaRCM', '--version'], stdout=subprocess.PIPE, encoding=encoding)
-    assert printed2.stdout == 'pyDeltaRCM ' + _pyimportedalias.__version__ + '\n'
+        ['python', '-m', 'pyDeltaRCM', '--version'],
+        stdout=subprocess.PIPE, encoding=encoding)
+    _exp_str2 = 'pyDeltaRCM ' + _pyimportedalias.__version__ + '\n'
+    assert printed2.stdout == _exp_str2
 
 
 # test high level python api
-from pyDeltaRCM import preprocessor
-
-
 def test_py_hlvl_wo_args():
     with pytest.raises(ValueError):
         pp = preprocessor.Preprocessor()
@@ -365,7 +362,8 @@ def test_py_hlvl_wo_timesteps(tmp_path):
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     f.close()
     pp = preprocessor.Preprocessor(p)
-    with pytest.raises(ValueError, match=r'You must specify a run duration *.'):
+    with pytest.raises(ValueError,
+                       match=r'You must specify a run duration *.'):
         pp.run_jobs()
 
 
@@ -1023,6 +1021,70 @@ def test_py_hlvl_ensemble_with_matrix(tmp_path):
         tmp_path / 'test', 'job_005', 'pyDeltaRCM_output.nc')
     assert os.path.isfile(exp_path_nc0)
     assert os.path.isfile(exp_path_nc5)
+
+
+def test_py_hlvl_parallel_boolean(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'ensemble', 2)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'parallel', True)
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    # assertions for job creation
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is False
+    pp.run_jobs()
+    # assertions after running jobs
+    assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+    assert pp._is_completed is True
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc1)
+
+
+def test_py_hlvl_parallel_integer(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'ensemble', 2)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'parallel', 2)
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    # assertions for job creation
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is False
+    pp.run_jobs()
+    # assertions after running jobs
+    assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+    assert pp._is_completed is True
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc1)
+    # NOTE: this does not actually test that
+    #       *exactly* two jobs were run in parallel.
 
 
 def test_py_hlvl_ensemble_badtype(tmp_path):
