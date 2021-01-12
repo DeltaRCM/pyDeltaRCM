@@ -231,8 +231,9 @@ class BasePreprocessor(abc.ABC):
     def run_jobs(self):
         """Run the set of jobs.
 
-        This will run jobs in parallel if `--parallel` is specified in the
-        command line or YAML.
+        This method can be seen as the actual execution stage of the
+        preprocessor. If `--parallel` is specified in the command line or YAML
+        file, the jobs will run in parallel.
         """
         if self._dryrun:
             return
@@ -242,7 +243,8 @@ class BasePreprocessor(abc.ABC):
         self.job_list = list()
 
         # NOTE: multiprocessing infrastructure is only available on linux.
-        #       We only use parallel approach if the --parallel flag is given and linux.
+        #       We only use parallel approach if the --parallel flag is given
+        #       and we are running on linux.
         _parallel_flag = _optional_input(
             'parallel', cli_dict=self.cli_dict, yaml_dict=self.yaml_dict,
             default=False)
@@ -325,12 +327,16 @@ class BasePreprocessor(abc.ABC):
 
 
 class _BaseJob(object):
-    """Class for individual jobs to run.
+    """Base class for individual jobs to run via the preprocessor.
 
-    This class handles setting options for its own run time duration.
+    The base class handles setting options for the run time duration, based on
+    the inputs to the command line and the yaml file.
 
-    You probably don't need to interact with this class directly.
+    .. important:: the :meth:`run` method must be implemented by subclasses.
+
+    .. note:: You probably don't need to interact with this class directly.
     """
+
     def __init__(self, i, input_file, cli_dict, yaml_dict, defer_output=False):
         """Initialize a job.
 
@@ -371,11 +377,20 @@ class _BaseJob(object):
     @abc.abstractmethod
     def run(self):
         """Implementation to run the jobs as needed.
+
+        .. note::
+
+            Consider using a series of ``try-except-else-finally` statements to
+            ensure that this method handles all outcomes of the simulations.
         """
         pass
 
     @property
     def timesteps(self):
+        """Timesteps to run the job for.
+
+        Potentially an empty value, depends on inputs to CLI and YAML.
+        """
         return self._timesteps
 
     @timesteps.setter
@@ -387,6 +402,10 @@ class _BaseJob(object):
 
     @property
     def time(self):
+        """Model time to run the job for.
+
+        Potentially an empty value, depends on inputs to CLI and YAML.
+        """
         return self._time
 
     @time.setter
@@ -398,6 +417,10 @@ class _BaseJob(object):
 
     @property
     def time_years(self):
+        """Model time to run the job for, in years.
+
+        Potentially an empty value, depends on inputs to CLI and YAML.
+        """
         return self._time_years
 
     @time_years.setter
@@ -409,6 +432,10 @@ class _BaseJob(object):
 
     @property
     def If(self):
+        """Intermittency of model time to real-world time for the job.
+
+        Default value is 1, value depends on inputs to CLI and YAML.
+        """
         return self._If
 
     @If.setter
@@ -420,8 +447,16 @@ class _BaseJob(object):
 
 
 class _SerialJob(_BaseJob):
+    """Serial job run by the preprocessor.
+
+    This class is a subclass of :obj:`_BaseJob` and implements the :meth:`run`
+    method for jobs that should occur in serial.
+
+    .. note:: You probably don't need to interact with this class directly.
+    """
+
     def __init__(self, i, input_file, cli_dict, yaml_dict):
-        """Initialize a parallel job.
+        """Initialize a serial job.
 
         The `input_file` argument is passed to the DeltaModel for
         instantiation.
@@ -478,6 +513,14 @@ class _SerialJob(_BaseJob):
 
 
 class _ParallelJob(_BaseJob, multiprocessing.Process):
+    """Parallel job run by the preprocessor.
+
+    This class is a subclass of :obj:`_BaseJob` and implements the :meth:`run`
+    method for jobs that should occur in parallel.
+
+    .. note:: You probably don't need to interact with this class directly.
+    """
+
     def __init__(self, i, queue, sema, input_file, cli_dict, yaml_dict):
         """Initialize a parallel job.
 
@@ -582,8 +625,9 @@ class PreprocessorCLI(BasePreprocessor):
     .. note::
 
         You probably do not need to interact with this class directly.
-        Instead, you can use the command line API as it is defined HERE XX or
-        the python API :class:`~pyDeltaRCM.preprocessor.Preprocessor`.
+        Instead, you can use the command line API as it is `described in the
+        User Guide <../guides/userguide#command-line-api>`_ or the python
+        API :class:`~pyDeltaRCM.preprocessor.Preprocessor`.
 
         When the class is called from the command line the instantiated
         object's method :meth:`run_jobs` is called by the
@@ -682,7 +726,7 @@ class Preprocessor(BasePreprocessor):
 
     This is the python high-level API class that is callable from a python
     script. For complete documentation on the API configurations, see
-    XXXXXXXXXXXXXX.
+    `the User Guide <../guides/userguide.html#high-level-model-api>`_.
 
     The class gives a way to configure and run multiple jobs from a python
     script.
