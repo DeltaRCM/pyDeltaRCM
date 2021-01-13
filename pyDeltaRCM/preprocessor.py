@@ -383,7 +383,7 @@ class _BaseJob(object):
             Consider using a series of ``try-except-else-finally` statements to
             ensure that this method handles all outcomes of the simulations.
         """
-        pass
+        ...
 
     @property
     def timesteps(self):
