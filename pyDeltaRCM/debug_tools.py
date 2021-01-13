@@ -80,31 +80,7 @@ class debug_tools(abc.ABC):
             raise TypeError('Expected string for `attribute`, but was %s'
                             % type(attribute))
         _attr = self._get_attribute(attribute)
-        _plot_domain(_attr, **kwargs)
-
-    def _plot_ind(self, _ind, *args, **kwargs):
-        """Plot points within the model domain.
-
-        Private method called by :obj:`show_ind`.
-        """
-        ax = kwargs.pop('ax', None)
-        block = kwargs.pop('block', False)
-
-        if not ax:
-            ax = plt.gca()
-
-        if len(args) == 0:
-            args = 'r.',
-        if isinstance(_ind, tuple):
-            if not len(_ind) == 2:
-                raise ValueError('Expected tuple length to be 2, but was %s'
-                                 % str(len(_ind)))
-        else:
-            _ind = shared_tools.custom_unravel(_ind, self.depth.shape)
-        plt.plot(_ind[1], _ind[0], *args, **kwargs)
-
-        if block:
-            plt.show()
+        plot_domain(_attr, **kwargs)
 
     def show_ind(self, ind, *args, **kwargs):
         """Show points within the model domain.
@@ -137,23 +113,46 @@ class debug_tools(abc.ABC):
             Any `kwargs` supported by `matplotlib.pyplot.plt`.
 
         """
+        _shape = self.depth.shape
         if isinstance(ind, list):
             for _, iind in enumerate(ind):
-                self._plot_ind(iind, *args, **kwargs)
+                plot_ind(iind, shape=_shape, *args, **kwargs)
         else:
-            self._plot_ind(ind, *args, **kwargs)
+            plot_ind(ind, shape=_shape, *args, **kwargs)
 
 
-def _plot_domain(_attr, ax=None, grid=True, block=False, label=None):
+def plot_domain(attr, ax=None, grid=True, block=False, label=None):
     """Plot the model domain.
 
-    Private method called by :obj:`show_attribute`.
+    Public function to plot *any* 2d grid with helper display utils.
+    This function is called by the DeltaModel method :obj:`show_attribute`.
+
+    Parameters
+    ----------
+    attr : :obj:`ndarray`
+        The data to display, as a 2D numpy array.
+
+    ax : :obj:`matplotlib.Axes`, optional
+        Which axes to render point into. Uses ``gca()`` if no axis is
+            provided.
+
+    grid : :obj:`bool`, optional
+        Whether to plot a grid over the domain to demarcate individual
+        cells. Default is `True` (show the grid).
+
+    block : :obj:`bool`, optional
+        Whether to show the plot automatically. Default is `False` (do not
+        show automatically).
+
+    label : :obj:`str`, optional
+        A string describing the field being plotted. If given, will be
+        appeneded to the colorbar of the domain plot.
     """
-    _attr_shape = _attr.shape
+    attr_shape = attr.shape
     if not ax:
         ax = plt.gca()
 
-    cobj = ax.imshow(_attr,
+    cobj = ax.imshow(attr,
                      cmap=plt.get_cmap('viridis'),
                      interpolation='none')
     divider = axtk.axes_divider.make_axes_locatable(ax)
@@ -163,7 +162,7 @@ def _plot_domain(_attr, ax=None, grid=True, block=False, label=None):
     plt.sca(ax)
 
     if grid:
-        shp = _attr_shape
+        shp = attr_shape
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.set_xticks(np.arange(-.5, shp[1], 1), minor=True)
@@ -173,6 +172,35 @@ def _plot_domain(_attr, ax=None, grid=True, block=False, label=None):
 
     if label:
         cbar.ax.set_ylabel(label)
+
+    if block:
+        plt.show()
+
+
+def plot_ind(_ind, *args, shape=None, **kwargs):
+    """Plot points within the model domain.
+
+    Private method called by :obj:`show_ind`.
+    """
+    ax = kwargs.pop('ax', None)
+    block = kwargs.pop('block', False)
+
+    _shape = shape
+
+    if not ax:
+        ax = plt.gca()
+
+    if len(args) == 0:
+        args = 'r.',
+    if isinstance(_ind, tuple):
+        if not len(_ind) == 2:
+            raise ValueError('Expected tuple length to be 2, but was %s'
+                             % str(len(_ind)))
+    else:
+        if (_shape is None):
+            raise ValueError('Shape of array must be given to unravel index.')
+        _ind = shared_tools.custom_unravel(_ind, _shape)
+    plt.plot(_ind[1], _ind[0], *args, **kwargs)
 
     if block:
         plt.show()
