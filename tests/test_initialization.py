@@ -1055,7 +1055,8 @@ def test_py_hlvl_parallel_boolean(tmp_path):
         assert os.path.isfile(exp_path_nc0)
         assert os.path.isfile(exp_path_nc1)
     else:
-        with pytest.raises(NotImplementedError):
+        with pytest.raises(NotImplementedError,
+                           match=r'Parallel simulations *.'):
             pp.run_jobs()
 
 
@@ -1078,7 +1079,6 @@ def test_py_hlvl_parallel_integer(tmp_path):
     assert type(pp.file_list) is list
     assert len(pp.file_list) == 2
     assert pp._is_completed is False
-    pp.run_jobs()
     # assertions after running jobs
     if platform.system() == 'Linux':
         pp.run_jobs()
@@ -1091,7 +1091,8 @@ def test_py_hlvl_parallel_integer(tmp_path):
         assert os.path.isfile(exp_path_nc0)
         assert os.path.isfile(exp_path_nc1)
     else:
-        with pytest.raises(NotImplementedError):
+        with pytest.raises(NotImplementedError,
+                           match=r'Parallel simulations *.'):
             pp.run_jobs()
     # NOTE: this does not actually test that
     #       *exactly* two jobs were run in parallel.
