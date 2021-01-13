@@ -9,6 +9,7 @@ import subprocess
 import glob
 import netCDF4
 import time
+import platform
 
 import pyDeltaRCM as _pyimportedalias
 from pyDeltaRCM.model import DeltaModel
@@ -1042,16 +1043,20 @@ def test_py_hlvl_parallel_boolean(tmp_path):
     assert type(pp.file_list) is list
     assert len(pp.file_list) == 2
     assert pp._is_completed is False
-    pp.run_jobs()
     # assertions after running jobs
-    assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
-    assert pp._is_completed is True
-    exp_path_nc0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-    exp_path_nc1 = os.path.join(
-        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-    assert os.path.isfile(exp_path_nc0)
-    assert os.path.isfile(exp_path_nc1)
+    if platform.system() == 'Linux':
+        pp.run_jobs()
+        assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+        assert pp._is_completed is True
+        exp_path_nc0 = os.path.join(
+            tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+        exp_path_nc1 = os.path.join(
+            tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+        assert os.path.isfile(exp_path_nc0)
+        assert os.path.isfile(exp_path_nc1)
+    else:
+        with pytest.raises(NotImplementedError):
+            pp.run_jobs()
 
 
 def test_py_hlvl_parallel_integer(tmp_path):
@@ -1075,14 +1080,19 @@ def test_py_hlvl_parallel_integer(tmp_path):
     assert pp._is_completed is False
     pp.run_jobs()
     # assertions after running jobs
-    assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
-    assert pp._is_completed is True
-    exp_path_nc0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-    exp_path_nc1 = os.path.join(
-        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-    assert os.path.isfile(exp_path_nc0)
-    assert os.path.isfile(exp_path_nc1)
+    if platform.system() == 'Linux':
+        pp.run_jobs()
+        assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+        assert pp._is_completed is True
+        exp_path_nc0 = os.path.join(
+            tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+        exp_path_nc1 = os.path.join(
+            tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+        assert os.path.isfile(exp_path_nc0)
+        assert os.path.isfile(exp_path_nc1)
+    else:
+        with pytest.raises(NotImplementedError):
+            pp.run_jobs()
     # NOTE: this does not actually test that
     #       *exactly* two jobs were run in parallel.
 
