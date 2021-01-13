@@ -159,7 +159,7 @@ def test_plot_multiple_subplots(test_DeltaModel):
     return plt.gcf()
 
 
-@pytest.mark.mpl_image_compare(remove_text=False)
+@pytest.mark.mpl_image_compare(remove_text=True)
 def test_plot_domain_withlabel(test_DeltaModel):
     fig, ax = plt.subplots(figsize=(5, 4))
     test_DeltaModel.update()
