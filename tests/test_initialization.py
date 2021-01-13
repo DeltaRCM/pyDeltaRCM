@@ -832,6 +832,24 @@ def test_python_highlevelapi_matrix_needs_out_dir(tmp_path):
         pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
 
 
+def test_python_highlevelapi_matrix_outdir_exists_error(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'save_strata', 300)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_matrix_to_file(f,
+                                   ['f_bedload'],
+                                   [[0.2, 0.5, 0.6]])
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    with pytest.raises(FileExistsError, match=r'Job output directory .*'):
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
 def test_py_hlvl_mtrx_bad_type(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
@@ -1035,6 +1053,7 @@ def test_py_hlvl_parallel_boolean(tmp_path):
     utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
     utilities.write_parameter_to_file(f, 'Np_water', 10)
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'verbose', 1)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     utilities.write_parameter_to_file(f, 'parallel', True)
     f.close()
@@ -1073,6 +1092,44 @@ def test_py_hlvl_parallel_integer(tmp_path):
     utilities.write_parameter_to_file(f, 'Np_sed', 10)
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
     utilities.write_parameter_to_file(f, 'parallel', 2)
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    # assertions for job creation
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is False
+    # assertions after running jobs
+    if platform.system() == 'Linux':
+        pp.run_jobs()
+        assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+        assert pp._is_completed is True
+        exp_path_nc0 = os.path.join(
+            tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+        exp_path_nc1 = os.path.join(
+            tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+        assert os.path.isfile(exp_path_nc0)
+        assert os.path.isfile(exp_path_nc1)
+    else:
+        with pytest.raises(NotImplementedError,
+                           match=r'Parallel simulations *.'):
+            pp.run_jobs()
+    # NOTE: this does not actually test that
+    #       *exactly* two jobs were run in parallel.
+
+
+def test_py_hlvl_parallel_float(tmp_path):
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'ensemble', 2)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'parallel', 2.3)
     f.close()
     pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
     # assertions for job creation
