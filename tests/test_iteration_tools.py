@@ -184,10 +184,10 @@ def test_verbose_printing_1(tmp_path, capsys):
     captd1 = capsys.readouterr()
     delta.update()
     captd2 = capsys.readouterr()
-    assert captd1.out == ''
-    assert len(glob.glob(os.path.join(delta.prefix, '*.log'))
-               ) == 1  # log file exists
-    assert 'Model time: 0.0' in captd2.out  # if verbose >= 1
+    log_glob = glob.glob(os.path.join(delta.prefix, '*.log'))
+    assert len(log_glob) == 1  # log file exists
+    assert 'Model time: 0.0' in captd1.out  # if verbose >= 1
+    assert 'Model time: 300.0' in captd2.out  # if verbose >= 1
     assert 'Creating output directory' not in captd2.out  # goes to logger
 
 
@@ -216,7 +216,8 @@ def test_verbose_printing_2(tmp_path, capsys):
     assert len(glob.glob(os.path.join(delta.prefix, '*.log'))
                ) == 1  # log file exists
     assert 'Setting random seed to' in captd1.out   # if verbose >= 2
-    assert 'Model time: 0.0' in captd2.out  # if verbose >= 1
+    assert 'Model time: 0.0' in captd1.out  # if verbose >= 1
+    assert 'Model time: 300.0' in captd2.out  # if verbose >= 1
     assert delta.seed == 10
 
 
@@ -286,7 +287,8 @@ def test_logger_has_timestep_lines(tmp_path):
         _lines = ' '.join(_lines)  # collapse to a single string
         assert '---- Model time 0.0 ----' in _lines
         assert '---- Model time 300.0 ----' in _lines
-        assert '---- Model time 600.0 ----' not in _lines
+        assert '---- Model time 600.0 ----' in _lines
+        assert '---- Model time 900.0 ----' not in _lines
 
 
 def test_logger_random_seed_always_recorded(tmp_path):

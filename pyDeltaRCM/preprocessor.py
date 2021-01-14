@@ -1,9 +1,14 @@
 import os
 import argparse
 import abc
+import time
+import platform
 
 import itertools
 from pathlib import Path
+import warnings
+
+import multiprocessing
 
 import yaml
 import numpy as np
@@ -30,6 +35,10 @@ class BasePreprocessor(abc.ABC):
         out the Python API.
 
     """
+    def __init__(self):
+        """Initialize the base preprocessor.
+        """
+        self._is_completed = False
 
     def preliminary_yaml_parsing(self):
         """Preliminary YAML parsing.
@@ -188,8 +197,8 @@ class BasePreprocessor(abc.ABC):
                        '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
 
             # create directory at root
-            jobs_root = self.yaml_dict['out_dir']  # checked above for exist
-            p = Path(jobs_root)
+            self.jobs_root = self.yaml_dict['out_dir']  # checked above for exist
+            p = Path(self.jobs_root)
             try:
                 p.mkdir()
             except FileExistsError:
@@ -201,188 +210,409 @@ class BasePreprocessor(abc.ABC):
             for i in range(jobs):
                 _ith_config = _fixed_config.copy()
                 ith_id = 'job_' + str(i).zfill(3)
-                ith_dir = os.path.join(jobs_root, ith_id)
+                ith_dir = os.path.join(self.jobs_root, ith_id)
                 _ith_config['out_dir'] = ith_dir
                 for j, val in enumerate(_combs[i]):
                     _ith_config[var_list[j]] = val
                 ith_p = self.write_yaml_config(i, _ith_config, ith_dir, ith_id)
                 self.file_list.append(ith_p)
 
-    def construct_job_list(self):
+    def construct_job_file_list(self):
         """Construct the job list.
 
         The job list is constructed by expanding the ``.yml`` matrix, and
         forming ensemble runs as needed.
-
         """
-        self.job_list = []
         if self._has_matrix:
-            self.expand_yaml_matrix()
-            # loop the expanded jobs
-            for i in range(len(self.file_list)):
-                try:
-                    self.job_list.append(self._Job(self.file_list[i],
-                                                   cli_dict=self.cli_dict,
-                                                   yaml_dict=self.yaml_dict))
-                except TypeError as e:
-                    raise TypeError(
-                        'During job instantiation, one of the model '
-                        'configurations received an incorrect type. This '
-                        'is likely because one of the "matrix" keys was '
-                        'misconfigured in your input YAML file. '
-                        'Check that the type of each value matches the '
-                        'expected type for that key. The original error '
-                        'is reproduced below:\n\n' +
-                        str(e))
+            self.expand_yaml_matrix()  # creates self.file_list
         else:
-            # there's only one job so append directly.
-            self.job_list.append(self._Job(self.input_file,
-                                           cli_dict=self.cli_dict,
-                                           yaml_dict=self.yaml_dict))
+            self.file_list = [self.input_file]
 
     def run_jobs(self):
         """Run the set of jobs.
 
-        .. note::
-            TODO: implement the parallel pool.
-
+        This method can be seen as the actual execution stage of the
+        preprocessor. If `--parallel` is specified in the command line or YAML
+        file, the jobs will run in parallel.
         """
         if self._dryrun:
             return
 
-        if len(self.job_list) > 1:
-            # set up parallel pool if multiple jobs
-            pass
+        # initialize empty list to maintain reference to all Job instances
+        num_total_processes = len(self.file_list)
+        self.job_list = list()
 
-        # run the job(s)
-        for i, job in enumerate(self.job_list):
+        # NOTE: multiprocessing infrastructure is only available on linux.
+        #       We only use parallel approach if the --parallel flag is given
+        #       and we are running on linux.
+        _parallel_flag = _optional_input(
+            'parallel', cli_dict=self.cli_dict, yaml_dict=self.yaml_dict,
+            default=False)
+        _os = platform.system()
 
-            if self.verbose > 0:
-                print("Starting job %s" % str(i))
+        # if the parallel flag is given use the parallel infrastructure
+        #   NOTE: the following evaluates to true for boolean `True` or
+        #         any `int` > 0
+        if _parallel_flag:
+            # validate that os is Linux, otherwise error
+            if _os != 'Linux':
+                raise NotImplementedError(
+                    'Parallel simulations only implemented on Linux.')
 
-            job.run_job()
-            job.finalize_model()
-
-    class _Job(object):
-        """Class for individual jobs to run.
-
-        This class handles setting options for its own run time duration.
-
-        You probably don't need to interact with this class directly.
-        """
-
-        def __init__(self, input_file, cli_dict, yaml_dict):
-            """Initialize a job.
-
-            The `input_file` argument is passed to the DeltaModel for
-            instantiation.
-
-            The various model run duration parameters are passed from the
-            `cli_dict` and `yaml_dict` arguments, and are processed into a
-            single value for the run time. Precedence is given to values
-            specified in the command line interface.
-            """
-            self.deltamodel = DeltaModel(input_file=input_file)
-            _curr_time = self.deltamodel._time
-
-            self.timesteps = ('timesteps', cli_dict, yaml_dict)
-            self.time = ('time', cli_dict, yaml_dict)
-            self.time_years = ('time_years', cli_dict, yaml_dict)
-            self.If = ('If', cli_dict, yaml_dict)
-
-            # determine job end time, *in model time*
-            if not (self.timesteps is None):
-                self._job_end_time = _curr_time + \
-                    ((self.timesteps * self.deltamodel._dt))
-            elif not (self.time is None):
-                self._job_end_time = _curr_time + ((self.time) * self.If)
-            elif not (self.time_years is None):
-                self._job_end_time = _curr_time + \
-                    ((self.time_years) * self.If * 86400 * 365.25)
+            # determine the number of processors to use
+            if (_parallel_flag is True):
+                # (number cores avail - 1), or 1 and never 0
+                num_parallel_processes = (multiprocessing.cpu_count() - 1) or 1
+            elif (isinstance(_parallel_flag, int)):
+                num_parallel_processes = _parallel_flag
             else:
-                raise ValueError(
-                    'You must specify a run duration configuration in either '
-                    'the input YAML file or via input arguments.')
+                num_parallel_processes = 1
 
-            self._is_completed = False
+            _msg = 'Running %g parallel jobs' % num_parallel_processes
+            if self.verbose >= 1:
+                print(_msg)
 
-        def run_job(self):
-            """Loop the model.
+            # use Semaphore to limit number of concurrent Job
+            s = multiprocessing.Semaphore(num_parallel_processes)
 
-            Iterate the timestep ``update`` routine for the specified number of
-            iterations.
-            """
+            # start a Queue for all Jobs
+            q = multiprocessing.Queue()
+
+            # loop and create and start all jobs
+            for i in range(0, num_total_processes):
+                s.acquire()  # aquire resource from Semaphore
+                p = _ParallelJob(i=i, queue=q, sema=s,
+                                 input_file=self.file_list[i],
+                                 cli_dict=self.cli_dict,
+                                 yaml_dict=self.yaml_dict)
+                self.job_list.append(p)
+                p.start()
+
+            # join processes to prevent ending the jobs before moving forward
+            for i in self.job_list:
+                i.join()
+
+            # read from the queue and report (asynchronous...buggy...)
+            time.sleep(1)
+            while not q.empty():
+                gotq = q.get()
+                if gotq['code'] == 1:
+                    print("Job {job} ended in error:\n {msg}".format_map(gotq))
+                else:
+                    print("Job {job} returned code {code} "
+                          "for stage {stage}.".format_map(gotq))
+
+        # if the parallel flag is False (default)
+        elif (_parallel_flag is False):
+
+            # loop and create all jobs
+            for i in range(0, num_total_processes):
+                p = _SerialJob(i=i,
+                               input_file=self.file_list[i],
+                               cli_dict=self.cli_dict,
+                               yaml_dict=self.yaml_dict)
+                self.job_list.append(p)
+
+            # run the job(s)
+            for i, job in enumerate(self.job_list):
+                if self.verbose > 0:
+                    print("Starting job %s" % str(i))
+                job.run()
+
+        # if the parallel flag is a junk value
+        else:
+            raise ValueError
+
+        self._is_completed = True
+
+
+class _BaseJob(object):
+    """Base class for individual jobs to run via the preprocessor.
+
+    The base class handles setting options for the run time duration, based on
+    the inputs to the command line and the yaml file.
+
+    .. important:: the :meth:`run` method must be implemented by subclasses.
+
+    .. note:: You probably don't need to interact with this class directly.
+    """
+
+    def __init__(self, i, input_file, cli_dict, yaml_dict, defer_output=False):
+        """Initialize a job.
+
+        The `input_file` argument is passed to the DeltaModel for
+        instantiation.
+
+        The various model run duration parameters are passed from the
+        `cli_dict` and `yaml_dict` arguments, and are processed into a
+        single value for the run time. Precedence is given to values
+        specified in the command line interface.
+        """
+        self.i = i
+        self.input_file = input_file
+
+        self.deltamodel = DeltaModel(input_file=input_file,
+                                     defer_output=defer_output)
+        _curr_time = self.deltamodel._time
+
+        self.timesteps = ('timesteps', cli_dict, yaml_dict)
+        self.time = ('time', cli_dict, yaml_dict)
+        self.time_years = ('time_years', cli_dict, yaml_dict)
+        self.If = ('If', cli_dict, yaml_dict)
+
+        # determine job end time, *in model time*
+        if not (self.timesteps is None):
+            self._job_end_time = _curr_time + \
+                ((self.timesteps * self.deltamodel._dt))
+        elif not (self.time is None):
+            self._job_end_time = _curr_time + ((self.time) * self.If)
+        elif not (self.time_years is None):
+            self._job_end_time = _curr_time + \
+                ((self.time_years) * self.If * 86400 * 365.25)
+        else:
+            raise ValueError(
+                'You must specify a run duration configuration in either '
+                'the input YAML file or via input arguments.')
+
+    @abc.abstractmethod
+    def run(self):
+        """Implementation to run the jobs as needed.
+
+        .. note::
+
+            Consider using a series of ``try-except-else-finally` statements to
+            ensure that this method handles all outcomes of the simulations.
+        """
+        ...
+
+    @property
+    def timesteps(self):
+        """Timesteps to run the job for.
+
+        Potentially an empty value, depends on inputs to CLI and YAML.
+        """
+        return self._timesteps
+
+    @timesteps.setter
+    def timesteps(self, arg_tuple):
+        _timesteps = _optional_input(
+            arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2],
+            type_func=int)
+        self._timesteps = _timesteps
+
+    @property
+    def time(self):
+        """Model time to run the job for.
+
+        Potentially an empty value, depends on inputs to CLI and YAML.
+        """
+        return self._time
+
+    @time.setter
+    def time(self, arg_tuple):
+        _time = _optional_input(
+            arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2],
+            type_func=float)
+        self._time = _time
+
+    @property
+    def time_years(self):
+        """Model time to run the job for, in years.
+
+        Potentially an empty value, depends on inputs to CLI and YAML.
+        """
+        return self._time_years
+
+    @time_years.setter
+    def time_years(self, arg_tuple):
+        _time_years = _optional_input(
+            arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2],
+            type_func=float)
+        self._time_years = _time_years
+
+    @property
+    def If(self):
+        """Intermittency of model time to real-world time for the job.
+
+        Default value is 1, value depends on inputs to CLI and YAML.
+        """
+        return self._If
+
+    @If.setter
+    def If(self, arg_tuple):
+        _If = _optional_input(
+            arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2],
+            default=1, type_func=float)
+        self._If = _If
+
+
+class _SerialJob(_BaseJob):
+    """Serial job run by the preprocessor.
+
+    This class is a subclass of :obj:`_BaseJob` and implements the :meth:`run`
+    method for jobs that should occur in serial.
+
+    .. note:: You probably don't need to interact with this class directly.
+    """
+
+    def __init__(self, i, input_file, cli_dict, yaml_dict):
+        """Initialize a serial job.
+
+        The `input_file` argument is passed to the DeltaModel for
+        instantiation.
+
+        The various model run duration parameters are passed from the
+        `cli_dict` and `yaml_dict` arguments, and are processed into a
+        single value for the run time. Precedence is given to values
+        specified in the command line interface.
+        """
+        super().__init__(i, input_file, cli_dict, yaml_dict,
+                         defer_output=False)
+
+    def run(self):
+        """Loop the model.
+
+        Iterate the timestep ``update`` routine for the specified number of
+        iterations.
+        """
+        # try to initialize and run the model
+        try:
+            # run the simualtion
             while self.deltamodel._time < self._job_end_time:
                 self.deltamodel.update()
 
-        def finalize_model(self):
-            """Finalize the job."""
+        # if the model run fails
+        except (RuntimeError, ValueError) as e:
+            _msg = ','.join(['job:', str(self.i), 'stage:', '1',
+                             'code:', '1', 'msg:', e])
+            self.deltamodel.logger.error(_msg)
+            warnings.warn(UserWarning(_msg))
+
+        # if the model run succeeds
+        else:
+            _msg = ','.join(['job:', str(self.i), 'stage:', '1',
+                             'code:', '0'])
+            self.deltamodel.logger.info(_msg)
+
+        # try to finalize the model
+        try:
             self.deltamodel.finalize()
-            self._is_completed = True
 
-        def _optional_input(self, argument, cli_dict=None, yaml_dict=None,
-                            default=None):
-            """
-            Processor function to be used on all the optional choices,
-            for determining the hierachy of options and setting a single
-            value.
+        # if the model finalization fails
+        except (RuntimeError, ValueError) as e:
+            _msg = ','.join(['job:', str(self.i), 'stage:', '2',
+                             'code:', '1', 'msg:', e])
+            self.deltamodel.logger.error(_msg)
+            warnings.warn(UserWarning(_msg))
 
-            Hierarchy is to use CLI/preprocessor options first, then yaml.
+        # if the finalization succeeds
+        else:
+            _msg = ','.join(['job:', str(self.i), 'stage:', '2',
+                             'code:', '0'])
+            self.deltamodel.logger.info(_msg)
 
-            Both inputs should be `dict`!
 
-            If default is not `None`, this value is used if no parameter
-            specified in the cli or yaml.
-            """
-            if argument in cli_dict.keys() and not (cli_dict[argument] is None):
-                return float(cli_dict[argument])
-            elif argument in yaml_dict.keys():
-                return float(yaml_dict[argument])
-            elif not (default is None):
-                return default
+class _ParallelJob(_BaseJob, multiprocessing.Process):
+    """Parallel job run by the preprocessor.
+
+    This class is a subclass of :obj:`_BaseJob` and implements the :meth:`run`
+    method for jobs that should occur in parallel.
+
+    .. note:: You probably don't need to interact with this class directly.
+    """
+
+    def __init__(self, i, queue, sema, input_file, cli_dict, yaml_dict):
+        """Initialize a parallel job.
+
+        The `input_file` argument is passed to the DeltaModel for
+        instantiation.
+
+        The various model run duration parameters are passed from the
+        `cli_dict` and `yaml_dict` arguments, and are processed into a
+        single value for the run time. Precedence is given to values
+        specified in the command line interface.
+        """
+        # super().__init__()
+        _BaseJob.__init__(self, i, input_file, cli_dict, yaml_dict,
+                          defer_output=True)
+        multiprocessing.Process.__init__(self)
+
+        self.queue = queue
+        self.sema = sema  # semaphore for limited multiprocessing
+
+    def run(self):
+        """Run the model, with infrastructure for parallel.
+
+        Iterate the timestep ``update`` routine for the specified number of
+        iterations.
+        """
+        self.queue.put({'job': self.i, 'stage': 0, 'code': 0})
+
+        # overall wrapped in try to ensure sema is safely released
+        try:
+            # try to initialize and run the model
+            try:
+                # initialize the output files (defer_output=True above)
+                self.deltamodel.init_output_file()
+
+                # run the simualtion
+                while self.deltamodel._time < self._job_end_time:
+                    self.deltamodel.update()
+
+            # if the model run fails
+            except (RuntimeError, ValueError) as e:
+                self.queue.put({'job': self.i, 'stage': 1,
+                                'code': 1, 'msg': e})
+
+            # if the model run succeeds
             else:
-                return None
+                self.queue.put({'job': self.i, 'stage': 1,
+                                'code': 0})
 
-        @property
-        def timesteps(self):
-            return self._timesteps
+            # try to finalize the model
+            try:
+                self.deltamodel.finalize()
 
-        @timesteps.setter
-        def timesteps(self, arg_tuple):
-            _timesteps = self._optional_input(
-                arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2])
-            self._timesteps = _timesteps
+            # if the model finalization fails
+            except (RuntimeError, ValueError) as e:
+                self.queue.put({'job': self.i, 'stage': 2,
+                                'code': 1, 'msg': e})
 
-        @property
-        def time(self):
-            return self._time
+            # if the finalization succeeds
+            else:
+                self.queue.put({'job': self.i, 'stage': 2,
+                                'code': 0})
 
-        @time.setter
-        def time(self, arg_tuple):
-            _time = self._optional_input(
-                arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2])
-            self._time = _time
+        # ALWAYS release the semaphore, so other runs can continue
+        finally:
+            self.sema.release()
 
-        @property
-        def time_years(self):
-            return self._time_years
 
-        @time_years.setter
-        def time_years(self, arg_tuple):
-            _time_years = self._optional_input(
-                arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2])
-            self._time_years = _time_years
+def _optional_input(argument, cli_dict=None, yaml_dict=None,
+                    default=None, type_func=lambda x: x):
+    """
+    Processor function to be used on the optional choices, of the _Job
+    for determining the hierachy of options and setting a single
+    value.
 
-        @property
-        def If(self):
-            return self._If
+    Hierarchy is to use CLI/preprocessor options first, then yaml.
 
-        @If.setter
-        def If(self, arg_tuple):
-            _If = self._optional_input(
-                arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2],
-                default=1)
-            self._If = _If
+    Both inputs should be `dict`!
+
+    If default is not `None`, this value is used if no parameter
+    specified in the cli or yaml.
+
+    If type_func is given, this function is applied to the parsed value,
+    before returning.
+    """
+    if argument in cli_dict.keys() and not (cli_dict[argument] is None):
+        return type_func(cli_dict[argument])
+    elif argument in yaml_dict.keys():
+        return type_func(yaml_dict[argument])
+    elif not (default is None):
+        return default
+    else:
+        return None
 
 
 class PreprocessorCLI(BasePreprocessor):
@@ -395,8 +625,9 @@ class PreprocessorCLI(BasePreprocessor):
     .. note::
 
         You probably do not need to interact with this class directly.
-        Instead, you can use the command line API as it is defined HERE XX or
-        the python API :class:`~pyDeltaRCM.preprocessor.Preprocessor`.
+        Instead, you can use the command line API as it is `described in the
+        User Guide <../guides/userguide#command-line-api>`_ or the python
+        API :class:`~pyDeltaRCM.preprocessor.Preprocessor`.
 
         When the class is called from the command line the instantiated
         object's method :meth:`run_jobs` is called by the
@@ -425,12 +656,12 @@ class PreprocessorCLI(BasePreprocessor):
             self.yaml_dict = {}
             self._has_matrix = False
 
-        self.construct_job_list()
-
         if self.cli_dict['dryrun']:
             self._dryrun = True
         else:
             self._dryrun = False
+
+        self.construct_job_file_list()
 
     def process_arguments(self):
         """Process the command line arguments.
@@ -473,6 +704,15 @@ class PreprocessorCLI(BasePreprocessor):
             help='Boolean indicating whether to execute timestepping or only '
             'set up the run.')
         parser.add_argument(
+            '--parallel', type=int, nargs='?', const=True,
+            help='Run jobs in parallel, if possible. If given without any'
+            'argument, the number of parallel cores used depends '
+            'on system specs as (ncores - 1). Specify an integer value to '
+            'specify the number of cores to be used. '
+            'Optional, default value is False.')
+        #    Note: the default value for the parallel option is assigned
+        #        during arg parsing of the yaml file.
+        parser.add_argument(
             '--version', action='version',
             version=_ver, help='Print pyDeltaRCM version.')
 
@@ -486,7 +726,7 @@ class Preprocessor(BasePreprocessor):
 
     This is the python high-level API class that is callable from a python
     script. For complete documentation on the API configurations, see
-    XXXXXXXXXXXXXX.
+    `the User Guide <../guides/userguide.html#high-level-model-api>`_.
 
     The class gives a way to configure and run multiple jobs from a python
     script.
@@ -533,6 +773,8 @@ class Preprocessor(BasePreprocessor):
         if not input_file and len(kwargs.keys()) == 0:
             raise ValueError('Cannot use Preprocessor with no arguments.')
 
+        self.cli_dict = kwargs
+
         if input_file:
             self.input_file = input_file
             self.preliminary_yaml_parsing()
@@ -541,9 +783,7 @@ class Preprocessor(BasePreprocessor):
             self.yaml_dict = {}
             self._has_matrix = False
 
-        self.cli_dict = kwargs
-
-        self.construct_job_list()
+        self.construct_job_file_list()
 
 
 def preprocessor_wrapper():
