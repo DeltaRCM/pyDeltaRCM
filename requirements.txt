@@ -2,5 +2,5 @@ numpy
 matplotlib
 scipy
 netCDF4
-pyyaml
+pyyaml>=5.1
 numba
