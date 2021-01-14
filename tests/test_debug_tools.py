@@ -157,3 +157,12 @@ def test_plot_multiple_subplots(test_DeltaModel):
     test_DeltaModel.show_attribute('cell_type', ax=ax[0])
     test_DeltaModel.show_attribute('ux', ax=ax[2])
     return plt.gcf()
+
+
+@pytest.mark.mpl_image_compare(remove_text=True)
+def test_plot_domain_withlabel(test_DeltaModel):
+    fig, ax = plt.subplots(figsize=(5, 4))
+    test_DeltaModel.update()
+    # This is a weak test, but it triggers coverage of the label lines.
+    test_DeltaModel.show_attribute('ux', label='')
+    return plt.gcf()
