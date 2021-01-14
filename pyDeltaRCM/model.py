@@ -32,7 +32,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     closed and written to disk.
     """
 
-    def __init__(self, input_file=None):
+    def __init__(self, input_file=None, defer_output=False):
         """Creates an instance of the pyDeltaRCM model.
 
         This method handles setting up the run, including parsing input files,
@@ -42,6 +42,15 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         ----------
         input_file : `str`, `os.PathLike`, optional
             User model run configuration file.
+
+        defer_output : `bool`, optional
+            Whether to create the output netCDF file during initialization. In
+            most cases, this can be ignored and left to default value `False`.
+            However, for parallel simulations it may be necessary to defer the
+            NetCDF file creation unitl the simualtion is assigned to the core
+            it will compute on, so that the DeltaModel object remains
+            pickle-able. Note, you will need to manually trigger the
+            :obj:`init_output_file` method if `defer_output` is `True`.
 
         Returns
         -------
@@ -83,9 +92,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         else:
             self.init_stratigraphy()
-            self.init_output_file()
+            if not defer_output:
+                self.init_output_file()
 
         self.logger.info('Model initialization complete')
+        self.log_model_time()
 
     def update(self):
         """Run the model for one full instance
@@ -122,6 +133,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_time_since_last += self.dt
         self._save_time_since_checkpoint += self.dt
         self._time_iter += int(1)
+
+        self.log_model_time()
 
         if self._save_time_since_checkpoint >= self.checkpoint_dt:
             self.output_checkpoint()
