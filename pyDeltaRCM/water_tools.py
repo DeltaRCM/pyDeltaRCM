@@ -37,6 +37,12 @@ class water_tools(abc.ABC):
 
         All parcels are processed in parallel, taking one step for each loop
         of the ``while`` loop.
+
+        Example
+        -------
+        On the initial delta surface, see how ten selected parcels are routed through the domain:
+
+        .. plot:: water_tools/run_water_iteration.py
         """
         _msg = 'Beginning stepping of water parcels'
         self.log_info(_msg, verbosity=2)
