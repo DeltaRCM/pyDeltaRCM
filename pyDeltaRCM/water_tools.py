@@ -11,6 +11,8 @@ from . import shared_tools
 class water_tools(abc.ABC):
 
     def init_water_iteration(self):
+        """Init the water iteration routine.
+        """
         _msg = 'Initializing water iteration'
         self.log_info(_msg, verbosity=2)
 
