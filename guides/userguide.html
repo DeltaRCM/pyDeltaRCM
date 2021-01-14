@@ -45,6 +45,7 @@
 <li><a class="reference internal" href="#command-line-api">Command line API</a></li>
 <li><a class="reference internal" href="#python-api">Python API</a></li>
 <li><a class="reference internal" href="#model-simulation-duration-in-the-high-level-api">Model simulation duration in the high-level API</a></li>
+<li><a class="reference internal" href="#running-simulations-in-parallel">Running simulations in parallel</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#low-level-model-api">Low-level model API</a></li>
@@ -193,6 +194,17 @@ This argument will scale the specified time-to-model-time, such that the <em>sca
 Specifying the <img class="math" src="../_images/math/8dfe9f65f28c336068909e07a36766e799a02da5.png" alt="I_f"/>  value is essential when using the model duration run specifications.
 See <a class="reference internal" href="../info/modeltime.html"><span class="doc">Time in pyDeltaRCM</span></a> for complete information on the scaling between model time and elapsed simulation time.</p>
 </div>
+<div class="section" id="running-simulations-in-parallel">
+<h4>Running simulations in parallel<a class="headerlink" href="#running-simulations-in-parallel" title="Permalink to this headline">¶</a></h4>
+<p>The high-level API provides the ability to run simulations in parallel on Linux environments.
+This option is only useful in the case where you are running multiple jobs with the <a class="reference internal" href="#matrix-expansion-tag"><span class="std std-ref">matrix expansion</span></a> or <a class="reference internal" href="#ensemble-expansion-tag"><span class="std std-ref">ensemble expansion</span></a> tools.</p>
+<p>To run jobs in parallel simply specify the <cite>–parallel</cite> flag to the command line interface.
+Optionally, you can specify the number of simulations to run at once by following the flag with a number.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pyDeltaRCM --config model_configuration.yml --timesteps <span class="m">5000</span> --parallel
+pyDeltaRCM --config model_configuration.yml --timesteps <span class="m">5000</span> --parallel <span class="m">6</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="low-level-model-api">
 <h3>Low-level model API<a class="headerlink" href="#low-level-model-api" title="Permalink to this headline">¶</a></h3>
@@ -215,7 +227,7 @@ The simplest case to use the low-level API is to do</p>
 <span id="configuring-multiple-jobs"></span><h3>Configuring multiple model runs from a single YAML file<a class="headerlink" href="#configuring-multiple-model-runs-from-a-single-yaml-file" title="Permalink to this headline">¶</a></h3>
 <p>Multiple model runs (referred to as “jobs”) can be configured by a single <cite>.yml</cite> configuration file, by using the <cite>matrix</cite> and <cite>ensemble</cite> configuration keys.</p>
 <div class="section" id="matrix-expansion">
-<h4>Matrix expansion<a class="headerlink" href="#matrix-expansion" title="Permalink to this headline">¶</a></h4>
+<span id="matrix-expansion-tag"></span><h4>Matrix expansion<a class="headerlink" href="#matrix-expansion" title="Permalink to this headline">¶</a></h4>
 <p>To use matrix expansion to configure multiple model runs, the dimensions of the matrix (i.e., the variables you want to run) should be listed below the <cite>matrix</cite> key. For example, the following configuration is a one-dimensional matrix with the variable <cite>f_bedload</cite>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;out_dir&#39;</span>
 <span class="nt">dx</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2.0</span>
@@ -256,7 +268,7 @@ Each folder will contain a copy of the configuration file used for that job; for
 </div>
 </div>
 <div class="section" id="ensemble-expansion">
-<h4>Ensemble expansion<a class="headerlink" href="#ensemble-expansion" title="Permalink to this headline">¶</a></h4>
+<span id="ensemble-expansion-tag"></span><h4>Ensemble expansion<a class="headerlink" href="#ensemble-expansion" title="Permalink to this headline">¶</a></h4>
 <p>Ensemble expansion creates replicates of specified model configurations with different random seed values.
 Like the matrix expansion, the <cite>out_dir</cite> key must be specified in the input configuration file.
 The <cite>ensemble</cite> key can be added to any configuration file that does not explicitly define the random seed.

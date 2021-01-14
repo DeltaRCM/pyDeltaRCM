@@ -81,8 +81,9 @@ defines a method to process the arguments from the command line (using the
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You probably do not need to interact with this class directly.
-Instead, you can use the command line API as it is defined HERE XX or
-the python API <a class="reference internal" href="pyDeltaRCM.preprocessor.Preprocessor.html#pyDeltaRCM.preprocessor.Preprocessor" title="pyDeltaRCM.preprocessor.Preprocessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Preprocessor</span></code></a>.</p>
+Instead, you can use the command line API as it is <a class="reference external" href="../guides/userguide#command-line-api">described in the
+User Guide</a> or the python
+API <a class="reference internal" href="pyDeltaRCM.preprocessor.Preprocessor.html#pyDeltaRCM.preprocessor.Preprocessor" title="pyDeltaRCM.preprocessor.Preprocessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Preprocessor</span></code></a>.</p>
 <p>When the class is called from the command line the instantiated
 object’s method <a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs" title="pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run_jobs()</span></code></a> is called by the
 <a class="reference internal" href="../reference/preprocessor/index.html#pyDeltaRCM.preprocessor.preprocessor_wrapper" title="pyDeltaRCM.preprocessor.preprocessor_wrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preprocessor_wrapper</span></code></a> function that the
@@ -107,7 +108,7 @@ during instantiation of the class.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.__init__" title="pyDeltaRCM.preprocessor.PreprocessorCLI.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
 <td><p>Initialize the CLI preprocessor.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_list" title="pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">construct_job_list</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_file_list" title="pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_file_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">construct_job_file_list</span></code></a>()</p></td>
 <td><p>Construct the job list.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_ensemble" title="pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_ensemble"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_yaml_ensemble</span></code></a>()</p></td>
@@ -130,52 +131,6 @@ during instantiation of the class.</p>
 </tr>
 </tbody>
 </table>
-<dl class="class">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI._Job">
-<em class="property">class </em><code class="descname">_Job</code><span class="sig-paren">(</span><em>input_file</em>, <em>cli_dict</em>, <em>yaml_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._Job" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for individual jobs to run.</p>
-<p>This class handles setting options for its own run time duration.</p>
-<p>You probably don’t need to interact with this class directly.</p>
-<dl class="method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI._Job.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>input_file</em>, <em>cli_dict</em>, <em>yaml_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._Job.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize a job.</p>
-<p>The <cite>input_file</cite> argument is passed to the DeltaModel for
-instantiation.</p>
-<p>The various model run duration parameters are passed from the
-<cite>cli_dict</cite> and <cite>yaml_dict</cite> arguments, and are processed into a
-single value for the run time. Precedence is given to values
-specified in the command line interface.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI._Job._optional_input">
-<code class="descname">_optional_input</code><span class="sig-paren">(</span><em>argument</em>, <em>cli_dict=None</em>, <em>yaml_dict=None</em>, <em>default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._Job._optional_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Processor function to be used on all the optional choices,
-for determining the hierachy of options and setting a single
-value.</p>
-<p>Hierarchy is to use CLI/preprocessor options first, then yaml.</p>
-<p>Both inputs should be <cite>dict</cite>!</p>
-<p>If default is not <cite>None</cite>, this value is used if no parameter
-specified in the cli or yaml.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI._Job.finalize_model">
-<code class="descname">finalize_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._Job.finalize_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Finalize the job.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI._Job.run_job">
-<code class="descname">run_job</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._Job.run_job" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loop the model.</p>
-<p>Iterate the timestep <code class="docutils literal notranslate"><span class="pre">update</span></code> routine for the specified number of
-iterations.</p>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="method">
 <dt>
 <code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
@@ -204,8 +159,8 @@ during instantiation of the class.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_list">
-<code class="descname">construct_job_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_list" title="Permalink to this definition">¶</a></dt>
+<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_file_list">
+<code class="descname">construct_job_file_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_file_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct the job list.</p>
 <p>The job list is constructed by expanding the <code class="docutils literal notranslate"><span class="pre">.yml</span></code> matrix, and
 forming ensemble runs as needed.</p>
@@ -254,10 +209,9 @@ any way.</p>
 <dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs">
 <code class="descname">run_jobs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the set of jobs.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>TODO: implement the parallel pool.</p>
-</div>
+<p>This method can be seen as the actual execution stage of the
+preprocessor. If <cite>–parallel</cite> is specified in the command line or YAML
+file, the jobs will run in parallel.</p>
 </dd></dl>
 
 <dl class="method">

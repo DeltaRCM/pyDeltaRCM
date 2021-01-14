@@ -77,7 +77,7 @@
 <dd><p>Python high level api.</p>
 <p>This is the python high-level API class that is callable from a python
 script. For complete documentation on the API configurations, see
-XXXXXXXXXXXXXX.</p>
+<a class="reference external" href="../guides/userguide.html#high-level-model-api">the User Guide</a>.</p>
 <p>The class gives a way to configure and run multiple jobs from a python
 script.</p>
 <p class="rubric">Examples</p>
@@ -120,7 +120,7 @@ file.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.__init__" title="pyDeltaRCM.preprocessor.Preprocessor.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([input_file])</p></td>
 <td><p>Initialize the python preprocessor.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.construct_job_list" title="pyDeltaRCM.preprocessor.Preprocessor.construct_job_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">construct_job_list</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.construct_job_file_list" title="pyDeltaRCM.preprocessor.Preprocessor.construct_job_file_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">construct_job_file_list</span></code></a>()</p></td>
 <td><p>Construct the job list.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.Preprocessor.expand_yaml_ensemble" title="pyDeltaRCM.preprocessor.Preprocessor.expand_yaml_ensemble"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_yaml_ensemble</span></code></a>()</p></td>
@@ -140,52 +140,6 @@ file.</p></li>
 </tr>
 </tbody>
 </table>
-<dl class="class">
-<dt id="pyDeltaRCM.preprocessor.Preprocessor._Job">
-<em class="property">class </em><code class="descname">_Job</code><span class="sig-paren">(</span><em>input_file</em>, <em>cli_dict</em>, <em>yaml_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor._Job" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for individual jobs to run.</p>
-<p>This class handles setting options for its own run time duration.</p>
-<p>You probably don’t need to interact with this class directly.</p>
-<dl class="method">
-<dt id="pyDeltaRCM.preprocessor.Preprocessor._Job.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>input_file</em>, <em>cli_dict</em>, <em>yaml_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor._Job.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize a job.</p>
-<p>The <cite>input_file</cite> argument is passed to the DeltaModel for
-instantiation.</p>
-<p>The various model run duration parameters are passed from the
-<cite>cli_dict</cite> and <cite>yaml_dict</cite> arguments, and are processed into a
-single value for the run time. Precedence is given to values
-specified in the command line interface.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyDeltaRCM.preprocessor.Preprocessor._Job._optional_input">
-<code class="descname">_optional_input</code><span class="sig-paren">(</span><em>argument</em>, <em>cli_dict=None</em>, <em>yaml_dict=None</em>, <em>default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor._Job._optional_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Processor function to be used on all the optional choices,
-for determining the hierachy of options and setting a single
-value.</p>
-<p>Hierarchy is to use CLI/preprocessor options first, then yaml.</p>
-<p>Both inputs should be <cite>dict</cite>!</p>
-<p>If default is not <cite>None</cite>, this value is used if no parameter
-specified in the cli or yaml.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyDeltaRCM.preprocessor.Preprocessor._Job.finalize_model">
-<code class="descname">finalize_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor._Job.finalize_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Finalize the job.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyDeltaRCM.preprocessor.Preprocessor._Job.run_job">
-<code class="descname">run_job</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor._Job.run_job" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loop the model.</p>
-<p>Iterate the timestep <code class="docutils literal notranslate"><span class="pre">update</span></code> routine for the specified number of
-iterations.</p>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="method">
 <dt>
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>input_file=None</em>, <em>**kwargs</em><span class="sig-paren">)</span></dt>
@@ -228,8 +182,8 @@ file.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyDeltaRCM.preprocessor.Preprocessor.construct_job_list">
-<code class="descname">construct_job_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.construct_job_list" title="Permalink to this definition">¶</a></dt>
+<dt id="pyDeltaRCM.preprocessor.Preprocessor.construct_job_file_list">
+<code class="descname">construct_job_file_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.construct_job_file_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct the job list.</p>
 <p>The job list is constructed by expanding the <code class="docutils literal notranslate"><span class="pre">.yml</span></code> matrix, and
 forming ensemble runs as needed.</p>
@@ -267,10 +221,9 @@ and place it into a dictionary.</p>
 <dt id="pyDeltaRCM.preprocessor.Preprocessor.run_jobs">
 <code class="descname">run_jobs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.Preprocessor.run_jobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the set of jobs.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>TODO: implement the parallel pool.</p>
-</div>
+<p>This method can be seen as the actual execution stage of the
+preprocessor. If <cite>–parallel</cite> is specified in the command line or YAML
+file, the jobs will run in parallel.</p>
 </dd></dl>
 
 <dl class="method">

@@ -14,7 +14,7 @@ pyDeltaRCM.preprocessor.Preprocessor
    .. autosummary::
    
       ~Preprocessor.__init__
-      ~Preprocessor.construct_job_list
+      ~Preprocessor.construct_job_file_list
       ~Preprocessor.expand_yaml_ensemble
       ~Preprocessor.expand_yaml_matrix
       ~Preprocessor.preliminary_yaml_parsing
