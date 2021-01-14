@@ -1,4 +1,4 @@
-pyDeltaRCM.model.DeltaModel
+﻿pyDeltaRCM.model.DeltaModel
 ===========================
 
 .. currentmodule:: pyDeltaRCM.model

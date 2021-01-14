@@ -1,19 +1,19 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Time in pyDeltaRCM &#8212; pyDeltaRCM 1.2.0 documentation</title>
-    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Hydrodynamics" href="hydrodynamics.html" />
@@ -32,9 +32,81 @@
           <a href="yamlparameters.html" title="YAML Parameters"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Model Information</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Model Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Time in pyDeltaRCM</a></li> 
       </ul>
-    </div>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="time-in-pydeltarcm">
+<h1>Time in pyDeltaRCM<a class="headerlink" href="#time-in-pydeltarcm" title="Permalink to this headline">¶</a></h1>
+<p>Time in the pyDeltaRCM model is simulated in units of seconds.
+The duration of a timestep is determined during model initialization to maintain numerical stability; the calculation is based on model domain and configuration parameters.
+The model is then iterated timestep by timestep, until an end-run condition is reached</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you are using the <a class="reference internal" href="../guides/userguide.html#high-level-api"><span class="std std-ref">high-level API</span></a>, the model run end condition is that the elapsed model time is <em>equal to or greater than</em> the specified input time. As a result, the model run duration is unlikely to exactly match the input time specification, because the model timestep is unlikely to be a factor of the specified time.</p>
+<p>Please keep this in mind when evaluating model results, and especially when comparing  between different model runs.</p>
+</div>
+<p>Over the duration of the model, the water discharge (and thus sediment discharge) are assumed to be at bankfull.
+This assumption is based on the concept of geomorphic work <a class="reference internal" href="#wm60" id="id1"><span>[WM60]</span></a> and the strongly nonlinear relationship between water discharge and sediment transport.
+To summarize the basis of this assumption, a very small proportion of sediment is in motion when discharge is at or near a low-flow “base flow” condition, relative to the amount of sediment in motion during flood conditions.
+So while flooding only occurs for a small fraction of total time, most of the time-integrated sediment transport occurs during this fraction of time, and the remainder of time is deemed negligible in comparison.</p>
+<p>For example, in the contrived river-delta hydrograph shown below, the discharge fluctuates around a base-flow condition for most of the year, with the exception of a 50 day period when a flood event occurs (from “start event” to “end event”).
+For 25 days of the flood event, the discharge is high enough to exceed the bankfull discharge (“flooding duration”).</p>
+<p>(<a class="reference external" href="../pyplots/modeltime/one_year_plot.png">png</a>, <a class="reference external" href="../pyplots/modeltime/one_year_plot.hires.png">hires.png</a>)</p>
+<div class="figure align-default">
+<img alt="../_images/one_year_plot.png" src="../_images/one_year_plot.png" />
+</div>
+<p>A numerical model could simulate every day of this hydrograph, but this would require substantial computing power.
+To accelerate the computation time of models, we assume that the only important period of time is when the river is at-or-above bankfull discharge, and we collapse the hydrograph to a single value: the bankfull discharge.
+The choice of bankfull discharge for the single-value discharge assumption is a matter of convenience, in that this is readily estimated from field data or measurements.</p>
+<p>The duration of time represented by the single-value discharge assumption is also  determined by the hydrograph.
+We arrive at the so-called <em>intermittency factor</em> (<img class="math" src="../_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>) by finding the fraction of unit-time per unit-time when the river is in flood.
+For this example, the intermittency factor scales between days and years as</p>
+<div class="math">
+<p><img src="../_images/math/13376e962d8f929d4c66b11ffefb730ef8b16cee.png" alt="\frac{25~\textrm{days}}{365.25~\textrm{days}} \approx 0.07 \equiv I_f"/></p>
+</div><p>The intermittency factor thus gives a relationship to scale pyDeltaRCM model time (which is always computed in units of seconds elapsed) from seconds to years.
+For example, for a model run that has elapsed <img class="math" src="../_images/math/c43bc0f79d7fa7584ab97c8973d389b8d8beddce.png" alt="4.32 \times 10^8"/> seconds and an assumed intermittency factor of 0.07:</p>
+<div class="math">
+<p><img src="../_images/math/333d8f4d40e5048332ca5078e0d9f853422b7fd2.png" alt="\frac{\textrm{seconds~elapsed}}{I_f} = \frac{4.32 \times 10^8~\textrm{seconds}}{0.07} = 6.17 \times 10^9~\textrm{seconds} \approx 196~\textrm{years}"/></p>
+</div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A convenience function is supplied with the low-level API for these time conversions: <a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.scale_model_time" title="pyDeltaRCM.shared_tools.scale_model_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_model_time</span></code></a>.</p>
+</div>
+<p>Applying the intermittency assumption to a four year model simulation reveals the computational advantage of this approach.
+A simulation of every day in the simulation duration would require 1460 days of simulated time (<img class="math" src="../_images/math/cabb77baaacc77b37f3d89c80d3163825517c5a4.png" alt="1.26 \times 10^8"/> seconds).</p>
+<p>(<a class="reference external" href="../pyplots/modeltime/four_year_plot.png">png</a>, <a class="reference external" href="../pyplots/modeltime/four_year_plot.hires.png">hires.png</a>)</p>
+<div class="figure align-default">
+<img alt="../_images/four_year_plot.png" src="../_images/four_year_plot.png" />
+</div>
+<p>In contrast, by condensing the simulated time down to a bankfull discharge only, the intermittency assumption allows us to simulate the same “four year” period in just under 59 days of simulated time (<img class="math" src="../_images/math/87ae2712a99293393aa40bbce6755bae8987d7cf.png" alt="5.08 \times 10^6"/> seconds).</p>
+<div class="section" id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/preprocessor/index.html#pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate" title="pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_relative_sea_level_rise_rate</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.scale_model_time" title="pyDeltaRCM.shared_tools.scale_model_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_model_time</span></code></a></p></li>
+</ul>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<dl class="citation">
+<dt class="label" id="wm60"><span class="brackets"><a class="fn-backref" href="#id1">WM60</a></span></dt>
+<dd><p>Wolman, M. G., &amp; Miller, J. P. (1960). Magnitude and frequency of forces in geomorphic processes. The Journal of Geology, 68(1), 54–74. <a class="reference external" href="https://doi.org/10.1086/626637">https://doi.org/10.1086/626637</a></p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table of Contents</a></h3>
@@ -60,85 +132,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="time-in-pydeltarcm">
-<h1>Time in pyDeltaRCM<a class="headerlink" href="#time-in-pydeltarcm" title="Permalink to this headline">¶</a></h1>
-<p>Time in the pyDeltaRCM model is simulated in units of seconds.
-The duration of a timestep is determined during model initialization to maintain numerical stability; the calculation is based on model domain and configuration parameters.
-The model is then iterated timestep by timestep, until an end-run condition is reached</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you are using the <a class="reference internal" href="../guides/userguide.html#high-level-api"><span class="std std-ref">high-level API</span></a>, the model run end condition is that the elapsed model time is <em>equal to or greater than</em> the specified input time. As a result, the model run duration is unlikely to exactly match the input time specification, because the model timestep is unlikely to be a factor of the specified time.</p>
-<p>Please keep this in mind when evaluating model results, and especially when comparing  between different model runs.</p>
-</div>
-<p>Over the duration of the model, the water discharge (and thus sediment discharge) are assumed to be at bankfull.
-This assumption is based on the concept of geomorphic work <a class="reference internal" href="#wm60" id="id1"><span>[WM60]</span></a> and the strongly nonlinear relationship between water discharge and sediment transport.
-To summarize the basis of this assumption, a very small proportion of sediment is in motion when discharge is at or near a low-flow “base flow” condition, relative to the amount of sediment in motion during flood conditions.
-So while flooding only occurs for a small fraction of total time, most of the time-integrated sediment transport occurs during this fraction of time, and the remainder of time is deemed negligible in comparison.</p>
-<p>For example, in the contrived river-delta hydrograph shown below, the discharge fluctuates around a base-flow condition for most of the year, with the exception of a 50 day period when a flood event occurs (from “start event” to “end event”).
-For 25 days of the flood event, the discharge is high enough to exceed the bankfull discharge (“flooding duration”).</p>
-<p>(<a class="reference external" href="../pyplots/modeltime/one_year_plot.png">png</a>, <a class="reference external" href="../pyplots/modeltime/one_year_plot.hires.png">hires.png</a>)</p>
-<div class="figure align-center">
-<img alt="../_images/one_year_plot.png" src="../_images/one_year_plot.png" />
-</div>
-<p>A numerical model could simulate every day of this hydrograph, but this would require substantial computing power.
-To accelerate the computation time of models, we assume that the only important period of time is when the river is at-or-above bankfull discharge, and we collapse the hydrograph to a single value: the bankfull discharge.
-The choice of bankfull discharge for the single-value discharge assumption is a matter of convenience, in that this is readily estimated from field data or measurements.</p>
-<p>The duration of time represented by the single-value discharge assumption is also  determined by the hydrograph.
-We arrive at the so-called <em>intermittency factor</em> (<img class="math" src="../_images/math/8dfe9f65f28c336068909e07a36766e799a02da5.png" alt="I_f"/>) by finding the fraction of unit-time per unit-time when the river is in flood.
-For this example, the intermittency factor scales between days and years as</p>
-<div class="math">
-<p><img src="../_images/math/be59c9710d5c1eb4a30c38f8e8411228216e21f2.png" alt="\frac{25~\textrm{days}}{365.25~\textrm{days}} \approx 0.07 \equiv I_f"/></p>
-</div><p>The intermittency factor thus gives a relationship to scale pyDeltaRCM model time (which is always computed in units of seconds elapsed) from seconds to years.
-For example, for a model run that has elapsed <img class="math" src="../_images/math/bac1c318acb49dfcc20f5a200c343047a1d29360.png" alt="4.32 \times 10^8"/> seconds and an assumed intermittency factor of 0.07:</p>
-<div class="math">
-<p><img src="../_images/math/89e1048727266bbd810d53f531e282cf526efb87.png" alt="\frac{\textrm{seconds~elapsed}}{I_f} = \frac{4.32 \times 10^8~\textrm{seconds}}{0.07} = 6.17 \times 10^9~\textrm{seconds} \approx 196~\textrm{years}"/></p>
-</div><div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>A convenience function is supplied with the low-level API for these time conversions: <a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.scale_model_time" title="pyDeltaRCM.shared_tools.scale_model_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_model_time</span></code></a>.</p>
-</div>
-<p>Applying the intermittency assumption to a four year model simulation reveals the computational advantage of this approach.
-A simulation of every day in the simulation duration would require 1460 days of simulated time (<img class="math" src="../_images/math/d87e5342c3f377b306846d51d430f0cd0bd0c8a6.png" alt="1.26 \times 10^8"/> seconds).</p>
-<p>(<a class="reference external" href="../pyplots/modeltime/four_year_plot.png">png</a>, <a class="reference external" href="../pyplots/modeltime/four_year_plot.hires.png">hires.png</a>)</p>
-<div class="figure align-center">
-<img alt="../_images/four_year_plot.png" src="../_images/four_year_plot.png" />
-</div>
-<p>In contrast, by condensing the simulated time down to a bankfull discharge only, the intermittency assumption allows us to simulate the same “four year” period in just under 59 days of simulated time (<img class="math" src="../_images/math/b8cdb4e51419aebf62e85ac2d95a2a28cc55a151.png" alt="5.08 \times 10^6"/> seconds).</p>
-<div class="section" id="see-also">
-<h2>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="../reference/preprocessor/index.html#pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate" title="pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_relative_sea_level_rise_rate</span></code></a></p></li>
-<li><p><a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.scale_model_time" title="pyDeltaRCM.shared_tools.scale_model_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_model_time</span></code></a></p></li>
-</ul>
-</div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<dl class="citation">
-<dt class="label" id="wm60"><span class="brackets"><a class="fn-backref" href="#id1">WM60</a></span></dt>
-<dd><p>Wolman, M. G., &amp; Miller, J. P. (1960). Magnitude and frequency of forces in geomorphic processes. The Journal of Geology, 68(1), 54–74. <a class="reference external" href="https://doi.org/10.1086/626637">https://doi.org/10.1086/626637</a></p>
-</dd>
-</dl>
-</div>
-</div>
-
-
-          </div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -156,12 +158,13 @@ A simulation of every day in the simulation duration would require 1460 days of 
           <a href="yamlparameters.html" title="YAML Parameters"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Model Information</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="index.html" >Model Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Time in pyDeltaRCM</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>

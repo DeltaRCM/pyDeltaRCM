@@ -1,4 +1,4 @@
-pyDeltaRCM.iteration\_tools.iteration\_tools
+﻿pyDeltaRCM.iteration\_tools.iteration\_tools
 ============================================
 
 .. currentmodule:: pyDeltaRCM.iteration_tools
@@ -13,6 +13,7 @@ pyDeltaRCM.iteration\_tools.iteration\_tools
 
    .. autosummary::
    
+      ~iteration_tools.__init__
       ~iteration_tools.apply_subsidence
       ~iteration_tools.expand_stratigraphy
       ~iteration_tools.finalize_timestep

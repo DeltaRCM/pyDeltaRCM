@@ -1,19 +1,19 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>pyDeltaRCM.sed_tools.BaseRouter &#8212; pyDeltaRCM 1.2.0 documentation</title>
-    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shared_tools" href="../reference/shared_tools/index.html" />
@@ -33,36 +33,10 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../reference/sed_tools/index.html" accesskey="U">sed_tools</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../reference/sed_tools/index.html" accesskey="U">sed_tools</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyDeltaRCM.sed_tools.BaseRouter</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="pyDeltaRCM.sed_tools.MudRouter.html"
-                        title="previous chapter">pyDeltaRCM.sed_tools.MudRouter</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../reference/shared_tools/index.html"
-                        title="next chapter">shared_tools</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/_autosummary/pyDeltaRCM.sed_tools.BaseRouter.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -71,9 +45,9 @@
             
   <div class="section" id="pydeltarcm-sed-tools-baserouter">
 <h1>pyDeltaRCM.sed_tools.BaseRouter<a class="headerlink" href="#pydeltarcm-sed-tools-baserouter" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="pyDeltaRCM.sed_tools.BaseRouter">
-<em class="property">class </em><code class="descclassname">pyDeltaRCM.sed_tools.</code><code class="descname">BaseRouter</code><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pyDeltaRCM.sed_tools.</code><code class="sig-name descname">BaseRouter</code><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter" title="Permalink to this definition">¶</a></dt>
 <dd><p>BaseRouter.</p>
 <p>Defines common methods for jitted routers.</p>
 <p>Subclasses need to define <cite>run</cite>, <cite>_route_one_parcel</cite>, and
@@ -88,27 +62,30 @@ included in the base class with abstract decorators to help make it
 clear that these methods need to be implemented in subclassing
 <cite>Router</cite>.</p>
 </div>
-<dl class="method">
+<dl class="py method">
 <dt id="pyDeltaRCM.sed_tools.BaseRouter.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.sed_tools.BaseRouter.__init__" title="pyDeltaRCM.sed_tools.BaseRouter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>(*args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="pyDeltaRCM.sed_tools.BaseRouter._compute_Vp_ero">
-<code class="descname">_compute_Vp_ero</code><span class="sig-paren">(</span><em>Vp_sed</em>, <em>U_loc</em>, <em>U_ero</em>, <em>beta</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter._compute_Vp_ero" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_compute_Vp_ero</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Vp_sed</span></em>, <em class="sig-param"><span class="n">U_loc</span></em>, <em class="sig-param"><span class="n">U_ero</span></em>, <em class="sig-param"><span class="n">beta</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter._compute_Vp_ero" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute volume erorded based on velocity.</p>
 <p>The volume of sediment eroded depends on the local flow velocity
 (<code class="xref py py-obj docutils literal notranslate"><span class="pre">U_loc</span></code>), the critical velocity for erosion (<code class="xref py py-obj docutils literal notranslate"><span class="pre">U_ero</span></code>), and
@@ -133,25 +110,25 @@ U_ero depends on the pathway.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="pyDeltaRCM.sed_tools.BaseRouter._deposit_or_erode">
-<code class="descname">_deposit_or_erode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter._deposit_or_erode" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">_deposit_or_erode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter._deposit_or_erode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine whether to erode or deposit.</p>
 <p>This is the decision making component of the routine, and will be
 different for sand vs mud.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="pyDeltaRCM.sed_tools.BaseRouter._limit_Vp_change">
-<code class="descname">_limit_Vp_change</code><span class="sig-paren">(</span><em>Vp</em>, <em>stage</em>, <em>eta</em>, <em>dx</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter._limit_Vp_change" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_limit_Vp_change</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Vp</span></em>, <em class="sig-param"><span class="n">stage</span></em>, <em class="sig-param"><span class="n">eta</span></em>, <em class="sig-param"><span class="n">dx</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter._limit_Vp_change" title="Permalink to this definition">¶</a></dt>
 <dd><p>Limit change in volume to 1/4 of a cell volume.</p>
 <p>Function is used by multiple pathways in <cite>mud_dep_ero</cite> and <cite>sand_dep_ero</cite>
 but with different inputs for the sediment volume (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Vp</span></code>).</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="pyDeltaRCM.sed_tools.BaseRouter._update_fields">
-<code class="descname">_update_fields</code><span class="sig-paren">(</span><em>Vp_change</em>, <em>px</em>, <em>py</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter._update_fields" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_update_fields</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Vp_change</span></em>, <em class="sig-param"><span class="n">px</span></em>, <em class="sig-param"><span class="n">py</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter._update_fields" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute deposit of sand or mud.</p>
 <p>Deposit sediment volume <cite>Vp_change</cite>. The change in bed elevation
 depends on the sediment mass conservation (i.e., Exner equation) and
@@ -184,7 +161,35 @@ should be negative.</p></li>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pyDeltaRCM.sed_tools.MudRouter.html"
+                        title="previous chapter">pyDeltaRCM.sed_tools.MudRouter</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../reference/shared_tools/index.html"
+                        title="next chapter">shared_tools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/pyDeltaRCM.sed_tools.BaseRouter.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -203,12 +208,13 @@ should be negative.</p></li>
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../reference/sed_tools/index.html" >sed_tools</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../reference/sed_tools/index.html" >sed_tools</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyDeltaRCM.sed_tools.BaseRouter</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>

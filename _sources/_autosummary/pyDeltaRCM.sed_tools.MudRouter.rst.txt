@@ -1,4 +1,4 @@
-pyDeltaRCM.sed\_tools.MudRouter
+﻿pyDeltaRCM.sed\_tools.MudRouter
 ===============================
 
 .. currentmodule:: pyDeltaRCM.sed_tools

@@ -1,4 +1,4 @@
-pyDeltaRCM.debug\_tools.debug\_tools
+﻿pyDeltaRCM.debug\_tools.debug\_tools
 ====================================
 
 .. currentmodule:: pyDeltaRCM.debug_tools
@@ -13,6 +13,7 @@ pyDeltaRCM.debug\_tools.debug\_tools
 
    .. autosummary::
    
+      ~debug_tools.__init__
       ~debug_tools.show_attribute
       ~debug_tools.show_ind
    

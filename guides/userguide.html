@@ -1,19 +1,19 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Guide &#8212; pyDeltaRCM 1.2.0 documentation</title>
-    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Model Information" href="../info/index.html" />
@@ -31,71 +31,10 @@
         <li class="right" >
           <a href="10min.html" title="10-minute tutorial"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">User Guide</a><ul>
-<li><a class="reference internal" href="#configuring-an-input-yaml-file">Configuring an input YAML file</a></li>
-<li><a class="reference internal" href="#starting-model-runs">Starting model runs</a><ul>
-<li><a class="reference internal" href="#high-level-model-api">High-level model API</a><ul>
-<li><a class="reference internal" href="#command-line-api">Command line API</a></li>
-<li><a class="reference internal" href="#python-api">Python API</a></li>
-<li><a class="reference internal" href="#model-simulation-duration-in-the-high-level-api">Model simulation duration in the high-level API</a></li>
-<li><a class="reference internal" href="#running-simulations-in-parallel">Running simulations in parallel</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#low-level-model-api">Low-level model API</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#advanced-model-configurations">Advanced model configurations</a><ul>
-<li><a class="reference internal" href="#configuring-multiple-model-runs-from-a-single-yaml-file">Configuring multiple model runs from a single YAML file</a><ul>
-<li><a class="reference internal" href="#matrix-expansion">Matrix expansion</a></li>
-<li><a class="reference internal" href="#ensemble-expansion">Ensemble expansion</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#working-with-subsidence">Working with subsidence</a><ul>
-<li><a class="reference internal" href="#turning-on-subsidence-in-pydeltarcm">Turning on Subsidence in pyDeltaRCM</a></li>
-<li><a class="reference internal" href="#configuring-lateral-extents-of-subsidence">Configuring Lateral Extents of Subsidence</a></li>
-<li><a class="reference internal" href="#configuring-when-subsidence-occurs">Configuring When Subsidence Occurs</a></li>
-<li><a class="reference internal" href="#configuring-the-rate-of-subsidence">Configuring The Rate of Subsidence</a></li>
-<li><a class="reference internal" href="#advanced-subsidence-configurations">Advanced Subsidence Configurations</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="10min.html"
-                        title="previous chapter">10-minute tutorial</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../info/index.html"
-                        title="next chapter">Model Information</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/guides/userguide.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -183,15 +122,15 @@ It is also possible to specify the input run duration in units of years with the
 pyDeltaRCM --config model_configuration.yml --time_years <span class="m">1</span>
 </pre></div>
 </div>
-<p>would each run a simulation for <img class="math" src="../_images/math/4905a658c40834f0359c17d38b2d13c3300c963c.png" alt="(86400 * 365.25)"/> seconds, or 1 year.</p>
+<p>would each run a simulation for <img class="math" src="../_images/math/e982197bf6146c4049a4a81b670f20fc7c481e96.png" alt="(86400 * 365.25)"/> seconds, or 1 year.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Do not specify both time arguments, or specify time arguments with the timesteps argument.
 In the case of multiple argument specification, precedence is given in the order <cite>timesteps</cite> &gt; <cite>time</cite> &gt; <cite>time_years</cite>.</p>
 </div>
-<p>When specifying the time to run the simulation, an additional parameter determining the intermittency factor (<img class="math" src="../_images/math/8dfe9f65f28c336068909e07a36766e799a02da5.png" alt="I_f"/>) may be specified <code class="docutils literal notranslate"><span class="pre">--If</span></code> at the command line (or <code class="docutils literal notranslate"><span class="pre">If:</span></code> in the YAML configuration file).
+<p>When specifying the time to run the simulation, an additional parameter determining the intermittency factor (<img class="math" src="../_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>) may be specified <code class="docutils literal notranslate"><span class="pre">--If</span></code> at the command line (or <code class="docutils literal notranslate"><span class="pre">If:</span></code> in the YAML configuration file).
 This argument will scale the specified time-to-model-time, such that the <em>scaled time</em> is equal to the input argument time.
-Specifying the <img class="math" src="../_images/math/8dfe9f65f28c336068909e07a36766e799a02da5.png" alt="I_f"/>  value is essential when using the model duration run specifications.
+Specifying the <img class="math" src="../_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>  value is essential when using the model duration run specifications.
 See <a class="reference internal" href="../info/modeltime.html"><span class="doc">Time in pyDeltaRCM</span></a> for complete information on the scaling between model time and elapsed simulation time.</p>
 </div>
 <div class="section" id="running-simulations-in-parallel">
@@ -324,7 +263,7 @@ write our yaml file with the following parameters:</p>
 Doing so, will generate a domain that has the a subsiding region as shown in
 yellow in the figure below.</p>
 <p>(<a class="reference external" href="../pyplots/userguide/subsidence_region.png">png</a>, <a class="reference external" href="../pyplots/userguide/subsidence_region.hires.png">hires.png</a>)</p>
-<div class="figure align-center">
+<div class="figure align-default">
 <img alt="../_images/subsidence_region.png" src="../_images/subsidence_region.png" />
 </div>
 </div>
@@ -337,14 +276,14 @@ parameter controls the time (in seconds) at which the subsidence will be turned
 </div>
 <div class="section" id="configuring-the-rate-of-subsidence">
 <h3>Configuring The Rate of Subsidence<a class="headerlink" href="#configuring-the-rate-of-subsidence" title="Permalink to this headline">¶</a></h3>
-<div class="admonition-todo admonition" id="index-0">
+<div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
 <p>Add documentation here.</p>
 </div>
 </div>
 <div class="section" id="advanced-subsidence-configurations">
 <h3>Advanced Subsidence Configurations<a class="headerlink" href="#advanced-subsidence-configurations" title="Permalink to this headline">¶</a></h3>
-<div class="admonition-todo admonition" id="index-1">
+<div class="admonition-todo admonition" id="id2">
 <p class="admonition-title">Todo</p>
 <p>Bit about subclassing and custom configurations</p>
 </div>
@@ -353,7 +292,70 @@ parameter controls the time (in seconds) at which the subsidence will be turned
 </div>
 
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">User Guide</a><ul>
+<li><a class="reference internal" href="#configuring-an-input-yaml-file">Configuring an input YAML file</a></li>
+<li><a class="reference internal" href="#starting-model-runs">Starting model runs</a><ul>
+<li><a class="reference internal" href="#high-level-model-api">High-level model API</a><ul>
+<li><a class="reference internal" href="#command-line-api">Command line API</a></li>
+<li><a class="reference internal" href="#python-api">Python API</a></li>
+<li><a class="reference internal" href="#model-simulation-duration-in-the-high-level-api">Model simulation duration in the high-level API</a></li>
+<li><a class="reference internal" href="#running-simulations-in-parallel">Running simulations in parallel</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#low-level-model-api">Low-level model API</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#advanced-model-configurations">Advanced model configurations</a><ul>
+<li><a class="reference internal" href="#configuring-multiple-model-runs-from-a-single-yaml-file">Configuring multiple model runs from a single YAML file</a><ul>
+<li><a class="reference internal" href="#matrix-expansion">Matrix expansion</a></li>
+<li><a class="reference internal" href="#ensemble-expansion">Ensemble expansion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#working-with-subsidence">Working with subsidence</a><ul>
+<li><a class="reference internal" href="#turning-on-subsidence-in-pydeltarcm">Turning on Subsidence in pyDeltaRCM</a></li>
+<li><a class="reference internal" href="#configuring-lateral-extents-of-subsidence">Configuring Lateral Extents of Subsidence</a></li>
+<li><a class="reference internal" href="#configuring-when-subsidence-occurs">Configuring When Subsidence Occurs</a></li>
+<li><a class="reference internal" href="#configuring-the-rate-of-subsidence">Configuring The Rate of Subsidence</a></li>
+<li><a class="reference internal" href="#advanced-subsidence-configurations">Advanced Subsidence Configurations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="10min.html"
+                        title="previous chapter">10-minute tutorial</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../info/index.html"
+                        title="next chapter">Model Information</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/guides/userguide.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -370,12 +372,13 @@ parameter controls the time (in seconds) at which the subsidence will be turned
         <li class="right" >
           <a href="10min.html" title="10-minute tutorial"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>

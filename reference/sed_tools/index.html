@@ -1,19 +1,19 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>sed_tools &#8212; pyDeltaRCM 1.2.0 documentation</title>
-    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pyDeltaRCM.sed_tools.sed_tools" href="../../_autosummary/pyDeltaRCM.sed_tools.sed_tools.html" />
@@ -32,9 +32,60 @@
           <a href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html" title="pyDeltaRCM.water_tools.water_tools"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">API reference</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">API reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">sed_tools</a></li> 
       </ul>
-    </div>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sed-tools">
+<h1>sed_tools<a class="headerlink" href="#sed-tools" title="Permalink to this headline">¶</a></h1>
+<p>The tools are defined in <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.sed_tools</span></code>.</p>
+<div class="section" id="public-api-methods-attached-to-model">
+<h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.sed_tools.html#pyDeltaRCM.sed_tools.sed_tools" title="pyDeltaRCM.sed_tools.sed_tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sed_tools</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="router-classes">
+<h2>Router classes<a class="headerlink" href="#router-classes" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.SandRouter.html#pyDeltaRCM.sed_tools.SandRouter" title="pyDeltaRCM.sed_tools.SandRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SandRouter</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Jitted class to route sand.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.MudRouter.html#pyDeltaRCM.sed_tools.MudRouter" title="pyDeltaRCM.sed_tools.MudRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MudRouter</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Jitted class to route mud.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html#pyDeltaRCM.sed_tools.BaseRouter" title="pyDeltaRCM.sed_tools.BaseRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseRouter</span></code></a>()</p></td>
+<td><p>BaseRouter.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table of Contents</a></h3>
@@ -60,64 +111,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="sed-tools">
-<h1>sed_tools<a class="headerlink" href="#sed-tools" title="Permalink to this headline">¶</a></h1>
-<p>The tools are defined in <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.sed_tools</span></code>.</p>
-<div class="section" id="public-api-methods-attached-to-model">
-<h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Permalink to this headline">¶</a></h2>
-<table class="longtable docutils align-center">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.sed_tools.html#pyDeltaRCM.sed_tools.sed_tools" title="pyDeltaRCM.sed_tools.sed_tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sed_tools</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="router-classes">
-<h2>Router classes<a class="headerlink" href="#router-classes" title="Permalink to this headline">¶</a></h2>
-<table class="longtable docutils align-center">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.SandRouter.html#pyDeltaRCM.sed_tools.SandRouter" title="pyDeltaRCM.sed_tools.SandRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SandRouter</span></code></a>(_dt, dx, Vp_sed, u_max, qs0, u0, …)</p></td>
-<td><p>Jitted class to route sand.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.MudRouter.html#pyDeltaRCM.sed_tools.MudRouter" title="pyDeltaRCM.sed_tools.MudRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MudRouter</span></code></a>(_dt, dx, Vp_sed, u_max, U_dep_mud, …)</p></td>
-<td><p>Jitted class to route mud.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html#pyDeltaRCM.sed_tools.BaseRouter" title="pyDeltaRCM.sed_tools.BaseRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseRouter</span></code></a></p></td>
-<td><p>BaseRouter.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-
-
-          </div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -135,12 +137,13 @@
           <a href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html" title="pyDeltaRCM.water_tools.water_tools"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">sed_tools</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>

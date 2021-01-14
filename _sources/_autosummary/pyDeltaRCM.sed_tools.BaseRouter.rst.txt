@@ -1,4 +1,4 @@
-pyDeltaRCM.sed\_tools.BaseRouter
+﻿pyDeltaRCM.sed\_tools.BaseRouter
 ================================
 
 .. currentmodule:: pyDeltaRCM.sed_tools
@@ -13,6 +13,7 @@ pyDeltaRCM.sed\_tools.BaseRouter
 
    .. autosummary::
    
+      ~BaseRouter.__init__
       ~BaseRouter.run
    
    

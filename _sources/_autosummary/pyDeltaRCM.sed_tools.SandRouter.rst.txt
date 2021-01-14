@@ -1,4 +1,4 @@
-pyDeltaRCM.sed\_tools.SandRouter
+﻿pyDeltaRCM.sed\_tools.SandRouter
 ================================
 
 .. currentmodule:: pyDeltaRCM.sed_tools

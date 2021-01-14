@@ -1,19 +1,19 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Preprocessor &#8212; pyDeltaRCM 1.2.0 documentation</title>
-    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
     <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pyDeltaRCM.preprocessor.PreprocessorCLI" href="../../_autosummary/pyDeltaRCM.preprocessor.PreprocessorCLI.html" />
@@ -32,45 +32,10 @@
           <a href="../model/yaml_defaults.html" title="Default Model Variable Values"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">API reference</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">API reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Preprocessor</a></li> 
       </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="../../index.html">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Preprocessor</a><ul>
-<li><a class="reference internal" href="#preprocessor-classes-and-api">Preprocessor classes and API</a></li>
-<li><a class="reference internal" href="#preprocessor-function-and-utilities">Preprocessor function and utilities</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="../model/yaml_defaults.html"
-                        title="previous chapter">Default Model Variable Values</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../../_autosummary/pyDeltaRCM.preprocessor.PreprocessorCLI.html"
-                        title="next chapter">pyDeltaRCM.preprocessor.PreprocessorCLI</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/reference/preprocessor/index.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -82,7 +47,7 @@
 <p>The high-level API is principally defined in <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.preprocessor</span></code>.</p>
 <div class="section" id="preprocessor-classes-and-api">
 <h2>Preprocessor classes and API<a class="headerlink" href="#preprocessor-classes-and-api" title="Permalink to this headline">¶</a></h2>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -102,9 +67,9 @@
 </div>
 <div class="section" id="preprocessor-function-and-utilities">
 <h2>Preprocessor function and utilities<a class="headerlink" href="#preprocessor-function-and-utilities" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="pyDeltaRCM.preprocessor.preprocessor_wrapper">
-<code class="descclassname">pyDeltaRCM.preprocessor.</code><code class="descname">preprocessor_wrapper</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.preprocessor_wrapper" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyDeltaRCM.preprocessor.</code><code class="sig-name descname">preprocessor_wrapper</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.preprocessor_wrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapper for CLI interface.</p>
 <p>The entry_points setup of a command line interface requires a function, so
 we use this simple wrapper to instantiate and run the jobs.</p>
@@ -114,9 +79,9 @@ we use this simple wrapper to instantiate and run the jobs.</p>
 jobs.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="pyDeltaRCM.preprocessor.write_yaml_config_to_file">
-<code class="descclassname">pyDeltaRCM.preprocessor.</code><code class="descname">write_yaml_config_to_file</code><span class="sig-paren">(</span><em>_config</em>, <em>_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.write_yaml_config_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyDeltaRCM.preprocessor.</code><code class="sig-name descname">write_yaml_config_to_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_config</span></em>, <em class="sig-param"><span class="n">_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.write_yaml_config_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a config to file in output folder.</p>
 <p>Write the entire yaml configuation for the configured job out to a
 file in the job output foler.</p>
@@ -127,9 +92,9 @@ well.</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate">
-<code class="descclassname">pyDeltaRCM.preprocessor.</code><code class="descname">scale_relative_sea_level_rise_rate</code><span class="sig-paren">(</span><em>mmyr</em>, <em>If=1</em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyDeltaRCM.preprocessor.</code><code class="sig-name descname">scale_relative_sea_level_rise_rate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mmyr</span></em>, <em class="sig-param"><span class="n">If</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scale a relative sea level rise rate to model time.</p>
 <p>This function scales any relative sea level rise rate (RSLR) (e.g., sea
 level rise, subsidence) to a rate appropriate for the model time. This is
@@ -140,9 +105,9 @@ real-world time to model time.</p>
 <p>Relative sea level rise (subsidence and/or sea level rise) are scaled from
 real world dimensions of mm/yr to model input as:</p>
 <div class="math">
-<p><img src="../../_images/math/bb6dfce61f57f0000e72aede3894f152e5a0b380.png" alt="\widehat{RSLR} = (RSLR / 1000) \cdot \dfrac{1}{I_f \cdot 365.25 \cdot 86400}"/></p>
+<p><img src="../../_images/math/f5d8c1b0cba30fdcd1b9fb9e3bf33c2e359d5970.png" alt="\widehat{RSLR} = (RSLR / 1000) \cdot \dfrac{1}{I_f \cdot 365.25 \cdot 86400}"/></p>
 </div><p>This conversion makes it such that when one real-world year has elapsed
-(<img class="math" src="../../_images/math/5babda140bdf558cf3a65ddf2d7d11e5ad452f60.png" alt="I_f \cdot 365.25 \cdot 86400"/> seconds in model time), the relative
+(<img class="math" src="../../_images/math/5ddce203faa1abd468c10f2aa3ae1f914fd458a3.png" alt="I_f \cdot 365.25 \cdot 86400"/> seconds in model time), the relative
 sea level has changed by the number of millimeters specified in the input
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">mmyr</span></code>.</p>
 <div class="admonition note">
@@ -173,7 +138,44 @@ i.e., no scaling is performed.</p></li>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Preprocessor</a><ul>
+<li><a class="reference internal" href="#preprocessor-classes-and-api">Preprocessor classes and API</a></li>
+<li><a class="reference internal" href="#preprocessor-function-and-utilities">Preprocessor function and utilities</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../model/yaml_defaults.html"
+                        title="previous chapter">Default Model Variable Values</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../_autosummary/pyDeltaRCM.preprocessor.PreprocessorCLI.html"
+                        title="next chapter">pyDeltaRCM.preprocessor.PreprocessorCLI</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/reference/preprocessor/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -191,12 +193,13 @@ i.e., no scaling is performed.</p></li>
           <a href="../model/yaml_defaults.html" title="Default Model Variable Values"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Preprocessor</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
     </div>
   </body>
 </html>

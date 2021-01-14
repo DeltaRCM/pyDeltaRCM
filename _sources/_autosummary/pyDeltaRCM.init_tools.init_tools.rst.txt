@@ -1,4 +1,4 @@
-pyDeltaRCM.init\_tools.init\_tools
+﻿pyDeltaRCM.init\_tools.init\_tools
 ==================================
 
 .. currentmodule:: pyDeltaRCM.init_tools
@@ -13,6 +13,7 @@ pyDeltaRCM.init\_tools.init\_tools
 
    .. autosummary::
    
+      ~init_tools.__init__
       ~init_tools.create_domain
       ~init_tools.create_other_variables
       ~init_tools.determine_random_seed

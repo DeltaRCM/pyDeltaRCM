@@ -1,4 +1,4 @@
-pyDeltaRCM.water\_tools.water\_tools
+﻿pyDeltaRCM.water\_tools.water\_tools
 ====================================
 
 .. currentmodule:: pyDeltaRCM.water_tools
@@ -13,6 +13,7 @@ pyDeltaRCM.water\_tools.water\_tools
 
    .. autosummary::
    
+      ~water_tools.__init__
       ~water_tools.build_weight_array
       ~water_tools.check_for_boundary
       ~water_tools.check_size_of_indices_matrix

@@ -1,4 +1,4 @@
-pyDeltaRCM.sed\_tools.sed\_tools
+﻿pyDeltaRCM.sed\_tools.sed\_tools
 ================================
 
 .. currentmodule:: pyDeltaRCM.sed_tools
@@ -13,6 +13,7 @@ pyDeltaRCM.sed\_tools.sed\_tools
 
    .. autosummary::
    
+      ~sed_tools.__init__
       ~sed_tools.route_all_mud_parcels
       ~sed_tools.route_all_sand_parcels
       ~sed_tools.sed_route
