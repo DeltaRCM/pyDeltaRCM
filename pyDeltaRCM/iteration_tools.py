@@ -46,12 +46,14 @@ class iteration_tools(abc.ABC):
             raise RuntimeError('Cannot update model, model already finalized!')
 
         # model operations
+        self.logger.info('beginning water iteration...')
         for iteration in range(self._itermax):
             self.init_water_iteration()
             self.run_water_iteration()
             self.compute_free_surface()
             self.finalize_water_iteration(iteration)
 
+        self.logger.info('beginning sediment iteration...')
         self.sed_route()
 
     def finalize_timestep(self):
@@ -324,6 +326,7 @@ class iteration_tools(abc.ABC):
                 self.save_grids('velocity_y', self.uy, save_idx)
 
         # ------------------ metadata ------------------
+        self.logger.info('saving metadata...')
         if self._save_metadata:
             self.output_netcdf['meta']['H_SL'][save_idx] = self._H_SL
             self.output_netcdf['meta']['f_bedload'][save_idx] = self._f_bedload
@@ -331,6 +334,7 @@ class iteration_tools(abc.ABC):
             self.output_netcdf['meta']['u0'][save_idx] = self._u0
 
         # -------------------- sync --------------------
+        self.logger.info('syncing...')
         if (self._save_metadata or self._save_any_grids):
             self.output_netcdf.sync()
 
@@ -525,6 +529,7 @@ class iteration_tools(abc.ABC):
         -------
 
         """
+        self.logger.info('saving ' + str(var_name) + ' grid...')
         try:
             self.output_netcdf.variables[var_name][ts, :, :] = var
         except:
