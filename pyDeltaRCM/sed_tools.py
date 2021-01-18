@@ -24,9 +24,16 @@ class sed_tools(abc.ABC):
         self.Vp_dep_sand[:] = 0
         self.Vp_dep_mud[:] = 0
 
+        _msg = 'Beginning sand parcel routing'
+        self.log_info(_msg, verbosity=2)
         self.route_all_sand_parcels()
+
+        _msg = 'Beginning mud parcel routing'
+        self.log_info(_msg, verbosity=2)
         self.route_all_mud_parcels()
 
+        _msg = 'Beginning topographic diffusion'
+        self.log_info(_msg, verbosity=2)
         self.topo_diffusion()
 
     def route_all_sand_parcels(self):
@@ -41,11 +48,17 @@ class sed_tools(abc.ABC):
         the model fields, where they are later used by the `MudRouter` and the
         water parcel routing.
         """
+        _msg = 'Determining sand parcel start indicies'
+        self.log_info(_msg, verbosity=2)
+
         num_starts = int(self._Np_sed * self._f_bedload)
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
                                                        inlet_weights,
                                                        num_starts)
+
+        _msg = 'Supplying model state to SandRouter for iteration'
+        self.log_info(_msg, verbosity=2)
 
         self._sr.run(start_indices, self.eta, self.stage, self.depth,
                      self.cell_type, self.uw, self.ux, self.uy,
@@ -56,6 +69,9 @@ class sed_tools(abc.ABC):
         # These are the variables updated at the end of the `SandRouter`. If
         # you attempt to drop in a replacement SandRouter, you will need to
         # update these fields!!
+        _msg = 'Updating DeltaModel based on SandRouter change'
+        self.log_info(_msg, verbosity=2)
+
         self.Vp_dep_mud = self._sr.Vp_dep_mud
         self.Vp_dep_sand = self._sr.Vp_dep_sand
         self.eta = self._sr.eta  # update bed
@@ -78,11 +94,17 @@ class sed_tools(abc.ABC):
         the model fields, where they are later used by the water parcel
         routing.
         """
+        _msg = 'Determining mud parcel start indicies'
+        self.log_info(_msg, verbosity=2)
+
         num_starts = int(self._Np_sed * (1 - self._f_bedload))
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
                                                        inlet_weights,
                                                        num_starts)
+
+        _msg = 'Supplying model state to MudRouter for iteration'
+        self.log_info(_msg, verbosity=2)
 
         self._mr.run(start_indices, self.eta, self.stage, self.depth,
                      self.cell_type, self.uw, self.ux, self.uy,
@@ -93,6 +115,9 @@ class sed_tools(abc.ABC):
         # These are the variables updated at the end of the `MudRouter`. If
         # you attempt to drop in a replacement MudRouter, you will need to
         # update these fields!!
+        _msg = 'Updating DeltaModel based on MudRouter change'
+        self.log_info(_msg, verbosity=2)
+
         self.Vp_dep_mud = self._mr.Vp_dep_mud
         self.Vp_dep_sand = self._mr.Vp_dep_sand
         self.eta = self._mr.eta  # update bed

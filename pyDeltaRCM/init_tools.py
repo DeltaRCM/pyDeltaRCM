@@ -24,7 +24,11 @@ from . import sed_tools
 class init_tools(abc.ABC):
 
     def init_output_infrastructure(self):
+        """Initialize the output infrastructure (i.e., folder).
 
+        This method is the first called in the initialization of the
+        `DeltaModel`, after the configuration variables have been imported.
+        """
         # output directory config
         self.prefix = self.out_dir
         self.prefix_abspath = os.path.abspath(self.prefix)
@@ -54,6 +58,9 @@ class init_tools(abc.ABC):
 
         # add handler to logger object
         self.logger.addHandler(fh)
+
+        _msg = 'Output log file initialized.'
+        self.log_info(_msg, verbosity=0)
 
     def import_files(self):
 
@@ -133,9 +140,7 @@ class init_tools(abc.ABC):
             *not* written to the log.
         """
         _msg = 'Setting up model configuration'
-        self.logger.info(_msg)
-        if self._verbose >= 2:
-            print(_msg)
+        self.log_info(_msg, verbosity=0)
 
         # process the input file to attributes of the model
         for k, v in list(self._input_file_vars.items()):
@@ -154,7 +159,7 @@ class init_tools(abc.ABC):
             for k, v in list(self._input_file_vars.items()):
                 _msg = 'Configuration variable `{var}`: {val}'.format(
                     var=k, val=v)
-                self.logger.info(_msg)
+                self.log_info(_msg, verbosity=0)
 
     def determine_random_seed(self):
         """Set the random seed if given.
@@ -167,19 +172,16 @@ class init_tools(abc.ABC):
             # generate a random seed for reproducibility
             self.seed = np.random.randint((2**32) - 1, dtype='u8')
 
-        _msg = 'Setting random seed to: %s ' % str(self._seed)
-        self.logger.info(_msg)
-        if self._verbose >= 2:
-            print(_msg)
-
         shared_tools.set_random_seed(self._seed)
 
         # always write the seed to file for record and reproducability
-        self.logger.info('Random seed is: %s ' % str(self._seed))
+        _msg = 'Random seed is: %s ' % str(self._seed)
+        self.log_info(_msg, verbosity=0)
 
     def set_constants(self):
 
-        self.logger.info('Setting model constants')
+        _msg = 'Setting model constants'
+        self.log_info(_msg, verbosity=1)
 
         self.g = 9.81   # (gravitation const.)
         sqrt2 = np.sqrt(2)
@@ -225,6 +227,9 @@ class init_tools(abc.ABC):
         `channel_width`, `channel_flow_depth`, and
         `influx_sediment_concentration`.
         """
+        _msg = 'Setting other variables'
+        self.log_info(_msg, verbosity=1)
+
         self.init_Np_water = self._Np_water
         self.init_Np_sed = self._Np_sed
 
@@ -315,7 +320,8 @@ class init_tools(abc.ABC):
         """
         Creates the model domain
         """
-        self.logger.info('Creating model domain')
+        _msg = 'Creating model domain'
+        self.log_info(_msg, verbosity=1)
 
         # ---- empty arrays ----
         self.x, self.y = np.meshgrid(np.arange(0, self.W),
@@ -400,6 +406,9 @@ class init_tools(abc.ABC):
         These are preinitialized because the "boxing" for jitted functions is
         expensive, so we avoid boxing up the constants on each iteration.
         """
+        _msg = 'Initializing sediment routers'
+        self.log_info(_msg, verbosity=1)
+
         # initialize the MudRouter object
         self._mr = sed_tools.MudRouter(self._dt, self._dx, self.Vp_sed,
                                        self.u_max, self.U_dep_mud, self.U_ero_mud,
@@ -420,6 +429,8 @@ class init_tools(abc.ABC):
 
     def init_stratigraphy(self):
         """Creates sparse array to store stratigraphy data."""
+        _msg = 'Initializing stratigraphy storage'
+        self.log_info(_msg, verbosity=1)
         if self.save_strata:
 
             self.strata_counter = 0
@@ -441,24 +452,25 @@ class init_tools(abc.ABC):
         .. warning:: Overwrites an existing netcdf file with the same name.
 
         """
+        _msg = 'Initializing output NetCDF4 file'
+        self.log_info(_msg, verbosity=1)
+
         if (self._save_metadata or
                 self._save_any_grids or
                 self.save_strata):
-
-            _msg = 'Generating netCDF file for output grids'
-            self.logger.info(_msg)
-            if self._verbose >= 2:
-                print(_msg)
 
             directory = self.prefix
             filename = 'pyDeltaRCM_output.nc'
 
             file_path = os.path.join(directory, filename)
+            _msg = 'Target output NetCDF4 file: {file}'.format(
+                file=file_path)
+            self.log_info(_msg, verbosity=2)
+            
             if os.path.exists(file_path):
                 _msg = 'Replacing existing netCDF file'
                 self.logger.warning(_msg)
-                if self._verbose >= 2:
-                    warnings.warn(UserWarning(_msg))
+                warnings.warn(UserWarning(_msg))
                 os.remove(file_path)
 
             self.output_netcdf = Dataset(file_path, 'w',
@@ -555,9 +567,7 @@ class init_tools(abc.ABC):
                                   vardims=('total_time'))
 
             _msg = 'Output netCDF file created'
-            self.logger.info(_msg)
-            if self._verbose >= 2:
-                print(_msg)
+            self.log_info(_msg, verbosity=2)
 
     def init_subsidence(self):
         """Initialize subsidence pattern.
@@ -578,6 +588,9 @@ class init_tools(abc.ABC):
         in the subsiding region is 30 degrees. theta2 defines the right angular
         bounds for the subsiding region in a similar fashion.
         """
+        _msg = 'Initializing subsidence'
+        self.log_info(_msg, verbosity=1)
+
         if self._toggle_subsidence:
 
             R1 = 0.3 * self.L
@@ -597,10 +610,23 @@ class init_tools(abc.ABC):
             self.sigma = self.subsidence_mask * self._sigma_max * self.dt
 
     def load_checkpoint(self):
-        """Load the checkpoint from the .npz file."""
+        """Load the checkpoint from the .npz file.
+
+        Uses the file at the path determined by `self.prefix` and a file named
+        `checkpoint.npz`.
+        """
+        _msg = 'Loading from checkpoint'
+        self.log_info(_msg, verbosity=0)
+
+        _msg = 'Locating checkpoint file'
+        self.log_info(_msg, verbosity=2)
         ckp_file = os.path.join(self.prefix, 'checkpoint.npz')
         checkpoint = np.load(ckp_file, allow_pickle=True)
+        
         # write saved variables back to the model
+        _msg = 'Loading variables into model'
+        self.log_info(_msg, verbosity=2)
+
         self._time = float(checkpoint['time'])
         self.H_SL = float(checkpoint['H_SL'])
         self._time_iter = int(checkpoint['time_iter'])
@@ -618,10 +644,16 @@ class init_tools(abc.ABC):
         self.n_steps = checkpoint['n_steps']
         self.init_eta = checkpoint['init_eta']
         self.strata_counter = checkpoint['strata_counter']
+
         # load and set random state to continue as if run hadn't stopped
+        _msg = 'Loading random state'
+        self.log_info(_msg, verbosity=2)
         rng_state = tuple(checkpoint['rng_state'])
         shared_tools.set_random_state(rng_state)
+
         # reconstruct the strata arrays
+        _msg = 'Loading stratigraphy arrays'
+        self.log_info(_msg, verbosity=2)
         strata_eta_csr = csr_matrix((checkpoint['eta_data'],
                                     checkpoint['eta_indices'],
                                     checkpoint['eta_indptr']),
@@ -633,6 +665,12 @@ class init_tools(abc.ABC):
                                      checkpoint['sand_indptr']),
                                      shape=checkpoint['sand_shape'])
         self.strata_sand_frac = strata_sand_csr.tolil()
+
         # re-open the netCDF4 file
+        _msg = 'Reopening NetCDF4 output file'
+        self.log_info(_msg, verbosity=2)
         file_path = os.path.join(self.prefix, 'pyDeltaRCM_output.nc')
         self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4_CLASSIC')
+
+        _msg = 'Successfully loaded checkpoint'
+        self.log_info(_msg, verbosity=1)
