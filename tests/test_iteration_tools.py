@@ -186,8 +186,8 @@ def test_verbose_printing_1(tmp_path, capsys):
     captd2 = capsys.readouterr()
     log_glob = glob.glob(os.path.join(delta.prefix, '*.log'))
     assert len(log_glob) == 1  # log file exists
-    assert 'Model time: 0.0' in captd1.out  # if verbose >= 1
-    assert 'Model time: 300.0' in captd2.out  # if verbose >= 1
+    assert 'Time: 0.0' in captd1.out  # if verbose >= 1
+    assert 'Time: 300.0' in captd2.out  # if verbose >= 1
     assert 'Creating output directory' not in captd2.out  # goes to logger
 
 
@@ -215,9 +215,8 @@ def test_verbose_printing_2(tmp_path, capsys):
     captd2 = capsys.readouterr()
     assert len(glob.glob(os.path.join(delta.prefix, '*.log'))
                ) == 1  # log file exists
-    assert 'Setting random seed to' in captd1.out   # if verbose >= 2
-    assert 'Model time: 0.0' in captd1.out  # if verbose >= 1
-    assert 'Model time: 300.0' in captd2.out  # if verbose >= 1
+    assert 'Time: 0.0' in captd1.out  # if verbose >= 1
+    assert 'Time: 300.0' in captd2.out  # if verbose >= 1
     assert delta.seed == 10
 
 
@@ -245,12 +244,10 @@ def test_logger_has_initialization_lines(tmp_path):
     with open(_logs[0], 'r') as _logfile:
         _lines = _logfile.readlines()
         _lines = ' '.join(_lines)  # collapse to a single string
-        assert 'Setting model constant' in _lines
-        assert 'Setting random seed to: 10' in _lines
+        assert 'Setting model constants' in _lines
         assert 'Random seed is: 10' in _lines
         assert 'Creating model domain' in _lines
-        assert 'Generating netCDF file for output grids' in _lines
-        assert 'Output netCDF file created' in _lines
+        assert 'Initializing output NetCDF4 file' in _lines
         assert 'Model initialization complete' in _lines
     assert not os.path.isfile(os.path.join(
         tmp_path, 'out_dir', 'discharge_0.0.png'))
@@ -285,10 +282,10 @@ def test_logger_has_timestep_lines(tmp_path):
     with open(_logs[0], 'r') as _logfile:
         _lines = _logfile.readlines()
         _lines = ' '.join(_lines)  # collapse to a single string
-        assert '---- Model time 0.0 ----' in _lines
-        assert '---- Model time 300.0 ----' in _lines
-        assert '---- Model time 600.0 ----' in _lines
-        assert '---- Model time 900.0 ----' not in _lines
+        assert 'Time: 0.0' in _lines
+        assert 'Time: 300.0' in _lines
+        assert 'Time: 600.0' in _lines
+        assert 'Time: 900.0' not in _lines
 
 
 def test_logger_random_seed_always_recorded(tmp_path):

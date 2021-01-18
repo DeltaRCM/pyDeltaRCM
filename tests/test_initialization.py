@@ -663,11 +663,11 @@ def test_py_hlvl_mtrx_1list_timesteps_arg(tmp_path):
     with open(_logs[0], 'r') as _logfile:
         _lines = _logfile.readlines()
         _lines = ' '.join(_lines)  # collapse to a single string
-        assert '---- Model time 0.0 ----' in _lines
-        assert '---- Model time 300.0 ----' in _lines
-        assert '---- Model time 600.0 ----' in _lines
-        assert '---- Model time 900.0 ----' in _lines
-        assert '---- Model time 1200.0 ----' not in _lines
+        assert 'Time: 0.0' in _lines
+        assert 'Time: 300.0' in _lines
+        assert 'Time: 600.0' in _lines
+        assert 'Time: 900.0' in _lines
+        assert 'Time: 1200.0' not in _lines
 
 
 def test_py_hlvl_mtrx_1list_tsteps_cfg(tmp_path):
