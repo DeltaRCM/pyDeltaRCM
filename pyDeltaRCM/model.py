@@ -86,8 +86,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
-            _msg = 'Loading data from checkpoint and reopening netCDF4 file.'
-            self.logger.info(_msg)
+            _msg = 'Loading from checkpoint and reopening netCDF4 file.'
+            self.log_info(_msg)
             self.load_checkpoint()
 
         else:
@@ -95,13 +95,16 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             if not defer_output:
                 self.init_output_file()
 
-        self.logger.info('Model initialization complete')
+        _msg = 'Model initialization complete'
+        self.log_info(_msg)
         self.log_model_time()
 
     def update(self):
-        """Run the model for one full instance
+        """Run the model for one full instance.
 
-        Calls, in sequence:
+        This method handles the input/output from the model, orchestrating the
+        various morphodynamic and basin-scale processes, and incrementing the
+        model time-tracking attributes. This method calls, in sequence:
 
             * the routine to run one timestep (i.e., water surface estimation
               and sediment routing, :meth:`run_one_timestep`)
@@ -110,7 +113,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             * straigraphy updating routine (:meth:`record_stratigraphy`)
 
         If you attempt to override the ``update`` routine, you must implement
-        these operations at a minimum.
+        these operations at a minimum. More likely, you can implement what you
+        need to by just overriding one of the methods called by `update`.
 
         Parameters
         ----------
@@ -119,23 +123,26 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         -------
 
         """
+        # record the state of the model
         if self._save_time_since_last >= self.save_dt:
             self.record_stratigraphy()
             self.output_data()
             self._save_iter += int(1)
             self._save_time_since_last = 0
 
+        # update the model, i.e., the actual model morphodynamics
         self.run_one_timestep()
         self.apply_subsidence()
         self.finalize_timestep()
 
+        # update time-tracking fields
         self._time += self.dt
         self._save_time_since_last += self.dt
         self._save_time_since_checkpoint += self.dt
         self._time_iter += int(1)
-
         self.log_model_time()
 
+        # save a checkpoint if needed
         if self._save_time_since_checkpoint >= self.checkpoint_dt:
             self.output_checkpoint()
             self._save_time_since_checkpoint = 0
@@ -153,7 +160,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         -------
 
         """
-        self.logger.info('Finalize model run')
+        _msg = 'Finalize the model run'
+        self.log_info(_msg)
 
         # get the final timestep recorded, if needed.
         if self._save_time_since_last >= self.save_dt:
@@ -167,12 +175,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         try:
             self.output_netcdf.close()
-            _msg = 'Closed output netcdf file'
-            self.logger.info(_msg)
-            if self.verbose >= 2:
-                print(_msg)
-        except Exception:
-            pass
+            _msg = 'Closed output NetCDF4 file'
+            self.log_info(_msg, verbosity=1)
+        except Exception as e:
+            self.logger.error('Failed to close output NetCDF4 file')
+            self.logger.exception(e)
 
         self._is_finalized = True
 
