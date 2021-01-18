@@ -5,6 +5,8 @@ import abc
 
 from . import shared_tools
 
+import matplotlib.pyplot as plt
+
 # tools for water routing algorithms
 
 
@@ -241,9 +243,23 @@ class water_tools(abc.ABC):
 
         # smooth newly calculated free surface
         Hnew_pad = np.pad(Hnew, 1, 'edge')
+        H_SL_pad = self.H_SL * np.ones_like(Hnew_pad)
         Hsmth = _smooth_free_surface(
             Hnew, Hnew_pad, self.cell_type, self.pad_cell_type,
             self._Nsmooth, self._Csmooth)
+
+        Hsmth_MOD = _smooth_free_surface_MOD(
+            Hnew, Hnew_pad, H_SL_pad, self.cell_type, self.pad_cell_type,
+            self._Nsmooth, self._Csmooth)
+
+
+        print("is same?", np.all(Hsmth == Hsmth_MOD))
+
+        # fig, ax = plt.subplots()
+        # ax.imshow(Hsmth - Hsmth_MOD)
+        # plt.show(block=False)
+
+        # breakpoint()
 
         if self._time_iter > 0:
             self.stage = ((1 - self._omega_sfc) * self.stage +
@@ -637,4 +653,45 @@ def _smooth_free_surface(Hnew, Hnew_pad, cell_type, pad_cell_type,
                                        (1 - Csmooth) * sumH / nbcount)
 
     Hsmth = Htemp
+    return Hsmth
+
+
+@njit
+def _smooth_free_surface_MOD(Hnew, Hnew_pad, H_SL_pad, cell_type, pad_cell_type,
+                         Nsmooth, Csmooth):
+    """Smooth the free surface."""
+    L, W = cell_type.shape
+    Htemp = np.copy(Hnew)
+    for _ in range(Nsmooth):
+
+        Hsmth = np.copy(Htemp)
+        for i in range(L):
+            for j in range(W):
+
+                if cell_type[i, j] > -2:
+                    # locate non-boundary cells
+                    sumH = 0
+                    nbcount = 0
+
+                    ct_ind = pad_cell_type[
+                        i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+                    Hnew_ind = Hnew_pad[
+                        i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+                    H_SL_ind = H_SL_pad[
+                        i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+
+                    Hnew_ind[1, 1] = 0
+                    Hnew_ind = Hnew_ind.ravel()
+                    _log = ct_ind.ravel() == -2
+                    Hnew_ind[_log] = 0
+
+                    sumH = np.sum(Hnew_ind)
+                    nbcount = np.sum(Hnew_ind > H_SL_ind.ravel())
+
+                    if nbcount > 0:
+                        # smooth if are not wall cells
+                        Htemp[i, j] = (Csmooth * Hsmth[i, j] +
+                                       (1 - Csmooth) * sumH / nbcount)
+
+    Hsmth = np.copy(Htemp)
     return Hsmth
