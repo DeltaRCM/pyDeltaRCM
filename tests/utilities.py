@@ -88,6 +88,7 @@ def read_endtime_from_log(log_folder):
         _lines = _logfile.readlines()
         _t = 0
         for i, _line in enumerate(_lines):
-            if '---- Model time' in _line:
-                _t = _line.split(' ')[8]
+            if 'Time: ' in _line:
+                _t = _line.split(' ')[6]
+                _t = _t.strip(' ;')
         return float(_t)
