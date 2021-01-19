@@ -212,14 +212,14 @@ class BasePreprocessor(abc.ABC):
 
             # loop through each job to write out info
             for i in range(jobs):
-                
+
                 # being with the fixed config
                 _ith_config = _fixed_config.copy()
 
                 # find job id and create output file
                 ith_id = 'job_' + str(i).zfill(3)
                 ith_dir = os.path.join(self.jobs_root, ith_id)
-                
+
                 # write the job number into output table
                 self.matrix_table[i, 0] = ith_id
 
@@ -228,7 +228,7 @@ class BasePreprocessor(abc.ABC):
 
                 # loop through each var of this job
                 for j, val in enumerate(_combs[i]):
-                    
+
                     # write info into fixed config dict
                     _ith_config[var_list[j]] = val
 
@@ -243,9 +243,10 @@ class BasePreprocessor(abc.ABC):
             #   this is useful for references by custom
             #   Python preprocessing / postprocessing
             matrix_table_file = os.path.join(self.jobs_root, 'jobs_parameters.txt')
+            self.matrix_table_header = ', '.join(['job_id', *var_list])
             np.savetxt(matrix_table_file, self.matrix_table,
                        fmt='%s', delimiter=',', comments='',
-                       header=', '.join(['job_id', *var_list]))
+                       header=self.matrix_table_header)
 
     def construct_job_file_list(self):
         """Construct the job list.
