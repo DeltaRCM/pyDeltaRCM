@@ -515,8 +515,8 @@ class _SerialJob(_BaseJob):
         # if the model run fails
         except (RuntimeError, ValueError) as e:
             _msg = ','.join(['job:', str(self.i), 'stage:', '1',
-                             'code:', '1', 'msg:', e])
-            self.deltamodel.logger.error(_msg)
+                             'code:', '1', 'msg:', str(e)])
+            self.deltamodel.logger.exception(_msg)
             warnings.warn(UserWarning(_msg))
 
         # if the model run succeeds
@@ -532,7 +532,7 @@ class _SerialJob(_BaseJob):
         # if the model finalization fails
         except (RuntimeError, ValueError) as e:
             _msg = ','.join(['job:', str(self.i), 'stage:', '2',
-                             'code:', '1', 'msg:', e])
+                             'code:', '1', 'msg:', str(e)])
             self.deltamodel.logger.error(_msg)
             warnings.warn(UserWarning(_msg))
 

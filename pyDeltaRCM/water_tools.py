@@ -11,6 +11,8 @@ from . import shared_tools
 class water_tools(abc.ABC):
 
     def init_water_iteration(self):
+        _msg = 'Initializing water iteration'
+        self.log_info(_msg, verbosity=2)
 
         self.qxn[:] = 0
         self.qyn[:] = 0
@@ -34,6 +36,9 @@ class water_tools(abc.ABC):
         All parcels are processed in parallel, taking one step for each loop
         of the ``while`` loop.
         """
+        _msg = 'Beginning stepping of water parcels'
+        self.log_info(_msg, verbosity=2)
+
         _step = 0  # the step number of parcels
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
@@ -97,6 +102,9 @@ class water_tools(abc.ABC):
         computation, the free surface is smoothed by steps in
         :obj:`finalize_free_surface`.
         """
+        _msg = 'Computing free surface from water parcels'
+        self.log_info(_msg, verbosity=2)
+
         self.sfc_visit, self.sfc_sum = _accumulate_free_surface_walks(
             self.free_surf_walk_indices, self.looped, self.cell_type,
             self.uw, self.ux, self.uy, self.depth,
@@ -109,6 +117,9 @@ class water_tools(abc.ABC):
 
         Clean up at end of water iteration
         """
+        _msg = 'Finalizing stepping of water parcels'
+        self.log_info(_msg, verbosity=2)
+
         self.stage[:] = np.maximum(self.stage, self._H_SL)
         self.depth[:] = np.maximum(self.stage - self.eta, 0)
 
@@ -116,27 +127,32 @@ class water_tools(abc.ABC):
         self.update_velocity_field()
 
     def check_size_of_indices_matrix(self, it):
+        """Check if step path matrix needs to be made larger.
+
+        Initial size of self.free_surf_walk_indices is half of self.stepmax
+        because the number of iterations doesn't go beyond
+        that for many timesteps.
+
+        Once it reaches it > self.stepmax/2 once, make the size
+        self.iter for all further timesteps
+        """
         if it >= self.free_surf_walk_indices.shape[1]:
-            """
-            Initial size of self.free_surf_walk_indices is half of self.stepmax
-            because the number of iterations doesn't go beyond
-            that for many timesteps.
-
-            Once it reaches it > self.stepmax/2 once, make the size
-            self.iter for all further timesteps
-            """
             _msg = 'Increasing size of self.free_surf_walk_indices'
-            self.logger.info(_msg)
-            if self._verbose >= 2:
-                print(_msg)
-
+            self.log_info(_msg, verbosity=2)
+            
             indices_blank = np.zeros(
                 (np.int(self._Np_water), np.int(self.stepmax / 4)), dtype=np.int)
 
             self.free_surf_walk_indices = np.hstack((self.free_surf_walk_indices, indices_blank))
 
     def get_water_weight_array(self):
+        """Get step direction weights for each cell.
 
+        This method is called once, before parcels are stepped, because the
+        weights do not change during the stepping of parcels.
+        """
+        _msg = 'Computing water weight array'
+        self.log_info(_msg, verbosity=2)
         self.water_weights = np.zeros(shape=(self.L, self.W, 9))
 
         for i in range(self.L):
@@ -157,6 +173,8 @@ class water_tools(abc.ABC):
 
     def update_Q(self, dist, current_inds, next_index, astep, jstep, istep):
         """Update discharge field values after one set of water parcel steps."""
+        _msg = 'Updating flux fields after single parcel step'
+        self.log_info(_msg, verbosity=2)
 
         self.qxn = _update_dirQfield(
             self.qxn.flat[:], dist, current_inds,
@@ -189,6 +207,9 @@ class water_tools(abc.ABC):
         inds : :obj:`ndarray`
             Unraveled indicies of parcels.
         """
+        _msg = 'Checking stepped parcels against boundary location'
+        self.log_info(_msg, verbosity=2)
+
         # where cell type is "edge" and free_surf_flag is currently valid
         self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == 0)] = 1
 
@@ -208,6 +229,9 @@ class water_tools(abc.ABC):
         method, thresholding is applied to correct for sea level, and a the
         free surface is smoothed by a jitted function (:obj:`_smooth_free_surface`).
         """
+        _msg = 'Smoothing and finalizing free surface'
+        self.log_info(_msg, verbosity=2)
+
         Hnew = self.eta + self.depth
 
         # water surface height not under sea level
@@ -235,6 +259,9 @@ class water_tools(abc.ABC):
         Update the water discharge field after one set of water parcels
         iteration.
         """
+        _msg = 'Updating discharge fields after parcel stepping'
+        self.log_info(_msg, verbosity=2)
+
         dloc = (self.qxn**2 + self.qyn**2)**(0.5)
 
         qwn_div = np.ones((self.L, self.W))
@@ -268,6 +295,8 @@ class water_tools(abc.ABC):
         Update the flow velocity fields after one set of water parcels
         iteration.
         """
+        _msg = 'Updating flow velocity fields after parcel stepping'
+        self.log_info(_msg, verbosity=2)
         mask = (self.depth > self.dry_depth) * (self.qw > 0)
 
         self.uw[mask] = np.minimum(
@@ -286,6 +315,9 @@ class water_tools(abc.ABC):
         of the center cell.
         If it is, flood the dry cell.
         """
+        _msg = 'Computing flooding correction'
+        self.log_info(_msg, verbosity=2)
+
         wet_mask = self.depth > self.dry_depth
         wet_mask_nh = self.get_wet_mask_nh()
         wet_mask_nh_sum = np.sum(wet_mask_nh, axis=0)

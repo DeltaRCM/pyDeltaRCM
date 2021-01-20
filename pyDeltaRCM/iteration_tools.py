@@ -45,13 +45,19 @@ class iteration_tools(abc.ABC):
         if self._is_finalized:
             raise RuntimeError('Cannot update model, model already finalized!')
 
-        # model operations
+        # start the model operations
+        #   water iterations
+        _msg = 'Beginning water iteration'
+        self.log_info(_msg, verbosity=2)
         for iteration in range(self._itermax):
             self.init_water_iteration()
             self.run_water_iteration()
             self.compute_free_surface()
             self.finalize_water_iteration(iteration)
 
+        #  sediment iteration
+        _msg = 'Beginning sediment iteration'
+        self.log_info(_msg, verbosity=2)
         self.sed_route()
 
     def finalize_timestep(self):
@@ -69,6 +75,9 @@ class iteration_tools(abc.ABC):
         -------
 
         """
+        _msg = 'Finalizing timestep'
+        self.log_info(_msg, verbosity=2)
+
         self.flooding_correction()
         self.stage[:] = np.maximum(self.stage, self._H_SL)
         self.depth[:] = np.maximum(self.stage - self.eta, 0)
@@ -78,17 +87,36 @@ class iteration_tools(abc.ABC):
 
         self.H_SL = self._H_SL + self._SLR * self._dt
 
+    def log_info(self, message, verbosity=0):
+        """Log message dependent on verbosity settings.
+
+        Parameters
+        ----------
+        message : :obj:`str`
+            Message string to write to the log as info.
+
+        verbosity : :obj:`int`, optional
+            Verbosity threshold, whether to write the message to the log or
+            not. Default value is `0`, or i.e. to always log.
+        """
+        if self._verbose >= verbosity:
+            self.logger.info(message)
+
     def log_model_time(self):
         """Log the time of the model.
 
         Reports the time to the log file, and depending on verbosity, will
         report it to stdout.
         """
-        self.logger.info('-' * 4 + ' Model time ' +
-                         str(self._time) + ' ' + '-' * 4)
+        _timemsg = 'Time: {time:.{digits}f}; timestep: {timestep:g}'.format(
+            time=self._time, timestep=self._time_iter, digits=1)
+        # self.logger.info('-' * 4 + ' Model time ' +
+                         # str(self._time) + ' ' + '-' * 4)
+        self.logger.info(_timemsg)
         if self._verbose > 0:
-            print('-' * 20)
-            print('Model time: ' + str(self._time))
+            # print('-' * 20)
+            # print('Model time: ' + str(self._time))
+            print(_timemsg)
 
     def expand_stratigraphy(self):
         """Expand stratigraphy array sizes.
@@ -101,9 +129,7 @@ class iteration_tools(abc.ABC):
 
         """
         _msg = 'Expanding stratigraphy arrays'
-        self.logger.info(_msg)
-        if self._verbose >= 2:
-            print(_msg)
+        self.log_info(_msg, verbosity=1)
 
         lil_blank = lil_matrix((self.L * self.W, self.n_steps),
                                dtype=np.float32)
@@ -141,9 +167,7 @@ class iteration_tools(abc.ABC):
                 self.expand_stratigraphy()
 
             _msg = 'Storing stratigraphy data'
-            self.logger.info(_msg)
-            if self._verbose >= 2:
-                print(_msg)
+            self.log_info(_msg, verbosity=2)
 
             # ------------------ sand frac ------------------
             # -1 for cells with deposition volumes < vol_limit
@@ -215,9 +239,7 @@ class iteration_tools(abc.ABC):
             if self._time >= self._start_subsidence:
 
                 _msg = 'Applying subsidence'
-                self.logger.info(_msg)
-                if self._verbose >= 2:
-                    print(_msg)
+                self.log_info(_msg, verbosity=1)
 
                 self.eta[:] = self.eta - self.sigma
 
@@ -240,6 +262,9 @@ class iteration_tools(abc.ABC):
         -------
 
         """
+        _msg = 'Saving data to output file'
+        self.log_info(_msg, verbosity=1)
+
         save_idx = self.save_iter
 
         if (self._save_metadata or self._save_any_grids):
@@ -249,9 +274,7 @@ class iteration_tools(abc.ABC):
         if self._save_any_figs:
 
             _msg = 'Saving figures'
-            self.logger.info(_msg)
-            if self._verbose >= 2:
-                print(_msg)
+            self.log_info(_msg, verbosity=2)
 
             if self._save_eta_figs:
                 _fe = self.make_figure('eta', self._time)
@@ -293,9 +316,7 @@ class iteration_tools(abc.ABC):
         if self._save_any_grids:
 
             _msg = 'Saving grids'
-            self.logger.info(_msg)
-            if self._verbose >= 2:
-                print(_msg)
+            self.log_info(_msg, verbosity=2)
 
             if self._save_eta_grids:
                 self.save_grids('eta', self.eta, save_idx)
@@ -325,6 +346,10 @@ class iteration_tools(abc.ABC):
 
         # ------------------ metadata ------------------
         if self._save_metadata:
+
+            _msg = 'Saving metadata'
+            self.log_info(_msg, verbosity=2)
+
             self.output_netcdf['meta']['H_SL'][save_idx] = self._H_SL
             self.output_netcdf['meta']['f_bedload'][save_idx] = self._f_bedload
             self.output_netcdf['meta']['C0_percent'][save_idx] = self._C0_percent
@@ -332,6 +357,10 @@ class iteration_tools(abc.ABC):
 
         # -------------------- sync --------------------
         if (self._save_metadata or self._save_any_grids):
+
+            _msg = 'Syncing data to output file'
+            self.log_info(_msg, verbosity=2)
+
             self.output_netcdf.sync()
 
     def output_checkpoint(self):
@@ -348,15 +377,17 @@ class iteration_tools(abc.ABC):
 
         """
         if self._save_checkpoint:
+
             _msg = 'Saving checkpoint'
-            self.logger.info(_msg)
+            self.log_info(_msg, verbosity=1)
+
             self.save_the_checkpoint()
 
             if self._checkpoint_dt != self._save_dt:
                 _msg = 'Grid save interval and checkpoint interval are not ' \
                        'identical, this may result in duplicate entries in ' \
                        'the output NetCDF4 after resuming the model run.'
-                self.logger.info(_msg)
+                self.logger.warning(_msg)
 
             self._save_time_since_checkpoint = 0
 
@@ -381,17 +412,13 @@ class iteration_tools(abc.ABC):
         if self._save_strata:
 
             _msg = 'Saving final stratigraphy to netCDF file'
-            self.logger.info(_msg)
-            if self._verbose >= 2:
-                print(_msg)
+            self.log_info(_msg, verbosity=0)
 
             if not self.strata_counter > 0:
                 _msg = 'Model has no computed stratigraphy. This is likely ' \
                     'because `delta.time < delta.save_dt`, and the model ' \
                     'has not computed stratigraphy.'
                 self.logger.error(_msg)
-                if self._verbose > 0:
-                    print(_msg)
                 raise RuntimeError(_msg)
 
             self.strata_eta = self.strata_eta[:, :self.strata_counter]
@@ -433,9 +460,7 @@ class iteration_tools(abc.ABC):
                 self.output_netcdf.variables['strata_depth'][i, :, :] = sz
 
             _msg = 'Stratigraphy data saved.'
-            self.logger.info(_msg)
-            if self._verbose >= 2:
-                print(_msg)
+            self.log_info(_msg, verbosity=0)
 
     def make_figure(self, var, timestep):
         """Create a figure.
@@ -525,10 +550,13 @@ class iteration_tools(abc.ABC):
         -------
 
         """
+        _msg = ' '.join(['saving', str(var_name), 'grid'])
+        self.log_info(_msg, verbosity=2)
         try:
             self.output_netcdf.variables[var_name][ts, :, :] = var
         except:
-            self.logger.error('Cannot save grid to netCDF file.')
+            _msg = 'Failed to save {var_name} grid to netCDF file.'.format(var_name=var_name)
+            self.logger.error(_msg)
             warnings.warn(UserWarning('Cannot save grid to netCDF file.'))
 
     def save_the_checkpoint(self):
