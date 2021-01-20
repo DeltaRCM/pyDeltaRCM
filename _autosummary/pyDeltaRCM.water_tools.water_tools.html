@@ -70,8 +70,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.check_for_boundary" title="pyDeltaRCM.water_tools.water_tools.check_for_boundary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_for_boundary</span></code></a>(inds)</p></td>
 <td><p>Check whether parcels have reached the boundary.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_size_of_indices_matrix</span></code>(it)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.check_size_of_indices_matrix" title="pyDeltaRCM.water_tools.water_tools.check_size_of_indices_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_size_of_indices_matrix</span></code></a>(it)</p></td>
+<td><p>Check if step path matrix needs to be made larger.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="pyDeltaRCM.water_tools.water_tools.compute_free_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_free_surface</span></code></a>()</p></td>
 <td><p>Calculate free surface after routing all water parcels.</p></td>
@@ -85,8 +85,8 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.flooding_correction" title="pyDeltaRCM.water_tools.water_tools.flooding_correction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flooding_correction</span></code></a>()</p></td>
 <td><p>Flood dry cells along the shore if necessary.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_water_weight_array</span></code>()</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.get_water_weight_array" title="pyDeltaRCM.water_tools.water_tools.get_water_weight_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_water_weight_array</span></code></a>()</p></td>
+<td><p>Get step direction weights for each cell.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.get_wet_mask_nh" title="pyDeltaRCM.water_tools.water_tools.get_wet_mask_nh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_wet_mask_nh</span></code></a>()</p></td>
 <td><p>Get wet mask.</p></td>
@@ -131,6 +131,17 @@ have, then update the information in
 </dd></dl>
 
 <dl class="py method">
+<dt id="pyDeltaRCM.water_tools.water_tools.check_size_of_indices_matrix">
+<code class="sig-name descname">check_size_of_indices_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">it</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.check_size_of_indices_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if step path matrix needs to be made larger.</p>
+<p>Initial size of self.free_surf_walk_indices is half of self.stepmax
+because the number of iterations doesn’t go beyond
+that for many timesteps.</p>
+<p>Once it reaches it &gt; self.stepmax/2 once, make the size
+self.iter for all further timesteps</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="pyDeltaRCM.water_tools.water_tools.compute_free_surface">
 <code class="sig-name descname">compute_free_surface</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate free surface after routing all water parcels.</p>
@@ -168,6 +179,14 @@ free surface is smoothed by a jitted function (<a class="reference internal" hre
 neighbors, check that their stage is not higher than the bed elevation
 of the center cell.
 If it is, flood the dry cell.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.water_tools.water_tools.get_water_weight_array">
+<code class="sig-name descname">get_water_weight_array</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.get_water_weight_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get step direction weights for each cell.</p>
+<p>This method is called once, before parcels are stepped, because the
+weights do not change during the stepping of parcels.</p>
 </dd></dl>
 
 <dl class="py method">

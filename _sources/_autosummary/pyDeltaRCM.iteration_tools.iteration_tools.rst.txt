@@ -17,6 +17,7 @@
       ~iteration_tools.apply_subsidence
       ~iteration_tools.expand_stratigraphy
       ~iteration_tools.finalize_timestep
+      ~iteration_tools.log_info
       ~iteration_tools.log_model_time
       ~iteration_tools.make_figure
       ~iteration_tools.output_checkpoint

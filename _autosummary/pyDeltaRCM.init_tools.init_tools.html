@@ -82,8 +82,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.init_output_file" title="pyDeltaRCM.init_tools.init_tools.init_output_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_output_file</span></code></a>()</p></td>
 <td><p>Creates a netCDF file to store output grids.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_output_infrastructure</span></code>()</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.init_output_infrastructure" title="pyDeltaRCM.init_tools.init_tools.init_output_infrastructure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_output_infrastructure</span></code></a>()</p></td>
+<td><p>Initialize the output infrastructure (i.e., folder).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.init_sediment_routers" title="pyDeltaRCM.init_tools.init_tools.init_sediment_routers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_sediment_routers</span></code></a>()</p></td>
 <td><p>Initialize the sediment router object here.</p></td>
@@ -152,6 +152,14 @@ setting.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="pyDeltaRCM.init_tools.init_tools.init_output_infrastructure">
+<code class="sig-name descname">init_output_infrastructure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools.init_output_infrastructure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the output infrastructure (i.e., folder).</p>
+<p>This method is the first called in the initialization of the
+<cite>DeltaModel</cite>, after the configuration variables have been imported.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="pyDeltaRCM.init_tools.init_tools.init_sediment_routers">
 <code class="sig-name descname">init_sediment_routers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools.init_sediment_routers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the sediment router object here.</p>
@@ -188,6 +196,8 @@ bounds for the subsiding region in a similar fashion.</p>
 <dt id="pyDeltaRCM.init_tools.init_tools.load_checkpoint">
 <code class="sig-name descname">load_checkpoint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools.load_checkpoint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the checkpoint from the .npz file.</p>
+<p>Uses the file at the path determined by <cite>self.prefix</cite> and a file named
+<cite>checkpoint.npz</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
