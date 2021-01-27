@@ -86,14 +86,16 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
-            _msg = 'Loading from checkpoint and reopening netCDF4 file.'
+            _msg = 'Loading from checkpoint.'
             self.log_info(_msg)
             self.load_checkpoint()
 
         else:
             self.init_stratigraphy()
-            if not defer_output:
-                self.init_output_file()
+
+        # always re-init output file, will clobber when checkpointing
+        if not defer_output:
+            self.init_output_file()
 
         _msg = 'Model initialization complete'
         self.log_info(_msg)
