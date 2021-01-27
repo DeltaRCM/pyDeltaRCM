@@ -210,14 +210,12 @@ class water_tools(abc.ABC):
         _msg = 'Checking stepped parcels against boundary location'
         self.log_info(_msg, verbosity=2)
 
-        # where cell type is "edge" and free_surf_flag is currently valid
+        # where cell type is "edge" and free_surf_flag is currently valid (value: 0)
         self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == 0)] = 1
 
-        # where cell type is "edge" and free_surf_flag is currently valid
+        # where cell type is "edge" and free_surf_flag is currently looped (value: -1)
         self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == -1)] = 2
 
-        # below is not needed, because of update at end of `iteration`. I'm
-        #   leaving it here for now. If removed, can also remove the return?
         inds[self.free_surf_flag == 2] = 0
         return inds
 
