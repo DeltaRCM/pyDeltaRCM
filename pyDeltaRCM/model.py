@@ -568,6 +568,65 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._start_subsidence = start_subsidence
 
     @property
+    def bedrock(self):
+        """
+        Define whether or not bedrock exists.
+
+        Default is False, meaning that there is no bedrock (or basement) to the
+        basin and erosion can continue unbounded. If set to True, then the
+        value of :attr:`bedrock_depth` defines the basement (or bedrock) depth
+        below which no erosion will be allowed to occur.
+        """
+        return self._bedrock
+
+    @bedrock.setter
+    def bedrock(self, bedrock):
+        self._bedrock = bedrock
+
+    @property
+    def bedrock_depth(self):
+        """
+        Set depth of bedrock.
+
+        If default value of `None` is used, then the bedrock depth will be set
+        as 2x the characteristic water depth, :attr:`h0`. If the value assigned
+        to the bedrock depth is above the initial basement floor of the basin,
+        then an error is raised.
+        """
+        return self._bedrock_depth
+
+    @bedrock_depth.setter
+    def bedrock_depth(self, bedrock_depth):
+        if bedrock_depth is None:
+            self._bedrock_depth = float(-1 * 2 * self._h0)
+        elif bedrock_depth < self._h0:
+            self._bedrock_depth = float(bedrock_depth)
+        else:
+            raise ValueError('Invalid bedrock depth provided, must be' +
+                             ' less than or equal to the initial basement' +
+                             ' the basin')
+
+    @property
+    def lithification(self):
+        """
+        Allow bedrock depth to vary with SLR.
+
+        If set to True, then :attr:`bedrock_depth` is updated as sea level
+        rises such that bedrock is updated to remain at a depth of
+        :attr:`H_SL` - :attr:`bedrock_depth` as
+        opposed to being the static value of :attr:`bedrock_depth` relative
+        to the initial sea level.
+        """
+        return self._lithification
+
+    @lithification.setter
+    def lithification(self, lithification):
+        self._lithification = lithification
+        # force bedrock to be turned on if lithification is on
+        if lithification is True:
+            self.bedrock = True
+
+    @property
     def save_eta_figs(self):
         """
         save_eta_figs controls whether or not figures of topography are saved.

@@ -62,6 +62,12 @@ Model Domain Parameters
 
 :attr:`pyDeltaRCM.model.DeltaModel.start_subsidence`
 
+:attr:`pyDeltaRCM.model.DeltaModel.bedrock`
+
+:attr:`pyDeltaRCM.model.DeltaModel.bedrock_depth`
+
+:attr:`pyDeltaRCM.model.DeltaModel.lithification`
+
 
 Output Settings
 ===============

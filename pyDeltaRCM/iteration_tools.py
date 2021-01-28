@@ -66,7 +66,8 @@ class iteration_tools(abc.ABC):
         Clean up after sediment routing. This includes a correction for
         flooded cells that are not "wet" (via :meth:`flooding_correction`).
 
-        Update sea level if baselevel changes between timesteps.
+        Update sea level if baselevel changes between timesteps, also update
+        the bedrock depth if lithification is turned on.
 
         Parameters
         ----------
@@ -86,6 +87,8 @@ class iteration_tools(abc.ABC):
         self.depth[0, self.inlet] = self._h0
 
         self.H_SL = self._H_SL + self._SLR * self._dt
+        if (self._lithification is True) and (self._bedrock is True):
+            self._bedrock_depth = self._bedrock_depth + self._SLR * self._dt
 
     def log_info(self, message, verbosity=0):
         """Log message dependent on verbosity settings.

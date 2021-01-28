@@ -70,6 +70,15 @@ sigma_max:
 start_subsidence:
   type: ['float', 'int']
   default: 216000
+bedrock:
+  type: 'bool'
+  default: False
+bedrock_depth:
+  type: ['float', 'int', 'None']
+  default: null
+lithification:
+  type: 'bool'
+  default: False
 save_eta_figs:
   type: 'bool'
   default: False
