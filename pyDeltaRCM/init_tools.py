@@ -14,7 +14,6 @@ import time as time_lib
 import yaml
 import re
 import abc
-import copy
 
 from . import shared_tools
 from . import sed_tools
