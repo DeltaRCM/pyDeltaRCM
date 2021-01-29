@@ -718,5 +718,7 @@ class init_tools(abc.ABC):
         # set object attribute for model
         self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4')
 
-        # delete old netCDF4 file
+        # open-close then delete old netCDF4 file
+        _tfile = Dataset(_tmp_name, 'r', format='NETCDF4')
+        _tfile.close()
         os.remove(_tmp_name)
