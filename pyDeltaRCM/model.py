@@ -92,10 +92,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         else:
             self.init_stratigraphy()
-
-        # always re-init output file, will clobber when checkpointing
-        if not defer_output:
-            self.init_output_file()
+            if not defer_output:
+                self.init_output_file()
 
         _msg = 'Model initialization complete'
         self.log_info(_msg)
