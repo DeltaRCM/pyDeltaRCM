@@ -570,40 +570,6 @@ class init_tools(abc.ABC):
             _msg = 'Output netCDF file created'
             self.log_info(_msg, verbosity=2)
 
-            # insert checkpoint values if provided
-            if self.resume_checkpoint:
-
-                # copying values to put back later
-                current_time = copy.copy(self._time)
-                figure_config = copy.copy(self._save_any_figs)
-                curr_save_since_last = copy.copy(self._save_time_since_last)
-                curr_save_iter = copy.copy(self._save_iter)
-
-                # setting false values to re-create netCDF file
-                self._time = 0  # pretend it is time 0
-                self._save_any_figs = False  # disable figure saving for now
-                self._save_time_since_last = 0
-                self._save_iter = 0
-
-                while self._time <= current_time:
-                    if self._save_time_since_last >= self.save_dt:
-                        self.record_stratigraphy()
-                        self.output_data()
-                        self._save_iter += int(1)
-                        self._save_time_since_last = 0
-                    # update time
-                    self._time += self.dt
-                    self._save_time_since_last += self.dt
-
-                # reset model parameters from checkpoint
-                self._time = current_time
-                self._save_any_figs = figure_config
-                self._save_time_since_last = curr_save_since_last
-                self._save_iter = curr_save_iter
-
-                _msg = 'Inserted checkpoint values into netCDF file.'
-                self.log_info(_msg, verbosity=2)
-
 
     def init_subsidence(self):
         """Initialize subsidence pattern.
@@ -702,11 +668,56 @@ class init_tools(abc.ABC):
                                      shape=checkpoint['sand_shape'])
         self.strata_sand_frac = strata_sand_csr.tolil()
 
-        # re-open the netCDF4 file
-        _msg = 'Reopening NetCDF4 output file'
+        # rename the old netCDF4 file
+        _msg = 'Renaming old NetCDF4 output file'
         self.log_info(_msg, verbosity=2)
         file_path = os.path.join(self.prefix, 'pyDeltaRCM_output.nc')
-        self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4_CLASSIC')
+        _tmp_name = os.path.join(self.prefix, 'old_pyDeltaRCM_output.nc')
+        os.rename(file_path, _tmp_name)
 
-        _msg = 'Successfully loaded checkpoint'
+        # write dims / attributes / variables to new netCDF file
+        # except the things defined by output_strata()
+        _msg = 'Creating NetCDF4 output file'
+        self.log_info(_msg, verbosity=2)
+
+        # list of things to not copy over
+        dimtoignore = ['total_strata_age']
+        vartoignore = ['strata_age', 'strata_sand_frac', 'strata_depth']
+
+        # copy data from old netCDF4 into new one
+        with Dataset(_tmp_name) as src, Dataset(file_path, 'w',
+                                                format='NETCDF4') as dst:
+            # copy attributes
+            for name in src.ncattrs():
+                dst.setncattr(name, src.getncattr(name))
+            # copy dimensions
+            for name, dimension in src.dimensions.items():
+                if name not in dimtoignore:
+                    if dimension.isunlimited():
+                        dst.createDimension(name, None)
+                    else:
+                        dst.createDimension(name, len(dimension))
+            # copy groups
+            for name in src.groups.keys():
+                dst.createGroup(name)
+                for vname, variable in src.groups[name].variables.items():
+                    _mname = name + '/' + vname
+                    dst.createVariable(_mname, variable.datatype,
+                                       variable.dimensions)
+                    dst.groups[name].variables[vname][:] = \
+                        src.groups[name].variables[vname][:]
+            # copy variables except ones to exclude
+            for name, variable in src.variables.items():
+                if name not in vartoignore:
+                    dst.createVariable(name, variable.datatype,
+                                       variable.dimensions)
+                    dst.variables[name][:] = src.variables[name][:]
+
+        _msg = 'Successfully loaded checkpoint and created new NetCDF file.'
         self.log_info(_msg, verbosity=1)
+
+        # set object attribute for model
+        self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4')
+
+        # delete old netCDF4 file
+        os.remove(_tmp_name)
