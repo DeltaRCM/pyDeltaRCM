@@ -425,6 +425,8 @@ def test_checkpoint_nc(tmp_path):
         baseModel.update()
     baseModel.finalize()
 
+    assert baseModel.time == 1200.0  # dt=300 * 4 = 1200
+
     # try defining a new model but plan to load checkpoint from baseModel
     file_name = 'base_run.yaml'
     base_p, base_f = utilities.create_temporary_file(tmp_path, file_name)
@@ -450,6 +452,8 @@ def test_checkpoint_nc(tmp_path):
     base_f.close()
     resumeModel = DeltaModel(input_file=base_p)
 
+    assert resumeModel.time == baseModel.time  # should be same when resumed
+
     # advance it six steps
     for _ in range(0, 6):
         resumeModel.update()
@@ -471,8 +475,17 @@ def test_checkpoint_nc(tmp_path):
     assert 'discharge' in out_vars
     # check attributes of variables
     assert output['time'][0].tolist() == 0.0
-    assert output['time'][-1].tolist() == 2700.0
+    assert output['time'][-1].tolist() == 3000.0
     assert output['eta'][0].shape == (10, 10)
     assert output['eta'][-1].shape == (10, 10)
     assert output['depth'][-1].shape == (10, 10)
     assert output['discharge'][-1].shape == (10, 10)
+    # check time
+    assert baseModel.dt == 300.0  # base model timestep
+    assert baseModel.time == 1200.0  # ran 4 steps, so 300*4=1200
+    assert resumeModel.dt == 300.0  # resume model timestep size
+    assert resumeModel.time == 3000.0  # ran 6 steps on top of base model
+    # should be 1200 + (6*300) = 1200 + 1800 = 3000
+
+    # checkpoint interval aligns w/ timestep dt so these should match
+    assert output['time'][-1].tolist() == resumeModel.time
