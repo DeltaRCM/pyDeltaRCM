@@ -696,7 +696,7 @@ class init_tools(abc.ABC):
                         dst.createDimension(name, None)
                     else:
                         dst.createDimension(name, len(dimension))
-            # copy groups
+            # copy groups (meta)
             for name in src.groups.keys():
                 dst.createGroup(name)
                 for vname, variable in src.groups[name].variables.items():
@@ -718,7 +718,5 @@ class init_tools(abc.ABC):
         # set object attribute for model
         self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4')
 
-        # open-close then delete old netCDF4 file
-        _tfile = Dataset(_tmp_name, 'r', format='NETCDF4')
-        _tfile.close()
+        # delete old netCDF4 file
         os.remove(_tmp_name)
