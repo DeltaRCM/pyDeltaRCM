@@ -1155,7 +1155,10 @@ def test_py_hlvl_parallel_float(tmp_path):
     #       *exactly* two jobs were run in parallel.
 
 
+@pytest.mark.skipif(platform.system() != 'Linux', reason='Parallel support \
+                    only on Linux OS.')
 def test_py_hlvl_parallel_checkpoint(tmp_path):
+    """Test checkpointing in parallel."""
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
     utilities.write_parameter_to_file(f, 'verbose', 2)
@@ -1179,20 +1182,15 @@ def test_py_hlvl_parallel_checkpoint(tmp_path):
     assert len(pp.file_list) == 2
     assert pp._is_completed is False
     # assertions after running jobs
-    if platform.system() == 'Linux':
-        pp.run_jobs()
-        assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
-        assert pp._is_completed is True
-        exp_path_nc0 = os.path.join(
-            tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-        exp_path_nc1 = os.path.join(
-            tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-        assert os.path.isfile(exp_path_nc0)
-        assert os.path.isfile(exp_path_nc1)
-    else:
-        with pytest.raises(NotImplementedError,
-                           match=r'Parallel simulations *.'):
-            pp.run_jobs()
+    pp.run_jobs()
+    assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+    assert pp._is_completed is True
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc1)
     # check that checkpoint files exist
     exp_path_ckpt0 = os.path.join(
         tmp_path / 'test', 'job_000', 'checkpoint.npz')
@@ -1232,20 +1230,15 @@ def test_py_hlvl_parallel_checkpoint(tmp_path):
     assert len(pp.file_list) == 2
     assert pp._is_completed is False
     # assertions after running jobs
-    if platform.system() == 'Linux':
-        pp.run_jobs()
-        assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
-        assert pp._is_completed is True
-        exp_path_nc0 = os.path.join(
-            tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-        exp_path_nc1 = os.path.join(
-            tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-        assert os.path.isfile(exp_path_nc0)
-        assert os.path.isfile(exp_path_nc1)
-    else:
-        with pytest.raises(NotImplementedError,
-                           match=r'Parallel simulations *.'):
-            pp.run_jobs()
+    pp.run_jobs()
+    assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+    assert pp._is_completed is True
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc1)
     # check that checkpoint files still exist
     exp_path_ckpt0 = os.path.join(
         tmp_path / 'test', 'job_000', 'checkpoint.npz')
