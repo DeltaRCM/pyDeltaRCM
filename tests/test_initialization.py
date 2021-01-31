@@ -1395,3 +1395,34 @@ class TestScaleRelativeSeaLeveLRiseRate():
     def test_scale_If_0p1(self):
         scaled = preprocessor.scale_relative_sea_level_rise_rate(5, If=0.1)
         assert scaled == 5 / 1000 / 365.25 / 86400 * 10
+
+
+def test_load_nocheckpoint(tmp_path):
+    """Try loading a checkpoint file when one doesn't exist."""
+    # define a yaml
+    file_name = 'trial_run.yaml'
+    base_p, base_f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(base_f, 'Length', 10.0)
+    utilities.write_parameter_to_file(base_f, 'Width', 10.0)
+    utilities.write_parameter_to_file(base_f, 'seed', 0)
+    utilities.write_parameter_to_file(base_f, 'dx', 1.0)
+    utilities.write_parameter_to_file(base_f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(base_f, 'Np_water', 10)
+    utilities.write_parameter_to_file(base_f, 'u0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(base_f, 'h0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'SLR', 0.001)
+    utilities.write_parameter_to_file(base_f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(base_f, 'save_dt', 50)
+    utilities.write_parameter_to_file(base_f, 'save_strata', True)
+    utilities.write_parameter_to_file(base_f, 'save_eta_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_depth_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_discharge_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_checkpoint', True)
+    utilities.write_parameter_to_file(base_f, 'resume_checkpoint', True)
+    utilities.write_parameter_to_file(base_f, 'out_dir', tmp_path / 'test')
+    base_f.close()
+
+    # try loading the model yaml despite no checkpoint existing
+    with pytest.raises(FileNotFoundError):
+        _ = DeltaModel(input_file=base_p)
