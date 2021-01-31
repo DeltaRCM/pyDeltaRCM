@@ -86,8 +86,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
-            if defer_output:
-                self.load_checkpoint()
+            self.load_checkpoint()
 
         else:
             self.init_stratigraphy()
