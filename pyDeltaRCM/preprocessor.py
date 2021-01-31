@@ -596,7 +596,7 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
             # try to initialize and run the model
             try:
                 # initialize the output files (defer_output=True above)
-                # unless resuming from checkpoint, then output file exists
+                # unless resuming from checkpoint, then load the checkpoint
                 if self.deltamodel.resume_checkpoint:
                     self.deltamodel.load_checkpoint()
                 else:
