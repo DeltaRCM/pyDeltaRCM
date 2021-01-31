@@ -120,7 +120,15 @@ class BasePreprocessor(abc.ABC):
             print('Writing YAML file for job ' + str(int(i)))
 
         d = Path(ith_dir)
-        d.mkdir()
+        try:
+            d.mkdir()
+        except FileExistsError:
+            if 'resume_checkpoint' in self.yaml_dict and \
+              self.yaml_dict['resume_checkpoint'] is True:
+                pass
+            else:
+                raise FileExistsError(
+                    'Job output directory (%s) already exists.' % str(p))
         ith_p = d / (str(ith_id) + '.yml')
         write_yaml_config_to_file(ith_config, ith_p)
         return ith_p
@@ -202,8 +210,12 @@ class BasePreprocessor(abc.ABC):
             try:
                 p.mkdir()
             except FileExistsError:
-                raise FileExistsError(
-                    'Job output directory (%s) already exists.' % str(p))
+                if 'resume_checkpoint' in self.yaml_dict and \
+                  self.yaml_dict['resume_checkpoint'] is True:
+                    pass
+                else:
+                    raise FileExistsError(
+                        'Job output directory (%s) already exists.' % str(p))
 
             # preallocate the matrix expansion job yamls and output table
             self.file_list = []  # create job yamls list
@@ -584,7 +596,9 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
             # try to initialize and run the model
             try:
                 # initialize the output files (defer_output=True above)
-                self.deltamodel.init_output_file()
+                # unless resuming from checkpoint, then output file exists
+                if self.deltamodel.resume_checkpoint is False:
+                    self.deltamodel.init_output_file()
 
                 # run the simualtion
                 while self.deltamodel._time < self._job_end_time:
