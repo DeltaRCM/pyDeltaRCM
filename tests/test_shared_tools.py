@@ -45,39 +45,89 @@ def test_get_steps():
     assert j == pytest.approx(j_exp)
     assert d == pytest.approx(d_exp)
 
+class TestRandomPick:
 
-def test_random_pick():
-    """
-    Test for function shared_tools.random_pick
-    """
-    # define probs array of zeros with a single 1 value
-    probs = np.zeros((8,))
-    probs[0] = 1
-    # should return first index
-    assert shared_tools.random_pick(probs) == 0
+    def test_random_pick(self):
+        """
+        Test for function shared_tools.random_pick
+        """
+        # define probs array of zeros with a single 1 value
+        probs = np.zeros((9,))
+        probs[0] = 1
+        # should return first index
+        assert shared_tools.random_pick(probs) == 0
 
+    def test_random_pick_diff_fixed(self):
+        """
+        Test for function shared_tools.random_pick
+        """
+        # define probs array of zeros with a single 1 value
+        probs = np.zeros((9,))
+        probs[2] = 1
+        # should return third index
+        assert shared_tools.random_pick(probs) == 2
 
-def test_random_pick_anybut_first(test_DeltaModel):
-    """
-    Test for function shared_tools.random_pick
-    """
-    shared_tools.set_random_seed(test_DeltaModel.seed)
-    probs = (1 / 7) * np.ones((3, 3), dtype=np.float64)
-    probs[0, 0] = 0
-    probs[1, 1] = 0
-    # should never return first index
-    _rets = np.zeros((100,))
-    for i in range(100):
-        _rets[i] = shared_tools.random_pick(probs.flatten())
-    assert np.all(_rets != 0)
-    assert np.all(_rets != 4)  # THIS LINE NEEDS TO PASS!!
-    assert np.sum(_rets == 1) > 0
-    assert np.sum(_rets == 2) > 0
-    assert np.sum(_rets == 3) > 0
-    assert np.sum(_rets == 5) > 0
-    assert np.sum(_rets == 6) > 0
-    assert np.sum(_rets == 7) > 0
-    assert np.sum(_rets == 8) > 0
+    def test_random_pick_not_zeroed(self):
+        """
+        Test for function shared_tools.random_pick
+        """
+        # define probs array of zeros with a single 1 value
+        probs = np.zeros((9,))
+        probs[:] = 1/6
+        probs[4] = 0
+        probs[5] = 0
+        probs[8] = 0
+        assert np.sum(probs) == 1
+        # should return first index
+        _rets = np.zeros((100,))
+        for i in range(100):
+            _rets[i] = shared_tools.random_pick(probs)
+        assert np.all(_rets != 4)
+        assert np.all(_rets != 5)
+        assert np.all(_rets != 8)
+
+    def test_random_pick_distribution(self):
+        """
+        Test for function shared_tools.random_pick
+        """
+        # define probs array of zeros with a single 1 value
+        probs = np.array([1/6, 1/3, 0,
+                          1/12, 1/12, 1/6,
+                          0, 0, 1/6])
+        assert np.sum(probs) == 1
+        _rets = np.zeros((10000,))
+        for i in range(10000):
+            _rets[i] = shared_tools.random_pick(probs)
+        _bins = np.arange(-0.5, 9, step=1.0)
+        _hist, _ = np.histogram(_rets, bins=_bins)
+        _binedge = _bins[:-1]
+        _histnorm = _hist / np.sum(_hist)
+
+        assert np.all(_histnorm == pytest.approx(probs, rel=0.10))
+
+    def test_random_pick_anybut_first(self, test_DeltaModel):
+        """
+        Test for function shared_tools.random_pick
+        """
+        shared_tools.set_random_seed(test_DeltaModel.seed)
+        probs = (1 / 7) * np.ones((3, 3), dtype=np.float64)
+        probs[0, 0] = 0
+        probs[1, 1] = 0
+        probs_flat = probs.flatten()
+        assert np.sum(probs_flat) == 1
+        # should never return first index
+        _rets = np.zeros((100,))
+        for i in range(100):
+            _rets[i] = shared_tools.random_pick(probs_flat)
+        assert np.all(_rets != 0)
+        assert np.all(_rets != 4)  # THIS LINE NEEDS TO PASS!!
+        assert np.sum(_rets == 1) > 0
+        assert np.sum(_rets == 2) > 0
+        assert np.sum(_rets == 3) > 0
+        assert np.sum(_rets == 5) > 0
+        assert np.sum(_rets == 6) > 0
+        assert np.sum(_rets == 7) > 0
+        assert np.sum(_rets == 8) > 0
 
 
 def test_custom_unravel_square():
