@@ -1334,7 +1334,8 @@ def test_subsidence_bounds(tmp_path):
     utilities.write_parameter_to_file(f, 'theta1', -np.pi / 2)
     utilities.write_parameter_to_file(f, 'theta1', 0)
     f.close()
-    delta = DeltaModel(input_file=p)
+    with pytest.warns(UserWarning):
+        delta = DeltaModel(input_file=p)
     # assert subsidence mask is binary
     assert np.all(delta.subsidence_mask == delta.subsidence_mask.astype(bool))
     # check specific regions
