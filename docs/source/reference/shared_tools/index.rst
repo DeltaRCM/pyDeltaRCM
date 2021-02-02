@@ -22,7 +22,6 @@ Shared functions
 .. autofunction:: custom_unravel
 .. autofunction:: custom_ravel
 .. autofunction:: get_weight_sfc_int
-.. autofunction:: get_weight_at_cell
 .. autofunction:: _get_version
 
 

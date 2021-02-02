@@ -25,3 +25,8 @@ Router classes
     SandRouter
     MudRouter
     BaseRouter
+
+
+Additionally, the sediment routing function:
+
+.. autofunction:: _get_weight_at_cell_sediment
