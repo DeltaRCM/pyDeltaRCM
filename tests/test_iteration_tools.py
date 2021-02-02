@@ -34,7 +34,8 @@ def test_subsidence_in_update(tmp_path):
                                   'sigma_max': 1e-8,
                                   'start_subsidence': 0,
                                   'seed': 0})
-    _delta = DeltaModel(input_file=p)
+    with pytest.warns(UserWarning):
+        _delta = DeltaModel(input_file=p)
     assert _delta.dt == 20000
     assert _delta.sigma_max == 1e-8
     assert _delta.sigma[17, 5] == 0.0  # outside the sigma mask
@@ -52,7 +53,8 @@ def test_subsidence_in_update_delayed_start(tmp_path):
                                   'sigma_max': 1e-8,
                                   'start_subsidence': 20000,
                                   'seed': 0})
-    _delta = DeltaModel(input_file=p)
+    with pytest.warns(UserWarning):
+        _delta = DeltaModel(input_file=p)
     assert _delta.dt == 20000
     assert _delta.sigma_max == 1e-8
     assert _delta.sigma[17, 5] == 0.0  # outside the sigma mask
@@ -73,7 +75,8 @@ def test_subsidence_changed_with_timestep(tmp_path):
     p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                  {'toggle_subsidence': True,
                                   'sigma_max': 1e-8})
-    _delta = DeltaModel(input_file=p)
+    with pytest.warns(UserWarning):
+        _delta = DeltaModel(input_file=p)
     assert _delta.dt == 20000
     assert _delta.sigma[17, 6] == 0.0002
     _delta.time_step = 86400
