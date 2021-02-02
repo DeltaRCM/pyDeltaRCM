@@ -34,8 +34,8 @@ def set_random_state(_state_tuple):
 
 
 @njit
-def get_random_uniform(N):
-    return np.random.uniform(0, 1)
+def get_random_uniform(limit):
+    return np.random.uniform(0, limit)
 
 
 @njit
@@ -48,14 +48,14 @@ def get_start_indices(inlet, inlet_weights, num_starts):
     return inlet.take(idxs)
 
 
+# @njit('(int64, int64, int64, int64)(int64[:], int64[:], int64[:])')
 @njit
 def get_steps(new_cells, iwalk, jwalk):
     """Find the values giving the next step."""
     istep = iwalk[new_cells]
     jstep = jwalk[new_cells]
     dist = np.sqrt(istep * istep + jstep * jstep)
-
-    astep = dist != 0
+    astep = (dist != 0)
 
     return dist, istep, jstep, astep
 
@@ -66,11 +66,12 @@ def random_pick(prob):
 
     Randomly pick a number weighted by array probabilities (len 9)
     Return the index of the selected weight in array probs
-    Takes a numpy array that is the precalculated cumulative probability
+    Takes a numpy array that is the precalculated probability
     around the cell flattened to 1D.
     """
     arr = np.arange(len(prob))
-    return arr[np.searchsorted(np.cumsum(prob), get_random_uniform(1))]
+    cumprob = np.cumsum(prob)
+    return arr[np.searchsorted(cumprob, get_random_uniform(cumprob[-1]))]
 
 
 @njit
@@ -94,6 +95,32 @@ def custom_ravel(tup, shape):
 
 
 @njit
+def custom_pad(arr):
+    """pad as np.pad(arr, 1, 'edge')
+    """
+    old_shape = arr.shape
+    new_shape = (old_shape[0]+2, old_shape[1]+2)
+    pad = np.zeros(new_shape, dtype=arr.dtype)
+
+    # center
+    pad[1:-1, 1:-1] = arr
+
+    # edges
+    pad[1:-1, 0] = arr[:, 0]  # left
+    pad[1:-1, -1] = arr[:, -1]  # right
+    pad[0, 1:-1] = arr[0, :]  # top
+    pad[-1, 1:-1] = arr[-1, :]  # bottom
+
+    # corners
+    pad[0, 0] = arr[0, 0]  # ul
+    pad[0, -1] = arr[0, -1]  # ur
+    pad[-1, 0] = arr[-1, 0]  # ll
+    pad[-1, -1] = arr[-1, -1]  # lr
+
+    return pad
+
+
+@njit
 def get_weight_sfc_int(stage, stage_nbrs, qx, qy, ivec, jvec, distances):
     """Determine random walk weight surfaces.
 
@@ -103,39 +130,6 @@ def get_weight_sfc_int(stage, stage_nbrs, qx, qy, ivec, jvec, distances):
     weight_sfc = np.maximum(0, (stage - stage_nbrs) / distances)
     weight_int = np.maximum(0, (qx * jvec + qy * ivec) / distances)
     return weight_sfc, weight_int
-
-
-@njit
-def get_weight_at_cell(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
-                       dry_depth, gamma, theta):
-
-    if ind[0] == 0:
-        weight_sfc[:3] = np.nan
-        weight_int[:3] = np.nan
-
-    drywall = (depth_nbrs <= dry_depth) | (ct_nbrs == -2)
-    weight_sfc[drywall] = np.nan
-    weight_int[drywall] = np.nan
-
-    if np.nansum(weight_sfc) > 0:
-        weight_sfc = weight_sfc / np.nansum(weight_sfc)
-
-    if np.nansum(weight_int) > 0:
-        weight_int = weight_int / np.nansum(weight_int)
-
-    weight = gamma * weight_sfc + (1 - gamma) * weight_int
-    weight = depth_nbrs ** theta * weight
-    weight[depth_nbrs <= dry_depth] = 0
-
-    nanWeight = np.isnan(weight)
-
-    if np.any(weight[~nanWeight] != 0):
-        weight = weight / np.nansum(weight)
-        weight[nanWeight] = 0
-    else:
-        weight[~nanWeight] = 1 / np.maximum(1, len(weight[~nanWeight]))
-        weight[nanWeight] = 0
-    return weight
 
 
 def _get_version():
