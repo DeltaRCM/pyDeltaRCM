@@ -11,6 +11,34 @@ from pyDeltaRCM import water_tools
 from pyDeltaRCM import shared_tools
 
 
+class TestWaterRoutingWeights:
+
+    def test_get_weight_at_cell(self, test_DeltaModel):
+        ind = (0, 4)
+        np.random.seed(test_DeltaModel.seed)
+        stage = np.random.uniform(0.5, 1, 9)
+        eta = np.random.uniform(0, 0.85, 9)
+        depth = stage - eta
+        depth[depth < 0] = 0
+        celltype = np.array([-2, -2, -2, 1, 1, -2, 0, 0, 0])
+        qx = 1
+        qy = 1
+        ivec = test_DeltaModel.ivec.flatten()
+        jvec = test_DeltaModel.jvec.flatten()
+        dists = test_DeltaModel.distances.flatten()
+        dry_thresh = 0.1
+        gamma = 0.001962
+        theta = 1
+        weight_sfc = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float64)
+        weight_int = np.array([0, 0, 0, 0, 0, 1, 0, 1, 1], dtype=np.float64)
+
+        wts = water_tools._get_weight_at_cell_water(ind, weight_sfc, weight_int, depth,
+                                                    celltype, dry_thresh, gamma, theta)
+        assert np.all(wts[[0, 1, 2, 5]] == 0)
+        assert wts[4] == 0
+        assert np.any(wts[[3, 6, 7, 8]] != 0)
+
+
 def test_update_flow_field_inlet(test_DeltaModel):
     """
     Check that the flow at the inlet is set as expected
