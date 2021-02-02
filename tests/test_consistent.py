@@ -68,6 +68,7 @@ def test_long_multi_validation(tmp_path):
 
     _exp2 = np.array([-4.9709163, -1.5536911, -3.268889, -3.2696986, -2.0843806])
     assert np.all(delta.eta[:5, 62] == pytest.approx(_exp2))
+    delta.finalize()
 
 
 def test_limit_inds_error_inlet_size_fixed_bug_example_1(tmp_path):
@@ -104,6 +105,7 @@ def test_limit_inds_error_inlet_size_fixed_bug_example_1(tmp_path):
 
     _exp = np.array([-4.9988008, -4.7794013, -4.5300136, -4.4977293, -4.56228])
     assert np.all(delta.eta[:5, 30] == pytest.approx(_exp))
+    delta.finalize()
 
 
 def test_limit_inds_error_inlet_size_fixed_bug_example_2(tmp_path):
@@ -140,6 +142,7 @@ def test_limit_inds_error_inlet_size_fixed_bug_example_2(tmp_path):
 
     _exp = np.array([-4.9975486, -4.9140935, -5.15276, -5.3690896, -5.1903167])
     assert np.all(delta.eta[:5, 30] == pytest.approx(_exp))
+    delta.finalize()
 
 
 def test_limit_inds_error_fixed_bug_example_3(tmp_path):
@@ -177,6 +180,7 @@ def test_limit_inds_error_fixed_bug_example_3(tmp_path):
 
     _exp = np.array([-4.99961, -4.605685, -3.8314152, -4.9007816, -5.])
     assert np.all(delta.eta[:5, 2] == pytest.approx(_exp))
+    delta.finalize()
 
 
 def test_model_similarity(tmp_path):
@@ -248,7 +252,7 @@ def test_simple_checkpoint(tmp_path):
 
     for _ in range(0, 3):
         longModel.update()
-    longModel.output_netcdf.close()
+    longModel.finalize()
 
     # try defining a new model but plan to load checkpoint from longModel
     file_name = 'base_run.yaml'
@@ -274,7 +278,7 @@ def test_simple_checkpoint(tmp_path):
 
     # advance it one step to catch up to longModel
     resumeModel.update()
-    resumeModel.output_netcdf.close()
+    resumeModel.finalize()
 
     # the longModel and resumeModel should match
     assert longModel.time == resumeModel.time
@@ -312,7 +316,7 @@ def test_simple_checkpoint(tmp_path):
 
     # advance it one step to catch up to resumeModel
     resumeModel2.update()
-    resumeModel2.output_netcdf.close()
+    resumeModel2.finalize()
 
     # the two models that resumed from the checkpoint should be the same
     assert resumeModel2.time == resumeModel.time
@@ -352,7 +356,7 @@ def test_longer_checkpoint(tmp_path):
 
     for _ in range(0, 7):
         longModel.update()
-    longModel.output_netcdf.close()
+    longModel.finalize()
 
     # try defining a new model but plan to load checkpoint from longModel
     file_name = 'base_run.yaml'
@@ -379,7 +383,7 @@ def test_longer_checkpoint(tmp_path):
     # advance it three steps to catch up to longModel
     for _ in range(0, 3):
         resumeModel.update()
-    resumeModel.output_netcdf.close()
+    resumeModel.finalize()
 
     # the longModel and resumeModel should match
     assert longModel.time == resumeModel.time
@@ -423,7 +427,9 @@ def test_checkpoint_nc(tmp_path):
 
     for _ in range(0, 4):
         baseModel.update()
-    baseModel.output_netcdf.close()
+    baseModel.finalize()
+
+    assert baseModel.time == 1200.0  # dt=300 * 4 = 1200
 
     # try defining a new model but plan to load checkpoint from baseModel
     file_name = 'base_run.yaml'
@@ -450,10 +456,12 @@ def test_checkpoint_nc(tmp_path):
     base_f.close()
     resumeModel = DeltaModel(input_file=base_p)
 
+    assert resumeModel.time == baseModel.time  # should be same when resumed
+
     # advance it six steps
     for _ in range(0, 6):
         resumeModel.update()
-    resumeModel.output_netcdf.close()
+    resumeModel.finalize()
 
     # assert that ouput netCDF4 exists
     exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
@@ -471,8 +479,231 @@ def test_checkpoint_nc(tmp_path):
     assert 'discharge' in out_vars
     # check attributes of variables
     assert output['time'][0].tolist() == 0.0
-    assert output['time'][-1].tolist() == 2700.0
+    assert output['time'][-1].tolist() == 3000.0
     assert output['eta'][0].shape == (10, 10)
     assert output['eta'][-1].shape == (10, 10)
     assert output['depth'][-1].shape == (10, 10)
     assert output['discharge'][-1].shape == (10, 10)
+    # check time
+    assert baseModel.dt == 300.0  # base model timestep
+    assert baseModel.time == 1200.0  # ran 4 steps, so 300*4=1200
+    assert resumeModel.dt == 300.0  # resume model timestep size
+    assert resumeModel.time == 3000.0  # ran 6 steps on top of base model
+    # should be 1200 + (6*300) = 1200 + 1800 = 3000
+
+    # checkpoint interval aligns w/ timestep dt so these should match
+    assert output['time'][-1].tolist() == resumeModel.time
+
+
+def test_checkpoint_diff_dt(tmp_path):
+    """Test when checkpoint_dt does not match dt or save_dt."""
+    # define a yaml for the base model run
+    file_name = 'base_run.yaml'
+    base_p, base_f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(base_f, 'Length', 10.0)
+    utilities.write_parameter_to_file(base_f, 'Width', 10.0)
+    utilities.write_parameter_to_file(base_f, 'seed', 0)
+    utilities.write_parameter_to_file(base_f, 'dx', 1.0)
+    utilities.write_parameter_to_file(base_f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(base_f, 'Np_water', 10)
+    utilities.write_parameter_to_file(base_f, 'u0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(base_f, 'h0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'SLR', 0.001)
+    utilities.write_parameter_to_file(base_f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(base_f, 'save_dt', 50)
+    utilities.write_parameter_to_file(base_f, 'save_strata', True)
+    utilities.write_parameter_to_file(base_f, 'save_eta_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_depth_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_discharge_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_checkpoint', True)
+    utilities.write_parameter_to_file(base_f, 'checkpoint_dt', 500)
+    utilities.write_parameter_to_file(base_f, 'out_dir', tmp_path / 'test')
+    base_f.close()
+    baseModel = DeltaModel(input_file=base_p)
+
+    for _ in range(0, 2):
+        baseModel.update()
+    baseModel.finalize()
+
+    assert baseModel.time == 600.0  # dt=300 * 2 = 600
+
+    # try defining a new model but plan to load checkpoint from baseModel
+    file_name = 'base_run.yaml'
+    base_p, base_f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(base_f, 'Length', 10.0)
+    utilities.write_parameter_to_file(base_f, 'Width', 10.0)
+    utilities.write_parameter_to_file(base_f, 'seed', 0)
+    utilities.write_parameter_to_file(base_f, 'dx', 1.0)
+    utilities.write_parameter_to_file(base_f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(base_f, 'Np_water', 10)
+    utilities.write_parameter_to_file(base_f, 'u0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(base_f, 'h0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'SLR', 0.001)
+    utilities.write_parameter_to_file(base_f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(base_f, 'save_dt', 50)
+    utilities.write_parameter_to_file(base_f, 'save_strata', True)
+    utilities.write_parameter_to_file(base_f, 'save_eta_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_depth_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_discharge_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_checkpoint', False)
+    utilities.write_parameter_to_file(base_f, 'resume_checkpoint', True)
+    utilities.write_parameter_to_file(base_f, 'out_dir', tmp_path / 'test')
+    base_f.close()
+    resumeModel = DeltaModel(input_file=base_p)
+
+    assert resumeModel.time == 600.0  # checkpoint dt was 500 but smaller than
+    # saving dt which was 300, so 300*2=600 should be time we resume from
+    assert resumeModel.time == baseModel.time  # should be same when resumed
+
+    # advance it two more steps
+    for _ in range(0, 2):
+        resumeModel.update()
+    resumeModel.finalize()
+
+    # assert that ouput netCDF4 exists
+    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc)
+
+    # load it into memory and check values in the netCDF4
+    output = Dataset(exp_path_nc, 'r', allow_pickle=True)
+    out_vars = output.variables.keys()
+    # check that expected variables are in the file
+    assert 'x' in out_vars
+    assert 'y' in out_vars
+    assert 'time' in out_vars
+    assert 'eta' in out_vars
+    assert 'depth' in out_vars
+    assert 'discharge' in out_vars
+    # check attributes of variables
+    assert output['time'][0].tolist() == 0.0
+    assert output['time'][-1].tolist() == 1200.0
+    assert output['eta'][0].shape == (10, 10)
+    assert output['eta'][-1].shape == (10, 10)
+    assert output['depth'][-1].shape == (10, 10)
+    assert output['discharge'][-1].shape == (10, 10)
+    # check time
+    assert baseModel.dt == 300.0  # base model timestep
+    assert baseModel.time == 600.0  # ran 4 steps, so 300*2=600
+    assert resumeModel.dt == 300.0  # resume model timestep size
+    assert resumeModel.time == 1200.0  # ran 2 steps on top of base model
+    # should be 600 + (2*300) = 1200
+    assert len(output['time'][:].tolist()) == 5  # 0-300-600-900-1200
+    # checkpoint interval aligns w/ timestep dt so these should match
+    assert output['time'][-1].tolist() == resumeModel.time
+
+
+def test_multi_checkpoints(tmp_path):
+    """Test using checkpoints multiple times for a given model run."""
+    # define a yaml for the base model run
+    file_name = 'base_run.yaml'
+    base_p, base_f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(base_f, 'Length', 10.0)
+    utilities.write_parameter_to_file(base_f, 'Width', 10.0)
+    utilities.write_parameter_to_file(base_f, 'seed', 0)
+    utilities.write_parameter_to_file(base_f, 'dx', 1.0)
+    utilities.write_parameter_to_file(base_f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(base_f, 'Np_water', 10)
+    utilities.write_parameter_to_file(base_f, 'u0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(base_f, 'h0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'SLR', 0.001)
+    utilities.write_parameter_to_file(base_f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(base_f, 'save_dt', 50)
+    utilities.write_parameter_to_file(base_f, 'save_strata', True)
+    utilities.write_parameter_to_file(base_f, 'save_eta_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_depth_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_discharge_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_checkpoint', True)
+    utilities.write_parameter_to_file(base_f, 'checkpoint_dt', 600)
+    utilities.write_parameter_to_file(base_f, 'out_dir', tmp_path / 'test')
+    base_f.close()
+    baseModel = DeltaModel(input_file=base_p)
+
+    # run base for 2 timesteps
+    for _ in range(0, 2):
+        baseModel.update()
+    baseModel.finalize()
+
+    assert baseModel.time == 600.0  # dt=300 * 2 = 600
+
+    # try defining a new model but plan to load checkpoint from baseModel
+    file_name = 'base_run.yaml'
+    base_p, base_f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(base_f, 'Length', 10.0)
+    utilities.write_parameter_to_file(base_f, 'Width', 10.0)
+    utilities.write_parameter_to_file(base_f, 'seed', 0)
+    utilities.write_parameter_to_file(base_f, 'dx', 1.0)
+    utilities.write_parameter_to_file(base_f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(base_f, 'Np_water', 10)
+    utilities.write_parameter_to_file(base_f, 'u0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(base_f, 'h0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'SLR', 0.001)
+    utilities.write_parameter_to_file(base_f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(base_f, 'save_dt', 50)
+    utilities.write_parameter_to_file(base_f, 'save_strata', True)
+    utilities.write_parameter_to_file(base_f, 'save_eta_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_depth_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_discharge_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_checkpoint', True)
+    utilities.write_parameter_to_file(base_f, 'resume_checkpoint', True)
+    utilities.write_parameter_to_file(base_f, 'checkpoint_dt', 600)
+    utilities.write_parameter_to_file(base_f, 'out_dir', tmp_path / 'test')
+    base_f.close()
+    resumeModel = DeltaModel(input_file=base_p)
+
+    assert resumeModel.time == 600.0  # checkpoint dt was 500 but smaller than
+    # saving dt which was 300, so 300*2=600 should be time we resume from
+    assert resumeModel.time == baseModel.time  # should be same when resumed
+
+    # advance it two more steps
+    for _ in range(0, 2):
+        resumeModel.update()
+    resumeModel.finalize()
+
+    # create another resume model
+    resumeModel02 = DeltaModel(input_file=base_p)
+
+    assert resumeModel02.time == resumeModel.time  # should be same
+    assert resumeModel02.time == 1200.0  # 300*4 = 1200
+
+    # step it twice
+    for _ in range(0, 2):
+        resumeModel02.update()
+    resumeModel02.finalize()
+
+    # assert that ouput netCDF4 exists
+    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc)
+
+    # load it into memory and check values in the netCDF4
+    output = Dataset(exp_path_nc, 'r', allow_pickle=True)
+    out_vars = output.variables.keys()
+    # check that expected variables are in the file
+    assert 'x' in out_vars
+    assert 'y' in out_vars
+    assert 'time' in out_vars
+    assert 'eta' in out_vars
+    assert 'depth' in out_vars
+    assert 'discharge' in out_vars
+    # check attributes of variables
+    assert output['time'][0].tolist() == 0.0
+    assert output['time'][-1].tolist() == 1800.0
+    assert output['eta'][0].shape == (10, 10)
+    assert output['eta'][-1].shape == (10, 10)
+    assert output['depth'][-1].shape == (10, 10)
+    assert output['discharge'][-1].shape == (10, 10)
+    # check time
+    assert baseModel.dt == 300.0  # base model timestep
+    assert baseModel.time == 600.0  # ran 2 steps, so 300*2=600
+    assert resumeModel.dt == 300.0  # resume model timestep size
+    assert resumeModel.time == 1200.0  # ran 2 steps on top of base model
+    # should be 600 + (2*300) = 1200
+    assert resumeModel02.dt == 300.0  # same dt
+    assert resumeModel02.time == 1800.0  # ran 2 steps + resume, 1200+600=1800
+
+    assert len(output['time'][:].tolist()) == 7  # 0-300-600-900-1200-1500-1800
+    # checkpoint interval aligns w/ timestep dt so these should match
+    assert output['time'][-1].tolist() == resumeModel02.time

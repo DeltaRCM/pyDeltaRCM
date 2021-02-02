@@ -255,6 +255,7 @@ def test_make_checkpoint(tmp_path, test_DeltaModel):
     test_DeltaModel.update()
     exp_path_npz = os.path.join(tmp_path / 'out_dir', 'checkpoint.npz')
     assert os.path.isfile(exp_path_npz)
+    test_DeltaModel.finalize()
     # check loading checkpoint and see if it works
     check_DeltaModel.load_checkpoint()
     assert check_DeltaModel._time == test_DeltaModel._time

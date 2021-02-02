@@ -1155,6 +1155,106 @@ def test_py_hlvl_parallel_float(tmp_path):
     #       *exactly* two jobs were run in parallel.
 
 
+@pytest.mark.skipif(platform.system() != 'Linux', reason='Parallel support \
+                    only on Linux OS.')
+def test_py_hlvl_parallel_checkpoint(tmp_path):
+    """Test checkpointing in parallel."""
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'verbose', 2)
+    utilities.write_parameter_to_file(f, 'ensemble', 2)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'parallel', 2)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'save_checkpoint', True)
+    utilities.write_parameter_to_file(f, 'save_eta_grids', True)
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=2)
+    # assertions for job creation
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is False
+    # assertions after running jobs
+    pp.run_jobs()
+    assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+    assert pp._is_completed is True
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc1)
+    # check that checkpoint files exist
+    exp_path_ckpt0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'checkpoint.npz')
+    exp_path_ckpt1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'checkpoint.npz')
+    assert os.path.isfile(exp_path_ckpt0)
+    assert os.path.isfile(exp_path_ckpt1)
+    # load one output files and check values
+    out_old = netCDF4.Dataset(exp_path_nc1)
+    assert 'meta' in out_old.groups.keys()
+    assert out_old['time'][0].tolist() == 0.0
+    assert out_old['time'][-1].tolist() == 600.0  # 2 timesteps of 300.0s run
+
+    # close netCDF file
+    out_old.close()
+    # try to resume jobs
+    file_name = 'user_parameters.yaml'
+    p, f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(f, 'verbose', 2)
+    utilities.write_parameter_to_file(f, 'ensemble', 2)
+    utilities.write_parameter_to_file(f, 'Length', 10.0)
+    utilities.write_parameter_to_file(f, 'Width', 10.0)
+    utilities.write_parameter_to_file(f, 'dx', 1.0)
+    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
+    utilities.write_parameter_to_file(f, 'Np_water', 10)
+    utilities.write_parameter_to_file(f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+    utilities.write_parameter_to_file(f, 'parallel', 2)
+    utilities.write_parameter_to_file(f, 'save_dt', 300)
+    utilities.write_parameter_to_file(f, 'resume_checkpoint', True)
+    utilities.write_parameter_to_file(f, 'save_eta_grids', True)
+    f.close()
+    pp = preprocessor.Preprocessor(input_file=p, timesteps=1)
+    # assertions for job creation
+    assert type(pp.file_list) is list
+    assert len(pp.file_list) == 2
+    assert pp._is_completed is False
+    # assertions after running jobs
+    pp.run_jobs()
+    assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+    assert pp._is_completed is True
+    exp_path_nc0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+    exp_path_nc1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
+    assert os.path.isfile(exp_path_nc0)
+    assert os.path.isfile(exp_path_nc1)
+    # check that checkpoint files still exist
+    exp_path_ckpt0 = os.path.join(
+        tmp_path / 'test', 'job_000', 'checkpoint.npz')
+    exp_path_ckpt1 = os.path.join(
+        tmp_path / 'test', 'job_001', 'checkpoint.npz')
+    assert os.path.isfile(exp_path_ckpt0)
+    assert os.path.isfile(exp_path_ckpt1)
+    # load one output file to check it out
+    out_fin = netCDF4.Dataset(exp_path_nc1)
+    assert 'meta' in out_old.groups.keys()
+    assert out_fin['time'][0].tolist() == 0
+    assert out_fin['time'][-1].tolist() == 900.0  # +1 timestep of 300.0s
+    # close netcdf file
+    out_fin.close()
+
+
 def test_py_hlvl_ensemble_badtype(tmp_path):
     file_name = 'user_parameters.yaml'
     p, f = utilities.create_temporary_file(tmp_path, file_name)
@@ -1234,7 +1334,8 @@ def test_subsidence_bounds(tmp_path):
     utilities.write_parameter_to_file(f, 'theta1', -np.pi / 2)
     utilities.write_parameter_to_file(f, 'theta1', 0)
     f.close()
-    delta = DeltaModel(input_file=p)
+    with pytest.warns(UserWarning):
+        delta = DeltaModel(input_file=p)
     # assert subsidence mask is binary
     assert np.all(delta.subsidence_mask == delta.subsidence_mask.astype(bool))
     # check specific regions
@@ -1395,3 +1496,34 @@ class TestScaleRelativeSeaLeveLRiseRate():
     def test_scale_If_0p1(self):
         scaled = preprocessor.scale_relative_sea_level_rise_rate(5, If=0.1)
         assert scaled == 5 / 1000 / 365.25 / 86400 * 10
+
+
+def test_load_nocheckpoint(tmp_path):
+    """Try loading a checkpoint file when one doesn't exist."""
+    # define a yaml
+    file_name = 'trial_run.yaml'
+    base_p, base_f = utilities.create_temporary_file(tmp_path, file_name)
+    utilities.write_parameter_to_file(base_f, 'Length', 10.0)
+    utilities.write_parameter_to_file(base_f, 'Width', 10.0)
+    utilities.write_parameter_to_file(base_f, 'seed', 0)
+    utilities.write_parameter_to_file(base_f, 'dx', 1.0)
+    utilities.write_parameter_to_file(base_f, 'L0_meters', 1.0)
+    utilities.write_parameter_to_file(base_f, 'Np_water', 10)
+    utilities.write_parameter_to_file(base_f, 'u0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'N0_meters', 2.0)
+    utilities.write_parameter_to_file(base_f, 'h0', 1.0)
+    utilities.write_parameter_to_file(base_f, 'SLR', 0.001)
+    utilities.write_parameter_to_file(base_f, 'Np_sed', 10)
+    utilities.write_parameter_to_file(base_f, 'save_dt', 50)
+    utilities.write_parameter_to_file(base_f, 'save_strata', True)
+    utilities.write_parameter_to_file(base_f, 'save_eta_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_depth_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_discharge_grids', True)
+    utilities.write_parameter_to_file(base_f, 'save_checkpoint', True)
+    utilities.write_parameter_to_file(base_f, 'resume_checkpoint', True)
+    utilities.write_parameter_to_file(base_f, 'out_dir', tmp_path / 'test')
+    base_f.close()
+
+    # try loading the model yaml despite no checkpoint existing
+    with pytest.raises(FileNotFoundError):
+        _ = DeltaModel(input_file=base_p)

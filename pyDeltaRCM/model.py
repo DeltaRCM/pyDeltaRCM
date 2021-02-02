@@ -86,8 +86,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
-            _msg = 'Loading from checkpoint and reopening netCDF4 file.'
-            self.log_info(_msg)
             self.load_checkpoint()
 
         else:
