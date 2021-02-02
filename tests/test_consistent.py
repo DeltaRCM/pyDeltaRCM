@@ -68,6 +68,7 @@ def test_long_multi_validation(tmp_path):
 
     _exp2 = np.array([-4.9709163, -1.5536911, -3.268889, -3.2696986, -2.0843806])
     assert np.all(delta.eta[:5, 62] == pytest.approx(_exp2))
+    delta.finalize()
 
 
 def test_limit_inds_error_inlet_size_fixed_bug_example_1(tmp_path):
@@ -104,6 +105,7 @@ def test_limit_inds_error_inlet_size_fixed_bug_example_1(tmp_path):
 
     _exp = np.array([-4.9988008, -4.7794013, -4.5300136, -4.4977293, -4.56228])
     assert np.all(delta.eta[:5, 30] == pytest.approx(_exp))
+    delta.finalize()
 
 
 def test_limit_inds_error_inlet_size_fixed_bug_example_2(tmp_path):
@@ -140,6 +142,7 @@ def test_limit_inds_error_inlet_size_fixed_bug_example_2(tmp_path):
 
     _exp = np.array([-4.9975486, -4.9140935, -5.15276, -5.3690896, -5.1903167])
     assert np.all(delta.eta[:5, 30] == pytest.approx(_exp))
+    delta.finalize()
 
 
 def test_limit_inds_error_fixed_bug_example_3(tmp_path):
@@ -177,6 +180,7 @@ def test_limit_inds_error_fixed_bug_example_3(tmp_path):
 
     _exp = np.array([-4.99961, -4.605685, -3.8314152, -4.9007816, -5.])
     assert np.all(delta.eta[:5, 2] == pytest.approx(_exp))
+    delta.finalize()
 
 
 def test_model_similarity(tmp_path):
