@@ -1,11 +1,14 @@
 
 import numpy as np
+from numba import njit
 from numba import float32, float64, int64
 from numba.experimental import jitclass
 from scipy import ndimage
 import abc
 
 from . import shared_tools
+
+import matplotlib.pyplot as plt
 
 # tools for sediment routing algorithms and deposition/erosion
 
@@ -28,13 +31,13 @@ class sed_tools(abc.ABC):
         self.log_info(_msg, verbosity=2)
         self.route_all_sand_parcels()
 
-        _msg = 'Beginning mud parcel routing'
-        self.log_info(_msg, verbosity=2)
-        self.route_all_mud_parcels()
-
         _msg = 'Beginning topographic diffusion'
         self.log_info(_msg, verbosity=2)
         self.topo_diffusion()
+
+        _msg = 'Beginning mud parcel routing'
+        self.log_info(_msg, verbosity=2)
+        self.route_all_mud_parcels()
 
     def route_all_sand_parcels(self):
         """Route sand parcels; topo diffusion.
@@ -131,24 +134,122 @@ class sed_tools(abc.ABC):
         """Diffuse topography after routing.
 
         Diffuse topography after routing all coarse sediment parcels. The
-        method uses convolution with a kernel to compute smoother topography,
-        and then adds this different to the current eta to do the smoothing.
-        The operation is repeated `N_crossdiff` times.
+        operation is repeated `N_crossdiff` times.
+
+        .. note:: 
+
+            The old method of this function used convolution with a kernel to
+            compute smoother topography, and then adds this different to the
+            current eta to do the smoothing. This method had a smaller effect
+            than the implementation in the original Matlab DeltaRCM code,
+            however, it was faster. This may be a good target for
+            optimization.
+
         """
-        for _ in range(self.N_crossdiff):
+        ### OLD CODE PRESERVED HERE ###
+        # for _ in range(self.N_crossdiff):
+        #
+        #     a = ndimage.convolve(self.eta, self.kernel1, mode='constant')
+        #     b = ndimage.convolve(self.qs, self.kernel2, mode='constant')
+        #     c = ndimage.convolve(self.qs * self.eta, self.kernel2,
+        #                          mode='constant')
+        #
+        #     self.cf = (self.diffusion_multiplier *
+        #                (self.qs * a - self.eta * b + c))
+        #
+        #     self.cf[self.cell_type == -2] = 0
+        #     self.cf[0, :] = 0
+        #
+        #     self.eta += self.cf
+        ### NEW CODE BELOW HERE ###
+        _smth_topo = _topo_diffusion(self.eta, self.qs, self.N_crossdiff,
+                                    self.cell_type, self.pad_cell_type,
+                                    self._dt, self._dx, self.alpha)
+        self.eta[:] = _smth_topo[:]  # force data copy
 
-            a = ndimage.convolve(self.eta, self.kernel1, mode='constant')
-            b = ndimage.convolve(self.qs, self.kernel2, mode='constant')
-            c = ndimage.convolve(self.qs * self.eta, self.kernel2,
-                                 mode='constant')
 
-            self.cf = (self.diffusion_multiplier *
-                       (self.qs * a - self.eta * b + c))
+@njit
+def _topo_diffusion(eta, qs, N_crossdiff, cell_type, pad_cell_type,
+                    dt, dx, alpha):
+    L, W = eta.shape
+    eta_diff = np.copy(eta)
+    qs_pad = np.copy(shared_tools.custom_pad(qs))
+    for _ in np.arange(N_crossdiff):
 
-            self.cf[self.cell_type == -2] = 0
-            self.cf[0, :] = 0
+        eta_N = np.copy(eta_diff)
+        eta_diff_pad = np.copy(shared_tools.custom_pad(eta_diff))
 
-            self.eta += self.cf
+        for i in np.arange(L):
+            for j in np.arange(W):
+                
+                if cell_type[i, j] != -2:  # if not land
+                    eta_diff_ind = eta_diff_pad[i - 1 + 1:i + 2 + 1,
+                                                j - 1 + 1:j + 2 + 1]
+                    cell_type_ind = pad_cell_type[i - 1 + 1:i + 2 + 1,
+                                                  j - 1 + 1:j + 2 + 1]
+                    qs_ind = qs_pad[i - 1 + 1:i + 2 + 1,
+                                    j - 1 + 1:j + 2 + 1]
+
+                    eta_diff_ind = eta_diff_ind.ravel()
+                    qs_ind = qs_ind.ravel()
+                    invalid_cells = (cell_type_ind.ravel() == -2)
+
+                    crossflux_nb = dt / N_crossdiff * alpha * \
+                        0.5 * (qs[i, j] + qs_ind) * dx * \
+                        (eta_diff_ind - eta_N[i, j]) / dx
+                    crossflux_nb[invalid_cells] = 0
+                    crossflux_nb = crossflux_nb / dx / dx
+
+                    eta_diff[i, j] = eta_diff[i, j] + np.sum(crossflux_nb);
+
+    eta_new = eta_diff
+
+    return eta_new
+
+
+@njit
+def _get_weight_at_cell_sediment(ind, weight_int, depth_nbrs, ct_nbrs,
+                                 dry_depth, theta, distances_flat):
+
+    dry = (depth_nbrs <= dry_depth)
+    wall = (ct_nbrs == -2)
+    ctr = (np.arange(9) == 4)
+    drywall = np.logical_or(dry, wall)
+    invalid = np.logical_or(drywall, ctr)
+
+    # always set ctr to 0 before rebalancing
+    weight_int[ctr] = 0 
+
+    weight = np.copy(weight_int)  # no gamma weighting here
+    weight = (depth_nbrs ** theta) * weight
+
+    # ALWAYS disallow the choice to not move
+    weight[ctr] = 0
+
+    # ALWAYS disallow the choice to go into land or dry cells
+    weight[drywall] = 0
+
+    # sanity check
+    if np.any(np.isnan(weight)):
+        raise RuntimeError('NaN encountered in sediment weighting. Please report error.')
+
+    # correct the weights for random choice
+    if np.nansum(weight) == 0:
+        # if no weights
+        #  convert to random walk into any non-wall,
+        #  (incl dry cells), weighted by distance
+        weight[:] = 1 / distances_flat
+
+        # disallow movement into walls
+        weight[wall] = 0
+
+    weight[ctr] = 0  # enforce
+
+    # final rebalance
+    weight = weight / np.nansum(weight)
+
+    return weight
+
 
 
 r_spec = [('_dt', float32), ('_dx', float32),
@@ -209,16 +310,18 @@ class BaseRouter(object):
         cell_type_ind = self.pad_cell_type[
             px:px + 3, py:py + 3]
 
-        weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
+        _, weight_int = shared_tools.get_weight_sfc_int(
             self.stage[px, py], stage_nbrs.ravel(), self.qx[px, py],
             self.qy[px, py], self.ivec_flat, self.jvec_flat,
             self.distances_flat)
-        weights = shared_tools.get_weight_at_cell(
-            (px, py), weight_sfc, weight_int, depth_nbrs.ravel(),
-            cell_type_ind.ravel(), self.dry_depth,
-            self.gamma, self.theta_sed)
+
+        weights = _get_weight_at_cell_sediment(
+            (px, py), weight_int, depth_nbrs.ravel(),
+            cell_type_ind.ravel(), self.dry_depth, self.theta_sed, self.distances_flat)
+
         new_cell = shared_tools.random_pick(weights)
-        dist, istep, jstep, _ = shared_tools.get_steps(
+
+        dist, istep, jstep, astep = shared_tools.get_steps(
             new_cell, self.iwalk_flat, self.jwalk_flat)
 
         return istep, jstep, dist
@@ -482,8 +585,8 @@ class SandRouter(BaseRouter):
             # Choose the next location for the parcel to travel
             istep, jstep, dist = self._choose_next_location(px0, py0)
 
-            px = px0 + jstep
-            py = py0 + istep
+            px = (px0 + jstep)
+            py = (py0 + istep)
 
             self._partition_sediment(px0, py0, px, py, dist)
             self._deposit_or_erode(px, py)
@@ -662,7 +765,7 @@ class MudRouter(BaseRouter):
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
                                               self.eta[px, py], self._dx)
 
-        elif U_loc > self.U_ero_mud:
+        if U_loc > self.U_ero_mud:
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
                                              self.U_ero_mud, self._beta)
             Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],

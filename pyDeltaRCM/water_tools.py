@@ -58,6 +58,7 @@ class water_tools(abc.ABC):
         self.get_water_weight_array()
         water_weights_flat = self.water_weights.reshape(-1, 9)  # flatten for fast access
 
+        # while any parcles still need to take any steps
         while (sum(current_inds) > 0) & (_step < self.stepmax):
 
             _step += 1
@@ -68,6 +69,7 @@ class water_tools(abc.ABC):
             new_direction = _choose_next_direction(current_inds, water_weights_flat)
             new_direction = new_direction.astype(np.int)
 
+            # use the new directions for each parcel to determine the new ind for each parcel
             new_indices = _calculate_new_ind(
                 current_inds,
                 new_direction,
@@ -75,13 +77,20 @@ class water_tools(abc.ABC):
                 self.jwalk_flat,
                 self.eta.shape)
 
+            # determine the step of each parcel made based on the new direction
             dist, istep, jstep, astep = shared_tools.get_steps(
                 new_direction,
                 self.iwalk_flat,
                 self.jwalk_flat)
 
-            self.update_Q(dist, current_inds, new_indices, astep, jstep, istep)
+            # update the discharge field with walk of parcels
+            self.update_Q(
+                dist, current_inds, new_indices, astep, jstep, istep,
+                update_current=True, update_next=True)
 
+            # check for any loops in the walks of parcels
+            #     Note, a loop disqualifies a parcel from the free surface calculation,
+            #     but does not stop the parcel from routing and changing qw field.
             current_inds, self.looped, self.free_surf_flag = _check_for_loops(
                 self.free_surf_walk_indices, new_indices, _step, self.L0, self.looped,
                 self.eta.shape, self.CTR, self.free_surf_flag)
@@ -91,7 +100,17 @@ class water_tools(abc.ABC):
             #     ``ind==0``, effectively ending the routing of these parcels.
             current_inds = self.check_for_boundary(current_inds)  # changes `free_surf_flag`
             self.free_surf_walk_indices[:, _step] = current_inds  # record indices
-            current_inds[self.free_surf_flag > 0] = 0
+            boundary = (self.free_surf_flag > 0)
+            current_inds[boundary] = 0
+
+            # update the q*n fields for the final step 
+            #    to ensure flux balanced at domain edge
+            if np.any(boundary):
+                self.update_Q(
+                    dist[boundary], current_inds[boundary], 
+                    new_indices[boundary], astep[boundary],
+                    jstep[boundary], istep[boundary],
+                    update_current=False, update_next=True)
 
     def compute_free_surface(self):
         """Calculate free surface after routing all water parcels.
@@ -168,34 +187,36 @@ class water_tools(abc.ABC):
                     self.qx[i, j], self.qy[i, j], self.ivec_flat, self.jvec_flat,
                     self.distances_flat)
 
-                self.water_weights[i, j] = shared_tools.get_weight_at_cell(
+                self.water_weights[i, j] = _get_weight_at_cell_water(
                     (i, j), weight_sfc, weight_int,
                     depth_nbrs.ravel(), ct_nbrs.ravel(),
                     self.dry_depth, self.gamma, self._theta_water)
 
-    def update_Q(self, dist, current_inds, next_index, astep, jstep, istep):
+    def update_Q(self, dist, current_inds, next_index, astep, jstep, istep,
+                 update_current=False, update_next=False):
         """Update discharge field values after one set of water parcel steps."""
         _msg = 'Updating flux fields after single parcel step'
         self.log_info(_msg, verbosity=2)
-
-        self.qxn = _update_dirQfield(
-            self.qxn.flat[:], dist, current_inds,
-            astep, jstep).reshape(self.qxn.shape)
-        self.qyn = _update_dirQfield(
-            self.qyn.flat[:], dist, current_inds,
-            astep, istep).reshape(self.qyn.shape)
-        self.qwn = _update_absQfield(
-            self.qwn.flat[:], dist, current_inds,
-            astep, self.Qp_water, self._dx).reshape(self.qwn.shape)
-        self.qxn = _update_dirQfield(
-            self.qxn.flat[:], dist, next_index,
-            astep, jstep).reshape(self.qxn.shape)
-        self.qyn = _update_dirQfield(
-            self.qyn.flat[:], dist, next_index,
-            astep, istep).reshape(self.qyn.shape)
-        self.qwn = _update_absQfield(
-            self.qwn.flat[:], dist, next_index,
-            astep, self.Qp_water, self._dx).reshape(self.qwn.shape)
+        if update_current:
+            self.qxn = _update_dirQfield(
+                self.qxn.flat[:], dist, current_inds,
+                astep, jstep).reshape(self.qxn.shape)
+            self.qyn = _update_dirQfield(
+                self.qyn.flat[:], dist, current_inds,
+                astep, istep).reshape(self.qyn.shape)
+            self.qwn = _update_absQfield(
+                self.qwn.flat[:], dist, current_inds,
+                astep, self.Qp_water, self._dx).reshape(self.qwn.shape)
+        if update_next:
+            self.qxn = _update_dirQfield(
+                self.qxn.flat[:], dist, next_index,
+                astep, jstep).reshape(self.qxn.shape)
+            self.qyn = _update_dirQfield(
+                self.qyn.flat[:], dist, next_index,
+                astep, istep).reshape(self.qyn.shape)
+            self.qwn = _update_absQfield(
+                self.qwn.flat[:], dist, next_index,
+                astep, self.Qp_water, self._dx).reshape(self.qwn.shape)
 
     def check_for_boundary(self, inds):
         """Check whether parcels have reached the boundary.
@@ -232,39 +253,26 @@ class water_tools(abc.ABC):
         _msg = 'Smoothing and finalizing free surface'
         self.log_info(_msg, verbosity=2)
 
+        # begin from the previous stage
         Hnew = self.eta + self.depth
 
         # water surface height not under sea level
         Hnew[Hnew < self._H_SL] = self._H_SL
 
-        # find average water surface elevation for a cell
+        # find average water surface elevation for a cell from accumulation
         Hnew[self.sfc_visit > 0] = (self.sfc_sum[self.sfc_visit > 0] /
                                     self.sfc_visit[self.sfc_visit > 0])
 
         # smooth newly calculated free surface
-        Hnew_pad = np.pad(Hnew, 1, 'edge')
-        H_SL_pad = self.H_SL * np.ones_like(Hnew_pad)
         Hsmth = _smooth_free_surface(
-            Hnew, Hnew_pad, self.cell_type, self.pad_cell_type,
-            self._Nsmooth, self._Csmooth)
+            Hnew, self.cell_type, self._Nsmooth, self._Csmooth)
 
-        Hsmth_MOD = _smooth_free_surface_MOD(
-            Hnew, Hnew_pad, H_SL_pad, self.cell_type, self.pad_cell_type,
-            self._Nsmooth, self._Csmooth)
-
-
-        print("is same?", np.all(Hsmth == Hsmth_MOD))
-
-        # fig, ax = plt.subplots()
-        # ax.imshow(Hsmth - Hsmth_MOD)
-        # plt.show(block=False)
-
-        # breakpoint()
-
+        # combine new smoothed and previous free surf with underrelaxation
         if self._time_iter > 0:
             self.stage = ((1 - self._omega_sfc) * self.stage +
                           self._omega_sfc * Hsmth)
 
+        # apply a flooding correction
         self.flooding_correction()
 
     def update_flow_field(self, iteration):
@@ -406,6 +414,77 @@ class water_tools(abc.ABC):
                 :, a_sum != 0] / a_sum[a_sum != 0]
 
         return wgt_array
+
+
+@njit
+def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
+                              dry_depth, gamma, theta):
+
+    dry = (depth_nbrs <= dry_depth)
+    wall = (ct_nbrs == -2)
+    ctr = (np.arange(9) == 4)
+    drywall = np.logical_or(dry, wall)
+    invalid = np.logical_or(drywall, ctr)
+
+    if ind[0] == 0:
+        invalid[:3] = True
+
+    # set drywall to zero
+    weight_sfc[drywall] = 0
+    weight_int[drywall] = 0 
+
+    # always set ctr to 0 before rebalancing
+    weight_sfc[ctr] = 0
+    weight_int[ctr] = 0 
+
+    # initial rebalance weights
+    if np.nansum(weight_sfc) > 0:
+        weight_sfc = weight_sfc / np.nansum(weight_sfc)
+    if np.nansum(weight_int) > 0:
+        weight_int = weight_int / np.nansum(weight_int)
+
+    weight = gamma * weight_sfc + (1 - gamma) * weight_int
+    weight[~dry] = (depth_nbrs[~dry] ** theta) * weight[~dry]
+
+    # enforce disallowed choice to not move
+    weight[ctr] = 0
+
+    # sanity check
+    nanweight = np.isnan(weight)
+    if np.any(np.isnan(weight)):
+        raise RuntimeError('NaN encountered in water weighting. Please report error.')
+
+    # correct the weights for random choice 
+    if np.nansum(weight) > 0:
+        # if any cells have positive weights, rebalance to sum() == 1
+        weight = weight / np.nansum(weight)
+        weight[nanweight] = 0
+
+    elif np.nansum(weight) == 0:
+        # if all weights are zeros/nan
+        if wall[4] == True: # np.all(wall):
+            # if current cell is wall cell
+            #    just set to zero and pass
+            weight[:] = 0
+        else:
+            # convert to random walk into any wet
+            nwet = np.sum(~dry)
+            if nwet == 0:
+                # no wet/nonland neighbors. How did we get here??
+                #  Force to stay at self, will kill particle
+                weight[:] = 0
+                weight[4] = 1
+            else:
+                weight[:] = 0
+                weight[~dry] = (1 / nwet)
+                if ind[0] == 0:
+                    weight[:3] = 0
+            weight = weight / np.nansum(weight)
+
+    else:
+        raise RuntimeError('Water sum(weight) less than 0. Please report error.')
+
+    return weight
 
 
 @njit('int64[:](int64[:], float64[:,:])')
@@ -618,80 +697,71 @@ def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
 
 
 @njit
-def _smooth_free_surface(Hnew, Hnew_pad, cell_type, pad_cell_type,
-                         Nsmooth, Csmooth):
-    """Smooth the free surface."""
-    L, W = cell_type.shape
-    Htemp = Hnew
+def _smooth_free_surface(H0, cell_type, Nsmooth, Csmooth):
+    """Smooth the free surface.
+
+    Parameters
+    ----------
+    H0
+        Stage input to the smoothing (i.e., the old stage).
+
+    cell_type
+        Type of each cell.
+
+    Nsmooth
+        Number of times to smooth the free surface (i.e., stage)
+
+    Csmooth
+        Underrelaxation coefficient for smoothing iterations.
+    """
+    # grab relevant shape information
+    L, W = H0.shape
+
+    # pad the input stage and cell type arrays
+    H0_pad = shared_tools.custom_pad(H0)
+    cell_type_pad = shared_tools.custom_pad(cell_type)
+
+    # create copy of H which is modified in following smoothing
+    Htemp = np.copy(H0)
     for _ in range(Nsmooth):
 
-        Hsmth = Htemp
-        for i in range(L):
-            for j in range(W):
-
-                if cell_type[i, j] > -2:
-                    # locate non-boundary cells
-                    sumH = 0
-                    nbcount = 0
-
-                    ct_ind = pad_cell_type[
-                        i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-                    Hnew_ind = Hnew_pad[
-                        i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-
-                    Hnew_ind[1, 1] = 0
-                    Hnew_ind = Hnew_ind.ravel()
-                    _log = ct_ind.ravel() == -2
-                    Hnew_ind[_log] = 0
-
-                    sumH = np.sum(Hnew_ind)
-                    nbcount = np.sum(Hnew_ind > 0)
-
-                    if nbcount > 0:
-                        # smooth if are not wall cells
-                        Htemp[i, j] = (Csmooth * Hsmth[i, j] +
-                                       (1 - Csmooth) * sumH / nbcount)
-
-    Hsmth = Htemp
-    return Hsmth
-
-
-@njit
-def _smooth_free_surface_MOD(Hnew, Hnew_pad, H_SL_pad, cell_type, pad_cell_type,
-                         Nsmooth, Csmooth):
-    """Smooth the free surface."""
-    L, W = cell_type.shape
-    Htemp = np.copy(Hnew)
-    for _ in range(Nsmooth):
-
+        # create another copy to refernce as base in Nsmooth iteration
         Hsmth = np.copy(Htemp)
+        Hsmth_pad = shared_tools.custom_pad(Hsmth)
+
+        # loop through all cells and determine a smoothed index
         for i in range(L):
             for j in range(W):
 
+                # locate non-land cells
                 if cell_type[i, j] > -2:
-                    # locate non-boundary cells
-                    sumH = 0
-                    nbcount = 0
 
-                    ct_ind = pad_cell_type[
+                    # slice the padded array neighbors
+                    cell_type_nbrs = cell_type_pad[
                         i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-                    Hnew_ind = Hnew_pad[
-                        i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-                    H_SL_ind = H_SL_pad[
+                    Hsmth_nbrs = Hsmth_pad[
                         i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
 
-                    Hnew_ind[1, 1] = 0
-                    Hnew_ind = Hnew_ind.ravel()
-                    _log = ct_ind.ravel() == -2
-                    Hnew_ind[_log] = 0
+                    # flatten
+                    Hsmth_nbrs = Hsmth_nbrs.ravel()
+                    cell_type_nbrs = cell_type_nbrs.ravel()
 
-                    sumH = np.sum(Hnew_ind)
-                    nbcount = np.sum(Hnew_ind > H_SL_ind.ravel())
+                    # create a validation array
+                    invalid_nbrs = (cell_type_nbrs == -2)  # where land
+                    invalid_nbrs[4] = True
 
+                    # invalid cells cannot contribute stage values
+                    Hsmth_nbrs[invalid_nbrs] = 0
+
+                    # contributed stage and number of contributing nbrs
+                    sumH = np.sum(Hsmth_nbrs)
+                    nbcount = np.sum(~invalid_nbrs)
+
+                    # if there are any nbrs
                     if nbcount > 0:
-                        # smooth if are not wall cells
+                        # the new stage is the underrelaxed average of nbrs
                         Htemp[i, j] = (Csmooth * Hsmth[i, j] +
                                        (1 - Csmooth) * sumH / nbcount)
 
-    Hsmth = np.copy(Htemp)
-    return Hsmth
+    # return the smoothed stage 
+    return Htemp
