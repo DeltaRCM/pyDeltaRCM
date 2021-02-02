@@ -120,15 +120,15 @@ class BasePreprocessor(abc.ABC):
             print('Writing YAML file for job ' + str(int(i)))
 
         d = Path(ith_dir)
-        try:
-            d.mkdir()
-        except FileExistsError:
+        if d.is_dir():
             if 'resume_checkpoint' in self.yaml_dict and \
               self.yaml_dict['resume_checkpoint'] is True:
                 pass
             else:
                 raise FileExistsError(
                     'Job output directory (%s) already exists.' % str(p))
+        else:
+            d.mkdir()
         ith_p = d / (str(ith_id) + '.yml')
         write_yaml_config_to_file(ith_config, ith_p)
         return ith_p
@@ -207,15 +207,15 @@ class BasePreprocessor(abc.ABC):
             # create directory at root
             self.jobs_root = self.yaml_dict['out_dir']  # checked above for exist
             p = Path(self.jobs_root)
-            try:
-                p.mkdir()
-            except FileExistsError:
+            if p.is_dir():
                 if 'resume_checkpoint' in self.yaml_dict and \
                   self.yaml_dict['resume_checkpoint'] is True:
                     pass
                 else:
                     raise FileExistsError(
                         'Job output directory (%s) already exists.' % str(p))
+            else:
+                p.mkdir()
 
             # preallocate the matrix expansion job yamls and output table
             self.file_list = []  # create job yamls list
