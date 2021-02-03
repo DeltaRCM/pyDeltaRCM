@@ -65,7 +65,6 @@ class sed_tools(abc.ABC):
 
         self._sr.run(start_indices, self.eta, self.stage, self.depth,
                      self.cell_type, self.uw, self.ux, self.uy,
-                     self.pad_stage, self.pad_depth, self.pad_cell_type,
                      self.Vp_dep_mud, self.Vp_dep_sand,
                      self.qw, self.qx, self.qy, self.qs)
 
@@ -111,7 +110,6 @@ class sed_tools(abc.ABC):
 
         self._mr.run(start_indices, self.eta, self.stage, self.depth,
                      self.cell_type, self.uw, self.ux, self.uy,
-                     self.pad_stage, self.pad_depth, self.pad_cell_type,
                      self.Vp_dep_mud, self.Vp_dep_sand,
                      self.qw, self.qx, self.qy)
 
@@ -209,7 +207,7 @@ r_spec = [('_dt', float32), ('_dx', float32),
           ('ivec_flat', float32[:]), ('jvec_flat', float32[:]),
           ('iwalk_flat', int64[:]), ('jwalk_flat', int64[:]),
           ('distances_flat', float32[:]),
-          ('dry_depth', float32), ('gamma', float32), ('_lambda', float32),
+          ('dry_depth', float32), ('_lambda', float32),
           ('_beta', float32),  ('_f_bedload', float32),
           ('theta_sed', float32), ('u_max', float32),
           ('qs0', float32), ('_u0', float32), ('Vp_sed', float32),
@@ -407,7 +405,7 @@ class SandRouter(BaseRouter):
     """
     def __init__(self, _dt, dx, Vp_sed, u_max, qs0, u0, U_ero_sand, f_bedload,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
-                 dry_depth, gamma, beta, stepmax, theta_sed):
+                 dry_depth, beta, stepmax, theta_sed):
 
         self._dt = _dt
         self._dx = dx
@@ -424,13 +422,12 @@ class SandRouter(BaseRouter):
         self.distances_flat = distances_flat
 
         self.dry_depth = dry_depth
-        self.gamma = gamma
         self._beta = beta
         self.stepmax = stepmax
         self.theta_sed = theta_sed
 
     def run(self, start_indices, eta, stage, depth, cell_type,
-            uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud, Vp_dep_sand,
+            uw, ux, uy, Vp_dep_mud, Vp_dep_sand,
             qw, qx, qy, qs):
         """The main function to route and deposit/erode sand parcels.
 
@@ -469,9 +466,9 @@ class SandRouter(BaseRouter):
         self.uw = uw
         self.ux = ux
         self.uy = uy
-        self.pad_stage = pad_stage
-        self.pad_depth = pad_depth
-        self.pad_cell_type = pad_cell_type
+        self.pad_stage = shared_tools.custom_pad(stage)
+        self.pad_depth = shared_tools.custom_pad(depth)
+        self.pad_cell_type = shared_tools.custom_pad(cell_type)
         self.Vp_dep_mud = Vp_dep_mud
         self.Vp_dep_sand = Vp_dep_sand
         self.qw = qw
@@ -616,7 +613,7 @@ class MudRouter(BaseRouter):
     """
     def __init__(self, _dt, dx, Vp_sed, u_max, U_dep_mud, U_ero_mud,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
-                 dry_depth, gamma, _lambda, beta, stepmax, theta_sed):
+                 dry_depth, _lambda, beta, stepmax, theta_sed):
 
         self._dt = _dt
         self._dx = dx
@@ -631,14 +628,13 @@ class MudRouter(BaseRouter):
         self.distances_flat = distances_flat
 
         self.dry_depth = dry_depth
-        self.gamma = gamma
         self._lambda = _lambda
         self._beta = beta
         self.stepmax = stepmax
         self.theta_sed = theta_sed
 
     def run(self, start_indices, eta, stage, depth, cell_type,
-            uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud, Vp_dep_sand,
+            uw, ux, uy, Vp_dep_mud, Vp_dep_sand,
             qw, qx, qy):
         """The main function to route and deposit/erode mud parcels.
 
@@ -651,9 +647,9 @@ class MudRouter(BaseRouter):
         self.uw = uw
         self.ux = ux
         self.uy = uy
-        self.pad_stage = pad_stage
-        self.pad_depth = pad_depth
-        self.pad_cell_type = pad_cell_type
+        self.pad_stage = shared_tools.custom_pad(stage)
+        self.pad_depth = shared_tools.custom_pad(depth)
+        self.pad_cell_type = shared_tools.custom_pad(cell_type)
         self.Vp_dep_mud = Vp_dep_mud
         self.Vp_dep_sand = Vp_dep_sand
         self.qw = qw
