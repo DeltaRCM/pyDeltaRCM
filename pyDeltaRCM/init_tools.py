@@ -414,7 +414,7 @@ class init_tools(abc.ABC):
                                        self.u_max, self.U_dep_mud, self.U_ero_mud,
                                        self.ivec_flat, self.jvec_flat,
                                        self.iwalk_flat, self.jwalk_flat,
-                                       self.distances_flat, self.dry_depth, self.gamma,
+                                       self.distances_flat, self.dry_depth,
                                        self._lambda, self._beta,  self.stepmax,
                                        self.theta_mud)
         # initialize the SandRouter object
@@ -423,7 +423,7 @@ class init_tools(abc.ABC):
                                         self._f_bedload,
                                         self.ivec_flat, self.jvec_flat,
                                         self.iwalk_flat, self.jwalk_flat,
-                                        self.distances_flat, self.dry_depth, self.gamma,
+                                        self.distances_flat, self.dry_depth,
                                         self._beta, self.stepmax,
                                         self.theta_sand)
 
