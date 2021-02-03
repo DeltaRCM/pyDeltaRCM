@@ -135,76 +135,21 @@ class sed_tools(abc.ABC):
 
         Diffuse topography after routing all coarse sediment parcels. The
         operation is repeated `N_crossdiff` times.
-
-        .. note:: 
-
-            The old method of this function used convolution with a kernel to
-            compute smoother topography, and then adds this different to the
-            current eta to do the smoothing. This method had a smaller effect
-            than the implementation in the original Matlab DeltaRCM code,
-            however, it was faster. This may be a good target for
-            optimization.
-
         """
-        ### OLD CODE PRESERVED HERE ###
-        # for _ in range(self.N_crossdiff):
-        #
-        #     a = ndimage.convolve(self.eta, self.kernel1, mode='constant')
-        #     b = ndimage.convolve(self.qs, self.kernel2, mode='constant')
-        #     c = ndimage.convolve(self.qs * self.eta, self.kernel2,
-        #                          mode='constant')
-        #
-        #     self.cf = (self.diffusion_multiplier *
-        #                (self.qs * a - self.eta * b + c))
-        #
-        #     self.cf[self.cell_type == -2] = 0
-        #     self.cf[0, :] = 0
-        #
-        #     self.eta += self.cf
-        ### NEW CODE BELOW HERE ###
-        _smth_topo = _topo_diffusion(self.eta, self.qs, self.N_crossdiff,
-                                    self.cell_type, self.pad_cell_type,
-                                    self._dt, self._dx, self.alpha)
-        self.eta[:] = _smth_topo[:]  # force data copy
-
-
-@njit
-def _topo_diffusion(eta, qs, N_crossdiff, cell_type, pad_cell_type,
-                    dt, dx, alpha):
-    L, W = eta.shape
-    eta_diff = np.copy(eta)
-    qs_pad = np.copy(shared_tools.custom_pad(qs))
-    for _ in np.arange(N_crossdiff):
-
-        eta_N = np.copy(eta_diff)
-        eta_diff_pad = np.copy(shared_tools.custom_pad(eta_diff))
-
-        for i in np.arange(L):
-            for j in np.arange(W):
-                
-                if cell_type[i, j] != -2:  # if not land
-                    eta_diff_ind = eta_diff_pad[i - 1 + 1:i + 2 + 1,
-                                                j - 1 + 1:j + 2 + 1]
-                    cell_type_ind = pad_cell_type[i - 1 + 1:i + 2 + 1,
-                                                  j - 1 + 1:j + 2 + 1]
-                    qs_ind = qs_pad[i - 1 + 1:i + 2 + 1,
-                                    j - 1 + 1:j + 2 + 1]
-
-                    eta_diff_ind = eta_diff_ind.ravel()
-                    qs_ind = qs_ind.ravel()
-                    invalid_cells = (cell_type_ind.ravel() == -2)
-
-                    crossflux_nb = dt / N_crossdiff * alpha * \
-                        0.5 * (qs[i, j] + qs_ind) * dx * \
-                        (eta_diff_ind - eta_N[i, j]) / dx
-                    crossflux_nb[invalid_cells] = 0
-                    crossflux_nb = crossflux_nb / dx / dx
-
-                    eta_diff[i, j] = eta_diff[i, j] + np.sum(crossflux_nb);
-
-    eta_new = eta_diff
-
-    return eta_new
+        for _ in range(self.N_crossdiff):
+        
+            a = ndimage.convolve(self.eta, self.kernel1, mode='constant')
+            b = ndimage.convolve(self.qs, self.kernel2, mode='constant')
+            c = ndimage.convolve(self.qs * self.eta, self.kernel2,
+                                 mode='constant')
+        
+            self.cf = (self.diffusion_multiplier *
+                       (self.qs * a - self.eta * b + c))
+        
+            self.cf[self.cell_type == -2] = 0
+            self.cf[0, :] = 0
+        
+            self.eta += self.cf
 
 
 @njit
