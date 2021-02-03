@@ -1,6 +1,6 @@
 
 import numpy as np
-from numba import njit
+from numba import njit, prange
 import abc
 
 from . import shared_tools
@@ -187,10 +187,13 @@ class water_tools(abc.ABC):
                     self.qx[i, j], self.qy[i, j], self.ivec_flat, self.jvec_flat,
                     self.distances_flat)
 
-                self.water_weights[i, j] = _get_weight_at_cell_water(
-                    (i, j), weight_sfc, weight_int,
-                    depth_nbrs.ravel(), ct_nbrs.ravel(),
-                    self.dry_depth, self.gamma, self._theta_water)
+                try:
+                    self.water_weights[i, j] = _get_weight_at_cell_water(
+                        (i, j), weight_sfc, weight_int,
+                        depth_nbrs.ravel(), ct_nbrs.ravel(),
+                        self.dry_depth, self.gamma, self._theta_water)
+                except:
+                    breakpoint()
 
     def update_Q(self, dist, current_inds, next_index, astep, jstep, istep,
                  update_current=False, update_next=False):
@@ -420,22 +423,22 @@ class water_tools(abc.ABC):
 def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
                               dry_depth, gamma, theta):
 
+    # create a fixed set of bools
     dry = (depth_nbrs <= dry_depth)
     wall = (ct_nbrs == -2)
     ctr = (np.arange(9) == 4)
     drywall = np.logical_or(dry, wall)
-    invalid = np.logical_or(drywall, ctr)
-
+    invalid = np.logical_or(wall, ctr)
     if ind[0] == 0:
         invalid[:3] = True
 
     # set drywall to zero
     weight_sfc[drywall] = 0
-    weight_int[drywall] = 0 
+    weight_int[drywall] = 0
 
-    # always set ctr to 0 before rebalancing
+    # set ctr to 0 before rebalancing
     weight_sfc[ctr] = 0
-    weight_int[ctr] = 0 
+    weight_int[ctr] = 0
 
     # initial rebalance weights
     if np.nansum(weight_sfc) > 0:
@@ -451,8 +454,9 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
 
     # sanity check
     nanweight = np.isnan(weight)
-    if np.any(np.isnan(weight)):
-        raise RuntimeError('NaN encountered in water weighting. Please report error.')
+    if np.any(nanweight):
+        raise RuntimeError('NaN encountered in water weighting. '
+                           'Please report error.')
 
     # correct the weights for random choice 
     if np.nansum(weight) > 0:
@@ -467,22 +471,29 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
             #    just set to zero and pass
             weight[:] = 0
         else:
-            # convert to random walk into any wet
-            nwet = np.sum(~dry)
-            if nwet == 0:
-                # no wet/nonland neighbors. How did we get here??
-                #  Force to stay at self, will kill particle
+            # convert to random walk into...
+            wetvalid = np.logical_and(~dry, ~invalid)
+            nwetvalid = np.nansum(wetvalid)
+            if nwetvalid > 0:
+                # any wet (and valid)
                 weight[:] = 0
-                weight[4] = 1
+                weight[wetvalid] = (1 / nwetvalid)
             else:
+                # no wet (and valid) neighbors. How did we get here?? Flooding corrections?
+                #    allow to walk into any non-land cell, true random
+                nnotwall = np.nansum(~wall)
                 weight[:] = 0
-                weight[~dry] = (1 / nwet)
-                if ind[0] == 0:
-                    weight[:3] = 0
+                if nnotwall > 0:
+                    weight[~wall] = (1 / nnotwall)
+                else:
+                    raise RuntimeError('No non-wall cells surrounding cell. '
+                                       'Please report error.')
+
             weight = weight / np.nansum(weight)
 
     else:
-        raise RuntimeError('Water sum(weight) less than 0. Please report error.')
+        raise RuntimeError('Water sum(weight) less than 0. '
+                           'Please report error.')
 
     return weight
 
@@ -552,7 +563,7 @@ def _calculate_new_ind(indices, new_cells, iwalk, jwalk, domain_shape):
 
 @njit
 def _check_for_loops(free_surf_walk_indices, new_indices, _step,
-                    L0, looped, domain_shape, CTR, free_surf_flag):
+                     L0, looped, domain_shape, CTR, free_surf_flag):
     """Check for loops in water parcel pathways.
 
     Look for looping random walks, i.e., where a parcel returns to somewhere
