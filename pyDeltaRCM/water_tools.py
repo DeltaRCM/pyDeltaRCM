@@ -187,13 +187,10 @@ class water_tools(abc.ABC):
                     self.qx[i, j], self.qy[i, j], self.ivec_flat, self.jvec_flat,
                     self.distances_flat)
 
-                try:
-                    self.water_weights[i, j] = _get_weight_at_cell_water(
-                        (i, j), weight_sfc, weight_int,
-                        depth_nbrs.ravel(), ct_nbrs.ravel(),
-                        self.dry_depth, self.gamma, self._theta_water)
-                except:
-                    breakpoint()
+                self.water_weights[i, j] = _get_weight_at_cell_water(
+                    (i, j), weight_sfc, weight_int,
+                    depth_nbrs.ravel(), ct_nbrs.ravel(),
+                    self.dry_depth, self.gamma, self._theta_water)
 
     def update_Q(self, dist, current_inds, next_index, astep, jstep, istep,
                  update_current=False, update_next=False):
