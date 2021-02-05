@@ -258,6 +258,12 @@ class BaseRouter(object):
             self.qy[px, py], self.ivec_flat, self.jvec_flat,
             self.distances_flat)
 
+        if np.any(np.isnan(weight_int)):
+            raise RuntimeError('NaN in weight_int.')
+
+        if not np.all(np.isfinite(depth_nbrs.ravel())):
+            raise RuntimeError('nonfinite in depth_nbrs.')
+
         weights = _get_weight_at_cell_sediment(
             (px, py), weight_int, depth_nbrs.ravel(),
             cell_type_ind.ravel(), self.dry_depth, self.theta_sed, self.distances_flat)
@@ -583,8 +589,9 @@ class SandRouter(BaseRouter):
             #     transport capacity is not yet reached.
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
                                              self.U_ero_sand, self._beta)
-            Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],
+            Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
                                                 self.eta[px, py], self._dx)
+            Vp_change = Vp_change * -1
 
         if Vp_change > 0:  # if deposition
             self.Vp_dep_sand[px, py] = self.Vp_dep_sand[px, py] + Vp_change
@@ -709,8 +716,9 @@ class MudRouter(BaseRouter):
         if U_loc > self.U_ero_mud:
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
                                              self.U_ero_mud, self._beta)
-            Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],
+            Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
                                                 self.eta[px, py], self._dx)
+            Vp_change = Vp_change * -1
 
         if Vp_change > 0:  # if deposition
             self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change
