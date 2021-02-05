@@ -141,9 +141,10 @@ class water_tools(abc.ABC):
         _msg = 'Finalizing stepping of water parcels'
         self.log_info(_msg, verbosity=2)
 
-        self.stage[:] = np.maximum(self.stage, self._H_SL)
-        self.depth[:] = np.maximum(self.stage - self.eta, 0)
+        # apply an update on the depth to match stage and eta values
+        self.depth[:] = np.maximum(self.stage - self.eta, 0)  # never negative
 
+        # update fields for sediment routing
         self.update_flow_field(iteration)
         self.update_velocity_field()
 
@@ -269,8 +270,8 @@ class water_tools(abc.ABC):
 
         # combine new smoothed and previous free surf with underrelaxation
         if self._time_iter > 0:
-            self.stage = ((1 - self._omega_sfc) * self.stage +
-                          self._omega_sfc * Hsmth)
+            self.stage = (((1 - self._omega_sfc) * self.stage) + 
+                          (self._omega_sfc * Hsmth))
 
         # apply a flooding correction
         self.flooding_correction()
@@ -319,14 +320,16 @@ class water_tools(abc.ABC):
         """
         _msg = 'Updating flow velocity fields after parcel stepping'
         self.log_info(_msg, verbosity=2)
-        mask = (self.depth > self.dry_depth) * (self.qw > 0)
+        
+        mask = np.logical_and((self.depth > self.dry_depth), (self.qw > 0))
 
-        self.uw[mask] = np.minimum(
-            self.u_max, self.qw[mask] / self.depth[mask])
-        self.uw[~mask] = 0
+        self.uw[mask] = np.minimum(self.u_max,
+                                   self.qw[mask] / self.depth[mask])
         self.ux[mask] = self.uw[mask] * self.qx[mask] / self.qw[mask]
-        self.ux[~mask] = 0
         self.uy[mask] = self.uw[mask] * self.qy[mask] / self.qw[mask]
+
+        self.uw[~mask] = 0
+        self.ux[~mask] = 0
         self.uy[~mask] = 0
 
     def flooding_correction(self):
@@ -581,7 +584,7 @@ def _check_for_loops(free_surf_walk_indices, new_indices, _step,
                 has_repeat_ind = len(_walk) != len(set(_walk))
                 if has_repeat_ind:
                     # handle when a loop is detected
-                    looped[p] += 1
+                    looped[p] = 1
                     px, py = shared_tools.custom_unravel(new_ind, domain_shape)
 
                     Fx = px - 1
@@ -705,12 +708,12 @@ def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
 
 
 @njit
-def _smooth_free_surface(H0, cell_type, Nsmooth, Csmooth):
+def _smooth_free_surface(Hin, cell_type, Nsmooth, Csmooth):
     """Smooth the free surface.
 
     Parameters
     ----------
-    H0
+    Hin
         Stage input to the smoothing (i.e., the old stage).
 
     cell_type
@@ -723,26 +726,26 @@ def _smooth_free_surface(H0, cell_type, Nsmooth, Csmooth):
         Underrelaxation coefficient for smoothing iterations.
     """
     # grab relevant shape information
-    L, W = H0.shape
+    L, W = Hin.shape
 
     # pad the input stage and cell type arrays
-    H0_pad = shared_tools.custom_pad(H0)
+    Hin_pad = shared_tools.custom_pad(Hin)
     cell_type_pad = shared_tools.custom_pad(cell_type)
 
     # create copy of H which is modified in following smoothing
-    Htemp = np.copy(H0)
+    Htemp = np.copy(Hin)
     for _ in range(Nsmooth):
 
         # create another copy to refernce as base in Nsmooth iteration
         Hsmth = np.copy(Htemp)
-        Hsmth_pad = shared_tools.custom_pad(Hsmth)
+        Hsmth_pad = np.copy(shared_tools.custom_pad(Hsmth))
 
         # loop through all cells and determine a smoothed index
         for i in range(L):
             for j in range(W):
 
-                # locate non-land cells
-                if cell_type[i, j] > -2:
+                # locate non-edge cells
+                if cell_type[i, j] != -1:
 
                     # slice the padded array neighbors
                     cell_type_nbrs = cell_type_pad[
@@ -751,8 +754,8 @@ def _smooth_free_surface(H0, cell_type, Nsmooth, Csmooth):
                         i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
 
                     # flatten
-                    Hsmth_nbrs = Hsmth_nbrs.ravel()
-                    cell_type_nbrs = cell_type_nbrs.ravel()
+                    Hsmth_nbrs = np.copy(Hsmth_nbrs.ravel())
+                    cell_type_nbrs = np.copy(cell_type_nbrs.ravel())
 
                     # create a validation array
                     invalid_nbrs = (cell_type_nbrs == -2)  # where land
@@ -768,8 +771,9 @@ def _smooth_free_surface(H0, cell_type, Nsmooth, Csmooth):
                     # if there are any nbrs
                     if nbcount > 0:
                         # the new stage is the underrelaxed average of nbrs
-                        Htemp[i, j] = (Csmooth * Hsmth[i, j] +
-                                       (1 - Csmooth) * sumH / nbcount)
+                        Htemp[i, j] = ((Csmooth * Hsmth[i, j]) +
+                                       ((1 - Csmooth) * (sumH / nbcount)))
 
-    # return the smoothed stage 
-    return Htemp
+    # return the smoothed stage
+    Hsmth = np.copy(Htemp)
+    return Hsmth
