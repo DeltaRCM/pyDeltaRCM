@@ -20,7 +20,7 @@ class water_tools(abc.ABC):
         self.qyn[:] = 0
         self.qwn[:] = 0
 
-        self.free_surf_flag[:] = 0
+        self.free_surf_flag[:] = 1  # all parcels begin as valid
         self.free_surf_walk_indices[:] = 0
         self.sfc_visit[:] = 0
         self.sfc_sum[:] = 0
@@ -47,13 +47,14 @@ class water_tools(abc.ABC):
                                                        inlet_weights,
                                                        self._Np_water)
 
+        # flux from ghost node
         self.qxn.flat[start_indices] += 1
+        self.qyn.flat[start_indices] += 0  # this could be omitted...
         self.qwn.flat[start_indices] += self.Qp_water / self._dx / 2
 
-        self.free_surf_walk_indices[:, 0] = start_indices
+        # load the initial indices into the walk indices
+        self.free_surf_walk_indices[:, _step] = start_indices
         current_inds = np.copy(start_indices)
-
-        self.looped[:] = 0
 
         self.get_water_weight_array()
         water_weights_flat = self.water_weights.reshape(-1, 9)  # flatten for fast access
@@ -61,8 +62,10 @@ class water_tools(abc.ABC):
         # while any parcles still need to take any steps
         while (sum(current_inds) > 0) & (_step < self.stepmax):
 
+            # step counter increment
             _step += 1
 
+            # check whether storage size needs to be increased
             self.check_size_of_indices_matrix(_step)
 
             # use water weights and random pick to determine d8 direction
@@ -70,7 +73,7 @@ class water_tools(abc.ABC):
             new_direction = new_direction.astype(np.int)
 
             # use the new directions for each parcel to determine the new ind for each parcel
-            new_indices = _calculate_new_ind(
+            new_inds = _calculate_new_ind(
                 current_inds,
                 new_direction,
                 self.iwalk_flat,
@@ -84,23 +87,33 @@ class water_tools(abc.ABC):
                 self.jwalk_flat)
 
             # update the discharge field with walk of parcels
+            #    this updates flux out of the old inds, and into the new inds
             self.update_Q(
-                dist, current_inds, new_indices, astep, jstep, istep,
+                dist, current_inds, new_inds, astep, jstep, istep,
                 update_current=True, update_next=True)
 
             # check for any loops in the walks of parcels
-            #     Note, a loop disqualifies a parcel from the free surface calculation,
-            #     but does not stop the parcel from routing and changing qw field.
-            current_inds, self.looped, self.free_surf_flag = _check_for_loops(
-                self.free_surf_walk_indices, new_indices, _step, self.L0, self.looped,
-                self.eta.shape, self.CTR, self.free_surf_flag)
+            #     A loop disqualifies a parcel from the free surface
+            #     calculation, but does not stop the parcel from routing, and
+            #     thus influencing the qw fields. If a parcel is looped, it
+            #     will be given a new location in the domain, along the
+            #     mean-transport vector.
+            new_inds, looped = _check_for_loops(
+                self.free_surf_walk_indices, new_inds, _step, self.L0, 
+                self.eta.shape, self.CTR)
 
-            # Record the parcel pathways for computing the free surface
-            #     Parcels that have reached the boundary are updated to
-            #     ``ind==0``, effectively ending the routing of these parcels.
-            current_inds = self.check_for_boundary(current_inds)  # changes `free_surf_flag`
+            # invalidate the looped parcels from the free surface
+            self.free_surf_flag[looped] = 0  
+
+            # set the current_inds to be the new_inds values (i.e., take the step)
+            current_inds[:] = new_inds[:]
+
+            # Record the parcel pathways for computing the free surface later
             self.free_surf_walk_indices[:, _step] = current_inds  # record indices
-            boundary = (self.free_surf_flag > 0)
+            boundary = self.check_for_boundary(current_inds)  # changes `free_surf_flag`
+
+            # parcels that have reached the boundary are set ``ind==0``,
+            # effectively ending the routing of these parcels.
             current_inds[boundary] = 0
 
             # update the q*n fields for the final step 
@@ -108,9 +121,9 @@ class water_tools(abc.ABC):
             if np.any(boundary):
                 self.update_Q(
                     dist[boundary], current_inds[boundary], 
-                    new_indices[boundary], astep[boundary],
+                    new_inds[boundary], astep[boundary],
                     jstep[boundary], istep[boundary],
-                    update_current=False, update_next=True)
+                    update_current=True, update_next=False)
 
     def compute_free_surface(self):
         """Calculate free surface after routing all water parcels.
@@ -127,7 +140,7 @@ class water_tools(abc.ABC):
         self.log_info(_msg, verbosity=2)
 
         self.sfc_visit, self.sfc_sum = _accumulate_free_surface_walks(
-            self.free_surf_walk_indices, self.looped, self.cell_type,
+            self.free_surf_walk_indices, self.free_surf_flag, self.cell_type,
             self.uw, self.ux, self.uy, self.depth,
             self._dx, self._u0, self.h0, self._H_SL, self._S0)
 
@@ -193,7 +206,7 @@ class water_tools(abc.ABC):
                     depth_nbrs.ravel(), ct_nbrs.ravel(),
                     self.dry_depth, self.gamma, self._theta_water)
 
-    def update_Q(self, dist, current_inds, next_index, astep, jstep, istep,
+    def update_Q(self, dist, current_inds, next_inds, astep, jstep, istep,
                  update_current=False, update_next=False):
         """Update discharge field values after one set of water parcel steps."""
         _msg = 'Updating flux fields after single parcel step'
@@ -210,13 +223,13 @@ class water_tools(abc.ABC):
                 astep, self.Qp_water, self._dx).reshape(self.qwn.shape)
         if update_next:
             self.qxn = _update_dirQfield(
-                self.qxn.flat[:], dist, next_index,
+                self.qxn.flat[:], dist, next_inds,
                 astep, jstep).reshape(self.qxn.shape)
             self.qyn = _update_dirQfield(
-                self.qyn.flat[:], dist, next_index,
+                self.qyn.flat[:], dist, next_inds,
                 astep, istep).reshape(self.qyn.shape)
             self.qwn = _update_absQfield(
-                self.qwn.flat[:], dist, next_index,
+                self.qwn.flat[:], dist, next_inds,
                 astep, self.Qp_water, self._dx).reshape(self.qwn.shape)
 
     def check_for_boundary(self, inds):
@@ -235,13 +248,14 @@ class water_tools(abc.ABC):
         self.log_info(_msg, verbosity=2)
 
         # where cell type is "edge" and free_surf_flag is currently valid (value: 0)
-        self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == 0)] = 1
+        # self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == 0)] = 1
 
         # where cell type is "edge" and free_surf_flag is currently looped (value: -1)
-        self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == -1)] = 2
+        # self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == -1)] = 2
 
-        inds[self.free_surf_flag == 2] = 0
-        return inds
+        # inds[self.free_surf_flag == 2] = 0
+        boundary = (self.cell_type.flat[inds] == -1)
+        return boundary
 
     def finalize_free_surface(self):
         """Finalize the water free surface.
@@ -562,31 +576,48 @@ def _calculate_new_ind(indices, new_cells, iwalk, jwalk, domain_shape):
 
 
 @njit
-def _check_for_loops(free_surf_walk_indices, new_indices, _step,
-                     L0, looped, domain_shape, CTR, free_surf_flag):
+def _check_for_loops(free_surf_walk_inds, new_inds, _step,
+                     L0, domain_shape, CTR):
     """Check for loops in water parcel pathways.
 
     Look for looping random walks, i.e., where a parcel returns to somewhere
     it has already been.
+
+    Parameters
+    ----------
+
+
+    Returns
+    -------
+    new_inds
+        An updated array of parcel indicies, where the index of a parcel has
+        been changed, if and only if, that parcel was looped.
+
+    looped
+        A binary integer array indicating whether a parcel was determined to
+        have been looped.
     """
-    nparcels = free_surf_walk_indices.shape[0]
+    nparcels = free_surf_walk_inds.shape[0]
     domain_min_x = domain_shape[0] - 2
     domain_min_y = domain_shape[1] - 2
+
+    looped = np.zeros_like(new_inds)
 
     # if the _step number is larger than the inlet length
     if (_step > L0):
         # loop though every parcel walk
         for p in np.arange(nparcels):
-            new_ind = new_indices[p]  # the new index of the parcel
-            walk = free_surf_walk_indices[p, :]  # the parcel's walk
+            new_ind = new_inds[p]  # the new index of the parcel
+            walk = free_surf_walk_inds[p, :]  # the parcel's walk
             _walk = walk[walk > 0]
             if (new_ind > 0):
                 has_repeat_ind = len(_walk) != len(set(_walk))
                 if has_repeat_ind:
                     # handle when a loop is detected
-                    looped[p] = 1
                     px, py = shared_tools.custom_unravel(new_ind, domain_shape)
 
+                    # compute a new location for the parcel along the
+                    #     mean-transport vector
                     Fx = px - 1
                     Fy = py - CTR
                     Fw = np.sqrt(Fx**2 + Fy**2)
@@ -600,9 +631,10 @@ def _check_for_loops(free_surf_walk_indices, new_indices, _step,
                     py = np.minimum(domain_min_y, np.maximum(1, py))
 
                     nind = shared_tools.custom_ravel((px, py), domain_shape)
-                    new_indices[p] = nind
-                    free_surf_flag[p] = -1
-    return new_indices, looped, free_surf_flag
+                    new_inds[p] = nind
+                    looped[p] = 1  # this parcel is looped
+
+    return new_inds, looped # free_surf_flag
 
 
 @njit
@@ -624,7 +656,7 @@ def _update_absQfield(qfield, dist, inds, astep, Qp_water, dx):
 
 
 @njit
-def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
+def _accumulate_free_surface_walks(free_surf_walk_indices, free_surf_flag, cell_type,
                                    uw, ux, uy, depth, dx, u0, h0, H_SL, S0):
     """Accumulate the free surface by walking parcel paths.
 
@@ -665,7 +697,7 @@ def _accumulate_free_surface_walks(free_surf_walk_indices, looped, cell_type,
 
         # determine whether the pathway contributes to the free surface
         Hnew[:] = 0
-        if ((cell_type[xs[-1], ys[-1]] == -1) and (looped[p] == 0)):
+        if ((cell_type[xs[-1], ys[-1]] == -1) and (free_surf_flag[p] == 1)):
             # if cell is in ocean, H = H_SL (downstream boundary condition)
             Hnew[xs[-1], ys[-1]] = H_SL
 

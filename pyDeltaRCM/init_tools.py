@@ -345,7 +345,6 @@ class init_tools(abc.ABC):
         self.Vp_dep_sand = np.zeros((self.L, self.W))
         self.Vp_dep_mud = np.zeros((self.L, self.W))
         self.free_surf_flag = np.zeros((self._Np_water,), dtype=np.int64)
-        self.looped = np.zeros((self._Np_water,), dtype=np.int64)
         self.free_surf_walk_indices = np.zeros((self._Np_water,
                                                 self.size_indices),
                                                dtype=np.int64)
