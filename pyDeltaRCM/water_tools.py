@@ -47,6 +47,9 @@ class water_tools(abc.ABC):
                                                        inlet_weights,
                                                        self._Np_water)
 
+        # reset the free surface flag on each iteration 
+        self.free_surf_flag[:] = 1
+
         # flux from ghost node
         self.qxn.flat[start_indices] += 1
         self.qyn.flat[start_indices] += 0  # this could be omitted...
@@ -86,6 +89,8 @@ class water_tools(abc.ABC):
                 self.iwalk_flat,
                 self.jwalk_flat)
 
+            # breakpoint()
+
             # update the discharge field with walk of parcels
             #    this updates flux out of the old inds, and into the new inds
             self.update_Q(
@@ -101,29 +106,41 @@ class water_tools(abc.ABC):
             new_inds, looped = _check_for_loops(
                 self.free_surf_walk_indices, new_inds, _step, self.L0, 
                 self.eta.shape, self.CTR)
-
-            # invalidate the looped parcels from the free surface
-            self.free_surf_flag[looped] = 0  
+            looped = looped.astype(np.bool)
 
             # set the current_inds to be the new_inds values (i.e., take the step)
             current_inds[:] = new_inds[:]
 
-            # Record the parcel pathways for computing the free surface later
-            self.free_surf_walk_indices[:, _step] = current_inds  # record indices
+            # invalidate the looped parcels from the free surface
+            # breakpoint()
+            self.free_surf_flag[looped] = 0  
+
+            # APPLY the current_inds to be the new_inds values (i.e., take the step)
+            # current_inds[:] = new_inds[:]
+
+            # check for parcels that have reached the boundary
             boundary = self.check_for_boundary(current_inds)  # changes `free_surf_flag`
 
+            # parcels that have looped are 
+            boundary_looped = np.logical_and(looped, boundary)
+            current_inds[boundary_looped] = 0
+
+            # Record the parcel pathways for computing the free surface later
+            self.free_surf_walk_indices[:, _step] = current_inds  # record indices
+
             # parcels that have reached the boundary are set ``ind==0``,
-            # effectively ending the routing of these parcels.
+            #     effectively ending the routing of these parcels.
             current_inds[boundary] = 0
+
 
             # update the q*n fields for the final step 
             #    to ensure flux balanced at domain edge
-            if np.any(boundary):
-                self.update_Q(
-                    dist[boundary], current_inds[boundary], 
-                    new_inds[boundary], astep[boundary],
-                    jstep[boundary], istep[boundary],
-                    update_current=True, update_next=False)
+            # if np.any(boundary):
+            #     self.update_Q(
+            #         dist[boundary], current_inds[boundary], 
+            #         new_inds[boundary], astep[boundary],
+            #         jstep[boundary], istep[boundary],
+            #         update_current=True, update_next=False)
 
     def compute_free_surface(self):
         """Calculate free surface after routing all water parcels.
@@ -289,6 +306,12 @@ class water_tools(abc.ABC):
 
         # apply a flooding correction
         self.flooding_correction()
+
+        # import matplotlib.pyplot as plt
+        # fig, ax = plt.subplots(1, 2)
+        # ax[0].imshow(self.sfc_visit)
+        # ax[1].imshow(self.stage)
+        # plt.show()
 
     def update_flow_field(self, iteration):
         """Update water discharge.
@@ -635,6 +658,17 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
                     looped[p] = 1  # this parcel is looped
 
     return new_inds, looped # free_surf_flag
+
+"""Something is wrong with the check for loops.
+First: it results in few walks contributing to the free surface (usually ~50%).
+I believe this may contribute to the lower-than-levee stages in channels. 
+
+One issue I see right away is that, although the check only looks for loops if
+the step is beyond L0, it will trigger on any loop that is within the L0 too.
+This NEEDS to be fixed. Hopefully that will help.
+"""
+
+
 
 
 @njit
