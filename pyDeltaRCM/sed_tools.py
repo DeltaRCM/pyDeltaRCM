@@ -382,15 +382,21 @@ class BaseRouter(object):
         return (Vp_sed * (U_loc**beta - U_ero**beta) /
                 U_ero**beta)
 
-    def _limit_Vp_change(self, Vp, stage, eta, dx):
+    def _limit_Vp_change(self, Vp, stage, eta, dx, dep_ero):
         """Limit change in volume to 1/4 of a cell volume.
 
         Function is used by multiple pathways in `mud_dep_ero` and `sand_dep_ero`
         but with different inputs for the sediment volume (:obj:`Vp`).
+
+        dep_ero indicates which pathway we are in, dep==0, ero==1
         """
-        depth = (stage - eta)
-        if depth <= 0:
-            return 0
+        depth = stage - eta
+        if depth < 0:
+            if dep_ero == 0:
+                return 0
+            else:
+                fourth = np.abs(depth) / 4 * (dx * dx)
+                return np.minimum(Vp, fourth)
         else:
             fourth = depth / 4 * (dx * dx)
             return np.minimum(Vp, fourth)
@@ -584,7 +590,7 @@ class SandRouter(BaseRouter):
             #     transport capacity of the cell (`qs_cap`), sediment needs to
             #     deposit on the bed.
             Vp_change = self._limit_Vp_change(self.Vp_res, self.stage[px, py],
-                                              self.eta[px, py], self._dx)
+                                              self.eta[px, py], self._dx, 0)
 
         elif (U_loc > self.U_ero_sand) and (qs_loc < qs_cap):
             # Sand erosion
@@ -594,7 +600,7 @@ class SandRouter(BaseRouter):
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
                                              self.U_ero_sand, self._beta)
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                                self.eta[px, py], self._dx)
+                                                self.eta[px, py], self._dx, 1)
             Vp_change = Vp_change * -1
 
         if Vp_change > 0:  # if deposition
@@ -715,13 +721,13 @@ class MudRouter(BaseRouter):
                          (self.U_dep_mud**self._beta - U_loc**self._beta) /
                          (self.U_dep_mud**self._beta))
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                              self.eta[px, py], self._dx)
+                                              self.eta[px, py], self._dx, 0)
 
         if U_loc > self.U_ero_mud:
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
                                              self.U_ero_mud, self._beta)
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                                self.eta[px, py], self._dx)
+                                                self.eta[px, py], self._dx, 1)
             Vp_change = Vp_change * -1
 
         if Vp_change > 0:  # if deposition
