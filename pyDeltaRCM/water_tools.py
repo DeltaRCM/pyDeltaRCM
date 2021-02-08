@@ -272,12 +272,15 @@ class water_tools(abc.ABC):
         # begin from the previous stage
         Hnew = self.eta + self.depth
 
-        # water surface height not under sea level
-        Hnew[Hnew < self._H_SL] = self._H_SL
-
         # find average water surface elevation for a cell from accumulation
         Hnew[self.sfc_visit > 0] = (self.sfc_sum[self.sfc_visit > 0] /
                                     self.sfc_visit[self.sfc_visit > 0])
+
+        # water surface height not under sea level
+        Hnew[Hnew < self._H_SL] = self._H_SL
+
+        # water surface height not below bed elevation
+        Hnew[Hnew < self.eta] = self.eta[Hnew < self.eta]
 
         # smooth newly calculated free surface
         Hsmth = _smooth_free_surface(
@@ -445,7 +448,7 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
                               dry_depth, gamma, theta):
 
     # create a fixed set of bools
-    dry = (depth_nbrs <= dry_depth)
+    dry = (depth_nbrs < dry_depth)
     wall = (ct_nbrs == -2)
     ctr = (np.arange(9) == 4)
     drywall = np.logical_or(dry, wall)
