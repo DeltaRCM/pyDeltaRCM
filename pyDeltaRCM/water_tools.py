@@ -7,6 +7,8 @@ from . import shared_tools
 
 import matplotlib.pyplot as plt
 
+from pytictoc import TicToc
+
 # tools for water routing algorithms
 
 
@@ -89,8 +91,6 @@ class water_tools(abc.ABC):
                 self.iwalk_flat,
                 self.jwalk_flat)
 
-            # breakpoint()
-
             # update the discharge field with walk of parcels
             #    this updates flux out of the old inds, and into the new inds
             self.update_Q(
@@ -112,16 +112,13 @@ class water_tools(abc.ABC):
             current_inds[:] = new_inds[:]
 
             # invalidate the looped parcels from the free surface
-            # breakpoint()
             self.free_surf_flag[looped] = 0  
-
-            # APPLY the current_inds to be the new_inds values (i.e., take the step)
-            # current_inds[:] = new_inds[:]
 
             # check for parcels that have reached the boundary
             boundary = self.check_for_boundary(current_inds)  # changes `free_surf_flag`
 
-            # parcels that have looped are 
+            # parcels that have looped and reached the boundary are set zero
+            #     before saving their indices
             boundary_looped = np.logical_and(looped, boundary)
             current_inds[boundary_looped] = 0
 
@@ -132,15 +129,14 @@ class water_tools(abc.ABC):
             #     effectively ending the routing of these parcels.
             current_inds[boundary] = 0
 
-
             # update the q*n fields for the final step 
             #    to ensure flux balanced at domain edge
-            # if np.any(boundary):
-            #     self.update_Q(
-            #         dist[boundary], current_inds[boundary], 
-            #         new_inds[boundary], astep[boundary],
-            #         jstep[boundary], istep[boundary],
-            #         update_current=True, update_next=False)
+            if np.any(boundary):
+                self.update_Q(
+                    dist[boundary], current_inds[boundary], 
+                    new_inds[boundary], astep[boundary],
+                    jstep[boundary], istep[boundary],
+                    update_current=True, update_next=False)
 
     def compute_free_surface(self):
         """Calculate free surface after routing all water parcels.
@@ -170,6 +166,10 @@ class water_tools(abc.ABC):
         """
         _msg = 'Finalizing stepping of water parcels'
         self.log_info(_msg, verbosity=2)
+
+        # apply boundary for water surface
+        #     Note: not in Matlab implementation
+        self.stage[:] = np.maximum(self.stage, self._H_SL)
 
         # apply an update on the depth to match stage and eta values
         self.depth[:] = np.maximum(self.stage - self.eta, 0)  # never negative
@@ -205,23 +205,13 @@ class water_tools(abc.ABC):
         """
         _msg = 'Computing water weight array'
         self.log_info(_msg, verbosity=2)
-        self.water_weights = np.zeros(shape=(self.L, self.W, 9))
 
-        for i in range(self.L):
-            for j in range(self.W):
-                stage_nbrs = self.pad_stage[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-                depth_nbrs = self.pad_depth[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-                ct_nbrs = self.pad_cell_type[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-
-                weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
-                    self.stage[i, j], stage_nbrs.ravel(),
-                    self.qx[i, j], self.qy[i, j], self.ivec_flat, self.jvec_flat,
-                    self.distances_flat)
-
-                self.water_weights[i, j] = _get_weight_at_cell_water(
-                    (i, j), weight_sfc, weight_int,
-                    depth_nbrs.ravel(), ct_nbrs.ravel(),
-                    self.dry_depth, self.gamma, self._theta_water)
+        # compiling the water weight array is handled inside a jitted
+        #     function below. ~4x faster.
+        self.water_weights = _get_water_weight_array(
+            self.depth, self.stage, self.cell_type, self.qx, self.qy, 
+            self.ivec_flat, self.jvec_flat, self.distances_flat, 
+            self.dry_depth, self.gamma, self._theta_water)
 
     def update_Q(self, dist, current_inds, next_inds, astep, jstep, istep,
                  update_current=False, update_next=False):
@@ -263,12 +253,6 @@ class water_tools(abc.ABC):
         """
         _msg = 'Checking stepped parcels against boundary location'
         self.log_info(_msg, verbosity=2)
-
-        # where cell type is "edge" and free_surf_flag is currently valid (value: 0)
-        # self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == 0)] = 1
-
-        # where cell type is "edge" and free_surf_flag is currently looped (value: -1)
-        # self.free_surf_flag[(self.cell_type.flat[inds] == -1) & (self.free_surf_flag == -1)] = 2
 
         # inds[self.free_surf_flag == 2] = 0
         boundary = (self.cell_type.flat[inds] == -1)
@@ -533,6 +517,36 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
                            'Please report error.')
 
     return weight
+
+
+@njit()
+def _get_water_weight_array(depth, stage, cell_type, qx, qy,
+                            ivec_flat, jvec_flat, distances_flat, 
+                            dry_depth, gamma, theta_water):
+    L, W = depth.shape
+    pad_stage = shared_tools.custom_pad(stage)
+    pad_depth = shared_tools.custom_pad(depth)
+    pad_cell_type = shared_tools.custom_pad(cell_type)
+
+    water_weights = np.zeros((L, W, 9))
+
+    for i in range(L):
+        for j in range(W):
+            stage_nbrs = pad_stage[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+            depth_nbrs = pad_depth[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+            ct_nbrs = pad_cell_type[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+
+            weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
+                stage[i, j], stage_nbrs.ravel(),
+                qx[i, j], qy[i, j], ivec_flat, jvec_flat,
+                distances_flat)
+
+            water_weights[i, j] = _get_weight_at_cell_water(
+                (i, j), weight_sfc, weight_int,
+                depth_nbrs.ravel(), ct_nbrs.ravel(),
+                dry_depth, gamma, theta_water)
+
+    return water_weights
 
 
 @njit('int64[:](int64[:], float64[:,:])')
