@@ -388,8 +388,12 @@ class BaseRouter(object):
         Function is used by multiple pathways in `mud_dep_ero` and `sand_dep_ero`
         but with different inputs for the sediment volume (:obj:`Vp`).
         """
-        fourth = (stage - eta) / 4 * (dx * dx)
-        return np.minimum(Vp, fourth)
+        depth = (stage - eta)
+        if depth <= 0:
+            return 0
+        else:
+            fourth = depth / 4 * (dx * dx)
+            return np.minimum(Vp, fourth)
 
 
 @jitclass(r_spec)
@@ -546,7 +550,7 @@ class SandRouter(BaseRouter):
                 sed_continue = False
 
     def _partition_sediment(self, px0, py0, px, py, dist):
-        """Spread sand between two cells.
+        """Spread sediment flux between two cells.
         """
         partition = self.Vp_res / 2. / self._dt / self._dx
         if dist > 0:
