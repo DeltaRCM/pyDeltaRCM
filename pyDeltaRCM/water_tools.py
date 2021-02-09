@@ -1,13 +1,9 @@
 
 import numpy as np
-from numba import njit, prange
+from numba import njit
 import abc
 
 from . import shared_tools
-
-import matplotlib.pyplot as plt
-
-from pytictoc import TicToc
 
 # tools for water routing algorithms
 
@@ -23,7 +19,7 @@ class water_tools(abc.ABC):
         self.qwn[:] = 0
 
         self.free_surf_flag[:] = 1  # all parcels begin as valid
-        self.free_surf_walk_indices[:] = 0
+        self.free_surf_walk_inds[:] = 0
         self.sfc_visit[:] = 0
         self.sfc_sum[:] = 0
 
@@ -49,7 +45,7 @@ class water_tools(abc.ABC):
                                                        inlet_weights,
                                                        self._Np_water)
 
-        # reset the free surface flag on each iteration 
+        # reset the free surface flag on each iteration
         self.free_surf_flag[:] = 1
 
         # flux from ghost node
@@ -58,11 +54,12 @@ class water_tools(abc.ABC):
         self.qwn.flat[start_indices] += self.Qp_water / self._dx / 2
 
         # load the initial indices into the walk indices
-        self.free_surf_walk_indices[:, _step] = start_indices
+        self.free_surf_walk_inds[:, _step] = start_indices
         current_inds = np.copy(start_indices)
 
+        # get weights, and flatten for faster access
         self.get_water_weight_array()
-        water_weights_flat = self.water_weights.reshape(-1, 9)  # flatten for fast access
+        water_weights_flat = self.water_weights.reshape(-1, 9)
 
         # while any parcles still need to take any steps
         while (sum(current_inds) > 0) & (_step < self.stepmax):
@@ -77,7 +74,8 @@ class water_tools(abc.ABC):
             new_direction = _choose_next_direction(current_inds, water_weights_flat)
             new_direction = new_direction.astype(np.int)
 
-            # use the new directions for each parcel to determine the new ind for each parcel
+            # use the new directions for each parcel to determine the new ind
+            #   for each parcel
             new_inds = _calculate_new_ind(
                 current_inds,
                 new_direction,
@@ -92,56 +90,57 @@ class water_tools(abc.ABC):
                 self.jwalk_flat)
 
             # update the discharge field with walk of parcels
-            #    this updates flux out of the old inds, and into the new inds
+            #   this updates flux out of the old inds, and into the new inds
             self.update_Q(
                 dist, current_inds, new_inds, astep, jstep, istep,
                 update_current=True, update_next=True)
 
             # check for any loops in the walks of parcels
-            #     A loop disqualifies a parcel from the free surface
-            #     calculation, but does not stop the parcel from routing, and
-            #     thus influencing the qw fields. If a parcel is looped, it
-            #     will be given a new location in the domain, along the
-            #     mean-transport vector.
+            #   A loop disqualifies a parcel from the free surface
+            #   calculation, but does not stop the parcel from routing, and
+            #   thus influencing the qw fields. If a parcel is looped, it
+            #   will be given a new location in the domain, along the
+            #   mean-transport vector.
             new_inds, looped = _check_for_loops(
-                self.free_surf_walk_indices, new_inds, _step, self.L0, 
+                self.free_surf_walk_inds, new_inds, _step, self.L0,
                 self.eta.shape, self.CTR)
             looped = looped.astype(np.bool)
 
-            # set the current_inds to be the new_inds values (i.e., take the step)
+            # set the current_inds to be the new_inds values
+            #   (i.e., take the step)
             current_inds[:] = new_inds[:]
 
             # invalidate the looped parcels from the free surface
-            self.free_surf_flag[looped] = 0  
+            self.free_surf_flag[looped] = 0
 
             # check for parcels that have reached the boundary
-            boundary = self.check_for_boundary(current_inds)  # changes `free_surf_flag`
+            boundary = self.check_for_boundary(current_inds)
 
             # parcels that have looped and reached the boundary are set zero
-            #     before saving their indices
+            #   before saving their indices
             boundary_looped = np.logical_and(looped, boundary)
             current_inds[boundary_looped] = 0
 
             # Record the parcel pathways for computing the free surface later
-            self.free_surf_walk_indices[:, _step] = current_inds  # record indices
+            self.free_surf_walk_inds[:, _step] = current_inds
 
             # parcels that have reached the boundary are set ``ind==0``,
-            #     effectively ending the routing of these parcels.
+            #   effectively ending the routing of these parcels.
             current_inds[boundary] = 0
 
-            # update the q*n fields for the final step 
-            #    to ensure flux balanced at domain edge
+            # update the q*n fields for the final step
+            #   to ensure flux balanced at domain edge
             if np.any(boundary):
                 self.update_Q(
-                    dist[boundary], current_inds[boundary], 
+                    dist[boundary], current_inds[boundary],
                     new_inds[boundary], astep[boundary],
                     jstep[boundary], istep[boundary],
-                    update_current=True, update_next=False)
+                    update_current=False, update_next=True)
 
     def compute_free_surface(self):
         """Calculate free surface after routing all water parcels.
 
-        This method uses the `free_surf_walk_indices` matrix accumulated
+        This method uses the `free_surf_walk_inds` matrix accumulated
         during the routing of the water parcels (in
         :obj:`run_water_iteration`) to determine the free surface. The
         operations of the free surface computation are placed in a jitted
@@ -153,7 +152,7 @@ class water_tools(abc.ABC):
         self.log_info(_msg, verbosity=2)
 
         self.sfc_visit, self.sfc_sum = _accumulate_free_surface_walks(
-            self.free_surf_walk_indices, self.free_surf_flag, self.cell_type,
+            self.free_surf_walk_inds, self.free_surf_flag, self.cell_type,
             self.uw, self.ux, self.uy, self.depth,
             self._dx, self._u0, self.h0, self._H_SL, self._S0)
 
@@ -181,21 +180,21 @@ class water_tools(abc.ABC):
     def check_size_of_indices_matrix(self, it):
         """Check if step path matrix needs to be made larger.
 
-        Initial size of self.free_surf_walk_indices is half of self.stepmax
+        Initial size of self.free_surf_walk_inds is half of self.stepmax
         because the number of iterations doesn't go beyond
         that for many timesteps.
 
         Once it reaches it > self.stepmax/2 once, make the size
         self.iter for all further timesteps
         """
-        if it >= self.free_surf_walk_indices.shape[1]:
-            _msg = 'Increasing size of self.free_surf_walk_indices'
+        if it >= self.free_surf_walk_inds.shape[1]:
+            _msg = 'Increasing size of self.free_surf_walk_inds'
             self.log_info(_msg, verbosity=2)
-            
+
             indices_blank = np.zeros(
                 (np.int(self._Np_water), np.int(self.stepmax / 4)), dtype=np.int)
 
-            self.free_surf_walk_indices = np.hstack((self.free_surf_walk_indices, indices_blank))
+            self.free_surf_walk_inds = np.hstack((self.free_surf_walk_inds, indices_blank))
 
     def get_water_weight_array(self):
         """Get step direction weights for each cell.
@@ -209,15 +208,19 @@ class water_tools(abc.ABC):
         # compiling the water weight array is handled inside a jitted
         #     function below. ~4x faster.
         self.water_weights = _get_water_weight_array(
-            self.depth, self.stage, self.cell_type, self.qx, self.qy, 
-            self.ivec_flat, self.jvec_flat, self.distances_flat, 
+            self.depth, self.stage, self.cell_type, self.qx, self.qy,
+            self.ivec_flat, self.jvec_flat, self.distances_flat,
             self.dry_depth, self.gamma, self._theta_water)
 
     def update_Q(self, dist, current_inds, next_inds, astep, jstep, istep,
                  update_current=False, update_next=False):
-        """Update discharge field values after one set of water parcel steps."""
+        """Update discharge field values.
+
+        Method is called after one set of water parcel steps.
+        """
         _msg = 'Updating flux fields after single parcel step'
         self.log_info(_msg, verbosity=2)
+
         if update_current:
             self.qxn = _update_dirQfield(
                 self.qxn.flat[:], dist, current_inds,
@@ -264,7 +267,8 @@ class water_tools(abc.ABC):
         This method occurs after the initial computation of the free surface,
         by accumulating the directed walks of all water parcels. In this
         method, thresholding is applied to correct for sea level, and a the
-        free surface is smoothed by a jitted function (:obj:`_smooth_free_surface`).
+        free surface is smoothed by a jitted function
+        (:obj:`_smooth_free_surface`).
         """
         _msg = 'Smoothing and finalizing free surface'
         self.log_info(_msg, verbosity=2)
@@ -288,17 +292,11 @@ class water_tools(abc.ABC):
 
         # combine new smoothed and previous free surf with underrelaxation
         if self._time_iter > 0:
-            self.stage = (((1 - self._omega_sfc) * self.stage) + 
+            self.stage = (((1 - self._omega_sfc) * self.stage) +
                           (self._omega_sfc * Hsmth))
 
         # apply a flooding correction
         self.flooding_correction()
-
-        # import matplotlib.pyplot as plt
-        # fig, ax = plt.subplots(1, 2)
-        # ax[0].imshow(self.sfc_visit)
-        # ax[1].imshow(self.stage)
-        # plt.show()
 
     def update_flow_field(self, iteration):
         """Update water discharge.
@@ -344,7 +342,7 @@ class water_tools(abc.ABC):
         """
         _msg = 'Updating flow velocity fields after parcel stepping'
         self.log_info(_msg, verbosity=2)
-        
+
         mask = np.logical_and((self.depth > self.dry_depth), (self.qw > 0))
 
         self.uw[mask] = np.minimum(self.u_max,
@@ -464,48 +462,47 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
     weight_sfc[ctr] = 0
     weight_int[ctr] = 0
 
+    # sanity check
+    if np.any(np.isnan(weight_sfc)) or np.any(np.isnan(weight_int)):
+        raise RuntimeError('NaN encountered in input to water weighting. '
+                           'Please report error.')
+
     # initial rebalance weights
-    if np.nansum(weight_sfc) > 0:
-        weight_sfc = weight_sfc / np.nansum(weight_sfc)
-    if np.nansum(weight_int) > 0:
-        weight_int = weight_int / np.nansum(weight_int)
+    if np.sum(weight_sfc) > 0:
+        weight_sfc = weight_sfc / np.sum(weight_sfc)
+    if np.sum(weight_int) > 0:
+        weight_int = weight_int / np.sum(weight_int)
 
     weight = gamma * weight_sfc + (1 - gamma) * weight_int
-    weight[~dry] = (depth_nbrs[~dry] ** theta) * weight[~dry]
+    weight = (depth_nbrs ** theta) * weight
 
     # enforce disallowed choice to not move
     weight[ctr] = 0
 
-    # sanity check
-    nanweight = np.isnan(weight)
-    if np.any(nanweight):
-        raise RuntimeError('NaN encountered in water weighting. '
-                           'Please report error.')
-
-    # correct the weights for random choice 
-    if np.nansum(weight) > 0:
+    # correct the weights for random choice
+    if np.sum(weight) > 0:
         # if any cells have positive weights, rebalance to sum() == 1
-        weight = weight / np.nansum(weight)
-        weight[nanweight] = 0
+        weight = weight / np.sum(weight)
 
-    elif np.nansum(weight) == 0:
+    elif np.sum(weight) == 0:
         # if all weights are zeros/nan
-        if wall[4] == True: # np.all(wall):
+        if wall[4] == True:  # noqa: E712
             # if current cell is wall cell
             #    just set to zero and pass
             weight[:] = 0
         else:
             # convert to random walk into...
             wetvalid = np.logical_and(~dry, ~invalid)
-            nwetvalid = np.nansum(wetvalid)
+            nwetvalid = np.sum(wetvalid)
             if nwetvalid > 0:
                 # any wet (and valid)
                 weight[:] = 0
                 weight[wetvalid] = (1 / nwetvalid)
             else:
-                # no wet (and valid) neighbors. How did we get here?? Flooding corrections?
+                # no wet (and valid) neighbors. How did we get here??
+                #    Maybe by flooding corrections? Solution is to
                 #    allow to walk into any non-land cell, true random
-                nnotwall = np.nansum(~wall)
+                nnotwall = np.sum(~wall)
                 weight[:] = 0
                 if nnotwall > 0:
                     weight[~wall] = (1 / nnotwall)
@@ -513,10 +510,15 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
                     raise RuntimeError('No non-wall cells surrounding cell. '
                                        'Please report error.')
 
-            weight = weight / np.nansum(weight)
+            weight = weight / np.sum(weight)
 
     else:
         raise RuntimeError('Water sum(weight) less than 0. '
+                           'Please report error.')
+
+    # final sanity check
+    if np.any(np.isnan(weight)):
+        raise RuntimeError('NaN encountered in return from water weighting. '
                            'Please report error.')
 
     return weight
@@ -524,7 +526,7 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
 
 @njit()
 def _get_water_weight_array(depth, stage, cell_type, qx, qy,
-                            ivec_flat, jvec_flat, distances_flat, 
+                            ivec_flat, jvec_flat, distances_flat,
                             dry_depth, gamma, theta_water):
     L, W = depth.shape
     pad_stage = shared_tools.custom_pad(stage)
@@ -674,18 +676,17 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
                     new_inds[p] = nind
                     looped[p] = 1  # this parcel is looped
 
-    return new_inds, looped # free_surf_flag
+    return new_inds, looped
+
 
 """Something is wrong with the check for loops.
 First: it results in few walks contributing to the free surface (usually ~50%).
-I believe this may contribute to the lower-than-levee stages in channels. 
+I believe this may contribute to the lower-than-levee stages in channels.
 
 One issue I see right away is that, although the check only looks for loops if
 the step is beyond L0, it will trigger on any loop that is within the L0 too.
 This NEEDS to be fixed. Hopefully that will help.
 """
-
-
 
 
 @njit
@@ -707,8 +708,9 @@ def _update_absQfield(qfield, dist, inds, astep, Qp_water, dx):
 
 
 @njit
-def _accumulate_free_surface_walks(free_surf_walk_indices, free_surf_flag, cell_type,
-                                   uw, ux, uy, depth, dx, u0, h0, H_SL, S0):
+def _accumulate_free_surface_walks(free_surf_walk_inds, free_surf_flag,
+                                   cell_type, uw, ux, uy, depth,
+                                   dx, u0, h0, H_SL, S0):
     """Accumulate the free surface by walking parcel paths.
 
     This routine comprises the hydrodynamic physics-based computations.
@@ -737,7 +739,7 @@ def _accumulate_free_surface_walks(free_surf_walk_indices, free_surf_flag, cell_
     sfc_sum = np.zeros(_shape)
 
     # for every parcel, walk the path of the parcel
-    for p, inds in enumerate(free_surf_walk_indices):
+    for p, inds in enumerate(free_surf_walk_inds):
 
         # unravel the indices of the parcel into `xs` and `ys`
         inds_whr = inds[inds > 0]  # where the path has meaningful values
@@ -812,7 +814,6 @@ def _smooth_free_surface(Hin, cell_type, Nsmooth, Csmooth):
     L, W = Hin.shape
 
     # pad the input stage and cell type arrays
-    Hin_pad = shared_tools.custom_pad(Hin)
     cell_type_pad = shared_tools.custom_pad(cell_type)
 
     # create copy of H which is modified in following smoothing
