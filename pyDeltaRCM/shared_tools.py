@@ -1,10 +1,9 @@
 
 import numpy as np
 
-from numba import njit, jit, typed, _helperlib
+from numba import njit, _helperlib
 
 # tools shared between deltaRCM water and sediment routing
-
 
 
 @njit
