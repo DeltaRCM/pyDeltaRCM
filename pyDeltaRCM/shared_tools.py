@@ -6,17 +6,6 @@ from numba import njit, jit, typed, _helperlib
 # tools shared between deltaRCM water and sediment routing
 
 
-def get_iwalk():
-    return np.array([[-1, 0, 1],
-                     [-1, 0, 1],
-                     [-1, 0, 1]], dtype=np.int64)
-
-
-def get_jwalk():
-    return np.array([[-1, -1, -1],
-                     [0, 0, 0],
-                     [1, 1, 1]], dtype=np.int64)
-
 
 @njit
 def set_random_seed(_seed):
@@ -48,7 +37,6 @@ def get_start_indices(inlet, inlet_weights, num_starts):
     return inlet.take(idxs)
 
 
-# @njit('(int64, int64, int64, int64)(int64[:], int64[:], int64[:])')
 @njit
 def get_steps(new_cells, iwalk, jwalk):
     """Find the values giving the next step."""
@@ -74,7 +62,7 @@ def random_pick(prob):
     return arr[np.searchsorted(cumprob, get_random_uniform(cumprob[-1]))]
 
 
-@njit
+@njit('UniTuple(int64, 2)(int64, UniTuple(int64, 2))')
 def custom_unravel(i, shape):
     """Unravel indexes for 2D array."""
     if i > (shape[1] * shape[0]):
@@ -84,7 +72,7 @@ def custom_unravel(i, shape):
     return x, y
 
 
-@njit
+@njit('int64(UniTuple(int64, 2), UniTuple(int64, 2))')
 def custom_ravel(tup, shape):
     """Ravel indexes for 2D array."""
     if tup[0] > shape[0] or tup[1] > shape[1]:
