@@ -183,32 +183,38 @@ class init_tools(abc.ABC):
         _msg = 'Setting model constants'
         self.log_info(_msg, verbosity=1)
 
+        # simple constants
         self.g = 9.81   # (gravitation const.)
         sqrt2 = np.sqrt(2)
         sqrt05 = np.sqrt(0.5)
 
-        self.distances = np.array([[sqrt2, 1, sqrt2],
-                                   [1, 1, 1],
-                                   [sqrt2, 1, sqrt2]]).astype(np.float32)
-        self.ivec = np.array([[-sqrt05, 0, sqrt05],
-                              [-1, 0, 1],
-                              [-sqrt05, 0, sqrt05]]).astype(np.float32)
-        self.jvec = np.array([[-sqrt05, -1, -sqrt05],
-                              [0, 0, 0],
-                              [sqrt05, 1, sqrt05]]).astype(np.float32)
-        self.iwalk = shared_tools.get_iwalk()
-        self.jwalk = shared_tools.get_jwalk()
-        self.dxn_iwalk = np.array([1, 1, 0, -1, -1, -1, 0, 1], dtype=np.int64)
-        self.dxn_jwalk = np.array([0, 1, 1, 1, 0, -1, -1, -1], dtype=np.int64)
-        self.dxn_dist = np.sqrt(self.dxn_iwalk**2 + self.dxn_jwalk**2)
-        self.walk_flat = np.array([1, -self.W + 1, -self.W, -self.W - 1,
-                                   -1, self.W - 1, self.W, self.W + 1])
+        # translations arrays
+        self.distances = np.array([[sqrt2,    1,  sqrt2],
+                                   [1,        1,      1],
+                                   [sqrt2,    1,  sqrt2]], dtype=np.float32)
+        self.ivec      = np.array([[-sqrt05,  0,  sqrt05],  # noqa: E221
+                                   [-1,       0,       1],
+                                   [-sqrt05,  0,  sqrt05]], dtype=np.float32)
+        self.jvec      = np.array([[-sqrt05, -1, -sqrt05],  # noqa: E221
+                                   [0,        0,       0],
+                                   [sqrt05,   1,  sqrt05]], dtype=np.float32)
+        self.iwalk     = np.array([[-1,       0,       1],  # noqa: E221
+                                   [-1,       0,       1],
+                                   [-1,       0,       1]], dtype=np.int64)
+        self.jwalk     = np.array([[-1,      -1,      -1],  # noqa: E221
+                                   [0,        0,       0],
+                                   [1,        1,       1]], dtype=np.int64)
+
+        # derivatives of translations
         self.distances_flat = self.distances.flatten()
         self.ivec_flat = self.ivec.flatten()
         self.jvec_flat = self.jvec.flatten()
         self.iwalk_flat = self.iwalk.flatten()
         self.jwalk_flat = self.jwalk.flatten()
+        self.ravel_walk = (self.jwalk * self.W) + self.iwalk  # walk in flattened array
+        self.ravel_walk_flat = self.ravel_walk.flatten()
 
+        # kernels for topographic smoothing
         self.kernel1 = np.array([[1, 1, 1],
                                  [1, -8, 1],
                                  [1, 1, 1]]).astype(np.int64)
@@ -258,11 +264,14 @@ class init_tools(abc.ABC):
 
         # (m) critial depth to switch to "dry" node
         self.dry_depth = min(0.1, 0.1 * self._h0)
+
+        # cross-stream center of domain idx
         self.CTR = floor(self.W / 2.) - 1
         if self.CTR <= 1:
             self.CTR = floor(self.W / 2.)
 
-        self.gamma = self.g * self._S0 * self._dx / (self._u0**2)
+        self.gamma = (self.g * self._S0 * self._dx /
+                      (self._u0**2))  # water weighting coeff
 
         # (m^3) reference volume, volume to fill cell to characteristic depth
         self.V0 = self.h0 * (self._dx**2)
@@ -270,10 +279,9 @@ class init_tools(abc.ABC):
 
         # at inlet
         self.qw0 = self._u0 * self.h0  # water unit input discharge
-        self.Qp_water = self.Qw0 / self._Np_water    # volume each water parcel
+        self.Qp_water = self.Qw0 / self._Np_water  # volume each water parcel
         self.qs0 = self.qw0 * self.C0  # sed unit discharge
-        # total amount of sed added to domain per timestep
-        self.dVs = 0.1 * self.N0**2 * self.V0
+        self.dVs = 0.1 * self.N0**2 * self.V0  # total sed added per timestep
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
         self.Vp_sed = self.dVs / self._Np_sed   # volume of each sediment parcel
 
@@ -330,20 +338,23 @@ class init_tools(abc.ABC):
                                      np.arange(0, self.L+1)*self._dx)
 
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int64)
-        self.eta = np.zeros((self.L, self.W)).astype(np.float32)
-        self.stage = np.zeros((self.L, self.W)).astype(np.float32)
-        self.depth = np.zeros((self.L, self.W)).astype(np.float32)
-        self.qx = np.zeros((self.L, self.W))
-        self.qy = np.zeros((self.L, self.W))
-        self.qxn = np.zeros((self.L, self.W))
-        self.qyn = np.zeros((self.L, self.W))
-        self.qwn = np.zeros((self.L, self.W))
-        self.ux = np.zeros((self.L, self.W))
-        self.uy = np.zeros((self.L, self.W))
-        self.uw = np.zeros((self.L, self.W))
-        self.qs = np.zeros((self.L, self.W))
-        self.Vp_dep_sand = np.zeros((self.L, self.W))
-        self.Vp_dep_mud = np.zeros((self.L, self.W))
+        self.eta = np.zeros((self.L, self.W), dtype=np.float32)
+        self.stage = np.zeros((self.L, self.W), dtype=np.float32)
+        self.depth = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qx = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qy = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qxn = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qyn = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qwn = np.zeros((self.L, self.W), dtype=np.float32)
+        self.ux = np.zeros((self.L, self.W), dtype=np.float32)
+        self.uy = np.zeros((self.L, self.W), dtype=np.float32)
+        self.uw = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qs = np.zeros((self.L, self.W), dtype=np.float32)
+
+        self.Vp_dep_sand = np.zeros((self.L, self.W), dtype=np.float32)
+        self.Vp_dep_mud = np.zeros((self.L, self.W), dtype=np.float32)
+
+        # arrays for computing the free surface after water iteration
         self.free_surf_flag = np.zeros((self._Np_water,), dtype=np.int64)
         self.free_surf_walk_inds = np.zeros(
             (self._Np_water, self.size_indices), dtype=np.int64)

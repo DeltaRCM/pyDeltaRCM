@@ -39,14 +39,14 @@ class water_tools(abc.ABC):
         _msg = 'Beginning stepping of water parcels'
         self.log_info(_msg, verbosity=2)
 
-        _step = 0  # the step number of parcels
+        # configure the starting indices for each parcel
         inlet_weights = np.ones_like(self.inlet)
         start_indices = shared_tools.get_start_indices(self.inlet,
                                                        inlet_weights,
                                                        self._Np_water)
 
-        # reset the free surface flag on each iteration
-        self.free_surf_flag[:] = 1
+        # init parcel step number counter
+        _step = 0
 
         # flux from ghost node
         self.qxn.flat[start_indices] += 1
@@ -71,17 +71,15 @@ class water_tools(abc.ABC):
             self.check_size_of_indices_matrix(_step)
 
             # use water weights and random pick to determine d8 direction
-            new_direction = _choose_next_direction(current_inds, water_weights_flat)
-            new_direction = new_direction.astype(np.int)
+            new_direction = _choose_next_directions(
+                current_inds, water_weights_flat)
 
             # use the new directions for each parcel to determine the new ind
             #   for each parcel
-            new_inds = _calculate_new_ind(
+            new_inds = _calculate_new_inds(
                 current_inds,
                 new_direction,
-                self.iwalk_flat,
-                self.jwalk_flat,
-                self.eta.shape)
+                self.ravel_walk_flat)
 
             # determine the step of each parcel made based on the new direction
             dist, istep, jstep, astep = shared_tools.get_steps(
@@ -524,7 +522,10 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
     return weight
 
 
-@njit()
+# @njit('(float32[:,:], float32[:,:], int64[:,:], float32[:,:], float32[:,:],'
+#       'float32[:], float32[:], float32[:],'
+#       'float64, float64, float64)')
+@njit
 def _get_water_weight_array(depth, stage, cell_type, qx, qy,
                             ivec_flat, jvec_flat, distances_flat,
                             dry_depth, gamma, theta_water):
@@ -555,7 +556,7 @@ def _get_water_weight_array(depth, stage, cell_type, qx, qy,
 
 
 @njit('int64[:](int64[:], float64[:,:])')
-def _choose_next_direction(inds, water_weights):
+def _choose_next_directions(inds, water_weights):
     """Get new cell locations, based on water weights.
 
     Algorithm is to:
@@ -578,46 +579,68 @@ def _choose_next_direction(inds, water_weights):
 
     Returns
     -------
-    new_cells : :obj:`ndarray`
-        The new cell for water parcels, relative to the current location.
-        I.e., this is the D8 direction the parcel is going to travel in the
-        next stage, :obj:`pyDeltaRCM.shared_tools._calculate_new_ind`.
+    next_direction : :obj:`ndarray`
+        The direction to move towards the new cell for water parcels, relative
+        to the current location. I.e., this is the D8 direction the parcel is
+        going to travel in the next stage,
+        :obj:`pyDeltaRCM.shared_tools._calculate_new_ind`.
     """
-    new_cells = []
-    for i in np.arange(inds.shape[0]):
-        ind = inds[i]
+    next_direction = np.zeros_like(inds)
+    for p in range(inds.shape[0]):
+        ind = inds[p]
         if ind != 0:
             weight = water_weights[ind, :]
-            new_cells.append(shared_tools.random_pick(weight))
+            next_direction[p] = shared_tools.random_pick(weight)
         else:
-            new_cells.append(4)
+            next_direction[p] = 4
 
-    new_cells = np.array(new_cells)
-    return new_cells
+    return next_direction
 
 
-@njit
-def _calculate_new_ind(indices, new_cells, iwalk, jwalk, domain_shape):
-    """Calculate the new location (indices) of parcels.
+@njit('int64[:](int64[:], int64[:], int64[:])')
+def _calculate_new_inds(current_inds, new_direction, ravel_walk):
+    """Calculate the new location (current_inds) of parcels.
 
-    Use the information of the current parcel (`indices`) in conjunction with
-    the D8 direction the parcel needs to travel (`new_cells`) to determine the
-    new indices of each parcel.
+    Use the information of the current parcel (`current_inds`) in conjunction
+    with the D8 direction the parcel needs to travel (`new_direction`) to
+    determine the new current_inds of each parcel.
+
+    In implementation, we use the flattened `ravel_walk` array, but the result
+    is identical to unraveling the index, adding `iwalk` and `jwalk` to the
+    location and then raveling the index back.
+
+    .. code::
+
+        ind_tuple = shared_tools.custom_unravel(ind, domain_shape)
+        new_ind = (ind_tuple[0] + jwalk[newd],
+                   ind_tuple[1] + iwalk[newd])
+        new_inds[p] = shared_tools.custom_ravel(new_ind, domain_shape)
+
+
     """
-    newbies = []
-    for p, q in zip(indices, new_cells):
-        if q != 4:
-            ind_tuple = shared_tools.custom_unravel(p, domain_shape)
-            new_ind = (ind_tuple[0] + jwalk[q],
-                       ind_tuple[1] + iwalk[q])
-            newbies.append(shared_tools.custom_ravel(new_ind, domain_shape))
+    # preallocate return array
+    new_inds = np.zeros_like(current_inds)
+
+    # loop through every parcel
+    for p in range(current_inds.shape[0]):
+
+        # extract current_ind and direction
+        ind = current_inds[p]
+        newd = new_direction[p]
+
+        # check if the parcel moves
+        if newd != 4:
+            # if moves, compute new ind for parcel
+            new_inds[p] = ind + ravel_walk[newd]
         else:
-            newbies.append(0)
+            # if not moves, set new ind to 0
+            #  (should be only those already at 0)
+            new_inds[p] = 0
 
-    return np.array(newbies)
+    return new_inds
 
 
-@njit
+@njit()
 def _check_for_loops(free_surf_walk_inds, new_inds, _step,
                      L0, domain_shape, CTR):
     """Check for loops in water parcel pathways.
@@ -642,26 +665,36 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
     nparcels = free_surf_walk_inds.shape[0]
     domain_min_x = domain_shape[0] - 2
     domain_min_y = domain_shape[1] - 2
+    L0_ind_cut = ((L0+1) * domain_shape[1])-1
 
     looped = np.zeros_like(new_inds)
 
-    # if the _step number is larger than the inlet length
     if (_step > L0):
         # loop though every parcel walk
-        for p in np.arange(nparcels):
+        for p in range(nparcels):
             new_ind = new_inds[p]  # the new index of the parcel
-            walk = free_surf_walk_inds[p, :]  # the parcel's walk
-            _walk = walk[walk > 0]
+
+            # only consider parcels that are still routing
             if (new_ind > 0):
-                has_repeat_ind = len(_walk) != len(set(_walk))
+                full_walk = free_surf_walk_inds[p, :]  # the parcel's walk
+                nonz_walk = full_walk[full_walk > 0]   # where non-zero
+                relv_walk = nonz_walk[nonz_walk > L0_ind_cut]
+
+                # determine if has a repeat ind
+                has_repeat_ind = False
+                for i in range(len(relv_walk)):
+                    if relv_walk[i] == new_ind:
+                        has_repeat_ind = True
+                        break
+
+                # handle when a loop is detected
                 if has_repeat_ind:
-                    # handle when a loop is detected
                     px, py = shared_tools.custom_unravel(new_ind, domain_shape)
 
                     # compute a new location for the parcel along the
                     #     mean-transport vector
-                    Fx = px - 1
-                    Fy = py - CTR
+                    Fx = px - 1 + 1
+                    Fy = py - CTR + 1
                     Fw = np.sqrt(Fx**2 + Fy**2)
                     if Fw != 0:
                         px = px + int(np.round(Fx / Fw * 5.))
@@ -672,21 +705,12 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
                     px = np.minimum(domain_min_x, np.maximum(px, L0))
                     py = np.minimum(domain_min_y, np.maximum(1, py))
 
+                    # update values in arrays
                     nind = shared_tools.custom_ravel((px, py), domain_shape)
                     new_inds[p] = nind
                     looped[p] = 1  # this parcel is looped
 
     return new_inds, looped
-
-
-"""Something is wrong with the check for loops.
-First: it results in few walks contributing to the free surface (usually ~50%).
-I believe this may contribute to the lower-than-levee stages in channels.
-
-One issue I see right away is that, although the check only looks for loops if
-the step is beyond L0, it will trigger on any loop that is within the L0 too.
-This NEEDS to be fixed. Hopefully that will help.
-"""
 
 
 @njit
@@ -838,8 +862,8 @@ def _smooth_free_surface(Hin, cell_type, Nsmooth, Csmooth):
                         i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
 
                     # flatten
-                    Hsmth_nbrs = np.copy(Hsmth_nbrs.ravel())
-                    cell_type_nbrs = np.copy(cell_type_nbrs.ravel())
+                    Hsmth_nbrs = Hsmth_nbrs.flatten()
+                    cell_type_nbrs = cell_type_nbrs.flatten()
 
                     # create a validation array
                     invalid_nbrs = (cell_type_nbrs == -2)  # where land

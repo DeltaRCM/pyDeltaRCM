@@ -1,14 +1,12 @@
 
 import numpy as np
 from numba import njit
-from numba import float32, float64, int64
+from numba import float32, int64
 from numba.experimental import jitclass
 from scipy import ndimage
 import abc
 
 from . import shared_tools
-
-import matplotlib.pyplot as plt
 
 # tools for sediment routing algorithms and deposition/erosion
 
@@ -135,18 +133,18 @@ class sed_tools(abc.ABC):
         operation is repeated `N_crossdiff` times.
         """
         for _ in range(self.N_crossdiff):
-        
+
             a = ndimage.convolve(self.eta, self.kernel1, mode='constant')
             b = ndimage.convolve(self.qs, self.kernel2, mode='constant')
             c = ndimage.convolve(self.qs * self.eta, self.kernel2,
                                  mode='constant')
-        
+
             self.cf = (self.diffusion_multiplier *
                        (self.qs * a - self.eta * b + c))
-        
+
             self.cf[self.cell_type == -2] = 0
             self.cf[0, :] = 0
-        
+
             self.eta += self.cf
 
 
@@ -158,10 +156,9 @@ def _get_weight_at_cell_sediment(ind, weight_int, depth_nbrs, ct_nbrs,
     wall = (ct_nbrs == -2)
     ctr = (np.arange(9) == 4)
     drywall = np.logical_or(dry, wall)
-    invalid = np.logical_or(drywall, ctr)
 
     # always set ctr to 0 before rebalancing
-    weight_int[ctr] = 0 
+    weight_int[ctr] = 0
 
     weight = np.copy(weight_int)  # no gamma weighting here
     weight = (depth_nbrs ** theta) * weight
@@ -174,7 +171,8 @@ def _get_weight_at_cell_sediment(ind, weight_int, depth_nbrs, ct_nbrs,
 
     # sanity check
     if np.any(np.isnan(weight)):
-        raise RuntimeError('NaN encountered in sediment weighting. Please report error.')
+        raise RuntimeError('NaN encountered in sediment weighting.'
+                           'Please report error.')
 
     # correct the weights for random choice
     if np.nansum(weight) == 0:
@@ -194,16 +192,15 @@ def _get_weight_at_cell_sediment(ind, weight_int, depth_nbrs, ct_nbrs,
     return weight
 
 
-
 r_spec = [('_dt', float32), ('_dx', float32),
           ('num_starts', int64), ('start_indices', int64[:]),
           ('stepmax', float32), ('px', int64), ('py', int64),
           ('eta', float32[:, :]), ('stage', float32[:, :]),
           ('depth', float32[:, :]), ('cell_type', int64[:, :]),
-          ('uw', float64[:, :]), ('ux', float64[:, :]), ('uy', float64[:, :]),
+          ('uw', float32[:, :]), ('ux', float32[:, :]), ('uy', float32[:, :]),
           ('pad_stage', float32[:, :]), ('pad_depth', float32[:, :]),
-          ('pad_cell_type', int64[:, :]), ('qw', float64[:, :]),
-          ('qx', float64[:, :]), ('qy', float64[:, :]), ('qs', float64[:, :]),
+          ('pad_cell_type', int64[:, :]), ('qw', float32[:, :]),
+          ('qx', float32[:, :]), ('qy', float32[:, :]), ('qs', float32[:, :]),
           ('ivec_flat', float32[:]), ('jvec_flat', float32[:]),
           ('iwalk_flat', int64[:]), ('jwalk_flat', int64[:]),
           ('distances_flat', float32[:]),
@@ -211,8 +208,8 @@ r_spec = [('_dt', float32), ('_dx', float32),
           ('_beta', float32),  ('_f_bedload', float32),
           ('theta_sed', float32), ('u_max', float32),
           ('qs0', float32), ('_u0', float32), ('Vp_sed', float32),
-          ('Vp_res', float32), ('Vp_dep_mud', float64[:, :]),
-          ('Vp_dep_sand', float64[:, :]),
+          ('Vp_res', float32), ('Vp_dep_mud', float32[:, :]),
+          ('Vp_dep_sand', float32[:, :]),
           ('U_dep_mud', float32), ('U_ero_mud', float32),
           ('U_ero_sand', float32)]
 
@@ -600,7 +597,7 @@ class SandRouter(BaseRouter):
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
                                              self.U_ero_sand, self._beta)
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                                self.eta[px, py], self._dx, 1)
+                                              self.eta[px, py], self._dx, 1)
             Vp_change = Vp_change * -1
 
         if Vp_change > 0:  # if deposition
@@ -727,7 +724,7 @@ class MudRouter(BaseRouter):
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
                                              self.U_ero_mud, self._beta)
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                                self.eta[px, py], self._dx, 1)
+                                              self.eta[px, py], self._dx, 1)
             Vp_change = Vp_change * -1
 
         if Vp_change > 0:  # if deposition
