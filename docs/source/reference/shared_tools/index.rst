@@ -12,8 +12,6 @@ Shared functions
 
 .. currentmodule:: pyDeltaRCM.shared_tools
 
-.. autofunction:: get_iwalk
-.. autofunction:: get_jwalk
 .. autofunction:: set_random_seed
 .. autofunction:: get_random_uniform
 .. autofunction:: get_start_indices
