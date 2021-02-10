@@ -166,3 +166,28 @@ def test_plot_domain_withlabel(test_DeltaModel):
     # This is a weak test, but it triggers coverage of the label lines.
     test_DeltaModel.show_attribute('ux', label='')
     return plt.gcf()
+
+
+@pytest.mark.mpl_image_compare(remove_text=True)
+def test_show_line_pts(test_DeltaModel):
+    fig, ax = plt.subplots(figsize=(5, 4))
+    _arr = np.column_stack((np.arange(9), 50*np.ones((9,))))
+    test_DeltaModel.show_line(_arr, ax=ax)  # autoreshaped by self
+    test_DeltaModel.show_line(_arr.T, 'r-.', ax=ax)  # autoreshaped by self
+    return plt.gcf()
+
+
+@pytest.mark.mpl_image_compare(remove_text=True)
+def test_show_line_set_points(test_DeltaModel):
+    fig, ax = plt.subplots(figsize=(5, 4))
+    np.random.seed(0)
+    test_DeltaModel.free_surf_walk_inds = np.tile(
+        np.arange(4, 60, step=10),
+        (test_DeltaModel._Np_water, 1))
+    _shape = test_DeltaModel.free_surf_walk_inds.shape
+    test_DeltaModel.free_surf_walk_inds += np.random.randint(-1, 2,
+                                                             size=_shape)
+    test_DeltaModel.show_attribute('eta', ax=ax)
+    test_DeltaModel.show_line(test_DeltaModel.free_surf_walk_inds,
+                              ax=ax)
+    return plt.gcf()
