@@ -701,6 +701,31 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
         A binary integer array indicating whether a parcel was determined to
         have been looped, and should be disqualified from the free surface
         computation.
+
+    Examples
+    --------
+
+    The following shows an example of how water parcels that looped along
+    their paths would be relocated.
+
+    .. plot::
+
+        new_inds0 = np.copy(new_inds)
+        new_inds, looped = _check_for_loops(
+            self.free_surf_walk_inds, new_inds, _step, self.L0,
+            self.eta.shape, self.CTR)
+        looped = looped.astype(np.bool)
+        neq = new_inds != new_inds0
+
+        print(np.where(neq)[0])
+        print([shared_tools.custom_unravel(i, self.eta.shape) for i in new_inds[neq]])
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        self.show_attribute('cell_type', ax=ax, grid=False)
+        self.show_ind(new_inds[neq], 'r.', ax=ax)
+        self.show_ind(new_inds0[neq], 'b.', ax=ax)
+        self.show_ind(self.free_surf_walk_inds[neq, :_step], 'k-', ax=ax)
+        plt.show()
     """
     nparcels = free_surf_walk_inds.shape[0]
     domain_shape = stage_above_SL.shape
