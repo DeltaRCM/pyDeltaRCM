@@ -114,7 +114,7 @@ class debug_tools(abc.ABC):
 
         """
         _shape = self.depth.shape
-        if isinstance(ind, list):
+        if isinstance(ind, list) or isinstance(ind, np.ndarray):
             for _, iind in enumerate(ind):
                 plot_ind(iind, shape=_shape, *args, **kwargs)
         else:
@@ -199,6 +199,8 @@ def plot_ind(_ind, *args, shape=None, **kwargs):
     else:
         if (_shape is None):
             raise ValueError('Shape of array must be given to unravel index.')
+        if isinstance(_ind, np.ndarray):
+            _ind = _ind[0]
         _ind = shared_tools.custom_unravel(_ind, _shape)
     plt.plot(_ind[1], _ind[0], *args, **kwargs)
 
