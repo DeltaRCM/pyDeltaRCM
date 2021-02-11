@@ -585,7 +585,9 @@ class iteration_tools(abc.ABC):
         # advance _time_iter since this is before update step fully finishes
         _time_iter = self._time_iter + int(1)
         # get rng state
-        rng_state = shared_tools.get_random_state()
+        rng_state_list = shared_tools.get_random_state()
+        rng_state = np.array(rng_state_list,
+                             dtype=object)  # convert to object before saving
 
         np.savez_compressed(ckp_file, time=self.time, H_SL=self._H_SL,
                             time_iter=_time_iter,
