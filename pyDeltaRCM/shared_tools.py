@@ -5,6 +5,11 @@ from numba import njit, _helperlib
 
 # tools shared between deltaRCM water and sediment routing
 
+# useful constants
+sec_in_day = 86400
+day_in_yr = 365.25
+earth_grav = 9.81
+
 
 @njit
 def set_random_seed(_seed):
@@ -204,8 +209,6 @@ def _scale_factor(If, units):
         `['seconds', 'days', 'years']`.
 
     """
-    sec_in_day = 86400
-    day_in_yr = 365.25
     if units == 'seconds':
         S_f = 1
     elif units == 'days':
