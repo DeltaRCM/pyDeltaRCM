@@ -98,10 +98,10 @@ class water_tools(abc.ABC):
             #   calculation, but does not stop the parcel from routing, and
             #   thus influencing the qw fields. If a parcel is looped, it
             #   will be given a new location in the domain, along the
-            #   mean-transport vector.
+            #   mean-transport vector. See function for full description.
             new_inds, looped = _check_for_loops(
                 self.free_surf_walk_inds, new_inds, _step, self.L0,
-                self.eta.shape, self.CTR)
+                self.CTR, self.stage - self.H_SL)
             looped = looped.astype(np.bool)
 
             # set the current_inds to be the new_inds values
@@ -640,17 +640,48 @@ def _calculate_new_inds(current_inds, new_direction, ravel_walk):
     return new_inds
 
 
-@njit()
+@njit
 def _check_for_loops(free_surf_walk_inds, new_inds, _step,
-                     L0, domain_shape, CTR):
+                     L0, CTR, stage_above_SL):
     """Check for loops in water parcel pathways.
 
-    Look for looping random walks, i.e., where a parcel returns to somewhere
-    it has already been.
+    Look for looping random walks. I.e., this function checks for where a
+    parcel will return on its :obj:`new_inds` to somewhere it has already been
+    in :obj:`free_surf_walk_inds`. If the loop is found, the parcel is
+    relocated along the mean transport vector of the parcel, which is computed
+    as the vector from the cell `(0, CTR)` to the new location in `new_inds`.
+
+    This implementation of loop checking will relocate any parcel that has
+    looped, but only disqualifies a parcel `p` from contributing to the free
+    surface in :obj:`_accumulate_free_surf_walks` (i.e., `looped[p] == 1`) if
+    the stage at the looped location is above the sea level in the domain.
 
     Parameters
     ----------
+    free_surf_walk_inds
+        Array recording the walk of parcels. Shape is `(:obj:`Np_water`,
+        ...)`, where the second dimension will depend on the step number, but
+        records each step of the parcel. Each element in the array records the
+        *flat* index into the domain.
 
+    new_inds
+        Array recording the new index for each water parcel, if the step is
+        taken. Shape is `(:obj:`Np_water`, 1)`, with each element recording
+        the *flat* index into the domain shape.
+
+    _step
+        Step number of water parcels.
+
+    L0
+        Domain shape parameter, number of cells inlet length.
+
+    CTR
+        Domain shape parameter, index along inlet wall making the center of
+        the domain. I.e., `(0, CTR)` is the midpoint across the inlet, along
+        the inlet domain edge.
+
+    stage_above_SL
+        Water surface elevation minuns the domain sea level.
 
     Returns
     -------
@@ -660,25 +691,29 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
 
     looped
         A binary integer array indicating whether a parcel was determined to
-        have been looped.
+        have been looped, and should be disqualified from the free surface
+        computation.
     """
     nparcels = free_surf_walk_inds.shape[0]
+    domain_shape = stage_above_SL.shape
     domain_min_x = domain_shape[0] - 2
     domain_min_y = domain_shape[1] - 2
-    L0_ind_cut = ((L0+1) * domain_shape[1])-1
+    L0_ind_cut = ((L0) * domain_shape[1])-1
 
     looped = np.zeros_like(new_inds)
 
+    stage_v_SL = np.abs(stage_above_SL) < 1e-1  # true if they are same
+
+    # if the _step number is larger than the inlet length
     if (_step > L0):
         # loop though every parcel walk
-        for p in range(nparcels):
+        for p in np.arange(nparcels):
             new_ind = new_inds[p]  # the new index of the parcel
+            full_walk = free_surf_walk_inds[p, :]  # the parcel's walk
+            nonz_walk = full_walk[full_walk > 0]   # where non-zero
+            relv_walk = nonz_walk[nonz_walk > L0_ind_cut]
 
-            # only consider parcels that are still routing
             if (new_ind > 0):
-                full_walk = free_surf_walk_inds[p, :]  # the parcel's walk
-                nonz_walk = full_walk[full_walk > 0]   # where non-zero
-                relv_walk = nonz_walk[nonz_walk > L0_ind_cut]
 
                 # determine if has a repeat ind
                 has_repeat_ind = False
@@ -687,28 +722,35 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
                         has_repeat_ind = True
                         break
 
-                # handle when a loop is detected
                 if has_repeat_ind:
-                    px, py = shared_tools.custom_unravel(new_ind, domain_shape)
+                    # handle when a loop is detected
+                    px0, py0 = shared_tools.custom_unravel(
+                        new_ind, domain_shape)
 
                     # compute a new location for the parcel along the
-                    #     mean-transport vector
-                    Fx = px - 1 + 1
-                    Fy = py - CTR + 1
+                    #   mean-transport vector
+                    Fx = px0 - 1
+                    Fy = py0 - CTR
                     Fw = np.sqrt(Fx**2 + Fy**2)
+
+                    # relocate the parcel along mean-transport vector
                     if Fw != 0:
-                        px = px + int(np.round(Fx / Fw * 5.))
-                        py = py + int(np.round(Fy / Fw * 5.))
+                        px = px0 + int(np.round(Fx / Fw * 5.))
+                        py = py0 + int(np.round(Fy / Fw * 5.))
 
                     # limit the new px and py to beyond the inlet, and
-                    #     away from domain edges
+                    #   away from domain edges
                     px = np.minimum(domain_min_x, np.maximum(px, L0))
                     py = np.minimum(domain_min_y, np.maximum(1, py))
 
-                    # update values in arrays
+                    # ravel the index for return
                     nind = shared_tools.custom_ravel((px, py), domain_shape)
                     new_inds[p] = nind
-                    looped[p] = 1  # this parcel is looped
+
+                    # only disqualify the parcel if it has not reached sea
+                    #   level by the time it loops
+                    if not stage_v_SL[px0, py0]:
+                        looped[p] = 1  # this parcel is looped
 
     return new_inds, looped
 
