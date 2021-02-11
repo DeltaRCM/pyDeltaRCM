@@ -717,8 +717,8 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
 
                 # determine if has a repeat ind
                 has_repeat_ind = False
-                for i in range(len(relv_walk)):
-                    if relv_walk[i] == new_ind:
+                for _, iind in enumerate(relv_walk):
+                    if iind == new_ind:
                         has_repeat_ind = True
                         break
 

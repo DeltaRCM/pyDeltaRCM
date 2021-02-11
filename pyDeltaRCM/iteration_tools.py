@@ -421,7 +421,7 @@ class iteration_tools(abc.ABC):
 
             shape = self.strata_eta.shape
 
-            total_strata_age = self.output_netcdf.createDimension(
+            self.output_netcdf.createDimension(
                 'total_strata_age',
                 shape[1])
 
