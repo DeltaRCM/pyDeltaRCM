@@ -267,13 +267,13 @@ class BaseRouter(object):
 
         new_cell = shared_tools.random_pick(weights)
 
-        dist, istep, jstep, astep = shared_tools.get_steps(
+        dist, istep, jstep, _ = shared_tools.get_steps(
             new_cell, self.iwalk_flat, self.jwalk_flat)
 
         return istep, jstep, dist
 
     @abc.abstractmethod
-    def _deposit_or_erode(self):
+    def _deposit_or_erode(self, px, py):
         """Determine whether to erode or deposit.
 
         This is the decision making component of the routine, and will be
