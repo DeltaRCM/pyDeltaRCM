@@ -94,22 +94,6 @@ def test_set_jwalk(test_DeltaModel):
     assert test_DeltaModel.jwalk[0, 0] == -1
 
 
-def test_set_dxn_iwalk(test_DeltaModel):
-    assert test_DeltaModel.dxn_iwalk[0] == 1
-
-
-def test_set_dxn_jwalk(test_DeltaModel):
-    assert test_DeltaModel.dxn_jwalk[0] == 0
-
-
-def test_set_dxn_dist(test_DeltaModel):
-    assert test_DeltaModel.dxn_dist[0] == 1
-
-
-def test_set_walk_flat(test_DeltaModel):
-    assert test_DeltaModel.walk_flat[0] == 1
-
-
 def test_kernel1(test_DeltaModel):
     assert test_DeltaModel.kernel1[0, 0] == 1
 
@@ -513,6 +497,7 @@ def test_save_discharge_components(tmp_path):
     assert _delta._save_any_figs is False
     assert _delta._save_discharge_components is True
 
+
 def test_save_velocity_components(tmp_path):
     p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                  {'save_velocity_components': True})
@@ -520,6 +505,7 @@ def test_save_velocity_components(tmp_path):
     assert _delta._save_any_grids is True
     assert _delta._save_any_figs is False
     assert _delta._save_velocity_components is True
+
 
 def test_save_eta_figs(tmp_path):
     p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -684,10 +670,6 @@ def test_Vp_dep_mud(test_DeltaModel):
 
 def test_free_surf_flag(test_DeltaModel):
     assert np.any(test_DeltaModel.free_surf_flag) == 0
-
-
-def test_looped(test_DeltaModel):
-    assert np.any(test_DeltaModel.looped) == 0
 
 
 def test_indices(test_DeltaModel):
