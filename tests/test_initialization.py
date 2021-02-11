@@ -81,7 +81,7 @@ def test_not_creating_illegal_attributes(tmp_path):
     utilities.write_parameter_to_file(f, 'illegal_attribute', True)
     f.close()
     delta = DeltaModel(input_file=p)
-    assert delta.S0 == 0.0002  # from default.yaml
+    assert delta.S0 == 0.00015  # from default.yaml
     assert not hasattr(delta, 'illegal_attribute')
 
 
@@ -92,7 +92,7 @@ def test_not_overwriting_existing_attributes(tmp_path):
     utilities.write_parameter_to_file(f, 'input_file', '/fake/path.yaml')
     f.close()
     delta = DeltaModel(input_file=p)
-    assert delta.S0 == 0.0002  # from default.yaml
+    assert delta.S0 == 0.00015  # from default.yaml
     assert hasattr(delta, 'input_file')
     assert delta.input_file == p
 
@@ -134,12 +134,14 @@ def test_no_outputs_save_dt_notreached(tmp_path):
     utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
     utilities.write_parameter_to_file(f, 'seed', 0)
     utilities.write_parameter_to_file(f, 'save_strata', True)
-    utilities.write_parameter_to_file(f, 'save_dt', 43200)
+    utilities.write_parameter_to_file(f, 'save_dt', 55000)
     f.close()
     delta = DeltaModel(input_file=p)
+    # update twice, so time should be dt*2
     for _ in range(2):
         delta.update()
-    assert delta.dt == 20000.0
+    assert delta.dt == 25000.0
+    assert delta.time == delta.dt * 2
     assert delta.strata_counter == 1  # one saved, t==0
     assert delta.time < delta.save_dt
     delta.finalize()
@@ -156,7 +158,7 @@ def test_no_outputs_save_strata_false(tmp_path):
     delta = DeltaModel(input_file=p)
     for _ in range(2):
         delta.update()
-    assert delta.dt == 20000.0
+    assert delta.dt == 25000.0
     assert not hasattr(delta, 'strata_counter')
     assert delta.time > delta.save_dt
 

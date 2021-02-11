@@ -23,13 +23,13 @@ def test_set_random_assignments(test_DeltaModel):
     assert got == pytest.approx(_exp)
 
 
-def test_get_steps():
+def test_get_steps(test_DeltaModel):
     """
     Test for function shared_tools.get_steps
     """
     new_cells = np.arange(9)
-    iwalk = shared_tools.get_iwalk()
-    jwalk = shared_tools.get_jwalk()
+    iwalk = test_DeltaModel.iwalk
+    jwalk = test_DeltaModel.jwalk
 
     d, i, j, a = shared_tools.get_steps(
         new_cells, iwalk.flatten(), jwalk.flatten())
@@ -131,67 +131,71 @@ class TestRandomPick:
         assert np.sum(_rets == 8) > 0
 
 
-def test_custom_unravel_square():
-    arr = np.arange(9).reshape((3, 3))
-    # test upper left corner
-    x, y = shared_tools.custom_unravel(0, arr.shape)
-    assert x == 0
-    assert y == 0
-    # test center
-    x, y = shared_tools.custom_unravel(4, arr.shape)
-    assert x == 1
-    assert y == 1
-    # test off-center
-    x, y = shared_tools.custom_unravel(5, arr.shape)
-    assert x == 1
-    assert y == 2
-    # test lower right corner
-    x, y = shared_tools.custom_unravel(8, arr.shape)
-    assert x == 2
-    assert y == 2
+class TestCustomUnravel:
+
+    def test_custom_unravel_square(self):
+        arr = np.arange(9).reshape((3, 3))
+        # test upper left corner
+        x, y = shared_tools.custom_unravel(0, arr.shape)
+        assert x == 0
+        assert y == 0
+        # test center
+        x, y = shared_tools.custom_unravel(4, arr.shape)
+        assert x == 1
+        assert y == 1
+        # test off-center
+        x, y = shared_tools.custom_unravel(5, arr.shape)
+        assert x == 1
+        assert y == 2
+        # test lower right corner
+        x, y = shared_tools.custom_unravel(8, arr.shape)
+        assert x == 2
+        assert y == 2
+
+    def test_custom_unravel_rectangle(self):
+        arr = np.arange(50).reshape((5, 10))
+        # test a few spots
+        x, y = shared_tools.custom_unravel(19, arr.shape)
+        assert x == 1
+        assert y == 9
+        x, y = shared_tools.custom_unravel(34, arr.shape)
+        assert x == 3
+        assert y == 4
+
+    def test_custom_unravel_exceed_error(self):
+        arr = np.arange(9).reshape((3, 3))
+        # next line should throw IndexError
+        with pytest.raises(IndexError):
+            x, y = shared_tools.custom_unravel(99, arr.shape)
 
 
-def test_custom_unravel_rectangle():
-    arr = np.arange(50).reshape((5, 10))
-    # test a few spots
-    x, y = shared_tools.custom_unravel(19, arr.shape)
-    assert x == 1
-    assert y == 9
-    x, y = shared_tools.custom_unravel(34, arr.shape)
-    assert x == 3
-    assert y == 4
+class TestGetWeightSfcInt:
+
+    def test_get_weight_sfc_int(self, test_DeltaModel):
+
+        np.random.seed(test_DeltaModel.seed)
+        stage = np.random.uniform(0.5, 1, 9)
+        qx = 1
+        qy = 1
+        ivec = test_DeltaModel.ivec_flat
+        jvec = test_DeltaModel.jvec_flat
+        dists = test_DeltaModel.distances_flat
+
+        weight_sfc, weight_int = shared_tools.get_weight_sfc_int(stage, stage,
+                                                                 qx, qy,
+                                                                 ivec, jvec,
+                                                                 dists)
+        assert np.all(weight_sfc == np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]))
+        assert np.all(weight_int == np.array([0, 0, 0, 0, 0, 1, 0, 1, 1]))
 
 
-def test_custom_unravel_exceed_error():
-    arr = np.arange(9).reshape((3, 3))
-    # next line should throw IndexError
-    with pytest.raises(IndexError):
-        x, y = shared_tools.custom_unravel(99, arr.shape)
+class TestVerisonSpecifications:
 
-
-def test_get_weight_sfc_int(test_DeltaModel):
-
-    np.random.seed(test_DeltaModel.seed)
-    stage = np.random.uniform(0.5, 1, 9)
-    qx = 1
-    qy = 1
-    ivec = test_DeltaModel.ivec_flat
-    jvec = test_DeltaModel.jvec_flat
-    dists = test_DeltaModel.distances_flat
-
-    weight_sfc, weight_int = shared_tools.get_weight_sfc_int(stage, stage,
-                                                             qx, qy,
-                                                             ivec, jvec,
-                                                             dists)
-    assert np.all(weight_sfc == np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]))
-    assert np.all(weight_int == np.array([0, 0, 0, 0, 0, 1, 0, 1, 1]))
-
-
-def test_version_is_valid():
-    v = shared_tools._get_version()
-    assert type(v) is str
-    dots = [i for i, c in enumerate(v) if c == '.']
-    assert len(dots) == 2
+    def test_version_is_valid(self):
+        v = shared_tools._get_version()
+        assert type(v) is str
+        dots = [i for i, c in enumerate(v) if c == '.']
+        assert len(dots) == 2
 
 
 class TestScaleModelTime():

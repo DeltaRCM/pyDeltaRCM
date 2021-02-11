@@ -94,34 +94,93 @@ def test_pad_cell_type(test_DeltaModel):
     assert a == 12
 
 
-def test_check_for_loops():
+class TestCheckForLoops:
 
-    idxs = np.array(
-        [[0, 11, 12, 13, 23, 22, 12],
-         [0, 1, 2, 3, 4, 5, 16]])
-    nidx = np.array([21, 6])
-    itt = 6
-    free = np.array([1, 1])
+    # set up a simple domain
+    #   10x10 domain
+    #   2 parcels taken six steps
+    free_surf_walk_inds = np.array(
+            [[4, 15, 25, 36, 46, 55, 66],
+             [5, 15, 26, 35, 44, 53, 62]]
+             )
+    stage = np.ones((10, 10))
     CTR = 4
     L0 = 1
-    looped = np.array([0, 0])
 
-    nidx, looped, free = water_tools._check_for_loops(
-        idxs, nidx, itt, L0, looped, (10, 10), CTR, free)
+    def test_check_for_loops_no_loops(self):
 
-    assert np.all(nidx == [41, 6])
-    assert np.all(looped == [1, 0])
-    assert np.all(free == [-1, 1])
+        # set up inds to go to new locations
+        new_inds0 = np.array([76, 73])
+        _step = self.free_surf_walk_inds.shape[1] + 1  # 7
+        SL = 0
+        stage_minus_SL = self.stage - SL
+
+        new_inds, looped = water_tools._check_for_loops(
+            self.free_surf_walk_inds, new_inds0.copy(), _step,
+            self.L0, self.CTR, stage_minus_SL)
+
+        # new inds should be same as input
+        assert np.all(new_inds == new_inds0)
+        # no loops
+        assert np.all(looped == [0, 0])
+
+    def test_check_for_loops_relocate_not_loop(self):
+        """
+        Will relocate parcel (repeated ind), but will not mark as a loop,
+        because parcel stage is at SL.
+        """
+        # set up inds[1] to go to a repeat ind
+        new_inds0 = np.array([76, 53])
+        _step = self.free_surf_walk_inds.shape[1] + 1  # 7
+        SL = 1
+        stage_minus_SL = self.stage - SL
+
+        new_inds, looped = water_tools._check_for_loops(
+            self.free_surf_walk_inds, new_inds0.copy(), _step,
+            self.L0, self.CTR, stage_minus_SL)
+
+        # new inds should NOT be same as input
+        assert new_inds[0] == new_inds0[0]
+        assert new_inds[1] != new_inds0[1]
+        # check that the parcel was thrown along vector
+        assert new_inds[1] > 80
+        # one loop
+        assert np.all(looped == [0, 0])
+
+    def test_check_for_loops_relocate_and_loop(self):
+        """
+        Will relocate parcel (repeated ind), and mark as a loop, because
+        parcel stage is not at SL.
+        """
+        # set up inds[1] to go to a repeat ind
+        new_inds0 = np.array([76, 53])
+        _step = self.free_surf_walk_inds.shape[1] + 1  # 7
+        SL = 0
+        stage_minus_SL = self.stage - SL
+
+        new_inds, looped = water_tools._check_for_loops(
+            self.free_surf_walk_inds, new_inds0.copy(), _step,
+            self.L0, self.CTR, stage_minus_SL)
+
+        # new inds should NOT be same as input
+        assert new_inds[0] == new_inds0[0]
+        assert new_inds[1] != new_inds0[1]
+        # check that the parcel was thrown along vector
+        assert new_inds[1] > 80
+        # one loop
+        assert np.all(looped == [0, 1])
 
 
-def test_calculate_new_ind():
+def test_calculate_new_ind(test_DeltaModel):
 
-    cidx = np.array([12, 16, 16])
-    ncel = np.array([6, 1, 4])
-    iwalk = shared_tools.get_iwalk()
-    jwalk = shared_tools.get_jwalk()
+    current_inds = np.array([12, 16, 16])
+    new_inds = np.array([6, 1, 4])
+    ravel_walk_flat = test_DeltaModel.ravel_walk_flat
 
-    nidx = water_tools._calculate_new_ind(cidx, ncel, iwalk.flatten(), jwalk.flatten(), (10, 10))
+    nidx = water_tools._calculate_new_inds(
+        current_inds, new_inds,
+        ravel_walk_flat
+        )
 
     nidx_exp = np.array([21, 6, 0])
     assert np.all(nidx == nidx_exp)
