@@ -173,8 +173,8 @@ class TestCheckForLoops:
 
 def test_calculate_new_ind(test_DeltaModel):
 
-    current_inds = np.array([12, 16, 16])
-    new_inds = np.array([6, 1, 4])
+    current_inds = np.array([12, 16, 16], dtype=np.int64)
+    new_inds = np.array([6, 1, 4], dtype=np.int64)
     ravel_walk_flat = test_DeltaModel.ravel_walk_flat
 
     nidx = water_tools._calculate_new_inds(
