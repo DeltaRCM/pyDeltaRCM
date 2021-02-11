@@ -673,7 +673,7 @@ def test_free_surf_flag(test_DeltaModel):
 
 
 def test_indices(test_DeltaModel):
-    assert np.any(test_DeltaModel.free_surf_walk_indices) == 0
+    assert np.any(test_DeltaModel.free_surf_walk_inds) == 0
 
 
 def test_sfc_visit(test_DeltaModel):
