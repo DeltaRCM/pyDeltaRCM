@@ -3,11 +3,10 @@ import os
 import logging
 import warnings
 
-from math import floor, sqrt, pi
+from math import floor
 import numpy as np
 
 from scipy.sparse import lil_matrix, csr_matrix
-from scipy import ndimage
 
 from netCDF4 import Dataset
 import time as time_lib
@@ -152,7 +151,8 @@ class init_tools(abc.ABC):
 
         # handle a not implemented setup
         if self.save_checkpoint and self._toggle_subsidence:
-            raise NotImplementedError('Cannot handle checkpointing with subsidence.')
+            raise NotImplementedError(
+                'Cannot handle checkpointing with subsidence.')
 
         # write the input file values to the log
         if not self._resume_checkpoint:
@@ -211,7 +211,7 @@ class init_tools(abc.ABC):
         self.jvec_flat = self.jvec.flatten()
         self.iwalk_flat = self.iwalk.flatten()
         self.jwalk_flat = self.jwalk.flatten()
-        self.ravel_walk = (self.jwalk * self.W) + self.iwalk  # walk in flattened array
+        self.ravel_walk = (self.jwalk * self.W) + self.iwalk  # walk, flattened
         self.ravel_walk_flat = self.ravel_walk.flatten()
 
         # kernels for topographic smoothing
@@ -283,7 +283,7 @@ class init_tools(abc.ABC):
         self.qs0 = self.qw0 * self.C0  # sed unit discharge
         self.dVs = 0.1 * self.N0**2 * self.V0  # total sed added per timestep
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
-        self.Vp_sed = self.dVs / self._Np_sed   # volume of each sediment parcel
+        self.Vp_sed = self.dVs / self._Np_sed  # volume of each sediment parcel
 
         # max number of jumps for parcel
         if self.stepmax is None:
@@ -373,7 +373,8 @@ class init_tools(abc.ABC):
         y_channel_max = channel_inds + self.N0
         self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
 
-        self.stage[:] = np.maximum(0, self.L0 - self.y - 1) * self._dx * self._S0
+        self.stage[:] = (np.maximum(0, self.L0 - self.y - 1) *
+                         self._dx * self._S0)
         self.stage[self.cell_type == cell_ocean] = 0.
 
         self.depth[self.cell_type == cell_ocean] = self.h0
@@ -491,9 +492,9 @@ class init_tools(abc.ABC):
             self.output_netcdf.source = 'pyDeltaRCM'
 
             # create master dimensions
-            length = self.output_netcdf.createDimension('length', self.L)
-            width = self.output_netcdf.createDimension('width', self.W)
-            total_time = self.output_netcdf.createDimension('total_time', None)
+            self.output_netcdf.createDimension('length', self.L)
+            self.output_netcdf.createDimension('width', self.W)
+            self.output_netcdf.createDimension('total_time', None)
 
             # create master coordinates (as netCDF variables)
             x = self.output_netcdf.createVariable(
@@ -577,7 +578,6 @@ class init_tools(abc.ABC):
 
             _msg = 'Output netCDF file created'
             self.log_info(_msg, verbosity=2)
-
 
     def init_subsidence(self):
         """Initialize subsidence pattern.
