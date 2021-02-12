@@ -632,6 +632,18 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_sedflux_figs = save_sedflux_figs
 
     @property
+    def save_sandfrac_figs(self):
+        """
+        save_sandfrac_figs controls whether or not figures of the sediment
+        surface (i.e., the bed) sand fraction are saved.
+        """
+        return self._save_sandfrac_figs
+
+    @save_sandfrac_figs.setter
+    def save_sandfrac_figs(self, save_sandfrac_figs):
+        self._save_sandfrac_figs = save_sandfrac_figs
+
+    @property
     def save_figs_sequential(self):
         """
         save_figs_sequential sets how figures are to be saved.
@@ -736,6 +748,18 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @save_sedflux_grids.setter
     def save_sedflux_grids(self, save_sedflux_grids):
         self._save_sedflux_grids = save_sedflux_grids
+
+    @property
+    def save_sandfrac_grids(self):
+        """
+        save_sandfrac_grids controls whether or not the sediment
+        surface (i.e., the bed) sand fraction is saved.
+        """
+        return self._save_sandfrac_grids
+
+    @save_sandfrac_grids.setter
+    def save_sandfrac_grids(self, save_sandfrac_grids):
+        self._save_sandfrac_grids = save_sandfrac_grids
 
     @property
     def save_discharge_components(self):

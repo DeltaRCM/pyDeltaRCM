@@ -46,6 +46,8 @@ class iteration_tools(abc.ABC):
             raise RuntimeError('Cannot update model, model already finalized!')
 
         # start the model operations
+        self.eta0 = np.copy(self.eta)  # copy
+
         #   water iterations
         _msg = 'Beginning water iteration'
         self.log_info(_msg, verbosity=2)
@@ -84,6 +86,8 @@ class iteration_tools(abc.ABC):
 
         self.eta[0, self.inlet] = self.stage[0, self.inlet] - self._h0
         self.depth[0, self.inlet] = self._h0
+
+        self.compute_sand_frac()
 
         self.H_SL = self._H_SL + self._SLR * self._dt
 
@@ -137,6 +141,57 @@ class iteration_tools(abc.ABC):
         self.strata_eta = hstack([self.strata_eta, lil_blank], format='lil')
         self.strata_sand_frac = hstack([self.strata_sand_frac, lil_blank],
                                        format='lil')
+
+    def compute_sand_frac(self):
+        """Compute the sand fraction as a continous updating data field.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        """
+
+        if self.save_strata:
+
+            _msg = 'Computing bed sand fraction'
+            self.log_info(_msg, verbosity=2)
+
+            # layer attributes at time t
+            actlyr_thick = (self._h0 * 0.5)
+            actlyr_top = np.copy(self.eta0)
+            actlyr_bot = actlyr_top - actlyr_thick
+
+            deta = self.eta - self.eta0
+
+            # everywhere the bed has degraded this timestep
+            whr_deg = (deta < 0)
+            if np.any(whr_deg):
+                # find where the erosion exceeded the active layer
+                whr_unkwn = self.eta < actlyr_bot
+
+                # update sand_frac in unknown to the basin value
+                self.sand_frac[whr_unkwn] = 0  # boundary condition
+
+                # find where erosion was into active layer
+                whr_actero = np.logical_and(whr_deg, self.eta >= actlyr_bot)
+
+                # update sand_frac to active_layer value
+                self.sand_frac[whr_actero] = self.active_layer[whr_actero]
+
+            # whr_agg = (deta > 0)
+            whr_agg = np.logical_or(
+                (self.Vp_dep_sand > 0), (self.Vp_dep_mud > 0))
+            if np.any(whr_agg):
+                # sand_frac and active_layer becomes the mixture of the deposit
+                mixture = (self.Vp_dep_sand[whr_agg] /
+                           (self.Vp_dep_mud[whr_agg] +
+                            self.Vp_dep_sand[whr_agg]))
+
+                # update sand_frac in act layer to this value
+                self.sand_frac[whr_agg] = mixture
+                self.active_layer[whr_agg] = mixture
 
     def record_stratigraphy(self):
         """Save stratigraphy to file.
@@ -312,6 +367,12 @@ class iteration_tools(abc.ABC):
                                  filename_root='sedflux_',
                                  timestep=self.save_iter)
 
+            if self._save_sandfrac_figs:
+                _ff = self.make_figure('sand_frac', self._time)
+                self.save_figure(_ff, directory=self.prefix,
+                                 filename_root='sandfrac_',
+                                 timestep=self.save_iter)
+
         # ------------------ grids ------------------
         if self._save_any_grids:
 
@@ -335,6 +396,9 @@ class iteration_tools(abc.ABC):
 
             if self._save_sedflux_grids:
                 self.save_grids('sedflux', self.qs, save_idx)
+
+            if self._save_sandfrac_grids:
+                self.save_grids('sandfrac', self.sand_frac, save_idx)
 
             if self._save_discharge_components:
                 self.save_grids('discharge_x', self.qx, save_idx)

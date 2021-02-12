@@ -88,6 +88,9 @@ save_velocity_figs:
 save_sedflux_figs:
   type: 'bool'
   default: False
+save_sandfrac_figs:
+  type: 'bool'
+  default: False
 save_figs_sequential:
   type: 'bool'
   default: True
@@ -110,6 +113,9 @@ save_velocity_grids:
   type: 'bool'
   default: False
 save_sedflux_grids:
+  type: 'bool'
+  default: False
+save_sandfrac_grids:
   type: 'bool'
   default: False
 save_discharge_components:

@@ -342,6 +342,9 @@ class init_tools(abc.ABC):
         self.uy = np.zeros((self.L, self.W))
         self.uw = np.zeros((self.L, self.W))
         self.qs = np.zeros((self.L, self.W))
+        self.sand_frac = np.zeros((self.L, self.W), dtype=np.float32)
+        self.active_layer = np.zeros((self.L, self.W), dtype=np.float32)
+        # self.substrate = np.zeros((self.L, self.W))
         self.Vp_dep_sand = np.zeros((self.L, self.W))
         self.Vp_dep_mud = np.zeros((self.L, self.W))
         self.free_surf_flag = np.zeros((self._Np_water,), dtype=np.int64)
@@ -524,6 +527,10 @@ class init_tools(abc.ABC):
                 sedflux = self.output_netcdf.createVariable(
                     'sedflux', 'f4', ('total_time', 'length', 'width'))
                 sedflux.units = 'cubic meters per second'
+            if self.save_sandfrac_grids:
+                sandfrac = self.output_netcdf.createVariable(
+                    'sandfrac', 'f4', ('total_time', 'length', 'width'))
+                sandfrac.units = 'fraction'
             if self.save_discharge_components:
                 discharge_x = self.output_netcdf.createVariable(
                     'discharge_x', 'f4', ('total_time', 'length', 'width'))
