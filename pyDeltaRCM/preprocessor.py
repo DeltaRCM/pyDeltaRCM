@@ -921,10 +921,10 @@ def scale_relative_sea_level_rise_rate(mmyr, If=1):
 
     .. math::
 
-        \widehat{RSLR} = (RSLR / 1000) \cdot \dfrac{1}{I_f \cdot 365.25 \cdot 86400}
+        \\widehat{RSLR} = (RSLR / 1000) \\cdot \\dfrac{1}{I_f \\cdot 365.25 \\cdot 86400}
 
     This conversion makes it such that when one real-world year has elapsed
-    (:math:`I_f \cdot 365.25 \cdot 86400` seconds in model time), the relative
+    (:math:`I_f \\cdot 365.25 \\cdot 86400` seconds in model time), the relative
     sea level has changed by the number of millimeters specified in the input
     :obj:`mmyr`.
 
