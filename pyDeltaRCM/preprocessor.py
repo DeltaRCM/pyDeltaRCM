@@ -55,9 +55,13 @@ class BasePreprocessor(abc.ABC):
 
         """
         # open the file, an error will be thrown if invalid yaml?
-        user_file = open(self.input_file, mode='r')
-        self.yaml_dict = yaml.load(user_file, Loader=yaml.FullLoader)
-        user_file.close()
+        if isinstance(self.input_file, dict):
+            self.yaml_dict = self.input_file
+        elif (isinstance(self.input_file, str) or
+              isinstance(self.input_file, Path)):
+            self.yaml_dict = self._open_yaml(self.input_file)
+        else:
+            raise ValueError('Invalid input file argument.')
 
         if 'ensemble' in self.yaml_dict.keys():
             self._has_ensemble = True
@@ -74,6 +78,27 @@ class BasePreprocessor(abc.ABC):
             self.verbose = 0
 
         return self.yaml_dict
+
+    def _open_yaml(self, input_file):
+        """Safely open, read, and close a yaml file.
+
+        Parameters
+        ----------
+        input file
+            string or path to file
+
+        Returns
+        -------
+        yaml_dict
+            yaml file, as a Python dict
+        """
+        if (input_file is None):
+            return {}  # return an empty dict
+        else:
+            user_file = open(input_file, mode='r')
+            yaml_dict = yaml.load(user_file, Loader=yaml.FullLoader)
+            user_file.close()
+            return yaml_dict
 
     def _create_matrix(self):
         """Create a matrix if not already in the yaml.
@@ -310,6 +335,9 @@ class BasePreprocessor(abc.ABC):
                 num_parallel_processes = _parallel_flag
             else:
                 num_parallel_processes = 1
+            # number of parallel processes is never greater than number of jobs
+            num_parallel_processes = np.minimum(
+                num_parallel_processes, num_total_processes)
 
             _msg = 'Running %g parallel jobs' % num_parallel_processes
             if self.verbose >= 1:
@@ -324,10 +352,15 @@ class BasePreprocessor(abc.ABC):
             # loop and create and start all jobs
             for i in range(0, num_total_processes):
                 s.acquire()  # aquire resource from Semaphore
+
+                # open yaml file for specific job
+                job_yaml = self._open_yaml(self.file_list[i])
+
+                # instantiate the job
                 p = _ParallelJob(i=i, queue=q, sema=s,
                                  input_file=self.file_list[i],
                                  cli_dict=self.cli_dict,
-                                 yaml_dict=self.yaml_dict)
+                                 yaml_dict=job_yaml)
                 self.job_list.append(p)
                 p.start()
 
@@ -350,10 +383,14 @@ class BasePreprocessor(abc.ABC):
 
             # loop and create all jobs
             for i in range(0, num_total_processes):
+
+                # open yaml file for specific job
+                job_yaml = self._open_yaml(self.file_list[i])
+
                 p = _SerialJob(i=i,
                                input_file=self.file_list[i],
                                cli_dict=self.cli_dict,
-                               yaml_dict=self.yaml_dict)
+                               yaml_dict=job_yaml)
                 self.job_list.append(p)
 
             # run the job(s)
