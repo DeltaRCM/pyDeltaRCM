@@ -2,6 +2,8 @@ import sys
 import os
 import glob
 
+import numpy as np
+
 import pytest
 from pyDeltaRCM.model import DeltaModel
 
@@ -32,8 +34,13 @@ def write_matrix_to_file(f, keys, lists):
             f.write('    ' + '- ' + str(lists[i][j]) + '\n')
 
 
-def yaml_from_dict(tmp_path, file_name, _dict):
+def yaml_from_dict(tmp_path, file_name, _dict=None):
     p, f = create_temporary_file(tmp_path, file_name)
+    if (_dict is None):
+        _dict = {'out_dir': tmp_path / 'out_dir'}
+    else:
+        _dict['out_dir'] = tmp_path / 'out_dir'
+
     for k in _dict.keys():
         write_parameter_to_file(f, k, _dict[k])
     f.close()
