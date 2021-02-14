@@ -830,10 +830,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @resume_checkpoint.setter
     def resume_checkpoint(self, resume_checkpoint):
         if isinstance(resume_checkpoint, str):
-            self._checkpoint_file = resume_checkpoint
+            self._checkpoint_folder = resume_checkpoint
             self._resume_checkpoint = True
         else:
-            self._checkpoint_file = None
+            self._checkpoint_folder = None
             self._resume_checkpoint = resume_checkpoint
 
     @property

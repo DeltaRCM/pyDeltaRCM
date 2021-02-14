@@ -1,0 +1,3 @@
+out_dir: 'deltaRCM_Output'
+seed: 451220118313
+save_checkpoint: True
