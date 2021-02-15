@@ -1,8 +1,7 @@
-# unit tests for deltaRCM_tools.py
+# unit tests for iteration_tools.py
 
 import pytest
 
-import glob
 import os
 import netCDF4
 import numpy as np
@@ -22,6 +21,7 @@ class TestRunOneTimestep:
         delta = DeltaModel(input_file=p)
 
         # mock top-level methods, verify call was made to each
+        delta.log_info = mock.MagicMock()
         delta.init_water_iteration = mock.MagicMock()
         delta.run_water_iteration = mock.MagicMock()
         delta.compute_free_surface = mock.MagicMock()
@@ -50,6 +50,7 @@ class TestRunOneTimestep:
         delta = DeltaModel(input_file=p)
 
         # mock top-level methods, verify call was made to each
+        delta.log_info = mock.MagicMock()
         delta.init_water_iteration = mock.MagicMock()
         delta.run_water_iteration = mock.MagicMock()
         delta.compute_free_surface = mock.MagicMock()
@@ -79,12 +80,17 @@ class TestFinalizeTimestep:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'SLR': 0.001})
         delta = DeltaModel(input_file=p)
-        # mock the flooding correction
+
+        # mock the flooding correction and log
+        delta.log_info = mock.MagicMock()
         delta.flooding_correction = mock.MagicMock()
+
         # run the step
         delta.finalize_timestep()
+
         # assert submethod called once
         delta.flooding_correction.call_count == 1
+
         # check that sea level rose as expected
         assert delta.H_SL == 25
 
@@ -626,7 +632,7 @@ class TestSaveFigure:
         assert os.path.isfile(exp_path_png0_latest)
 
 
-class TestValidityOfSavedGrids:
+class TestSaveGrids:
 
     def test_save_eta_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -634,18 +640,23 @@ class TestValidityOfSavedGrids:
                                       'save_eta_grids': True})
         _delta = DeltaModel(input_file=p)
 
-        # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        # mock the log_info
+        _delta.log_info = mock.MagicMock()
 
         exp_path_nc = os.path.join(
             tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
         assert os.path.isfile(exp_path_nc)
 
-        for _ in range(0, 2):
-            _delta.update()
-        _delta.finalize()
+        for _t in range(0, 6):
+            _delta.save_grids('eta', _delta.eta, _delta._save_iter)
+            _delta._save_iter += 1
 
+        # close the file and connect
+        _delta.output_netcdf.close()
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+
+        # assertions
+        assert (_delta.log_info.call_count == 6)
         _arr = ds.variables['eta']
         assert _arr.shape[1] == _delta.eta.shape[0]
         assert _arr.shape[2] == _delta.eta.shape[1]
@@ -657,18 +668,23 @@ class TestValidityOfSavedGrids:
                                       'save_depth_grids': True})
         _delta = DeltaModel(input_file=p)
 
-        # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        # mock the log_info
+        _delta.log_info = mock.MagicMock()
 
         exp_path_nc = os.path.join(
             tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
         assert os.path.isfile(exp_path_nc)
 
-        for _ in range(0, 2):
-            _delta.update()
-        _delta.finalize()
+        for _t in range(0, 6):
+            _delta.save_grids('depth', _delta.depth, _delta._save_iter)
+            _delta._save_iter += 1
 
+        # close the file and connect
+        _delta.output_netcdf.close()
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+
+        # assertions
+        assert (_delta.log_info.call_count == 6)
         _arr = ds.variables['depth']
         assert _arr.shape[1] == _delta.depth.shape[0]
         assert _arr.shape[2] == _delta.depth.shape[1]
@@ -680,22 +696,26 @@ class TestValidityOfSavedGrids:
                                       'save_velocity_grids': True})
         _delta = DeltaModel(input_file=p)
 
-        # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        # mock the log_info
+        _delta.log_info = mock.MagicMock()
 
         exp_path_nc = os.path.join(
             tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
         assert os.path.isfile(exp_path_nc)
 
-        for _ in range(0, 2):
-            _delta.update()
-        assert _delta.time_iter == 2.0
-        _delta.finalize()
+        for _t in range(0, 6):
+            _delta.save_grids('velocity', _delta.uw, _delta._save_iter)
+            _delta._save_iter += 1
 
+        # close the file and connect
+        _delta.output_netcdf.close()
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+
+        # assertions
+        assert (_delta.log_info.call_count == 6)
         _arr = ds.variables['velocity']
-        assert _arr.shape[1] == _delta.eta.shape[0]
-        assert _arr.shape[2] == _delta.eta.shape[1]
+        assert _arr.shape[1] == _delta.uw.shape[0]
+        assert _arr.shape[2] == _delta.uw.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
 
     def test_save_stage_grids(self, tmp_path):
@@ -704,21 +724,26 @@ class TestValidityOfSavedGrids:
                                       'save_stage_grids': True})
         _delta = DeltaModel(input_file=p)
 
-        # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        # mock the log_info
+        _delta.log_info = mock.MagicMock()
 
         exp_path_nc = os.path.join(
             tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
         assert os.path.isfile(exp_path_nc)
 
-        for _ in range(0, 2):
-            _delta.update()
-        _delta.finalize()
+        for _t in range(0, 6):
+            _delta.save_grids('stage', _delta.stage, _delta._save_iter)
+            _delta._save_iter += 1
 
+        # close the file and connect
+        _delta.output_netcdf.close()
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+
+        # assertions
+        assert (_delta.log_info.call_count == 6)
         _arr = ds.variables['stage']
-        assert _arr.shape[1] == _delta.eta.shape[0]
-        assert _arr.shape[2] == _delta.eta.shape[1]
+        assert _arr.shape[1] == _delta.stage.shape[0]
+        assert _arr.shape[2] == _delta.stage.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
 
     def test_save_discharge_grids(self, tmp_path):
@@ -727,21 +752,26 @@ class TestValidityOfSavedGrids:
                                       'save_discharge_grids': True})
         _delta = DeltaModel(input_file=p)
 
-        # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        # mock the log_info
+        _delta.log_info = mock.MagicMock()
 
         exp_path_nc = os.path.join(
             tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
         assert os.path.isfile(exp_path_nc)
 
-        for _ in range(0, 2):
-            _delta.update()
-        _delta.finalize()
+        for _t in range(0, 6):
+            _delta.save_grids('discharge', _delta.qw, _delta._save_iter)
+            _delta._save_iter += 1
 
+        # close the file and connect
+        _delta.output_netcdf.close()
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+
+        # assertions
+        assert (_delta.log_info.call_count == 6)
         _arr = ds.variables['discharge']
-        assert _arr.shape[1] == _delta.eta.shape[0]
-        assert _arr.shape[2] == _delta.eta.shape[1]
+        assert _arr.shape[1] == _delta.qw.shape[0]
+        assert _arr.shape[2] == _delta.qw.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
 
     def test_save_sedflux_grids(self, tmp_path):
@@ -750,19 +780,24 @@ class TestValidityOfSavedGrids:
                                       'save_sedflux_grids': True})
         _delta = DeltaModel(input_file=p)
 
-        # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        # mock the log_info
+        _delta.log_info = mock.MagicMock()
 
         exp_path_nc = os.path.join(
             tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
         assert os.path.isfile(exp_path_nc)
 
-        for _ in range(0, 2):
-            _delta.update()
-        _delta.finalize()
+        for _t in range(0, 6):
+            _delta.save_grids('sedflux', _delta.qs, _delta._save_iter)
+            _delta._save_iter += 1
 
+        # close the file and connect
+        _delta.output_netcdf.close()
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
+
+        # assertions
+        assert (_delta.log_info.call_count == 6)
         _arr = ds.variables['sedflux']
-        assert _arr.shape[1] == _delta.eta.shape[0]
-        assert _arr.shape[2] == _delta.eta.shape[1]
+        assert _arr.shape[1] == _delta.qs.shape[0]
+        assert _arr.shape[2] == _delta.qs.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too

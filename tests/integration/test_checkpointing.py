@@ -2,15 +2,15 @@
 
 import pytest
 
-import sys
 import os
 import numpy as np
 from netCDF4 import Dataset
 
+import unittest.mock as mock
+
 from pyDeltaRCM import DeltaModel
 
-from .utilities import test_DeltaModel
-from . import utilities
+from .. import utilities
 
 
 def test_simple_checkpoint(tmp_path):

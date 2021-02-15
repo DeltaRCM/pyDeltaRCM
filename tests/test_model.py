@@ -1,34 +1,202 @@
 # unit tests for deltaRCM_driver.py
 
-import pytest
-
-import sys
 import os
 import numpy as np
 
+import pytest
+
 import netCDF4
 
+import unittest.mock as mock
+
+from pyDeltaRCM.model import DeltaModel
+from . import utilities
 from .utilities import test_DeltaModel
 
 # need to create a simple case of pydeltarcm object to test these functions
 
 
-def test_init(test_DeltaModel):
-    """
-    test the deltaRCM_driver init (happened when delta.initialize was run)
-    """
-    assert test_DeltaModel.time_iter == 0.
-    assert test_DeltaModel._is_finalized is False
+class Test__init__:
+
+    def test_init(self, tmp_path):
+        """
+        test the deltaRCM_driver init (happened when delta.initialize was run)
+        """
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        assert _delta.time_iter == 0.
+        assert _delta._is_finalized is False
 
 
-def test_update(test_DeltaModel):
-    test_DeltaModel.update()
-    assert test_DeltaModel.time_iter == int(1)
-    assert test_DeltaModel.time == test_DeltaModel.dt
-    test_DeltaModel.update()
-    assert test_DeltaModel.time_iter == int(2)
-    assert test_DeltaModel.time == 2 * test_DeltaModel.dt
-    assert test_DeltaModel._is_finalized is False
+class TestUpdate:
+
+    def test_update_make_record(self, tmp_path):
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # modify the save interval to be twice dt
+        _delta._save_dt = 2 * _delta._dt
+        _delta._checkpoint_dt = 2 * _delta._dt
+
+        # mock top-level methods, verify call was made to each
+        _delta.record_stratigraphy = mock.MagicMock()
+        _delta.output_data = mock.MagicMock()
+        _delta.run_one_timestep = mock.MagicMock()
+        _delta.apply_subsidence = mock.MagicMock()
+        _delta.finalize_timestep = mock.MagicMock()
+        _delta.log_model_time = mock.MagicMock()
+        _delta.output_checkpoint = mock.MagicMock()
+
+        # run the timestep: t=0
+        #   * should call output and core
+        #   * does not output checkpoint on t=0
+        _delta.update()
+
+        # assert calls
+        assert _delta.record_stratigraphy.call_count == 1
+        assert _delta.output_data.call_count == 1
+        assert _delta.run_one_timestep.call_count == 1
+        assert _delta.apply_subsidence.call_count == 1
+        assert _delta.finalize_timestep.call_count == 1
+        assert _delta.log_model_time.call_count == 1
+        assert _delta.output_checkpoint.call_count == 0
+
+        # assert times / counters
+        assert _delta.time_iter == int(1)
+        assert _delta.time == _delta.dt
+        assert _delta.save_time_since_last == _delta._dt
+        assert _delta.save_iter == int(1)
+        assert _delta._save_time_since_checkpoint == _delta._dt
+
+        # run another step
+        #   * should only call core steps
+        _delta.update()
+
+        # assert calls
+        assert _delta.record_stratigraphy.call_count == 1
+        assert _delta.output_data.call_count == 1
+        assert _delta.run_one_timestep.call_count == 2
+        assert _delta.apply_subsidence.call_count == 2
+        assert _delta.finalize_timestep.call_count == 2
+        assert _delta.log_model_time.call_count == 2
+        assert _delta.output_checkpoint.call_count == 0
+
+        # assert times / counters
+        assert _delta.time_iter == int(2)
+        assert _delta.time == 2 * _delta.dt
+        assert _delta.save_time_since_last == 2 * _delta._dt
+        assert _delta.save_iter == int(1)
+        assert _delta._save_time_since_checkpoint == 2 * _delta._dt
+
+        # run another step
+        #   should call output, core, and checkpoint steps
+        _delta.update()
+
+        # assert calls
+        assert _delta.record_stratigraphy.call_count == 2
+        assert _delta.output_data.call_count == 2
+        assert _delta.run_one_timestep.call_count == 3
+        assert _delta.apply_subsidence.call_count == 3
+        assert _delta.finalize_timestep.call_count == 3
+        assert _delta.log_model_time.call_count == 3
+        assert _delta.output_checkpoint.call_count == 1
+
+        # assert times / counters
+        assert _delta.time_iter == int(3)
+        assert _delta.time == 3 * _delta.dt
+        assert _delta.save_time_since_last == _delta._dt
+        assert _delta.save_iter == int(2)
+        assert _delta._save_time_since_checkpoint == _delta._dt
+
+    def test_update_is_finalized(self, tmp_path):
+        # create a delta with different itermax
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # change state to finalized
+        _delta._is_finalized = True
+
+        # run the timestep
+        with pytest.raises(RuntimeError):
+            _delta.update()
+
+
+class TestFinalize:
+
+    def test_finalize_not_updated(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        _delta.log_info = mock.MagicMock()
+        _delta.record_stratigraphy = mock.MagicMock()
+        _delta.output_data = mock.MagicMock()
+        _delta.output_checkpoint = mock.MagicMock()
+        _delta.output_strata = mock.MagicMock()
+
+        # run finalize
+        _delta.finalize()
+
+        # assert calls
+        #  should hit all options since no saves
+        assert _delta.log_info.call_count == 2
+        assert _delta.record_stratigraphy.call_count == 1
+        assert _delta.output_data.call_count == 1
+        assert _delta.output_checkpoint.call_count == 0
+        assert _delta.output_strata.call_count == 1
+
+        assert _delta._is_finalized is True
+
+    def test_finalize_updated(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # mock the top-level
+        _delta.log_info = mock.MagicMock()
+        _delta.record_stratigraphy = mock.MagicMock()
+        _delta.output_data = mock.MagicMock()
+        _delta.output_checkpoint = mock.MagicMock()
+        _delta.output_strata = mock.MagicMock()
+
+        # modify the save interval
+        _t = 5
+        _delta._save_dt = _t * _delta._dt
+        _delta._checkpoint_dt = _t * _delta._dt
+
+        # run a mock update / save
+        _delta._time = _t * _delta._dt
+        _delta._save_iter += int(1)
+        _delta._save_time_since_last = 0
+        _delta._save_time_since_checkpoint = 0
+
+        # run finalize
+        _delta.finalize()
+
+        # assert calls
+        #   should only hit top-levels
+        assert _delta.log_info.call_count == 2
+        assert _delta.record_stratigraphy.call_count == 0
+        assert _delta.output_data.call_count == 0
+        assert _delta.output_checkpoint.call_count == 0
+        assert _delta.output_strata.call_count == 1
+
+        assert _delta._is_finalized is True
+
+    def test_finalize_is_finalized(self, tmp_path):
+        # create a delta with different itermax
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # change state to finalized
+        _delta._is_finalized = True
+
+        # run the timestep
+        with pytest.raises(RuntimeError):
+            _delta.finalize()
+
+        assert _delta._is_finalized is True
 
 
 def get_saved_times_from_file(_path):
@@ -164,108 +332,156 @@ def test_update_saving_intervals_offset_long_over_double(test_DeltaModel):
     assert np.all(_saves == np.array([0, 1200, 2400, 3600, 4800, 6000, 7200, 8400, 9600, 10800]))
 
 
-def test_finalize(test_DeltaModel):
-    for _ in range(2):
-        test_DeltaModel.update()
-    test_DeltaModel.finalize()
-    assert test_DeltaModel._is_finalized is True
-
 
 def test_output_strata_error_if_no_updates(test_DeltaModel):
     with pytest.raises(RuntimeError, match=r'Model has no computed strat.*'):
         test_DeltaModel.output_strata()
 
 
-def test_multifinalization_error(test_DeltaModel):
-    err_delta = test_DeltaModel
-    assert err_delta.dt == 300.0
-    err_delta.save_dt = 300.0
-    err_delta.update()
-    # test will fail if any assertion is wrong
-    assert err_delta.time_iter == 1.0
-    assert err_delta._is_finalized is False
-    err_delta.finalize()
-    assert err_delta._is_finalized is True
-    # next line should throw RuntimeError
-    with pytest.raises(RuntimeError, match=r'Cannot update model,.*'):
-        err_delta.update()
+class TestPublicSettersAndGetters:
 
+    def test_setting_getting_sea_surface_mean_elevation(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
 
-def test_initial_values(test_DeltaModel):
-    assert np.all(test_DeltaModel.sea_surface_elevation == 0)
-    assert test_DeltaModel.water_depth[0, 2] == 0
-    assert test_DeltaModel.water_depth[0, 3] == 1
-    assert test_DeltaModel.water_depth[4, 4] == 1
-    assert test_DeltaModel.bed_elevation[0, 2] == 0
-    assert test_DeltaModel.bed_elevation[0, 3] == -1
-    assert test_DeltaModel.bed_elevation[4, 4] == -1
+        assert _delta.sea_surface_mean_elevation == 0
+        _delta.sea_surface_mean_elevation = 0.5
+        assert _delta.sea_surface_mean_elevation == 0.5
 
+    def test_setting_getting_sea_surface_elevation_change(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
 
-def test_setting_getting_sea_surface_mean_elevation(test_DeltaModel):
-    assert test_DeltaModel.sea_surface_mean_elevation == 0
-    test_DeltaModel.sea_surface_mean_elevation = 0.5
-    assert test_DeltaModel.sea_surface_mean_elevation == 0.5
+        assert _delta.sea_surface_elevation_change == 0
+        _delta.sea_surface_elevation_change = 0.002
+        assert _delta.sea_surface_elevation_change == 0.002
 
+    def test_setting_getting_bedload_fraction(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
 
-def test_setting_getting_sea_surface_elevation_change(test_DeltaModel):
-    assert test_DeltaModel.sea_surface_elevation_change == 0.001
-    test_DeltaModel.sea_surface_elevation_change = 0.002
-    assert test_DeltaModel.sea_surface_elevation_change == 0.002
+        assert _delta.bedload_fraction == 0.5
+        _delta.bedload_fraction = 0.25
+        assert _delta.bedload_fraction == 0.25
 
+    def test_setting_getting_channel_flow_velocity(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
 
-def test_setting_getting_bedload_fraction(test_DeltaModel):
-    assert test_DeltaModel.bedload_fraction == 0.5
-    test_DeltaModel.bedload_fraction = 0.25
-    assert test_DeltaModel.bedload_fraction == 0.25
+        # mock the init methods
+        _delta.create_other_variables = mock.MagicMock()
+        _delta.init_sediment_routers = mock.MagicMock()
 
+        # check initials
+        assert _delta.channel_flow_velocity == 1
 
-def test_setting_getting_channel_flow_velocity(test_DeltaModel):
-    assert test_DeltaModel.channel_flow_velocity == 1
-    test_DeltaModel.channel_flow_velocity = 3
-    assert test_DeltaModel.channel_flow_velocity == 3
-    assert test_DeltaModel.u_max == 6
+        # change and assert changed
+        _delta.channel_flow_velocity = 3
+        assert _delta.channel_flow_velocity == 3
+        assert _delta.channel_flow_velocity == _delta.u0
+        assert _delta.channel_flow_velocity == _delta._u0
 
+        # assert reinitializers called
+        assert (_delta.create_other_variables.called is True)
+        assert (_delta.init_sediment_routers.called is True)
 
-def test_setting_getting_channel_width(test_DeltaModel):
-    assert test_DeltaModel.channel_width == 2
-    test_DeltaModel.channel_width = 10
-    assert test_DeltaModel.channel_width == 10
-    assert test_DeltaModel.N0 == 10
+    def test_setting_getting_channel_width(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
 
+        _delta.create_other_variables = mock.MagicMock()
+        _delta.init_sediment_routers = mock.MagicMock()
 
-def test_setting_getting_channel_width(test_DeltaModel):
-    assert test_DeltaModel.channel_flow_depth == 1
-    test_DeltaModel.channel_flow_depth = 2
-    assert test_DeltaModel.channel_flow_depth == 2
+        # check initials
+        assert _delta.channel_width == 250
 
+        # change value
+        #  the channel width is then changed internally with `N0`, according
+        #  to the `create_other_variables` so no change is actually made
+        #  here.
+        with pytest.warns(UserWarning):
+            _delta.channel_width = 300
+        assert _delta.channel_width == 250  # not changed!
 
-def test_setting_getting_channel_width(test_DeltaModel):
-    assert test_DeltaModel.influx_sediment_concentration == 0.1
-    test_DeltaModel.influx_sediment_concentration = 2
-    assert test_DeltaModel.C0 == 0.02
+        # assert reinitializers called
+        assert (_delta.create_other_variables.called is True)
+        assert (_delta.init_sediment_routers.called is True)
 
+    def test_setting_getting_flow_depth(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
 
-def test_make_checkpoint(tmp_path, test_DeltaModel):
-    """Test setting the checkpoint option to 'True' and saving a checkpoint."""
-    test_DeltaModel.save_checkpoint = True
-    test_DeltaModel._save_checkpoint = True
-    test_DeltaModel.checkpoint_dt = 1
-    test_DeltaModel.save_dt = 1
-    check_DeltaModel = test_DeltaModel
-    test_DeltaModel.update()
-    exp_path_npz = os.path.join(tmp_path / 'out_dir', 'checkpoint.npz')
-    assert os.path.isfile(exp_path_npz)
-    test_DeltaModel.finalize()
-    # check loading checkpoint and see if it works
-    check_DeltaModel.load_checkpoint()
-    assert check_DeltaModel._time == test_DeltaModel._time
-    assert np.all(check_DeltaModel.uw == test_DeltaModel.uw)
-    assert np.all(check_DeltaModel.ux == test_DeltaModel.ux)
-    assert np.all(check_DeltaModel.uy == test_DeltaModel.uy)
-    assert np.all(check_DeltaModel.depth == test_DeltaModel.depth)
-    assert np.all(check_DeltaModel.stage == test_DeltaModel.stage)
-    assert np.all(check_DeltaModel.eta == test_DeltaModel.eta)
-    assert np.all(check_DeltaModel.strata_eta.todense() ==
-                  test_DeltaModel.strata_eta.todense())
-    assert np.all(check_DeltaModel.strata_sand_frac.todense() ==
-                  test_DeltaModel.strata_sand_frac.todense())
+        # mock the init methods
+        _delta.create_other_variables = mock.MagicMock()
+        _delta.init_sediment_routers = mock.MagicMock()
+
+        # check initials
+        assert _delta.channel_flow_depth == 5
+
+        # change and assert changed
+        _delta.channel_flow_depth = 2
+        assert _delta.channel_flow_depth == 2
+        assert _delta.channel_flow_depth == _delta.h0
+        assert _delta.channel_flow_depth == _delta._h0
+
+        # assert reinitializers called
+        assert (_delta.create_other_variables.called is True)
+        assert (_delta.init_sediment_routers.called is True)
+
+    def test_setting_getting_influx_concentration(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # mock the init methods
+        _delta.create_other_variables = mock.MagicMock()
+        _delta.init_sediment_routers = mock.MagicMock()
+
+        # check initials
+        assert _delta.influx_sediment_concentration == 0.1
+
+        # change and assert changed
+        _delta.influx_sediment_concentration = 0.003
+        assert _delta.C0_percent == 0.3
+
+        # assert reinitializers called
+        assert (_delta.create_other_variables.called is True)
+        assert (_delta.init_sediment_routers.called is True)
+
+    def test_getter_nosetter_sea_surface_elevation(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # check that one is alias of other
+        assert np.all(_delta.sea_surface_elevation == _delta.stage)
+        assert (_delta.sea_surface_elevation is _delta.stage)
+
+        # setter should return error, not allowed
+        with pytest.raises(AttributeError):
+            _delta.sea_surface_elevation = np.random.uniform(
+                0, 1, size=_delta.eta.shape)
+
+    def test_getter_nosetter_water_depth(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # check that one is alias of other
+        assert np.all(_delta.water_depth == _delta.depth)
+        assert (_delta.water_depth is _delta.depth)
+
+        # setter should return error, not allowed
+        with pytest.raises(AttributeError):
+            _delta.water_depth = np.random.uniform(
+                0, 1, size=_delta.eta.shape)
+
+    def test_getter_nosetter_bed_elevation(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # check that one is alias of other
+        assert np.all(_delta.bed_elevation == _delta.eta)
+        assert (_delta.bed_elevation is _delta.eta)
+
+        # setter should return error, not allowed
+        with pytest.raises(AttributeError):
+            _delta.bed_elevation = np.random.uniform(
+                0, 1, size=_delta.eta.shape)
