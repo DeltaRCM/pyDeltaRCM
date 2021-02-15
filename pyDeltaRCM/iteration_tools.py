@@ -42,9 +42,6 @@ class iteration_tools(abc.ABC):
         RuntimeError
             If model has already been finalized via :meth:`finalize`.
         """
-        if self._is_finalized:
-            raise RuntimeError('Cannot update model, model already finalized!')
-
         # start the model operations
         #   water iterations
         _msg = 'Beginning water iteration'

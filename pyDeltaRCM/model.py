@@ -121,12 +121,20 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         -------
 
         """
+        if self._is_finalized:
+            raise RuntimeError('Cannot update model, model already finalized!')
+
         # record the state of the model
         if self._save_time_since_last >= self.save_dt:
             self.record_stratigraphy()
             self.output_data()
             self._save_iter += int(1)
             self._save_time_since_last = 0
+
+        # save a checkpoint if needed
+        if self._save_time_since_checkpoint >= self.checkpoint_dt:
+            self.output_checkpoint()
+            self._save_time_since_checkpoint = 0
 
         # update the model, i.e., the actual model morphodynamics
         self.run_one_timestep()
@@ -139,11 +147,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_time_since_checkpoint += self.dt
         self._time_iter += int(1)
         self.log_model_time()
-
-        # save a checkpoint if needed
-        if self._save_time_since_checkpoint >= self.checkpoint_dt:
-            self.output_checkpoint()
-            self._save_time_since_checkpoint = 0
 
     def finalize(self):
         """Finalize the model run.
@@ -160,6 +163,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         """
         _msg = 'Finalize the model run'
         self.log_info(_msg)
+
+        if self._is_finalized:
+            raise RuntimeError('Cannot finalize model, '
+                               'model already finalized!')
 
         # get the final timestep recorded, if needed.
         if self._save_time_since_last >= self.save_dt:
@@ -1094,13 +1101,18 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def channel_width(self):
         """Get channel width."""
-        return self.N0_meters
+        return self.N0 * self._dx
 
     @channel_width.setter
-    def channel_width(self, new_N0):
-        self.N0_meters = new_N0
+    def channel_width(self, new_N0_meters):
+        self.N0_meters = new_N0_meters
         self.create_other_variables()
         self.init_sediment_routers()
+        if self.channel_width != new_N0_meters:
+            warnings.warn(UserWarning(
+                'Channel width was updated to {0} m, rather than input {1},'
+                'due to grid resolution or imposed domain '
+                'restrictions.'.format(self.channel_width, new_N0_meters)))
 
     @property
     def channel_flow_depth(self):
@@ -1146,8 +1158,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self.C0_percent
 
     @influx_sediment_concentration.setter
-    def influx_sediment_concentration(self, new_u0):
-        self.C0_percent = new_u0
+    def influx_sediment_concentration(self, new_C0):
+        self.C0_percent = new_C0 * 100
         self.create_other_variables()
         self.init_sediment_routers()
 
