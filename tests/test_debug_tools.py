@@ -10,7 +10,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-from utilities import test_DeltaModel
+from .utilities import test_DeltaModel
 # import utilities
 
 

@@ -9,8 +9,8 @@ from netCDF4 import Dataset
 
 from pyDeltaRCM import DeltaModel
 
-from utilities import test_DeltaModel
-import utilities
+from .utilities import test_DeltaModel
+from . import utilities
 
 
 def test_simple_checkpoint(tmp_path):

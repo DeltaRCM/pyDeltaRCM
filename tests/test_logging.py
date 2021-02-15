@@ -9,7 +9,7 @@ import netCDF4
 
 from pyDeltaRCM.model import DeltaModel
 
-import utilities
+from . import utilities
 
 
 def test_verbose_printing_0(tmp_path, capsys):

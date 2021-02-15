@@ -16,8 +16,8 @@ from pyDeltaRCM.model import DeltaModel
 from pyDeltaRCM import shared_tools
 from pyDeltaRCM import preprocessor
 
-import utilities
-from utilities import test_DeltaModel
+from . import utilities
+from .utilities import test_DeltaModel
 
 
 # test yaml parsing

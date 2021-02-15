@@ -6,7 +6,7 @@ import numpy as np
 
 from pyDeltaRCM.model import DeltaModel
 
-import utilities
+from . import utilities
 
 
 class TestModelDomainSetup:

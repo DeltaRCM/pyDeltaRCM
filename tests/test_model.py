@@ -8,7 +8,7 @@ import numpy as np
 
 import netCDF4
 
-from utilities import test_DeltaModel
+from .utilities import test_DeltaModel
 
 # need to create a simple case of pydeltarcm object to test these functions
 

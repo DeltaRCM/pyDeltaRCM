@@ -6,7 +6,7 @@ import sys
 import os
 import numpy as np
 
-from utilities import test_DeltaModel
+from .utilities import test_DeltaModel
 
 
 def test_sed_route_padding(test_DeltaModel):

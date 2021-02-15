@@ -10,7 +10,7 @@ import numpy as np
 import unittest.mock as mock
 
 from pyDeltaRCM.model import DeltaModel
-import utilities
+from . import utilities
 
 
 class TestRunOneTimestep:

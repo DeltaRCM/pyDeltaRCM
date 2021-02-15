@@ -6,7 +6,7 @@ import sys
 import os
 import numpy as np
 
-from utilities import test_DeltaModel
+from .utilities import test_DeltaModel
 from pyDeltaRCM import water_tools
 from pyDeltaRCM import shared_tools
 

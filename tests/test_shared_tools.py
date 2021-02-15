@@ -8,8 +8,8 @@ import numpy as np
 
 from pyDeltaRCM.model import DeltaModel
 from pyDeltaRCM import shared_tools
-import utilities
-from utilities import test_DeltaModel
+from . import utilities
+from .utilities import test_DeltaModel
 
 
 def test_set_random_assignments(test_DeltaModel):
