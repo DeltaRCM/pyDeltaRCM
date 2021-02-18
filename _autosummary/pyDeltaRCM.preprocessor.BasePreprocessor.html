@@ -47,7 +47,7 @@
 <h1>pyDeltaRCM.preprocessor.BasePreprocessor<a class="headerlink" href="#pydeltarcm-preprocessor-basepreprocessor" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor">
-<em class="property">class </em><code class="sig-prename descclassname">pyDeltaRCM.preprocessor.</code><code class="sig-name descname">BasePreprocessor</code><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.preprocessor.</span></code><code class="sig-name descname"><span class="pre">BasePreprocessor</span></code><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base preprocessor class.</p>
 <p>Defines a prelimiary yaml reading, then handles the YAML “meta” tag
 parsing, model instatiation, and job running.</p>
@@ -60,7 +60,7 @@ out the Python API.</p>
 </div>
 <dl class="py method">
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the base preprocessor.</p>
 </dd></dl>
 
@@ -96,14 +96,14 @@ out the Python API.</p>
 </table>
 <dl class="py method">
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor._create_matrix">
-<code class="sig-name descname">_create_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._create_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_create_matrix</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._create_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a matrix if not already in the yaml.</p>
 <p>Note that this is only needed for ensemble expansion.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor._seed_matrix">
-<code class="sig-name descname">_seed_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_ensembles</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._seed_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">_seed_matrix</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_ensembles</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._seed_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate random integers to be used as seeds for ensemble runs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -114,7 +114,7 @@ out the Python API.</p>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor.construct_job_file_list">
-<code class="sig-name descname">construct_job_file_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.construct_job_file_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">construct_job_file_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.construct_job_file_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct the job list.</p>
 <p>The job list is constructed by expanding the <code class="docutils literal notranslate"><span class="pre">.yml</span></code> matrix, and
 forming ensemble runs as needed.</p>
@@ -122,7 +122,7 @@ forming ensemble runs as needed.</p>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor.expand_yaml_ensemble">
-<code class="sig-name descname">expand_yaml_ensemble</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.expand_yaml_ensemble" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">expand_yaml_ensemble</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.expand_yaml_ensemble" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create ensemble random seeds and put into matrix.</p>
 <p>Seed the yaml configuration based on the number of ensembles specified.
 If matrix exists add seeds there, if not, create matrix and add seeds.</p>
@@ -130,14 +130,14 @@ If matrix exists add seeds there, if not, create matrix and add seeds.</p>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor.expand_yaml_matrix">
-<code class="sig-name descname">expand_yaml_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.expand_yaml_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">expand_yaml_matrix</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.expand_yaml_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Expand YAML matrix, if given.</p>
 <p>Compute the matrix expansion of parameters listed in <cite>matrix</cite> key.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor.preliminary_yaml_parsing">
-<code class="sig-name descname">preliminary_yaml_parsing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.preliminary_yaml_parsing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">preliminary_yaml_parsing</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.preliminary_yaml_parsing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Preliminary YAML parsing.</p>
 <p>Extract <code class="docutils literal notranslate"><span class="pre">.yml</span></code> file (<code class="docutils literal notranslate"><span class="pre">self.input_file</span></code>) into a dictionary, if
 provided. This dictionary provides a few keys used throughout the
@@ -150,7 +150,7 @@ and place it into a dictionary.</p>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor.run_jobs">
-<code class="sig-name descname">run_jobs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.run_jobs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">run_jobs</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.run_jobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the set of jobs.</p>
 <p>This method can be seen as the actual execution stage of the
 preprocessor. If <cite>–parallel</cite> is specified in the command line or YAML
@@ -159,7 +159,7 @@ file, the jobs will run in parallel.</p>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor.write_yaml_config">
-<code class="sig-name descname">write_yaml_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">i</span></em>, <em class="sig-param"><span class="n">ith_config</span></em>, <em class="sig-param"><span class="n">ith_dir</span></em>, <em class="sig-param"><span class="n">ith_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.write_yaml_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">write_yaml_config</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ith_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ith_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ith_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.write_yaml_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write full config to file in output folder.</p>
 <p>Write the entire yaml configuation for the configured job out to a
 file in the job output foler.</p>
@@ -223,7 +223,7 @@ file in the job output foler.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.1.
     </div>
   </body>
 </html>

@@ -58,6 +58,7 @@
       ~DeltaModel.set_constants
       ~DeltaModel.show_attribute
       ~DeltaModel.show_ind
+      ~DeltaModel.show_line
       ~DeltaModel.topo_diffusion
       ~DeltaModel.update
       ~DeltaModel.update_Q

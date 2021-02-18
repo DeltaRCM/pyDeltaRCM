@@ -16,6 +16,7 @@
       ~debug_tools.__init__
       ~debug_tools.show_attribute
       ~debug_tools.show_ind
+      ~debug_tools.show_line
    
    
 
