@@ -815,6 +815,14 @@ def _accumulate_free_surface_walks(free_surf_walk_inds, free_surf_flag,
 
         4. repeat from 2, for each parcel.
 
+
+    Examples
+    --------
+
+    The following shows an example of the walk of a few water parcels, along with the resultant computed water surface.
+
+    .. plot:: water_tools/_accumulate_free_surface_walks.py
+
     """
     _shape = uw.shape
     Hnew = np.zeros(_shape)

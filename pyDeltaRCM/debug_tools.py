@@ -178,7 +178,7 @@ class debug_tools(abc.ABC):
             raise NotImplementedError
 
 
-def plot_domain(attr, ax=None, grid=True, block=False, label=None):
+def plot_domain(attr, ax=None, grid=True, block=False, label=None, **kwargs):
     """Plot the model domain.
 
     Public function to plot *any* 2d grid with helper display utils.
@@ -211,7 +211,8 @@ def plot_domain(attr, ax=None, grid=True, block=False, label=None):
 
     cobj = ax.imshow(attr,
                      cmap=plt.get_cmap('viridis'),
-                     interpolation='none')
+                     interpolation='none',
+                     **kwargs)
     divider = axtk.axes_divider.make_axes_locatable(ax)
     cax = divider.append_axes("right", size="2%", pad=0.05)
     cbar = plt.colorbar(cobj, cax=cax)
