@@ -6,6 +6,11 @@ import sys
 import os
 import numpy as np
 
+import unittest.mock as mock
+
+from pyDeltaRCM.model import DeltaModel
+from . import utilities
+
 from .utilities import test_DeltaModel
 from pyDeltaRCM import water_tools
 from pyDeltaRCM import shared_tools
@@ -13,9 +18,14 @@ from pyDeltaRCM import shared_tools
 
 class TestWaterRoutingWeights:
 
-    def test_get_weight_at_cell(self, test_DeltaModel):
+    def test_get_weight_at_cell(self, tmp_path):
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        delta = DeltaModel(input_file=p)
+
+        # prepare necessary ingredients for test
         ind = (0, 4)
-        np.random.seed(test_DeltaModel.seed)
+        np.random.seed(0)
         stage = np.random.uniform(0.5, 1, 9)
         eta = np.random.uniform(0, 0.85, 9)
         depth = stage - eta
@@ -23,15 +33,16 @@ class TestWaterRoutingWeights:
         celltype = np.array([-2, -2, -2, 1, 1, -2, 0, 0, 0])
         qx = 1
         qy = 1
-        ivec = test_DeltaModel.ivec.flatten()
-        jvec = test_DeltaModel.jvec.flatten()
-        dists = test_DeltaModel.distances.flatten()
+        ivec = delta.ivec.flatten()
+        jvec = delta.jvec.flatten()
+        dists = delta.distances.flatten()
         dry_thresh = 0.1
         gamma = 0.001962
         theta = 1
         weight_sfc = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float64)
         weight_int = np.array([0, 0, 0, 0, 0, 1, 0, 1, 1], dtype=np.float64)
 
+        # get weights back from the test
         wts = water_tools._get_weight_at_cell_water(ind, weight_sfc, weight_int, depth,
                                                     celltype, dry_thresh, gamma, theta)
         assert np.all(wts[[0, 1, 2, 5]] == 0)
@@ -39,28 +50,59 @@ class TestWaterRoutingWeights:
         assert np.any(wts[[3, 6, 7, 8]] != 0)
 
 
-def test_update_flow_field_inlet(test_DeltaModel):
-    """
-    Check that the flow at the inlet is set as expected
-    """
-    test_DeltaModel.update_flow_field(1)
-    assert test_DeltaModel.qw[0, 4] == 1.
+class TestUpdateFlowField:
+
+    def test_update_flow_field_time0_iteration0(self, tmp_path):
+        """
+        Check that the flow at the inlet is set as expected
+        """
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        delta = DeltaModel(input_file=p)
+
+        # mock the log
+        delta.log_info = mock.MagicMock()
+
+        # conditions are zero already, but...
+        delta._time_iter = 0
+        iteration = 0
+
+        delta.update_flow_field(iteration)
+        assert delta.qw[0, 4] == 1.
+
+        assert delta.log_info.call_count == 1
 
 
-def test_update_flow_field_out(test_DeltaModel):
-    """
-    Check that the flow in domain is set as expected when no flow (qx & qy==0)
-    """
-    test_DeltaModel.update_flow_field(1)
-    assert test_DeltaModel.qw[0, 0] == 0.
+    def test_update_flow_field_out(self, tmp_path):
+        """
+        Check that the flow in domain is set as expected when no flow (qx & qy==0)
+        """
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        delta = DeltaModel(input_file=p)
+
+        delta.log_info = mock.MagicMock()
+
+        delta.update_flow_field(1)
+        assert delta.qw[0, 0] == 0.
+
+        assert delta.log_info.call_count == 1
 
 
-def test_update_velocity_field(test_DeltaModel):
-    """
-    Check that flow velocity field is updated as expected
-    """
-    test_DeltaModel.update_velocity_field()
-    assert test_DeltaModel.uw[0, 0] == 0.
+    def test_update_velocity_field(self, tmp_path):
+        """
+        Check that flow velocity field is updated as expected
+        """
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        delta = DeltaModel(input_file=p)
+
+        delta.log_info = mock.MagicMock()
+
+        delta.update_velocity_field()
+        assert delta.uw[0, 0] == 0.
+
+        assert delta.log_info.call_count == 1
 
 
 def test_pad_stage(test_DeltaModel):
