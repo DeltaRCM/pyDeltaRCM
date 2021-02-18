@@ -3,11 +3,10 @@ import os
 import logging
 import warnings
 
-from math import floor, sqrt, pi
+from math import floor
 import numpy as np
 
 from scipy.sparse import lil_matrix, csr_matrix
-from scipy import ndimage
 
 from netCDF4 import Dataset
 import time as time_lib
@@ -152,7 +151,8 @@ class init_tools(abc.ABC):
 
         # handle a not implemented setup
         if self.save_checkpoint and self._toggle_subsidence:
-            raise NotImplementedError('Cannot handle checkpointing with subsidence.')
+            raise NotImplementedError(
+                'Cannot handle checkpointing with subsidence.')
 
         # write the input file values to the log
         if not self._resume_checkpoint:
@@ -183,32 +183,38 @@ class init_tools(abc.ABC):
         _msg = 'Setting model constants'
         self.log_info(_msg, verbosity=1)
 
+        # simple constants
         self.g = 9.81   # (gravitation const.)
         sqrt2 = np.sqrt(2)
         sqrt05 = np.sqrt(0.5)
 
-        self.distances = np.array([[sqrt2, 1, sqrt2],
-                                   [1, 1, 1],
-                                   [sqrt2, 1, sqrt2]]).astype(np.float32)
-        self.ivec = np.array([[-sqrt05, 0, sqrt05],
-                              [-1, 0, 1],
-                              [-sqrt05, 0, sqrt05]]).astype(np.float32)
-        self.jvec = np.array([[-sqrt05, -1, -sqrt05],
-                              [0, 0, 0],
-                              [sqrt05, 1, sqrt05]]).astype(np.float32)
-        self.iwalk = shared_tools.get_iwalk()
-        self.jwalk = shared_tools.get_jwalk()
-        self.dxn_iwalk = np.array([1, 1, 0, -1, -1, -1, 0, 1], dtype=np.int64)
-        self.dxn_jwalk = np.array([0, 1, 1, 1, 0, -1, -1, -1], dtype=np.int64)
-        self.dxn_dist = np.sqrt(self.dxn_iwalk**2 + self.dxn_jwalk**2)
-        self.walk_flat = np.array([1, -self.W + 1, -self.W, -self.W - 1,
-                                   -1, self.W - 1, self.W, self.W + 1])
+        # translations arrays
+        self.distances = np.array([[sqrt2,    1,  sqrt2],
+                                   [1,        1,      1],
+                                   [sqrt2,    1,  sqrt2]], dtype=np.float32)
+        self.ivec      = np.array([[-sqrt05,  0,  sqrt05],  # noqa: E221
+                                   [-1,       0,       1],
+                                   [-sqrt05,  0,  sqrt05]], dtype=np.float32)
+        self.jvec      = np.array([[-sqrt05, -1, -sqrt05],  # noqa: E221
+                                   [0,        0,       0],
+                                   [sqrt05,   1,  sqrt05]], dtype=np.float32)
+        self.iwalk     = np.array([[-1,       0,       1],  # noqa: E221
+                                   [-1,       0,       1],
+                                   [-1,       0,       1]], dtype=np.int64)
+        self.jwalk     = np.array([[-1,      -1,      -1],  # noqa: E221
+                                   [0,        0,       0],
+                                   [1,        1,       1]], dtype=np.int64)
+
+        # derivatives of translations
         self.distances_flat = self.distances.flatten()
         self.ivec_flat = self.ivec.flatten()
         self.jvec_flat = self.jvec.flatten()
         self.iwalk_flat = self.iwalk.flatten()
         self.jwalk_flat = self.jwalk.flatten()
+        self.ravel_walk = (self.jwalk * self.W) + self.iwalk  # walk, flattened
+        self.ravel_walk_flat = self.ravel_walk.flatten()
 
+        # kernels for topographic smoothing
         self.kernel1 = np.array([[1, 1, 1],
                                  [1, -8, 1],
                                  [1, 1, 1]]).astype(np.int64)
@@ -258,11 +264,14 @@ class init_tools(abc.ABC):
 
         # (m) critial depth to switch to "dry" node
         self.dry_depth = min(0.1, 0.1 * self._h0)
+
+        # cross-stream center of domain idx
         self.CTR = floor(self.W / 2.) - 1
         if self.CTR <= 1:
             self.CTR = floor(self.W / 2.)
 
-        self.gamma = self.g * self._S0 * self._dx / (self._u0**2)
+        self.gamma = (self.g * self._S0 * self._dx /
+                      (self._u0**2))  # water weighting coeff
 
         # (m^3) reference volume, volume to fill cell to characteristic depth
         self.V0 = self.h0 * (self._dx**2)
@@ -270,12 +279,11 @@ class init_tools(abc.ABC):
 
         # at inlet
         self.qw0 = self._u0 * self.h0  # water unit input discharge
-        self.Qp_water = self.Qw0 / self._Np_water    # volume each water parcel
+        self.Qp_water = self.Qw0 / self._Np_water  # volume each water parcel
         self.qs0 = self.qw0 * self.C0  # sed unit discharge
-        # total amount of sed added to domain per timestep
-        self.dVs = 0.1 * self.N0**2 * self.V0
+        self.dVs = 0.1 * self.N0**2 * self.V0  # total sed added per timestep
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
-        self.Vp_sed = self.dVs / self._Np_sed   # volume of each sediment parcel
+        self.Vp_sed = self.dVs / self._Np_sed  # volume of each sediment parcel
 
         # max number of jumps for parcel
         if self.stepmax is None:
@@ -330,25 +338,26 @@ class init_tools(abc.ABC):
                                      np.arange(0, self.L+1)*self._dx)
 
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int64)
-        self.eta = np.zeros((self.L, self.W)).astype(np.float32)
-        self.stage = np.zeros((self.L, self.W)).astype(np.float32)
-        self.depth = np.zeros((self.L, self.W)).astype(np.float32)
-        self.qx = np.zeros((self.L, self.W))
-        self.qy = np.zeros((self.L, self.W))
-        self.qxn = np.zeros((self.L, self.W))
-        self.qyn = np.zeros((self.L, self.W))
-        self.qwn = np.zeros((self.L, self.W))
-        self.ux = np.zeros((self.L, self.W))
-        self.uy = np.zeros((self.L, self.W))
-        self.uw = np.zeros((self.L, self.W))
-        self.qs = np.zeros((self.L, self.W))
-        self.Vp_dep_sand = np.zeros((self.L, self.W))
-        self.Vp_dep_mud = np.zeros((self.L, self.W))
+        self.eta = np.zeros((self.L, self.W), dtype=np.float32)
+        self.stage = np.zeros((self.L, self.W), dtype=np.float32)
+        self.depth = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qx = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qy = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qxn = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qyn = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qwn = np.zeros((self.L, self.W), dtype=np.float32)
+        self.ux = np.zeros((self.L, self.W), dtype=np.float32)
+        self.uy = np.zeros((self.L, self.W), dtype=np.float32)
+        self.uw = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qs = np.zeros((self.L, self.W), dtype=np.float32)
+
+        self.Vp_dep_sand = np.zeros((self.L, self.W), dtype=np.float32)
+        self.Vp_dep_mud = np.zeros((self.L, self.W), dtype=np.float32)
+
+        # arrays for computing the free surface after water iteration
         self.free_surf_flag = np.zeros((self._Np_water,), dtype=np.int64)
-        self.looped = np.zeros((self._Np_water,), dtype=np.int64)
-        self.free_surf_walk_indices = np.zeros((self._Np_water,
-                                                self.size_indices),
-                                               dtype=np.int64)
+        self.free_surf_walk_inds = np.zeros(
+            (self._Np_water, self.size_indices), dtype=np.int64)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
 
@@ -364,7 +373,8 @@ class init_tools(abc.ABC):
         y_channel_max = channel_inds + self.N0
         self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
 
-        self.stage[:] = np.maximum(0, self.L0 - self.y - 1) * self._dx * self._S0
+        self.stage[:] = (np.maximum(0, self.L0 - self.y - 1) *
+                         self._dx * self._S0)
         self.stage[self.cell_type == cell_ocean] = 0.
 
         self.depth[self.cell_type == cell_ocean] = self.h0
@@ -414,7 +424,7 @@ class init_tools(abc.ABC):
                                        self.u_max, self.U_dep_mud, self.U_ero_mud,
                                        self.ivec_flat, self.jvec_flat,
                                        self.iwalk_flat, self.jwalk_flat,
-                                       self.distances_flat, self.dry_depth, self.gamma,
+                                       self.distances_flat, self.dry_depth,
                                        self._lambda, self._beta,  self.stepmax,
                                        self.theta_mud)
         # initialize the SandRouter object
@@ -423,7 +433,7 @@ class init_tools(abc.ABC):
                                         self._f_bedload,
                                         self.ivec_flat, self.jvec_flat,
                                         self.iwalk_flat, self.jwalk_flat,
-                                        self.distances_flat, self.dry_depth, self.gamma,
+                                        self.distances_flat, self.dry_depth,
                                         self._beta, self.stepmax,
                                         self.theta_sand)
 
@@ -482,9 +492,9 @@ class init_tools(abc.ABC):
             self.output_netcdf.source = 'pyDeltaRCM'
 
             # create master dimensions
-            length = self.output_netcdf.createDimension('length', self.L)
-            width = self.output_netcdf.createDimension('width', self.W)
-            total_time = self.output_netcdf.createDimension('total_time', None)
+            self.output_netcdf.createDimension('length', self.L)
+            self.output_netcdf.createDimension('width', self.W)
+            self.output_netcdf.createDimension('total_time', None)
 
             # create master coordinates (as netCDF variables)
             x = self.output_netcdf.createVariable(
@@ -568,7 +578,6 @@ class init_tools(abc.ABC):
 
             _msg = 'Output netCDF file created'
             self.log_info(_msg, verbosity=2)
-
 
     def init_subsidence(self):
         """Initialize subsidence pattern.

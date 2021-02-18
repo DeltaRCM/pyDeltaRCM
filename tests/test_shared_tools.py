@@ -23,13 +23,13 @@ def test_set_random_assignments(test_DeltaModel):
     assert got == pytest.approx(_exp)
 
 
-def test_get_steps():
+def test_get_steps(test_DeltaModel):
     """
     Test for function shared_tools.get_steps
     """
     new_cells = np.arange(9)
-    iwalk = shared_tools.get_iwalk()
-    jwalk = shared_tools.get_jwalk()
+    iwalk = test_DeltaModel.iwalk
+    jwalk = test_DeltaModel.jwalk
 
     d, i, j, a = shared_tools.get_steps(
         new_cells, iwalk.flatten(), jwalk.flatten())
@@ -46,128 +46,156 @@ def test_get_steps():
     assert d == pytest.approx(d_exp)
 
 
-def test_random_pick():
-    """
-    Test for function shared_tools.random_pick
-    """
-    # define probs array of zeros with a single 1 value
-    probs = np.zeros((8,))
-    probs[0] = 1
-    # should return first index
-    assert shared_tools.random_pick(probs) == 0
+class TestRandomPick:
+
+    def test_random_pick(self):
+        """
+        Test for function shared_tools.random_pick
+        """
+        # define probs array of zeros with a single 1 value
+        probs = np.zeros((9,))
+        probs[0] = 1
+        # should return first index
+        assert shared_tools.random_pick(probs) == 0
+
+    def test_random_pick_diff_fixed(self):
+        """
+        Test for function shared_tools.random_pick
+        """
+        # define probs array of zeros with a single 1 value
+        probs = np.zeros((9,))
+        probs[2] = 1
+        # should return third index
+        assert shared_tools.random_pick(probs) == 2
+
+    def test_random_pick_not_zeroed(self):
+        """
+        Test for function shared_tools.random_pick
+        """
+        # define probs array of zeros with a single 1 value
+        probs = np.zeros((9,))
+        probs[:] = 1/6
+        probs[4] = 0
+        probs[5] = 0
+        probs[8] = 0
+        assert np.sum(probs) == 1
+        # should return first index
+        _rets = np.zeros((100,))
+        for i in range(100):
+            _rets[i] = shared_tools.random_pick(probs)
+        assert np.all(_rets != 4)
+        assert np.all(_rets != 5)
+        assert np.all(_rets != 8)
+
+    def test_random_pick_distribution(self):
+        """
+        Test for function shared_tools.random_pick
+        """
+        # define probs array of zeros with a single 1 value
+        probs = np.array([1/6, 1/3, 0,
+                          1/12, 1/12, 1/6,
+                          0, 0, 1/6])
+        assert np.sum(probs) == 1
+        _rets = np.zeros((10000,))
+        for i in range(10000):
+            _rets[i] = shared_tools.random_pick(probs)
+        _bins = np.arange(-0.5, 9, step=1.0)
+        _hist, _ = np.histogram(_rets, bins=_bins)
+        _binedge = _bins[:-1]
+        _histnorm = _hist / np.sum(_hist)
+
+        assert np.all(_histnorm == pytest.approx(probs, rel=0.10))
+
+    def test_random_pick_anybut_first(self, test_DeltaModel):
+        """
+        Test for function shared_tools.random_pick
+        """
+        shared_tools.set_random_seed(test_DeltaModel.seed)
+        probs = (1 / 7) * np.ones((3, 3), dtype=np.float64)
+        probs[0, 0] = 0
+        probs[1, 1] = 0
+        probs_flat = probs.flatten()
+        assert np.sum(probs_flat) == 1
+        # should never return first index
+        _rets = np.zeros((100,))
+        for i in range(100):
+            _rets[i] = shared_tools.random_pick(probs_flat)
+        assert np.all(_rets != 0)
+        assert np.all(_rets != 4)  # THIS LINE NEEDS TO PASS!!
+        assert np.sum(_rets == 1) > 0
+        assert np.sum(_rets == 2) > 0
+        assert np.sum(_rets == 3) > 0
+        assert np.sum(_rets == 5) > 0
+        assert np.sum(_rets == 6) > 0
+        assert np.sum(_rets == 7) > 0
+        assert np.sum(_rets == 8) > 0
 
 
-def test_random_pick_anybut_first(test_DeltaModel):
-    """
-    Test for function shared_tools.random_pick
-    """
-    shared_tools.set_random_seed(test_DeltaModel.seed)
-    probs = (1 / 7) * np.ones((3, 3), dtype=np.float64)
-    probs[0, 0] = 0
-    probs[1, 1] = 0
-    # should never return first index
-    _rets = np.zeros((100,))
-    for i in range(100):
-        _rets[i] = shared_tools.random_pick(probs.flatten())
-    assert np.all(_rets != 0)
-    assert np.all(_rets != 4)  # THIS LINE NEEDS TO PASS!!
-    assert np.sum(_rets == 1) > 0
-    assert np.sum(_rets == 2) > 0
-    assert np.sum(_rets == 3) > 0
-    assert np.sum(_rets == 5) > 0
-    assert np.sum(_rets == 6) > 0
-    assert np.sum(_rets == 7) > 0
-    assert np.sum(_rets == 8) > 0
+class TestCustomUnravel:
+
+    def test_custom_unravel_square(self):
+        arr = np.arange(9).reshape((3, 3))
+        # test upper left corner
+        x, y = shared_tools.custom_unravel(0, arr.shape)
+        assert x == 0
+        assert y == 0
+        # test center
+        x, y = shared_tools.custom_unravel(4, arr.shape)
+        assert x == 1
+        assert y == 1
+        # test off-center
+        x, y = shared_tools.custom_unravel(5, arr.shape)
+        assert x == 1
+        assert y == 2
+        # test lower right corner
+        x, y = shared_tools.custom_unravel(8, arr.shape)
+        assert x == 2
+        assert y == 2
+
+    def test_custom_unravel_rectangle(self):
+        arr = np.arange(50).reshape((5, 10))
+        # test a few spots
+        x, y = shared_tools.custom_unravel(19, arr.shape)
+        assert x == 1
+        assert y == 9
+        x, y = shared_tools.custom_unravel(34, arr.shape)
+        assert x == 3
+        assert y == 4
+
+    def test_custom_unravel_exceed_error(self):
+        arr = np.arange(9).reshape((3, 3))
+        # next line should throw IndexError
+        with pytest.raises(IndexError):
+            x, y = shared_tools.custom_unravel(99, arr.shape)
 
 
-def test_custom_unravel_square():
-    arr = np.arange(9).reshape((3, 3))
-    # test upper left corner
-    x, y = shared_tools.custom_unravel(0, arr.shape)
-    assert x == 0
-    assert y == 0
-    # test center
-    x, y = shared_tools.custom_unravel(4, arr.shape)
-    assert x == 1
-    assert y == 1
-    # test off-center
-    x, y = shared_tools.custom_unravel(5, arr.shape)
-    assert x == 1
-    assert y == 2
-    # test lower right corner
-    x, y = shared_tools.custom_unravel(8, arr.shape)
-    assert x == 2
-    assert y == 2
+class TestGetWeightSfcInt:
+
+    def test_get_weight_sfc_int(self, test_DeltaModel):
+
+        np.random.seed(test_DeltaModel.seed)
+        stage = np.random.uniform(0.5, 1, 9)
+        qx = 1
+        qy = 1
+        ivec = test_DeltaModel.ivec_flat
+        jvec = test_DeltaModel.jvec_flat
+        dists = test_DeltaModel.distances_flat
+
+        weight_sfc, weight_int = shared_tools.get_weight_sfc_int(stage, stage,
+                                                                 qx, qy,
+                                                                 ivec, jvec,
+                                                                 dists)
+        assert np.all(weight_sfc == np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]))
+        assert np.all(weight_int == np.array([0, 0, 0, 0, 0, 1, 0, 1, 1]))
 
 
-def test_custom_unravel_rectangle():
-    arr = np.arange(50).reshape((5, 10))
-    # test a few spots
-    x, y = shared_tools.custom_unravel(19, arr.shape)
-    assert x == 1
-    assert y == 9
-    x, y = shared_tools.custom_unravel(34, arr.shape)
-    assert x == 3
-    assert y == 4
+class TestVerisonSpecifications:
 
-
-def test_custom_unravel_exceed_error():
-    arr = np.arange(9).reshape((3, 3))
-    # next line should throw IndexError
-    with pytest.raises(IndexError):
-        x, y = shared_tools.custom_unravel(99, arr.shape)
-
-
-def test_get_weight_sfc_int(test_DeltaModel):
-
-    np.random.seed(test_DeltaModel.seed)
-    stage = np.random.uniform(0.5, 1, 9)
-    qx = 1
-    qy = 1
-    ivec = test_DeltaModel.ivec_flat
-    jvec = test_DeltaModel.jvec_flat
-    dists = test_DeltaModel.distances_flat
-
-    weight_sfc, weight_int = shared_tools.get_weight_sfc_int(stage, stage,
-                                                             qx, qy,
-                                                             ivec, jvec,
-                                                             dists)
-    assert np.all(weight_sfc == np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]))
-    assert np.all(weight_int == np.array([0, 0, 0, 0, 0, 1, 0, 1, 1]))
-
-
-def test_get_weight_at_cell(test_DeltaModel):
-
-    ind = (0, 4)
-    np.random.seed(test_DeltaModel.seed)
-    stage = np.random.uniform(0.5, 1, 9)
-    eta = np.random.uniform(0, 0.85, 9)
-    depth = stage - eta
-    depth[depth < 0] = 0
-    celltype = np.array([-2, -2, -2, 1, 1, -2, 0, 0, 0])
-    qx = 1
-    qy = 1
-    ivec = test_DeltaModel.ivec.flatten()
-    jvec = test_DeltaModel.jvec.flatten()
-    dists = test_DeltaModel.distances.flatten()
-    dry_thresh = 0.1
-    gamma = 0.001962
-    theta = 1
-    weight_sfc = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float64)
-    weight_int = np.array([0, 0, 0, 0, 0, 1, 0, 1, 1], dtype=np.float64)
-
-    wts = shared_tools.get_weight_at_cell(ind, weight_sfc, weight_int, depth,
-                                          celltype, dry_thresh, gamma, theta)
-    assert np.all(wts[[0, 1, 2, 5]] == 0)
-    assert wts[4] == 0
-    assert np.any(wts[[3, 6, 7, 8]] != 0)
-
-
-def test_version_is_valid():
-    v = shared_tools._get_version()
-    assert type(v) is str
-    dots = [i for i, c in enumerate(v) if c == '.']
-    assert len(dots) == 2
+    def test_version_is_valid(self):
+        v = shared_tools._get_version()
+        assert type(v) is str
+        dots = [i for i, c in enumerate(v) if c == '.']
+        assert len(dots) == 2
 
 
 class TestScaleModelTime():

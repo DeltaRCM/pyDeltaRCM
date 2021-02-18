@@ -25,8 +25,9 @@ Note that these routines are jitted for speed. They generally take a large
 number of arrays and constants and return a new array(s) to continue with the
 model progression.
 
-.. autofunction:: _choose_next_direction
-.. autofunction:: _calculate_new_ind
+.. autofunction:: _get_weight_at_cell_water
+.. autofunction:: _choose_next_directions
+.. autofunction:: _calculate_new_inds
 .. autofunction:: _check_for_loops
 .. autofunction:: _update_dirQfield
 .. autofunction:: _update_absQfield

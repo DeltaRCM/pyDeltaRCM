@@ -528,7 +528,8 @@ class _SerialJob(_BaseJob):
         except (RuntimeError, ValueError) as e:
             _msg = ','.join(['job:', str(self.i), 'stage:', '1',
                              'code:', '1', 'msg:', str(e)])
-            self.deltamodel.logger.exception(_msg)
+            self.deltamodel.logger.error(_msg)
+            self.deltamodel.logger.exception(e)
             warnings.warn(UserWarning(_msg))
 
         # if the model run succeeds
@@ -546,6 +547,7 @@ class _SerialJob(_BaseJob):
             _msg = ','.join(['job:', str(self.i), 'stage:', '2',
                              'code:', '1', 'msg:', str(e)])
             self.deltamodel.logger.error(_msg)
+            self.deltamodel.logger.exception(e)
             warnings.warn(UserWarning(_msg))
 
         # if the finalization succeeds
@@ -609,7 +611,9 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
             # if the model run fails
             except (RuntimeError, ValueError) as e:
                 self.queue.put({'job': self.i, 'stage': 1,
-                                'code': 1, 'msg': e})
+                                'code': 1, 'msg': str(e)})
+                self.deltamodel.logger.error(str(e))
+                self.deltamodel.logger.exception(e)
 
             # if the model run succeeds
             else:
@@ -623,7 +627,9 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
             # if the model finalization fails
             except (RuntimeError, ValueError) as e:
                 self.queue.put({'job': self.i, 'stage': 2,
-                                'code': 1, 'msg': e})
+                                'code': 1, 'msg': str(e)})
+                self.deltamodel.logger.error(str(e))
+                self.deltamodel.logger.exception(e)
 
             # if the finalization succeeds
             else:
