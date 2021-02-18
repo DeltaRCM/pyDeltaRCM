@@ -110,12 +110,8 @@ class iteration_tools(abc.ABC):
         """
         _timemsg = 'Time: {time:.{digits}f}; timestep: {timestep:g}'.format(
             time=self._time, timestep=self._time_iter, digits=1)
-        # self.logger.info('-' * 4 + ' Model time ' +
-                         # str(self._time) + ' ' + '-' * 4)
         self.logger.info(_timemsg)
         if self._verbose > 0:
-            # print('-' * 20)
-            # print('Model time: ' + str(self._time))
             print(_timemsg)
 
     def expand_stratigraphy(self):
@@ -425,7 +421,7 @@ class iteration_tools(abc.ABC):
 
             shape = self.strata_eta.shape
 
-            total_strata_age = self.output_netcdf.createDimension(
+            self.output_netcdf.createDimension(
                 'total_strata_age',
                 shape[1])
 

@@ -28,60 +28,71 @@ def test_finalize_timestep(test_DeltaModel):
     assert test_DeltaModel.H_SL == 0.3
 
 
-def test_subsidence_in_update(tmp_path):
-    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                 {'toggle_subsidence': True,
-                                  'sigma_max': 1e-8,
-                                  'start_subsidence': 0,
-                                  'seed': 0})
-    with pytest.warns(UserWarning):
-        _delta = DeltaModel(input_file=p)
-    assert _delta.dt == 20000
-    assert _delta.sigma_max == 1e-8
-    assert _delta.sigma[17, 5] == 0.0  # outside the sigma mask
-    assert _delta.sigma[17, 6] == 0.0002  # inside the sigma mask
-    assert np.all(_delta.eta[17, 5:7] == -_delta.h0)
-    _delta.update()
-    assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
-    assert _delta.eta[17, 6] == pytest.approx(-_delta.h0 - 0.0002)
-    _delta.output_netcdf.close()
+class TestApplyingSubsidence:
 
+    in_idx = (34, 44)
+    out_idx = (34, 45)
 
-def test_subsidence_in_update_delayed_start(tmp_path):
-    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                 {'toggle_subsidence': True,
-                                  'sigma_max': 1e-8,
-                                  'start_subsidence': 20000,
-                                  'seed': 0})
-    with pytest.warns(UserWarning):
-        _delta = DeltaModel(input_file=p)
-    assert _delta.dt == 20000
-    assert _delta.sigma_max == 1e-8
-    assert _delta.sigma[17, 5] == 0.0  # outside the sigma mask
-    assert _delta.sigma[17, 6] == 0.0002  # inside the sigma mask
-    assert np.all(_delta.eta[17, 5:7] == -_delta.h0)
-    _delta.update()  # no subsidence applied
-    assert _delta.time == 20000
-    assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
-    assert _delta.eta[17, 6] == pytest.approx(-_delta.h0)
-    _delta.update()
-    assert _delta.time == 40000
-    assert _delta.eta[17, 5] == pytest.approx(-_delta.h0)
-    assert _delta.eta[17, 6] == pytest.approx(-_delta.h0 - 0.0002)
-    _delta.output_netcdf.close()
+    def test_subsidence_in_update(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'toggle_subsidence': True,
+                                      'sigma_max': 1e-8,
+                                      'start_subsidence': 0,
+                                      'seed': 0})
+        with pytest.warns(UserWarning):  # overwriting netcdf warn
+            _delta = DeltaModel(input_file=p)
 
+        assert _delta.dt == 25000
+        assert _delta.sigma_max == 1e-8
+        assert _delta.sigma[self.in_idx] == 0.0  # outside the sigma mask
+        assert _delta.sigma[self.out_idx] == 0.00025  # inside the sigma mask
+        assert np.all(_delta.eta[34, 44:7] == -_delta.h0)
 
-def test_subsidence_changed_with_timestep(tmp_path):
-    p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                 {'toggle_subsidence': True,
-                                  'sigma_max': 1e-8})
-    with pytest.warns(UserWarning):
-        _delta = DeltaModel(input_file=p)
-    assert _delta.dt == 20000
-    assert _delta.sigma[17, 6] == 0.0002
-    _delta.time_step = 86400
-    assert _delta.sigma[17, 6] == 0.000864
-    _delta.output_netcdf.close()
+        _delta.update()
+        assert _delta.eta[self.in_idx] == pytest.approx(-_delta.h0)
+        assert _delta.eta[self.out_idx] == pytest.approx(-_delta.h0 - 0.00025)
+        _delta.output_netcdf.close()
+
+    def test_subsidence_in_update_delayed_start(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'toggle_subsidence': True,
+                                      'sigma_max': 1e-8,
+                                      'start_subsidence': 25000,
+                                      'seed': 0})
+        with pytest.warns(UserWarning):  # overwriting netcdf warn
+            _delta = DeltaModel(input_file=p)
+
+        assert _delta.dt == 25000
+        assert _delta.sigma_max == 1e-8
+        assert _delta.sigma[self.in_idx] == 0.0  # outside the sigma mask
+        assert _delta.sigma[self.out_idx] == 0.00025  # inside the sigma mask
+        assert np.all(_delta.eta[self.in_idx[0],
+                                 self.in_idx[1]:self.in_idx[1]+5] ==
+                      -_delta.h0)
+
+        _delta.update()  # no subsidence applied
+        assert _delta.time == 25000
+        assert _delta.eta[self.in_idx] == pytest.approx(-_delta.h0)
+        assert _delta.eta[self.out_idx] == pytest.approx(-_delta.h0)
+
+        _delta.update()
+        assert _delta.time == 50000
+        assert _delta.eta[self.in_idx] == pytest.approx(-_delta.h0)
+        assert _delta.eta[self.out_idx] == pytest.approx(-_delta.h0 - 0.00025)
+        _delta.output_netcdf.close()
+
+    def test_subsidence_changed_with_timestep(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'toggle_subsidence': True,
+                                      'sigma_max': 1e-8})
+        with pytest.warns(UserWarning):  # overwriting netcdf warn
+            _delta = DeltaModel(input_file=p)
+
+        assert _delta.dt == 25000
+        assert _delta.sigma[self.out_idx] == 0.00025
+        _delta.time_step = 86400
+        assert _delta.sigma[self.out_idx] == 0.000864
+        _delta.output_netcdf.close()
 
 
 def test_expand_stratigraphy(tmp_path):
