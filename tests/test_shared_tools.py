@@ -2,48 +2,56 @@
 
 import pytest
 
-import sys
-import os
 import numpy as np
 
 from pyDeltaRCM.model import DeltaModel
 from pyDeltaRCM import shared_tools
 from . import utilities
-from .utilities import test_DeltaModel
 
 
-def test_set_random_assignments(test_DeltaModel):
-    """
-    Test for function shared_tools.get_random_uniform and
-    test for function shared_tools.set_random_seed
-    """
-    shared_tools.set_random_seed(test_DeltaModel.seed)
-    got = shared_tools.get_random_uniform(1)
-    _exp = 0.5488135039273248
-    assert got == pytest.approx(_exp)
+class TestGetAndSetRandom:
+    
+    def test_set_random_get_expected(self, tmp_path):
+        """
+        Test for function shared_tools.get_random_uniform and
+        test for function shared_tools.set_random_seed
+        """
+        # set the random seed
+        shared_tools.set_random_seed(0)
+
+        # get back an expected value
+        got = shared_tools.get_random_uniform(1)
+        
+        # assertion against expected value
+        _exp = 0.5488135039273248
+        assert got == pytest.approx(_exp)
 
 
-def test_get_steps(test_DeltaModel):
-    """
-    Test for function shared_tools.get_steps
-    """
-    new_cells = np.arange(9)
-    iwalk = test_DeltaModel.iwalk
-    jwalk = test_DeltaModel.jwalk
+class TestGetSteps:
 
-    d, i, j, a = shared_tools.get_steps(
-        new_cells, iwalk.flatten(), jwalk.flatten())
+    def test_get_steps(self, tmp_path):
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        delta = DeltaModel(input_file=p)
 
-    d_exp = np.array([1.41421356, 1., 1.41421356, 1., 0.,
-                      1., 1.41421356, 1., 1.41421356])
-    i_exp = np.array([-1,  0,  1, -1,  0,  1, -1,  0,  1])
-    j_exp = np.array([-1, -1, -1,  0,  0,  0,  1,  1,  1])
+        new_cells = np.arange(9)
+        iwalk = delta.iwalk
+        jwalk = delta.jwalk
 
-    assert np.all(np.delete(a, 4))
-    assert ~a[4]
-    assert i == pytest.approx(i_exp)
-    assert j == pytest.approx(j_exp)
-    assert d == pytest.approx(d_exp)
+        d, i, j, a = shared_tools.get_steps(
+            new_cells, iwalk.flatten(), jwalk.flatten())
+
+        d_exp = np.array([1.41421356, 1., 1.41421356, 1., 0.,
+                          1., 1.41421356, 1., 1.41421356])
+        i_exp = np.array([-1,  0,  1, -1,  0,  1, -1,  0,  1])
+        j_exp = np.array([-1, -1, -1,  0,  0,  0,  1,  1,  1])
+
+        # assertions
+        assert np.all(np.delete(a, 4))
+        assert ~a[4]
+        assert i == pytest.approx(i_exp)
+        assert j == pytest.approx(j_exp)
+        assert d == pytest.approx(d_exp)
 
 
 class TestRandomPick:
@@ -106,20 +114,21 @@ class TestRandomPick:
 
         assert np.all(_histnorm == pytest.approx(probs, rel=0.10))
 
-    def test_random_pick_anybut_first(self, test_DeltaModel):
+    def test_random_pick_anybut_first(self, tmp_path):
         """
         Test for function shared_tools.random_pick
         """
-        shared_tools.set_random_seed(test_DeltaModel.seed)
         probs = (1 / 7) * np.ones((3, 3), dtype=np.float64)
         probs[0, 0] = 0
         probs[1, 1] = 0
         probs_flat = probs.flatten()
+
         assert np.sum(probs_flat) == 1
         # should never return first index
         _rets = np.zeros((100,))
         for i in range(100):
             _rets[i] = shared_tools.random_pick(probs_flat)
+
         assert np.all(_rets != 0)
         assert np.all(_rets != 4)  # THIS LINE NEEDS TO PASS!!
         assert np.sum(_rets == 1) > 0
@@ -171,22 +180,25 @@ class TestCustomUnravel:
 
 class TestGetWeightSfcInt:
 
-    def test_get_weight_sfc_int(self, test_DeltaModel):
+    def test_get_weight_sfc_int(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        delta = DeltaModel(input_file=p)
 
-        np.random.seed(test_DeltaModel.seed)
         stage = np.random.uniform(0.5, 1, 9)
         qx = 1
         qy = 1
-        ivec = test_DeltaModel.ivec_flat
-        jvec = test_DeltaModel.jvec_flat
-        dists = test_DeltaModel.distances_flat
+        ivec = delta.ivec_flat
+        jvec = delta.jvec_flat
+        dists = delta.distances_flat
 
-        weight_sfc, weight_int = shared_tools.get_weight_sfc_int(stage, stage,
-                                                                 qx, qy,
-                                                                 ivec, jvec,
-                                                                 dists)
-        assert np.all(weight_sfc == np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]))
-        assert np.all(weight_int == np.array([0, 0, 0, 0, 0, 1, 0, 1, 1]))
+        weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
+            stage[4], stage, qx, qy, ivec, jvec, dists)
+        # assert np.all(weight_sfc == np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]))
+        # assert np.all(weight_int == np.array([0, 0, 0, 0, 0, 1, 0, 1, 1]))
+        assert np.all(weight_sfc <= 1)
+        assert np.all(weight_int <= 1)
+        assert np.all(weight_sfc >= 0)
+        assert np.all(weight_int >= 0)
 
 
 class TestVerisonSpecifications:
