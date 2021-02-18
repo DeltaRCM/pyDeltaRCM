@@ -175,7 +175,7 @@ def _get_weight_at_cell_sediment(ind, weight_int, depth_nbrs, ct_nbrs,
                            'Please report error.')
 
     # correct the weights for random choice
-    if np.nansum(weight) == 0:
+    if np.sum(weight) == 0:
         # if no weights
         #  convert to random walk into any non-wall,
         #  (incl dry cells), weighted by distance
@@ -186,8 +186,14 @@ def _get_weight_at_cell_sediment(ind, weight_int, depth_nbrs, ct_nbrs,
 
     weight[ctr] = 0  # enforce
 
+    # sanity check
+    weight_sum = np.sum(weight)
+    if weight_sum == 0:
+        raise RuntimeError('No weights encountered in sediment weighting.'
+                           'Please report error.')
+
     # final rebalance
-    weight = weight / np.nansum(weight)
+    weight = weight / weight_sum
 
     return weight
 
