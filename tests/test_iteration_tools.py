@@ -801,3 +801,13 @@ class TestSaveGrids:
         assert _arr.shape[1] == _delta.qs.shape[0]
         assert _arr.shape[2] == _delta.qs.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
+
+
+class TestOutputStrata:
+
+    def test_output_strata_error_if_no_updates(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+        with pytest.raises(RuntimeError,
+                           match=r'Model has no computed strat.*'):
+            _delta.output_strata()

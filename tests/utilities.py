@@ -6,6 +6,7 @@ import numpy as np
 
 import pytest
 from pyDeltaRCM.model import DeltaModel
+from pyDeltaRCM import shared_tools
 
 # utilities for file writing
 
@@ -86,6 +87,26 @@ def test_DeltaModel(tmp_path):
     f.close()
     _delta = DeltaModel(input_file=p)
     return _delta
+
+
+class FastIteratingDeltaModel:
+
+    def run_one_timestep(self):
+
+        def _get_random_field(shp):
+            field = np.zeros(shp, dtype=np.float32)
+            for i in range(shp[0]):
+                for j in range(shp[1]):
+                    field[i, j] = shared_tools.get_random_uniform(1)
+            return field
+
+        shp = self.eta.shape
+        self.eta += _get_random_field(shp)
+        self.uw += _get_random_field(shp)
+        self.ux += _get_random_field(shp)
+        self.uy += _get_random_field(shp)
+        self.depth += _get_random_field(shp)
+        self.stage += _get_random_field(shp)
 
 
 def read_endtime_from_log(log_folder):

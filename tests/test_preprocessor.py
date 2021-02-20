@@ -2,1491 +2,796 @@
 import pytest
 
 import os
-import shutil
-import locale
-import numpy as np
-import subprocess
+# import shutil
+# import locale
+# import numpy as np
+# import subprocess
 import glob
 import netCDF4
-import time
+# import time
 import platform
 
-import pyDeltaRCM as _pyimportedalias
+import unittest.mock as mock
+
+import pyDeltaRCM
 from pyDeltaRCM.model import DeltaModel
-from pyDeltaRCM import shared_tools
+# from pyDeltaRCM import shared_tools
 from pyDeltaRCM import preprocessor
 
 from . import utilities
-from .utilities import test_DeltaModel
-
-
-# test yaml parsing
-def test_override_from_testfile(test_DeltaModel):
-    out_path = test_DeltaModel.out_dir.split(os.path.sep)
-    assert out_path[-1] == 'out_dir'
-    assert test_DeltaModel.Length == 10
-
-
-def test_error_if_no_file_found():
-    with pytest.raises(FileNotFoundError):
-        delta = DeltaModel(input_file='./nonexisting_file.yaml')
-
-
-def test_override_single_default(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'S0', 0.005)
-    f.close()
-    delta = DeltaModel(input_file=p)
-    assert delta.S0 == 0.005
-
-
-def test_override_two_defaults(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'S0', 0.005)
-    utilities.write_parameter_to_file(f, 'Np_sed', 2)
-    f.close()
-    delta = DeltaModel(input_file=p)
-    assert delta.S0 == 0.005
-    assert delta.Np_sed == 2
-
-
-def test_override_bad_type_float_string(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'S0', 'a string?!')
-    f.close()
-    with pytest.raises(TypeError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_override_bad_type_int_float(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'beta', 24.4234)
-    f.close()
-    with pytest.raises(TypeError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_not_creating_illegal_attributes(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'illegal_attribute', True)
-    f.close()
-    delta = DeltaModel(input_file=p)
-    assert delta.S0 == 0.00015  # from default.yaml
-    assert not hasattr(delta, 'illegal_attribute')
-
-
-def test_not_overwriting_existing_attributes(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'input_file', '/fake/path.yaml')
-    f.close()
-    delta = DeltaModel(input_file=p)
-    assert delta.S0 == 0.00015  # from default.yaml
-    assert hasattr(delta, 'input_file')
-    assert delta.input_file == p
-
-
-# paramter specific yaml settings
-
-def test_random_seed_settings_value(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'seed', 9999)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    f.close()
-    shared_tools.set_random_seed(9999)
-    _preval_same = shared_tools.get_random_uniform(1)
-    shared_tools.set_random_seed(5)
-    _preval_diff = shared_tools.get_random_uniform(1000)
-    delta = DeltaModel(input_file=p)
-    assert delta.seed == 9999
-    _postval_same = shared_tools.get_random_uniform(1)
-    assert _preval_same == _postval_same
-    assert delta.seed == 9999
-
-
-def test_random_seed_settings_newinteger_default(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'S0', 0.005)
-    f.close()
-    delta = DeltaModel(input_file=p)
-    assert delta.seed is not None
-    assert delta.seed <= (2**32) - 1
-    assert isinstance(int(delta.seed), int)
-
-
-def test_no_outputs_save_dt_notreached(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'seed', 0)
-    utilities.write_parameter_to_file(f, 'save_strata', True)
-    utilities.write_parameter_to_file(f, 'save_dt', 55000)
-    f.close()
-    delta = DeltaModel(input_file=p)
-    # update twice, so time should be dt*2
-    for _ in range(2):
-        delta.update()
-    assert delta.dt == 25000.0
-    assert delta.time == delta.dt * 2
-    assert delta.strata_counter == 1  # one saved, t==0
-    assert delta.time < delta.save_dt
-    delta.finalize()
-
-
-def test_no_outputs_save_strata_false(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'seed', 0)
-    utilities.write_parameter_to_file(f, 'save_strata', False)
-    utilities.write_parameter_to_file(f, 'save_dt', 21600)
-    f.close()
-    delta = DeltaModel(input_file=p)
-    for _ in range(2):
-        delta.update()
-    assert delta.dt == 25000.0
-    assert not hasattr(delta, 'strata_counter')
-    assert delta.time > delta.save_dt
-
-
-# test the entry points
-def test_entry_point_installed_call(tmp_path):
-    """
-    test calling the command line feature with a config file.
-    """
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'seed', 0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'timesteps', 2)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
-    f.close()
-    subprocess.check_output(['pyDeltaRCM',
-                             '--config', str(p)])
-    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
-    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
-    assert os.path.isfile(exp_path_nc)
-    assert os.path.isfile(exp_path_png0)
-    assert os.path.isfile(exp_path_png1)
-
-
-def test_entry_point_python_main_call(tmp_path):
-    """
-    test calling the python hook command line feature with a config file.
-    """
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'seed', 0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'timesteps', 1)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
-    f.close()
-    subprocess.check_output(['python', '-m', 'pyDeltaRCM',
-                             '--config', str(p)])
-    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
-    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
-    exp_path_png2 = os.path.join(tmp_path / 'test', 'eta_00002.png')
-    assert os.path.isfile(exp_path_nc)
-    assert os.path.isfile(exp_path_png)
-    assert os.path.isfile(exp_path_png1)
-    assert not os.path.isfile(exp_path_png2)
-
-
-def test_entry_point_python_main_call_dryrun(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'seed', 0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'timesteps', 1)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    f.close()
-    subprocess.check_output(['python', '-m', 'pyDeltaRCM',
-                             '--config', str(p),
-                             '--dryrun'])
-    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
-    assert not os.path.isfile(exp_path_nc)   # does not exist because --dryrun
-    assert not os.path.isfile(exp_path_png)  # does not exist because --dryrun
-
-
-def test_entry_point_python_main_call_timesteps(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'seed', 0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
-    f.close()
-    subprocess.check_output(['python', '-m', 'pyDeltaRCM',
-                             '--config', str(p),
-                             '--timesteps', '2'])
-    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
-    assert os.path.isfile(exp_path_nc)
-    assert os.path.isfile(exp_path_png)
-
-
-def test_error_if_no_timesteps(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    f.close()
-    with pytest.raises(subprocess.CalledProcessError):
-        subprocess.check_output(['python', '-m', 'pyDeltaRCM',
-                                 '--config', str(p)])
-
-
-def test_entry_point_timesteps(tmp_path):
-    """
-    test calling the command line feature with a config file.
-    """
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'seed', 0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
-    f.close()
-    subprocess.check_output(['pyDeltaRCM',
-                             '--config', str(p), '--timesteps', '2'])
-    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
-    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
-    assert os.path.isfile(exp_path_nc)
-    assert os.path.isfile(exp_path_png0)
-    assert os.path.isfile(exp_path_png1)
-
-
-def test_entry_point_time(tmp_path):
-    """
-    test calling the command line feature with a config file.
-    """
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'seed', 0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
-    f.close()
-    subprocess.check_output(['pyDeltaRCM',
-                             '--config', str(p), '--time', '1000'])
-    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
-    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
-    assert os.path.isfile(exp_path_nc)
-    assert os.path.isfile(exp_path_png0)
-    assert os.path.isfile(exp_path_png1)
-
-
-def test_version_call():
-    """
-    test calling the command line feature to query the version.
-    """
-    encoding = locale.getpreferredencoding()
-    printed1 = subprocess.run(['pyDeltaRCM', '--version'],
-                              stdout=subprocess.PIPE, encoding=encoding)
-    _exp_str1 = 'pyDeltaRCM ' + _pyimportedalias.__version__ + '\n'
-    assert printed1.stdout == _exp_str1
-    printed2 = subprocess.run(
-        ['python', '-m', 'pyDeltaRCM', '--version'],
-        stdout=subprocess.PIPE, encoding=encoding)
-    _exp_str2 = 'pyDeltaRCM ' + _pyimportedalias.__version__ + '\n'
-    assert printed2.stdout == _exp_str2
-
-
-# test high level python api
-def test_py_hlvl_wo_args():
-    with pytest.raises(ValueError):
-        pp = preprocessor.Preprocessor()
-
-
-def test_py_hlvl_wo_timesteps(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    f.close()
-    pp = preprocessor.Preprocessor(p)
-    with pytest.raises(ValueError,
-                       match=r'You must specify a run duration *.'):
-        pp.run_jobs()
-
-
-def test_py_hlvl_tsteps_yml_runjobs_sngle(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'timesteps', 50)
-    f.close()
-    pp = preprocessor.Preprocessor(p)
-    assert len(pp.file_list) == 1
-    assert pp._is_completed is False
-    pp.run_jobs()
-    assert pp._is_completed is True
-    end_time = utilities.read_endtime_from_log(tmp_path / 'test')
-    assert end_time == 15000
-
-
-def test_py_hlvl_time_yml_runjobs_sngle(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'time', 1000)
-    f.close()
-    pp = preprocessor.Preprocessor(p)
-    assert len(pp.file_list) == 1
-    pp.run_jobs()
-    assert pp._is_completed is True
-    end_time = utilities.read_endtime_from_log(tmp_path / 'test')
-    assert end_time == 1200
-
-
-def test_py_hlvl_time_If_yml_runjobs_sngle(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'time', 10000)
-    utilities.write_parameter_to_file(f, 'If', 0.1)
-    f.close()
-    pp = preprocessor.Preprocessor(p)
-    assert len(pp.file_list) == 1
-    pp.run_jobs()
-    assert pp._is_completed is True
-    end_time = utilities.read_endtime_from_log(tmp_path / 'test')
-    assert end_time == 1200
-
-
-def test_py_hlvl_timeargs_precedence_tstepsovertime(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'time', 10000)
-    utilities.write_parameter_to_file(f, 'timesteps', 2)
-    f.close()
-    pp = preprocessor.Preprocessor(p)
-    pp.run_jobs()
-    assert pp._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 600
-    assert pp.job_list[0].deltamodel.time_iter == 2
-
-
-def test_py_hlvl_timeargs_precedence_tstepsovertimeyears(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'time_years', 10000)
-    utilities.write_parameter_to_file(f, 'timesteps', 2)
-    f.close()
-    pp = preprocessor.Preprocessor(p)
-    pp.run_jobs()
-    assert pp._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 600
-    assert pp.job_list[0].deltamodel.time_iter == 2
-
-
-def test_py_hlvl_timeargs_precedence_timeovertimeyears(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'time', 900)
-    utilities.write_parameter_to_file(f, 'time_years', 10000)
-    f.close()
-    pp = preprocessor.Preprocessor(p)
-    pp.run_jobs()
-    assert pp._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 900
-    assert pp.job_list[0].deltamodel.time_iter == 3
-
-
-def test_py_hlvl_time_timestep_mismatch_endtime_check(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'time', 1000)
-    f.close()
-    pp = preprocessor.Preprocessor(p)
-    pp.run_jobs()
-    # timestep will have been 300, so should have run 4 iterations, and time
-    # will equal 1200. I.e., more than specified, this is the expected
-    # behavior
-    assert pp._is_completed is True
-    assert pp.job_list[0].deltamodel.time == 1200
-    assert pp.job_list[0].deltamodel.time_iter == 4
-
-
-def test_py_hlvl_timeyears_yml_runjobs_sngle(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'time_years', 3.16880878140e-05)
-    f.close()
-    pp = preprocessor.Preprocessor(p)
-    assert len(pp.file_list) == 1
-    pp.run_jobs()
-    assert pp._is_completed is True
-    end_time = utilities.read_endtime_from_log(tmp_path / 'test')
-    assert end_time == 1200
-
-
-def test_py_hlvl_timeyears_If_yml_runjobs_sngle(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'time_years', 0.00031688087814)
-    utilities.write_parameter_to_file(f, 'If', 0.1)
-    f.close()
-    pp = preprocessor.Preprocessor(p)
-    assert len(pp.file_list) == 1
-    assert pp._is_completed is False
-    pp.run_jobs()
-    assert pp._is_completed is True
-    end_time = utilities.read_endtime_from_log(tmp_path / 'test')
-    assert end_time == 1200
-
-
-def test_py_hlvl_args(tmp_path):
-    """
-    test calling the python hook command line feature with a config file.
-    """
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'seed', 0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'save_eta_figs', True)
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=2)
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 1
-    assert pp._is_completed is False
-    pp.run_jobs()
-    assert type(pp.job_list[0].deltamodel) is DeltaModel
-    assert pp.job_list[0].deltamodel.Length == 10.0
-    assert pp.job_list[0].deltamodel.Width == 10.0
-    assert pp.job_list[0].deltamodel.dx == 1.0
-    assert pp.job_list[0].deltamodel.seed == 0
-    assert issubclass(type(pp.job_list[0]), preprocessor._BaseJob)
-    assert len(pp.file_list) == 1
-    assert len(pp.job_list) == 1
-    assert pp._is_completed is True
-    exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-    exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
-    exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
-    exp_path_png2 = os.path.join(tmp_path / 'test', 'eta_00002.png')
-    exp_path_png3 = os.path.join(tmp_path / 'test', 'eta_00003.png')
-    assert os.path.isfile(exp_path_nc)
-    assert os.path.isfile(exp_path_png)
-    assert os.path.isfile(exp_path_png1)
-    assert not os.path.isfile(exp_path_png3)
-
-
-def test_py_hlvl_mtrx_1list_timesteps_arg(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'save_dt', 600)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload'],
-                                   [[0.2, 0.6]])
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    assert pp._has_matrix is True
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is False
-    pp.run_jobs()
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is True
-    f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
-    assert sum([j == 0.2 for j in f_bedload_list]) == 1
-    assert sum([j == 0.6 for j in f_bedload_list]) == 1
-    end_time_000 = utilities.read_endtime_from_log(
-        tmp_path / 'test' / 'job_000')
-    end_time_001 = utilities.read_endtime_from_log(
-        tmp_path / 'test' / 'job_000')
-    assert end_time_000 == 900.0
-    assert end_time_001 == 900.0
-    assert pp.job_list[1].deltamodel.dt == 300.0
-    assert pp._is_completed is True
-    end_time = utilities.read_endtime_from_log(tmp_path / 'test' / 'job_000')
-    assert end_time == pp.job_list[1].deltamodel.dt * 3
-    exp_path_nc0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-    exp_path_nc1 = os.path.join(
-        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-    assert os.path.isfile(exp_path_nc0)
-    assert os.path.isfile(exp_path_nc1)
-    _logs = glob.glob(os.path.join(pp.job_list[0].deltamodel.prefix, '*.log'))
-    assert len(_logs) == 1  # log file exists
-    with open(_logs[0], 'r') as _logfile:
-        _lines = _logfile.readlines()
-        _lines = ' '.join(_lines)  # collapse to a single string
-        assert 'Time: 0.0' in _lines
-        assert 'Time: 300.0' in _lines
-        assert 'Time: 600.0' in _lines
-        assert 'Time: 900.0' in _lines
-        assert 'Time: 1200.0' not in _lines
-
-
-def test_py_hlvl_mtrx_1list_tsteps_cfg(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'timesteps', 3)
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'save_strata', True)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload'],
-                                   [[0.2, 0.6]])
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p)
-    assert pp._has_matrix is True
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is False
-    pp.run_jobs()
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is True
-    f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
-    assert sum([j == 0.2 for j in f_bedload_list]) == 1
-    assert sum([j == 0.6 for j in f_bedload_list]) == 1
-    end_time_000 = utilities.read_endtime_from_log(
-        tmp_path / 'test' / 'job_000')
-    end_time_001 = utilities.read_endtime_from_log(
-        tmp_path / 'test' / 'job_001')
-    assert end_time_000 == 900.0
-    assert end_time_001 == 900.0
-    exp_path_nc0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-    exp_path_nc1 = os.path.join(
-        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-    assert os.path.isfile(exp_path_nc0)
-    assert os.path.isfile(exp_path_nc1)
-    ds = netCDF4.Dataset(exp_path_nc0, "r", format="NETCDF4")
-    assert ds.variables['strata_sand_frac'].shape[1:] == (10, 10)
-    assert ds.variables['strata_sand_frac'].shape[1:] == (10, 10)
-    assert ds.variables['strata_age'].shape == (4,)
-
-
-def test_py_hlvl_mtrx_2list(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload', 'u0'],
-                                   [[0.2, 0.5, 0.6], [1.0, 1.5, 2.0]])
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    assert pp._has_matrix is True
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 9
-    assert pp._is_completed is False
-    pp.run_jobs()
-    f_bedload_list = [j.deltamodel.f_bedload for j in pp.job_list]
-    assert sum([j == 0.2 for j in f_bedload_list]) == 3
-    assert sum([j == 0.5 for j in f_bedload_list]) == 3
-    assert sum([j == 0.6 for j in f_bedload_list]) == 3
-    comb_list = [(j.deltamodel.f_bedload, j.deltamodel.u0)
-                 for j in pp.job_list]
-    assert (0.2, 2.0) in comb_list
-    assert (0.5, 1.0) in comb_list
-    assert not (0.5, 0.2) in comb_list
-    assert pp.job_list[0].deltamodel.dt == 300.0
-    end_time_000 = utilities.read_endtime_from_log(
-        tmp_path / 'test' / 'job_000')
-    assert end_time_000 == 900.0
-    assert len(pp.file_list) == 9
-    assert pp._is_completed is True
-    exp_path_nc0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-    exp_path_nc5 = os.path.join(
-        tmp_path / 'test', 'job_005', 'pyDeltaRCM_output.nc')
-    exp_path_nc8 = os.path.join(
-        tmp_path / 'test', 'job_008', 'pyDeltaRCM_output.nc')
-    assert os.path.isfile(exp_path_nc0)
-    assert os.path.isfile(exp_path_nc5)
-    assert os.path.isfile(exp_path_nc8)
-
-
-def test_py_hlvl_mtrx_scientificnotation(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload', 'SLR'],
-                                   [[0.2, 0.5, 0.6], [0.00004, 1e-6]])
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3, dry_run=True)
-    pp.run_jobs()
-    SLR_list = [j.deltamodel.SLR for j in pp.job_list]
-    assert sum([j == 4e-5 for j in SLR_list]) == 3
-    assert sum([j == 0.000001 for j in SLR_list]) == 3
-
-
-def test_py_hlvl_mtrx_one_list_time_config(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'time', 1000)
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload'],
-                                   [[0.2, 0.6]])
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p)
-    assert pp._is_completed is False
-    pp.run_jobs()
-    assert pp._is_completed is True
-    end_time_000 = utilities.read_endtime_from_log(
-        tmp_path / 'test' / 'job_000')
-    end_time_001 = utilities.read_endtime_from_log(
-        tmp_path / 'test' / 'job_001')
-    assert end_time_000 == 1200.0
-    assert end_time_001 == 1200.0
-
-
-def test_python_highlevelapi_matrix_needs_out_dir(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    # missing out_dir in the config will throw an error
-    #   ==>  utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload'],
-                                   [[0.2, 0.5, 0.6]])
-    f.close()
-    with pytest.raises(ValueError, match=r'You must specify "out_dir" in YAML .*'):
+# from .utilities import test_DeltaModel
+
+
+class TestPreprocessorSingleJobSetups:
+
+    # test high level python api
+    def test_py_hlvl_wo_args(self):
+        with pytest.raises(ValueError):
+            _ = preprocessor.Preprocessor()
+
+    def test_py_hlvl_tsteps_yml_runjobs_sngle(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'timesteps': 50})
+        pp = preprocessor.Preprocessor(p)
+
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        assert pp.yaml_dict['timesteps'] == 50
+        assert not ('timesteps' in pp.cli_dict.keys())
+        assert not ('time' in pp.yaml_dict.keys())
+        assert not ('time' in pp.cli_dict.keys())
+
+    def test_py_hlvl_time_yml_runjobs_sngle(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'time': 1000})
+        pp = preprocessor.Preprocessor(p)
+
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        assert pp.yaml_dict['time'] == 1000
+        assert not ('time' in pp.cli_dict.keys())
+        assert not ('timesteps' in pp.yaml_dict.keys())
+        assert not ('timesteps' in pp.cli_dict.keys())
+
+    def test_py_hlvl_time_If_yml_runjobs_sngle(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'time': 10000,
+                                      'If': 0.1})
+        pp = preprocessor.Preprocessor(p)
+
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        assert pp.yaml_dict['time'] == 10000
+        assert pp.yaml_dict['If'] == 0.1
+        assert not ('time' in pp.cli_dict.keys())
+
+    def test_py_hlvl_timeyears_yml_runjobs_sngle(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'time_years': 3.16880878140e-05})
+        pp = preprocessor.Preprocessor(p)
+
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        assert pp.yaml_dict['time_years'] == pytest.approx(3.1688087e-05)
+        assert not ('If' in pp.yaml_dict.keys())
+        assert not ('time' in pp.yaml_dict.keys())
+        assert not ('time' in pp.cli_dict.keys())
+
+    def test_py_hlvl_timeyears_If_yml_runjobs_sngle(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'time_years': 0.00031688087814,
+                                      'If': 0.1})
+        pp = preprocessor.Preprocessor(p)
+
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        assert pp.yaml_dict['time_years'] == pytest.approx(.00031688087814)
+        assert pp.yaml_dict['If'] == 0.1
+        assert not ('time' in pp.yaml_dict.keys())
+        assert not ('time' in pp.cli_dict.keys())
+
+    def test_py_hlvl_timesteps_and_yaml_argument(self, tmp_path):
+        """
+        test calling the python hook command line feature with a config file.
+        """
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_eta_figs': True})
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=2)
+
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        assert pp.cli_dict['timesteps'] == 2
+        assert (pp.yaml_dict['save_eta_figs'] is True)
+        assert not ('timesteps' in pp.yaml_dict.keys())
+
+
+class TestPreprocessorMatrixJobsSetups:
+
+    def test_py_hlvl_mtrx_1list_timesteps_arg(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload'],
+                                       [[0.2, 0.6]])
+        f.close()
         pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
 
+        assert pp._has_matrix is True
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 2
+        assert pp._is_completed is False
 
-def test_python_highlevelapi_matrix_outdir_exists_error(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'save_strata', 300)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload'],
-                                   [[0.2, 0.5, 0.6]])
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    with pytest.raises(FileExistsError, match=r'Job output directory .*'):
-        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+        f_bedload_list = pp.matrix_table[:, 1]
 
+        assert sum([j == 0.2 for j in f_bedload_list]) == 1
+        assert sum([j == 0.6 for j in f_bedload_list]) == 1
+        assert pp.cli_dict['timesteps'] == 3
+        assert not ('timesteps' in pp.yaml_dict.keys())
 
-def test_py_hlvl_mtrx_bad_type(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    # bad configuration will lead to error
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload', 'u0'],
-                                   [[0.2, 0.5, 0.6], ['badstr1', 'badstr2']])
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    with pytest.raises(TypeError, match='Input for "u0" not of the right type .*'):
-        pp.run_jobs()
+    def test_py_hlvl_mtrx_1list_tsteps_cfg(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'timesteps', 3)
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload'],
+                                       [[0.2, 0.6]])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p)
 
+        assert pp._has_matrix is True
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 2
+        assert pp._is_completed is False
 
-def test_py_hlvl_mtrx_bad_len1(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    # bad configuration is a list of length 1
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload', 'u0'],
-                                   [[0.2], [0.5, 0.6, 1.25]])
-    f.close()
-    with pytest.raises(ValueError,  match=r'Length of matrix key "f_bedload" was 1,'):
-        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+        f_bedload_list = pp.matrix_table[:, 1]
 
+        assert sum([j == 0.2 for j in f_bedload_list]) == 1
+        assert sum([j == 0.6 for j in f_bedload_list]) == 1
+        assert pp.yaml_dict['timesteps'] == 3
+        assert not ('timesteps' in pp.cli_dict.keys())
 
-def test_py_hlvl_mtrx_bad_listinlist(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    # bad configuration will lead to error
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload', 'u0'],
-                                   [[0.2, [0.5, 0.6]], [0.5, 1.25]])
-    f.close()
-    with pytest.raises(ValueError,  match=r'Depth of matrix expansion must not be > 1'):
-        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+    def test_py_hlvl_mtrx_2list(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload', 'u0'],
+                                       [[0.2, 0.5, 0.6], [1.0, 1.5, 2.0]])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p)
 
+        assert pp._has_matrix is True
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 9
+        assert pp._is_completed is False
 
-def test_py_hlvl_mtrx_bad_samekey(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'f_bedload', 0.3)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    # bad configuration will lead to error
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload', 'u0'],
-                                   [[0.2, 0.5, 0.6], [0.5, 1.25]])
-    f.close()
-    with pytest.raises(ValueError,  match=r'You cannot specify the same key in the matrix .*'):
-        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+        f_bedload_list = pp.matrix_table[:, 1]
+        u0_list = pp.matrix_table[:, 2]
 
+        assert sum([j == 0.2 for j in f_bedload_list]) == 3
+        assert sum([j == 0.5 for j in f_bedload_list]) == 3
+        assert sum([j == 0.6 for j in f_bedload_list]) == 3
+        assert sum([j == 1.0 for j in u0_list]) == 3
+        assert sum([j == 1.5 for j in u0_list]) == 3
+        assert sum([j == 2.0 for j in u0_list]) == 3
 
-def test_py_hlvl_mtrx_bad_colon(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    # bad configuration will lead to error
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload', 'u0:'],
-                                   [[0.2, 0.5], [0.5, 1.25]])
-    f.close()
-    with pytest.raises(ValueError,  match=r'Colon operator found in matrix expansion key.'):
-        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+        comb_list = pp.matrix_table[:, 1:].tolist()
+        assert [0.2, 2.0] in comb_list
+        assert [0.5, 1.0] in comb_list
+        assert not ([0.5, 0.2] in comb_list)
 
+    def test_py_hlvl_mtrx_scientificnotation(self, tmp_path):
+        """Test that preprocessor can read and write scinotation"""
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload', 'SLR'],
+                                       [[0.2, 0.5, 0.6], [0.00004, 1e-6]])
+        f.close()
 
-def test_py_hlvl_mtrx_no_out_dir_in_mtrx(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['out_dir', 'f_bedload'],
-                                   [['dir1', 'dir2'], [0.2, 0.5, 0.6]])
-    f.close()
-    with pytest.raises(ValueError, match=r'You cannot specify "out_dir" as .*'):
-        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+        # will convert everything to scientific notation
+        pp = preprocessor.Preprocessor(input_file=p)
 
+        SLR_list = pp.matrix_table[:, 2]
+        assert sum([j == 4e-5 for j in SLR_list]) == 3
+        assert sum([j == 0.000001 for j in SLR_list]) == 3
 
-def test_python_highlevelapi_matrix_verbosity(tmp_path, capsys):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'verbose', 1)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload', 'u0'],
-                                   [[0.2, 0.5, 0.6], [1.5, 2.0]])
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    captd = capsys.readouterr()
-    assert 'Timestep: 0.0' not in captd.out
-    assert 'Writing YAML file for job 0' in captd.out
-    assert 'Writing YAML file for job 1' in captd.out
-    assert 'Writing YAML file for job 2' in captd.out
-    assert 'Writing YAML file for job 3' in captd.out
-    assert 'Writing YAML file for job 4' in captd.out
-    assert 'Writing YAML file for job 5' in captd.out
-    assert 'Matrix expansion:' in captd.out
-    assert '  dims 2' in captd.out
-    assert '  jobs 6' in captd.out
+    def test_py_hlvL_mtrx_needs_out_dir(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        # missing out_dir in the config will throw an error
+        # => utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload'],
+                                       [[0.2, 0.5, 0.6]])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'You must specify "out_dir" in YAML .*'):
+            _ = preprocessor.Preprocessor(input_file=p)
 
+    def test_py_hlvl_mtrx_outdir_exists_error(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload'],
+                                       [[0.2, 0.5, 0.6]])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p)
 
-def test_py_hlvl_ensemble(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'ensemble', 2)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    # assertions for job creation
-    assert pp._has_matrix is True
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is False
-    pp.run_jobs()
-    # assertions after running jobs
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is True
-    exp_path_nc0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-    exp_path_nc1 = os.path.join(
-        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-    assert os.path.isfile(exp_path_nc0)
-    assert os.path.isfile(exp_path_nc1)
+        # misc assertions
+        assert pp._has_matrix is True
 
+        # verify the directory exists
+        assert pp.jobs_root == str(tmp_path / 'test')
+        assert (tmp_path / 'test').is_dir()
 
-def test_py_hlvl_ensemble_with_matrix(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'ensemble', 2)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['f_bedload'],
-                                   [[0.2, 0.5, 0.6]])
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    # assertions for job creation
-    assert pp._has_matrix is True
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 6
-    assert pp._is_completed is False
-    pp.run_jobs()
-    # assertions after running jobs
-    assert len(pp.file_list) == 6
-    assert pp._is_completed is True
-    exp_path_nc0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-    exp_path_nc5 = os.path.join(
-        tmp_path / 'test', 'job_005', 'pyDeltaRCM_output.nc')
-    assert os.path.isfile(exp_path_nc0)
-    assert os.path.isfile(exp_path_nc5)
+        # try to create another preprocessor at same directory
+        with pytest.raises(FileExistsError,
+                           match=r'Job output directory .*'):
+            _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_py_hlvl_mtrx_bad_len1(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        # bad configuration is a list of length 1
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload', 'u0'],
+                                       [[0.2], [0.5, 0.6, 1.25]])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'Length of matrix key "f_bedload" was 1,'):
+            _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_py_hlvl_mtrx_bad_listinlist(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        # bad configuration will lead to error
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload', 'u0'],
+                                       [[0.2, [0.5, 0.6]], [0.5, 1.25]])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'Depth of matrix expansion must not be > 1'):
+            _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_py_hlvl_mtrx_bad_samekey(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'f_bedload', 0.3)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        # bad configuration will lead to error
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload', 'u0'],
+                                       [[0.2, 0.5, 0.6], [0.5, 1.25]])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'You cannot specify the same key '
+                                  'in the matrix .*'):  # noqa: E127
+            _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_py_hlvl_mtrx_bad_colon(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        # bad configuration will lead to error
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload', 'u0:'],
+                                       [[0.2, 0.5], [0.5, 1.25]])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'Colon operator found '
+                                  'in matrix expansion key.'):  # noqa: E127
+            _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_py_hlvl_mtrx_no_out_dir_in_mtrx(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_matrix_to_file(f,
+                                       ['out_dir', 'f_bedload'],
+                                       [['dir1', 'dir2'], [0.2, 0.5, 0.6]])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'You cannot specify "out_dir" as .*'):
+            _ = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+    def test_python_highlevelapi_matrix_verbosity(self, tmp_path, capsys):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'verbose', 1)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload', 'u0'],
+                                       [[0.2, 0.5, 0.6], [1.5, 2.0]])
+        f.close()
+        _ = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+        captd = capsys.readouterr()
+        assert 'Timestep: 0.0' not in captd.out
+        assert 'Writing YAML file for job 0' in captd.out
+        assert 'Writing YAML file for job 1' in captd.out
+        assert 'Writing YAML file for job 2' in captd.out
+        assert 'Writing YAML file for job 3' in captd.out
+        assert 'Writing YAML file for job 4' in captd.out
+        assert 'Writing YAML file for job 5' in captd.out
+        assert 'Matrix expansion:' in captd.out
+        assert '  dims 2' in captd.out
+        assert '  jobs 6' in captd.out
 
 
-def test_py_hlvl_parallel_boolean(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'ensemble', 2)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'verbose', 1)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'parallel', True)
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    # assertions for job creation
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is False
-    # assertions after running jobs
-    if platform.system() == 'Linux':
-        pp.run_jobs()
-        assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
-        assert pp._is_completed is True
-        exp_path_nc0 = os.path.join(
-            tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-        exp_path_nc1 = os.path.join(
-            tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-        assert os.path.isfile(exp_path_nc0)
-        assert os.path.isfile(exp_path_nc1)
-    else:
-        with pytest.raises(NotImplementedError,
-                           match=r'Parallel simulations *.'):
+class TestPreprocessorEnsembleJobsSetups:
+
+    def test_py_hlvl_ensemble(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'ensemble', 2)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p)
+        # assertions for job creation
+        assert pp._has_matrix is True
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 2
+
+    def test_py_hlvl_ensemble_badtype(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'ensemble', 2.0)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        f.close()
+        with pytest.raises(TypeError,
+                           match=r'Invalid ensemble type, '
+                                  'must be an integer.'):  # noqa: E127
+            _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_py_hlvl_ensemble_double_seeds(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'ensemble', 2)
+        utilities.write_parameter_to_file(f, 'seed', 1)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'You cannot specify the same key in the '
+                                  'matrix configuration and '  # noqa: E127
+                                  'fixed configuration. Key "seed" was '
+                                  'specified in both.'):
+            _ = preprocessor.Preprocessor(input_file=p)
+
+
+class TestPreprocessorMatrixAndEnsembleJobsSetups:
+
+    def test_py_hlvl_ensemble_with_matrix(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'ensemble', 2)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_matrix_to_file(f,
+                                       ['f_bedload'],
+                                       [[0.2, 0.5, 0.6]])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p)
+        # assertions for job creation
+        assert pp._has_matrix is True
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 6
+
+    def test_py_hlvl_ensemble_matrix_seeds(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'ensemble', 2)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_matrix_to_file(f,
+                                       ['seed'],
+                                       [[1, 2]])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'Random seeds cannot be specified in '
+                                  'the matrix, if an "ensemble" number '  # noqa: E127, E501
+                                  'is specified as well.'):
+            _ = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
+class TestPreprocessorParallelJobsSetups:
+    """
+    Note that parallel job setup will work on any operating system. This is
+    helpful for someone who wants to use the preprocessor to tinker with job
+    configurations locally, but will run jobs on a remote Linux cluster/HPC.
+    """
+
+    def test_py_hlvl_parallel_works_onejob(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'parallel', True)
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p)
+        # assertions for job creation
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 1
+        assert pp._has_matrix is False
+
+        assert pp.yaml_dict['parallel'] is True
+
+    def test_py_hlvl_parallel_boolean_yaml(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'ensemble', 2)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'parallel', True)
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p)
+        # assertions for job creation
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 2
+        assert pp._has_matrix is True
+
+        assert pp.yaml_dict['parallel'] is True
+        assert not ('parallel' in pp.cli_dict.keys())
+
+    def test_py_hlvl_parallel_boolean_cli(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'ensemble', 2)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p, parallel=True)
+        # assertions for job creation
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 2
+        assert pp._has_matrix is True
+
+        assert pp.cli_dict['parallel'] is True
+        assert not ('parallel' in pp.yaml_dict.keys())
+
+    def test_py_hlvl_parallel_integer_yaml(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'ensemble', 2)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'parallel', 2)
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p)
+        # assertions for job creation
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 2
+        assert pp._has_matrix is True
+
+        assert pp.yaml_dict['parallel'] == 2
+        assert not ('parallel' in pp.cli_dict.keys())
+
+    def test_py_hlvl_parallel_integer_cli(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'ensemble', 2)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p, parallel=2)
+        # assertions for job creation
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 2
+        assert pp._has_matrix is True
+        assert pp._is_completed is False
+
+        assert pp.cli_dict['parallel'] == 2
+        assert not ('parallel' in pp.yaml_dict.keys())
+
+
+class TestPreprocessorRunJobs:
+
+    def test_run_single_serial_job(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        pp = preprocessor.Preprocessor(p)
+
+        # patch jobs
+        with mock.patch('pyDeltaRCM.preprocessor._SerialJob') as ptch:
+
+            # run the method
             pp.run_jobs()
 
-
-def test_py_hlvl_parallel_integer(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'ensemble', 2)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'parallel', 2)
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    # assertions for job creation
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is False
-    # assertions after running jobs
-    if platform.system() == 'Linux':
-        pp.run_jobs()
-        assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+        assert ptch.call_count == 1
+        assert len(pp.job_list) == 1
         assert pp._is_completed is True
-        exp_path_nc0 = os.path.join(
-            tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-        exp_path_nc1 = os.path.join(
-            tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-        assert os.path.isfile(exp_path_nc0)
-        assert os.path.isfile(exp_path_nc1)
-    else:
-        with pytest.raises(NotImplementedError,
-                           match=r'Parallel simulations *.'):
+
+    def test_run_two_serial_jobs(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        pp = preprocessor.Preprocessor(p)
+
+        pp.file_list = [*pp.file_list] * 2
+
+        # patch jobs
+        with mock.patch('pyDeltaRCM.preprocessor._SerialJob') as ptch:
+
+            # run the method
             pp.run_jobs()
-    # NOTE: this does not actually test that
-    #       *exactly* two jobs were run in parallel.
 
-
-def test_py_hlvl_parallel_float(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'ensemble', 2)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'parallel', 2.3)
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
-    # assertions for job creation
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is False
-    # assertions after running jobs
-    if platform.system() == 'Linux':
-        pp.run_jobs()
-        assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
+        assert ptch.call_count == 2
+        assert len(pp.job_list) == 2
         assert pp._is_completed is True
-        exp_path_nc0 = os.path.join(
-            tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-        exp_path_nc1 = os.path.join(
-            tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-        assert os.path.isfile(exp_path_nc0)
-        assert os.path.isfile(exp_path_nc1)
-    else:
-        with pytest.raises(NotImplementedError,
-                           match=r'Parallel simulations *.'):
+
+    def test_run_five_parallel_jobs_bool(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        pp = preprocessor.Preprocessor(p, parallel=True)
+
+        # expand the list to include multiples
+        pp.file_list = [*pp.file_list] * 5
+
+        # patch jobs and semaphore to check number of processes called
+        with mock.patch('pyDeltaRCM.preprocessor._ParallelJob') as ptch, \
+             mock.patch('multiprocessing.Semaphore') as sem:
+
+            # run the method
             pp.run_jobs()
-    # NOTE: this does not actually test that
-    #       *exactly* two jobs were run in parallel.
+
+        # assertions
+        assert ptch.call_count == 5
+        sem.assert_called_with(5)
+        assert len(pp.job_list) == 5
+        assert pp._is_completed is True
+
+    def test_run_five_parallel_jobs_int_two(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        pp = preprocessor.Preprocessor(p, parallel=2)
+
+        # expand the list to include multiples
+        pp.file_list = [*pp.file_list] * 5
+
+        # patch jobs and semaphore to check number of processes called
+        with mock.patch('pyDeltaRCM.preprocessor._ParallelJob') as ptch, \
+             mock.patch('multiprocessing.Semaphore') as sem:
+
+            # run the method
+            pp.run_jobs()
+
+        # assertions
+        assert ptch.call_count == 5
+        sem.assert_called_with(2)
+        assert len(pp.job_list) == 5
+        assert pp._is_completed is True
+
+    def test_run_five_parallel_jobs_bad_types(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        pp_float = preprocessor.Preprocessor(p, parallel=3.33)
+        pp_str = preprocessor.Preprocessor(p, parallel='string!')
+
+        # patch jobs and semaphore to check number of processes called
+        with mock.patch('pyDeltaRCM.preprocessor._ParallelJob'), \
+             mock.patch('multiprocessing.Semaphore'):
+
+            with pytest.raises(ValueError, match=r'Parallel flag *.'):
+                # run the method
+                pp_float.run_jobs()
+
+        with mock.patch('pyDeltaRCM.preprocessor._ParallelJob'), \
+             mock.patch('multiprocessing.Semaphore'):
+
+            with pytest.raises(ValueError, match=r'Parallel flag *.'):
+                # run the method
+                pp_str.run_jobs()
 
 
-@pytest.mark.skipif(platform.system() != 'Linux', reason='Parallel support \
-                    only on Linux OS.')
-def test_py_hlvl_parallel_checkpoint(tmp_path):
-    """Test checkpointing in parallel."""
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'verbose', 2)
-    utilities.write_parameter_to_file(f, 'ensemble', 2)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'parallel', 2)
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'save_checkpoint', True)
-    utilities.write_parameter_to_file(f, 'save_eta_grids', True)
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=2)
-    # assertions for job creation
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is False
-    # assertions after running jobs
-    pp.run_jobs()
-    assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
-    assert pp._is_completed is True
-    exp_path_nc0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-    exp_path_nc1 = os.path.join(
-        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-    assert os.path.isfile(exp_path_nc0)
-    assert os.path.isfile(exp_path_nc1)
-    # check that checkpoint files exist
-    exp_path_ckpt0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'checkpoint.npz')
-    exp_path_ckpt1 = os.path.join(
-        tmp_path / 'test', 'job_001', 'checkpoint.npz')
-    assert os.path.isfile(exp_path_ckpt0)
-    assert os.path.isfile(exp_path_ckpt1)
-    # load one output files and check values
-    out_old = netCDF4.Dataset(exp_path_nc1)
-    assert 'meta' in out_old.groups.keys()
-    assert out_old['time'][0].tolist() == 0.0
-    assert out_old['time'][-1].tolist() == 600.0  # 2 timesteps of 300.0s run
+class DummyDelta(object):
 
-    # close netCDF file
-    out_old.close()
-    # try to resume jobs
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'verbose', 2)
-    utilities.write_parameter_to_file(f, 'ensemble', 2)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_parameter_to_file(f, 'parallel', 2)
-    utilities.write_parameter_to_file(f, 'save_dt', 300)
-    utilities.write_parameter_to_file(f, 'resume_checkpoint', True)
-    utilities.write_parameter_to_file(f, 'save_eta_grids', True)
-    f.close()
-    pp = preprocessor.Preprocessor(input_file=p, timesteps=1)
-    # assertions for job creation
-    assert type(pp.file_list) is list
-    assert len(pp.file_list) == 2
-    assert pp._is_completed is False
-    # assertions after running jobs
-    pp.run_jobs()
-    assert isinstance(pp.job_list[0], preprocessor._ParallelJob)
-    assert pp._is_completed is True
-    exp_path_nc0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
-    exp_path_nc1 = os.path.join(
-        tmp_path / 'test', 'job_001', 'pyDeltaRCM_output.nc')
-    assert os.path.isfile(exp_path_nc0)
-    assert os.path.isfile(exp_path_nc1)
-    # check that checkpoint files still exist
-    exp_path_ckpt0 = os.path.join(
-        tmp_path / 'test', 'job_000', 'checkpoint.npz')
-    exp_path_ckpt1 = os.path.join(
-        tmp_path / 'test', 'job_001', 'checkpoint.npz')
-    assert os.path.isfile(exp_path_ckpt0)
-    assert os.path.isfile(exp_path_ckpt1)
-    # load one output file to check it out
-    out_fin = netCDF4.Dataset(exp_path_nc1)
-    assert 'meta' in out_old.groups.keys()
-    assert out_fin['time'][0].tolist() == 0
-    assert out_fin['time'][-1].tolist() == 900.0  # +1 timestep of 300.0s
-    # close netcdf file
-    out_fin.close()
+    def __init__(self, dt=1, time=0):
+        raise RuntimeError
+        self._dt = dt
+        self._time = time
 
 
-def test_py_hlvl_ensemble_badtype(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'ensemble', 2.0)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    f.close()
-    with pytest.raises(TypeError, match=r'Invalid ensemble type, must be an integer.'):
-        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+@mock.patch.multiple(pyDeltaRCM.preprocessor._BaseJob,
+                     __abstractmethods__=set())
+class TestBaseJob:
+    """
+    To test the BaseJob, we patch the base job with a filled abstract method
+    `.run()`.
+
+    .. note:: This patch is handled at the class level above!!
+    """
+
+    def test_wo_timesteps(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+
+        with pytest.raises(ValueError,
+                           match=r'You must specify a run duration *.'):
+            _ = preprocessor._BaseJob(
+                i=0, input_file=p,
+                cli_dict={}, yaml_dict={})
+
+    def test_timeargs_precedence_tstepsovertime(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+
+        basej = preprocessor._BaseJob(
+            i=0, input_file=p,
+            cli_dict={}, yaml_dict={'time': 10000,
+                                    'timesteps': 2})
+
+        assert isinstance(basej.deltamodel, DeltaModel)
+        assert basej._job_end_time == basej.deltamodel._dt * 2
+        assert basej._job_end_time != 10000
+
+    def test_timeargs_precedence_tstepsovertimeyears(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+
+        basej = preprocessor._BaseJob(
+            i=0, input_file=p,
+            cli_dict={}, yaml_dict={'time_years': 10000,
+                                    'timesteps': 2})
+
+        assert isinstance(basej.deltamodel, DeltaModel)
+        assert basej._job_end_time == basej.deltamodel._dt * 2
+        assert basej._job_end_time != 10000
+        assert basej._job_end_time != 10000 * 365.25
+
+    def test_timeargs_precedence_timeovertimeyears(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+
+        basej = preprocessor._BaseJob(
+            i=0, input_file=p,
+            cli_dict={}, yaml_dict={'time_years': 10000,
+                                    'time': 900})
+
+        assert isinstance(basej.deltamodel, DeltaModel)
+        assert basej._job_end_time == 900
+        assert basej._job_end_time != 10000
+        assert basej._job_end_time != 10000 * 365.25
 
 
-def test_py_hlvl_ensemble_double_seeds(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'ensemble', 2)
-    utilities.write_parameter_to_file(f, 'seed', 1)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    f.close()
-    with pytest.raises(ValueError,
-                       match=r'You cannot specify the same key in the matrix '
-                             'configuration and fixed configuration. Key "seed" '
-                             'was specified in both.'):
-        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+class TestSerialJob:
+
+    def test_run(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+
+        sj = preprocessor._SerialJob(
+            i=0, input_file=p,
+            cli_dict={}, yaml_dict={'timesteps': 10})
+
+        # modify the save interval to be twice dt
+        sj.deltamodel._save_dt = 2 * sj.deltamodel._dt
+        sj.deltamodel._checkpoint_dt = 2 * sj.deltamodel._dt
+
+        # mock top-level methods, verify call was made to each
+        sj.deltamodel.record_stratigraphy = mock.MagicMock()
+        sj.deltamodel.output_data = mock.MagicMock()
+        sj.deltamodel.run_one_timestep = mock.MagicMock()
+        sj.deltamodel.apply_subsidence = mock.MagicMock()
+        sj.deltamodel.finalize_timestep = mock.MagicMock()
+        sj.deltamodel.log_model_time = mock.MagicMock()
+        sj.deltamodel.logger = mock.MagicMock()
+        sj.deltamodel.output_checkpoint = mock.MagicMock()
+        sj.deltamodel.finalize = mock.MagicMock()
+
+        # run the method (call update 10 times)
+        sj.run()
+
+        # assertions
+        assert sj.deltamodel._time_iter == 10
+        assert sj.deltamodel.record_stratigraphy.call_count == 5
+        assert sj.deltamodel.output_data.call_count == 5
+        assert sj.deltamodel.run_one_timestep.call_count == 10
+        assert sj.deltamodel.apply_subsidence.call_count == 10
+        assert sj.deltamodel.finalize_timestep.call_count == 10
+        assert sj.deltamodel.log_model_time.call_count == 10
+        assert sj.deltamodel.output_checkpoint.call_count == 4
+        assert sj.deltamodel.finalize.call_count == 1
+
+        # check the log outputs for successes
+        _calls = [mock.call('job: 0, stage: 1, code: 0'),
+                  mock.call('job: 0, stage: 2, code: 0')]
+        sj.deltamodel.logger.info.assert_has_calls(_calls)
+
+    def test_run_error_update(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+
+        sj = preprocessor._SerialJob(
+            i=99, input_file=p,
+            cli_dict={}, yaml_dict={'timesteps': 10})
+
+        # modify the save interval to be twice dt
+        sj.deltamodel._save_dt = 2 * sj.deltamodel._dt
+        sj.deltamodel._checkpoint_dt = 2 * sj.deltamodel._dt
+
+        # mock top-level methods, verify call was made to each
+        sj.deltamodel.record_stratigraphy = mock.MagicMock()
+        sj.deltamodel.output_data = mock.MagicMock()
+        sj.deltamodel.run_one_timestep = mock.MagicMock()
+        sj.deltamodel.apply_subsidence = mock.MagicMock()
+        sj.deltamodel.finalize_timestep = mock.MagicMock()
+        sj.deltamodel.log_model_time = mock.MagicMock()
+        sj.deltamodel.logger = mock.MagicMock()
+        sj.deltamodel.output_checkpoint = mock.MagicMock(
+            side_effect=RuntimeError('error!'))
+        sj.deltamodel.finalize = mock.MagicMock()
+
+        # run the method (error on `output_checkpoint`)
+        sj.run()
+
+        # assertions
+        assert sj.deltamodel._time_iter == 2
+        assert sj.deltamodel.record_stratigraphy.call_count == 2
+        assert sj.deltamodel.output_data.call_count == 2
+        assert sj.deltamodel.run_one_timestep.call_count == 2
+        assert sj.deltamodel.apply_subsidence.call_count == 2
+        assert sj.deltamodel.finalize_timestep.call_count == 2
+        assert sj.deltamodel.log_model_time.call_count == 2
+        assert sj.deltamodel.output_checkpoint.call_count == 1
+        assert sj.deltamodel.finalize.call_count == 1
+
+        # check the log outputs for success/failure
+        _info_calls = [mock.call('job: 99, stage: 2, code: 0')]
+        _error_calls = [mock.call('job: 99, stage: 1, code: 1, msg: error!')]
+        sj.deltamodel.logger.info.assert_has_calls(_info_calls)
+        sj.deltamodel.logger.error.assert_has_calls(_error_calls)
+        sj.deltamodel.logger.exception.assert_called_once()
+
+    def test_run_error_finalize(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+
+        sj = preprocessor._SerialJob(
+            i=0, input_file=p,
+            cli_dict={}, yaml_dict={'timesteps': 10})
+
+        # modify the save interval to be twice dt
+        sj.deltamodel._save_dt = 2 * sj.deltamodel._dt
+        sj.deltamodel._checkpoint_dt = 2 * sj.deltamodel._dt
+
+        # mock top-level methods, verify call was made to each
+        sj.deltamodel.record_stratigraphy = mock.MagicMock()
+        sj.deltamodel.output_data = mock.MagicMock()
+        sj.deltamodel.run_one_timestep = mock.MagicMock()
+        sj.deltamodel.apply_subsidence = mock.MagicMock()
+        sj.deltamodel.finalize_timestep = mock.MagicMock()
+        sj.deltamodel.log_model_time = mock.MagicMock()
+        sj.deltamodel.logger = mock.MagicMock()
+        sj.deltamodel.output_checkpoint = mock.MagicMock()
+        sj.deltamodel.finalize = mock.MagicMock(
+            side_effect=RuntimeError('error!'))
+
+        # run the method (error on `output_checkpoint`)
+        sj.run()
+
+        # assertions
+        assert sj.deltamodel._time_iter == 10
+        assert sj.deltamodel.record_stratigraphy.call_count == 5
+        assert sj.deltamodel.output_data.call_count == 5
+        assert sj.deltamodel.run_one_timestep.call_count == 10
+        assert sj.deltamodel.apply_subsidence.call_count == 10
+        assert sj.deltamodel.finalize_timestep.call_count == 10
+        assert sj.deltamodel.log_model_time.call_count == 10
+        assert sj.deltamodel.output_checkpoint.call_count == 4
+        assert sj.deltamodel.finalize.call_count == 1
+
+        # check the log outputs for success/failure
+        _info_calls = [mock.call('job: 0, stage: 1, code: 0')]
+        _error_calls = [mock.call('job: 0, stage: 2, code: 1, msg: error!')]
+        sj.deltamodel.logger.info.assert_has_calls(_info_calls)
+        sj.deltamodel.logger.error.assert_has_calls(_error_calls)
+        sj.deltamodel.logger.exception.assert_called_once()
 
 
-def test_py_hlvl_ensemble_matrix_seeds(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'ensemble', 2)
-    utilities.write_parameter_to_file(f, 'Length', 10.0)
-    utilities.write_parameter_to_file(f, 'Width', 10.0)
-    utilities.write_parameter_to_file(f, 'dx', 1.0)
-    utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'N0_meters', 1.0)
-    utilities.write_parameter_to_file(f, 'Np_water', 10)
-    utilities.write_parameter_to_file(f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
-    utilities.write_matrix_to_file(f,
-                                   ['seed'],
-                                   [[1, 2]])
-    f.close()
-    with pytest.raises(ValueError,
-                       match=r'Random seeds cannot be specified in the matrix, '
-                             'if an "ensemble" number is specified as well.'):
-        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+class TestParallelJob:
+    pass
 
 
-def test_Preprocessor_toplevelimport():
-    import pyDeltaRCM
+class TestPreprocessorImported:
 
-    assert 'Preprocessor' in dir(pyDeltaRCM)
-    assert pyDeltaRCM.Preprocessor is pyDeltaRCM.preprocessor.Preprocessor
+    def test_Preprocessor_toplevelimport(self):
+        import pyDeltaRCM
 
-
-def test_subsidence_bounds(tmp_path):
-    """Test subsidence bounds."""
-
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'Length', 600.)
-    utilities.write_parameter_to_file(f, 'Width', 600.)
-    utilities.write_parameter_to_file(f, 'dx', 5)
-    utilities.write_parameter_to_file(f, 'toggle_subsidence', True)
-    utilities.write_parameter_to_file(f, 'theta1', -np.pi / 2)
-    utilities.write_parameter_to_file(f, 'theta1', 0)
-    f.close()
-    with pytest.warns(UserWarning):
-        delta = DeltaModel(input_file=p)
-    # assert subsidence mask is binary
-    assert np.all(delta.subsidence_mask == delta.subsidence_mask.astype(bool))
-    # check specific regions
-    assert np.all(delta.subsidence_mask[75:, 60:] == 1)
-    assert np.all(delta.subsidence_mask[:, :55] == 0)
-
-
-# test private variable setters for valid values
-
-def test_negative_length(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'Length', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_negative_width(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'Width', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_negative_dx(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'dx', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_bigger_than_Width_dx(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'Width', 10)
-    utilities.write_parameter_to_file(f, 'dx', 100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_bigger_than_Length_dx(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'Length', 10)
-    utilities.write_parameter_to_file(f, 'dx', 100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_negative_L0_meters(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'L0_meters', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_negative_itermax(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'itermax', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_negative_Np_water(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'Np_water', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_negative_N0_meters(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'N0_meters', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_negative_Np_sed(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'Np_sed', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_negative_f_bedload(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'f_bedload', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_big_f_bedload(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'f_bedload', 2)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_negative_C0_percent(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'C0_percent', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
-
-
-def test_negative_Csmooth(tmp_path):
-    file_name = 'user_parameters.yaml'
-    p, f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-    utilities.write_parameter_to_file(f, 'Csmooth', -100)
-    f.close()
-    with pytest.raises(ValueError):
-        delta = DeltaModel(input_file=p)
+        assert 'Preprocessor' in dir(pyDeltaRCM)
+        assert pyDeltaRCM.Preprocessor is pyDeltaRCM.preprocessor.Preprocessor
 
 
 class TestScaleRelativeSeaLeveLRiseRate():
@@ -1498,34 +803,3 @@ class TestScaleRelativeSeaLeveLRiseRate():
     def test_scale_If_0p1(self):
         scaled = preprocessor.scale_relative_sea_level_rise_rate(5, If=0.1)
         assert scaled == 5 / 1000 / 365.25 / 86400 * 10
-
-
-def test_load_nocheckpoint(tmp_path):
-    """Try loading a checkpoint file when one doesn't exist."""
-    # define a yaml
-    file_name = 'trial_run.yaml'
-    base_p, base_f = utilities.create_temporary_file(tmp_path, file_name)
-    utilities.write_parameter_to_file(base_f, 'Length', 10.0)
-    utilities.write_parameter_to_file(base_f, 'Width', 10.0)
-    utilities.write_parameter_to_file(base_f, 'seed', 0)
-    utilities.write_parameter_to_file(base_f, 'dx', 1.0)
-    utilities.write_parameter_to_file(base_f, 'L0_meters', 1.0)
-    utilities.write_parameter_to_file(base_f, 'Np_water', 10)
-    utilities.write_parameter_to_file(base_f, 'u0', 1.0)
-    utilities.write_parameter_to_file(base_f, 'N0_meters', 2.0)
-    utilities.write_parameter_to_file(base_f, 'h0', 1.0)
-    utilities.write_parameter_to_file(base_f, 'SLR', 0.001)
-    utilities.write_parameter_to_file(base_f, 'Np_sed', 10)
-    utilities.write_parameter_to_file(base_f, 'save_dt', 50)
-    utilities.write_parameter_to_file(base_f, 'save_strata', True)
-    utilities.write_parameter_to_file(base_f, 'save_eta_grids', True)
-    utilities.write_parameter_to_file(base_f, 'save_depth_grids', True)
-    utilities.write_parameter_to_file(base_f, 'save_discharge_grids', True)
-    utilities.write_parameter_to_file(base_f, 'save_checkpoint', True)
-    utilities.write_parameter_to_file(base_f, 'resume_checkpoint', True)
-    utilities.write_parameter_to_file(base_f, 'out_dir', tmp_path / 'test')
-    base_f.close()
-
-    # try loading the model yaml despite no checkpoint existing
-    with pytest.raises(FileNotFoundError):
-        _ = DeltaModel(input_file=base_p)

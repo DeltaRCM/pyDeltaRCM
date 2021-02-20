@@ -161,6 +161,29 @@ class TestInvalidConfigurations:
             _ = DeltaModel(input_file=p)
 
 
+class TestInitSubsidence:
+
+    def test_subsidence_bounds(self, tmp_path):
+        """Test subsidence bounds."""
+
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'Length', 600.)
+        utilities.write_parameter_to_file(f, 'Width', 600.)
+        utilities.write_parameter_to_file(f, 'dx', 5)
+        utilities.write_parameter_to_file(f, 'toggle_subsidence', True)
+        utilities.write_parameter_to_file(f, 'theta1', -np.pi / 2)
+        utilities.write_parameter_to_file(f, 'theta1', 0)
+        f.close()
+
+        delta = DeltaModel(input_file=p)
+        # assert subsidence mask is binary
+        assert np.all(delta.subsidence_mask == delta.subsidence_mask.astype(bool))
+        # check specific regions
+        assert np.all(delta.subsidence_mask[75:, 60:] == 1)
+        assert np.all(delta.subsidence_mask[:, :55] == 0)
+
+
 class TestSettingConstants:
     """
     tests for all of the constants

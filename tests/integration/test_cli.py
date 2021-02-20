@@ -1,11 +1,11 @@
 import pytest
 import os
 import platform
-import numpy as np
+import locale
+import subprocess
 
-from ..utilities import test_DeltaModel
 from .. import utilities
-from pyDeltaRCM import DeltaModel
+import pyDeltaRCM as _pyimportedalias
 
 
 class TestCommandLineInterfaceDirectly:
@@ -33,51 +33,184 @@ class TestCommandLineInterfaceDirectly:
         else:
             assert result == 256
 
-
-class TestConsistentOutputsBetweenMerges:
-
-    def test_bed_after_one_update(self, test_DeltaModel):
-
-        test_DeltaModel.update()
-
-        # slice is: test_DeltaModel.eta[:5, 4]
-        _exp = np.array([-1., -0.9152762, -1.0004134, -1., -1.])
-        assert np.all(test_DeltaModel.eta[:5, 4] == pytest.approx(_exp))
-
-    def test_bed_after_ten_updates(self, test_DeltaModel):
-
-        for _ in range(0, 10):
-            test_DeltaModel.update()
-
-        # slice is: test_DeltaModel.eta[:5, 4]
-        _exp = np.array([1.7, 0.394864, -0.95006764,  -1., -1.])
-        assert np.all(test_DeltaModel.eta[:5, 4] == pytest.approx(_exp))
-
-    def test_long_multi_validation(self, tmp_path):
-        # IndexError on corner.
-
+    # test the entry points
+    def test_entry_point_installed_call(self, tmp_path):
+        """
+        test calling the command line feature with a config file.
+        """
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
-        utilities.write_parameter_to_file(f, 'seed', 42)
-        utilities.write_parameter_to_file(f, 'Length', 600.)
-        utilities.write_parameter_to_file(f, 'Width', 600.)
-        utilities.write_parameter_to_file(f, 'dx', 5)
+        utilities.write_parameter_to_file(f, 'Length', 10.0)
+        utilities.write_parameter_to_file(f, 'Width', 10.0)
+        utilities.write_parameter_to_file(f, 'seed', 0)
+        utilities.write_parameter_to_file(f, 'dx', 1.0)
+        utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+        utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
         utilities.write_parameter_to_file(f, 'Np_water', 10)
         utilities.write_parameter_to_file(f, 'Np_sed', 10)
-        utilities.write_parameter_to_file(f, 'f_bedload', 0.05)
+        utilities.write_parameter_to_file(f, 'timesteps', 2)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'save_dt', 300)
+        utilities.write_parameter_to_file(f, 'save_eta_figs', True)
         f.close()
-        delta = DeltaModel(input_file=p)
+        subprocess.check_output(['pyDeltaRCM',
+                                 '--config', str(p)])
+        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
+        exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
+        exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+        assert os.path.isfile(exp_path_nc)
+        assert os.path.isfile(exp_path_png0)
+        assert os.path.isfile(exp_path_png1)
 
-        for _ in range(0, 3):
-            delta.update()
+    def test_entry_point_python_main_call(self, tmp_path):
+        """
+        test calling the python hook command line feature with a config file.
+        """
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'Length', 10.0)
+        utilities.write_parameter_to_file(f, 'Width', 10.0)
+        utilities.write_parameter_to_file(f, 'seed', 0)
+        utilities.write_parameter_to_file(f, 'dx', 1.0)
+        utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+        utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+        utilities.write_parameter_to_file(f, 'Np_water', 10)
+        utilities.write_parameter_to_file(f, 'Np_sed', 10)
+        utilities.write_parameter_to_file(f, 'timesteps', 1)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'save_dt', 300)
+        utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+        f.close()
+        subprocess.check_output(['python', '-m', 'pyDeltaRCM',
+                                 '--config', str(p)])
+        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
+        exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
+        exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+        exp_path_png2 = os.path.join(tmp_path / 'test', 'eta_00002.png')
+        assert os.path.isfile(exp_path_nc)
+        assert os.path.isfile(exp_path_png)
+        assert os.path.isfile(exp_path_png1)
+        assert not os.path.isfile(exp_path_png2)
 
-        # slice is: test_DeltaModel.eta[:5, 62]
-        _exp1 = np.array([-4.976912, -4.979, -7.7932253, -4.9805, -2.7937498])
-        assert np.all(delta.eta[:5, 62] == pytest.approx(_exp1))
+    def test_entry_point_python_main_call_dryrun(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'Length', 10.0)
+        utilities.write_parameter_to_file(f, 'Width', 10.0)
+        utilities.write_parameter_to_file(f, 'seed', 0)
+        utilities.write_parameter_to_file(f, 'dx', 1.0)
+        utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+        utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+        utilities.write_parameter_to_file(f, 'Np_water', 10)
+        utilities.write_parameter_to_file(f, 'Np_sed', 10)
+        utilities.write_parameter_to_file(f, 'timesteps', 1)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        f.close()
+        subprocess.check_output(['python', '-m', 'pyDeltaRCM',
+                                 '--config', str(p),
+                                 '--dryrun'])
+        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
+        exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
+        assert not os.path.isfile(exp_path_nc)   # does not exist because --dryrun
+        assert not os.path.isfile(exp_path_png)  # does not exist because --dryrun
 
-        for _ in range(0, 10):
-            delta.update()
+    def test_entry_point_python_main_call_timesteps(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'Length', 10.0)
+        utilities.write_parameter_to_file(f, 'Width', 10.0)
+        utilities.write_parameter_to_file(f, 'seed', 0)
+        utilities.write_parameter_to_file(f, 'dx', 1.0)
+        utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+        utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+        utilities.write_parameter_to_file(f, 'Np_water', 10)
+        utilities.write_parameter_to_file(f, 'Np_sed', 10)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'save_dt', 300)
+        utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+        f.close()
+        subprocess.check_output(['python', '-m', 'pyDeltaRCM',
+                                 '--config', str(p),
+                                 '--timesteps', '2'])
+        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
+        exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
+        assert os.path.isfile(exp_path_nc)
+        assert os.path.isfile(exp_path_png)
 
-        _exp2 = np.array([-4.9614887, -3.4891236, -12.195051,  -4.6706524, -2.7937498])
-        assert np.all(delta.eta[:5, 62] == pytest.approx(_exp2))
-        delta.finalize()
+    def test_error_if_no_timesteps(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        f.close()
+        with pytest.raises(subprocess.CalledProcessError):
+            subprocess.check_output(['python', '-m', 'pyDeltaRCM',
+                                     '--config', str(p)])
+
+    def test_entry_point_timesteps(self, tmp_path):
+        """
+        test calling the command line feature with a config file.
+        """
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'Length', 10.0)
+        utilities.write_parameter_to_file(f, 'Width', 10.0)
+        utilities.write_parameter_to_file(f, 'seed', 0)
+        utilities.write_parameter_to_file(f, 'dx', 1.0)
+        utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+        utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+        utilities.write_parameter_to_file(f, 'Np_water', 10)
+        utilities.write_parameter_to_file(f, 'Np_sed', 10)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'save_dt', 300)
+        utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+        f.close()
+        subprocess.check_output(['pyDeltaRCM',
+                                 '--config', str(p), '--timesteps', '2'])
+        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
+        exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
+        exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+        assert os.path.isfile(exp_path_nc)
+        assert os.path.isfile(exp_path_png0)
+        assert os.path.isfile(exp_path_png1)
+
+    def test_entry_point_time(self, tmp_path):
+        """
+        test calling the command line feature with a config file.
+        """
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'Length', 10.0)
+        utilities.write_parameter_to_file(f, 'Width', 10.0)
+        utilities.write_parameter_to_file(f, 'seed', 0)
+        utilities.write_parameter_to_file(f, 'dx', 1.0)
+        utilities.write_parameter_to_file(f, 'L0_meters', 1.0)
+        utilities.write_parameter_to_file(f, 'N0_meters', 2.0)
+        utilities.write_parameter_to_file(f, 'Np_water', 10)
+        utilities.write_parameter_to_file(f, 'Np_sed', 10)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'save_dt', 300)
+        utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+        f.close()
+        subprocess.check_output(['pyDeltaRCM',
+                                 '--config', str(p), '--time', '1000'])
+        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
+        exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
+        exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+        assert os.path.isfile(exp_path_nc)
+        assert os.path.isfile(exp_path_png0)
+        assert os.path.isfile(exp_path_png1)
+
+    def test_version_call(self):
+        """
+        test calling the command line feature to query the version.
+        """
+        encoding = locale.getpreferredencoding()
+        printed1 = subprocess.run(['pyDeltaRCM', '--version'],
+                                  stdout=subprocess.PIPE, encoding=encoding)
+        _exp_str1 = 'pyDeltaRCM ' + _pyimportedalias.__version__ + '\n'
+        assert printed1.stdout == _exp_str1
+        printed2 = subprocess.run(
+            ['python', '-m', 'pyDeltaRCM', '--version'],
+            stdout=subprocess.PIPE, encoding=encoding)
+        _exp_str2 = 'pyDeltaRCM ' + _pyimportedalias.__version__ + '\n'
+        assert printed2.stdout == _exp_str2

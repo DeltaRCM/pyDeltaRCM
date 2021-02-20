@@ -2,8 +2,6 @@
 
 import pytest
 
-import sys
-import os
 import numpy as np
 
 import unittest.mock as mock
@@ -16,11 +14,7 @@ from pyDeltaRCM import water_tools
 
 class TestWaterRoutingWeights:
 
-    def test_get_weight_at_cell(self, tmp_path):
-        # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
-        delta = DeltaModel(input_file=p)
-
+    def test_get_weight_at_cell(self):
         # prepare necessary ingredients for test
         ind = (0, 4)
         np.random.seed(0)
@@ -29,11 +23,6 @@ class TestWaterRoutingWeights:
         depth = stage - eta
         depth[depth < 0] = 0
         celltype = np.array([-2, -2, -2, 1, 1, -2, 0, 0, 0])
-        qx = 1
-        qy = 1
-        ivec = delta.ivec.flatten()
-        jvec = delta.jvec.flatten()
-        dists = delta.distances.flatten()
         dry_thresh = 0.1
         gamma = 0.001962
         theta = 1
@@ -41,8 +30,9 @@ class TestWaterRoutingWeights:
         weight_int = np.array([0, 0, 0, 0, 0, 1, 0, 1, 1], dtype=np.float64)
 
         # get weights back from the test
-        wts = water_tools._get_weight_at_cell_water(ind, weight_sfc, weight_int, depth,
-                                                    celltype, dry_thresh, gamma, theta)
+        wts = water_tools._get_weight_at_cell_water(
+            ind, weight_sfc, weight_int, depth,
+            celltype, dry_thresh, gamma, theta)
         assert np.all(wts[[0, 1, 2, 5]] == 0)
         assert wts[4] == 0
         assert np.any(wts[[3, 6, 7, 8]] != 0)
@@ -150,13 +140,13 @@ class TestCheckForLoops:
 
 
 class TestCalculateNewInds:
-    
+
     def test_calculate_new_inds(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         delta = DeltaModel(input_file=p)
 
         current_inds = np.array(
-            [12, 16, 16], dtype=np.int64)
+            [7754, 7743, 7755], dtype=np.int64)
         new_inds = np.array(
             [6, 1, 4], dtype=np.int64)
         ravel_walk_flat = delta.ravel_walk_flat
@@ -165,7 +155,9 @@ class TestCalculateNewInds:
             current_inds, new_inds,
             ravel_walk_flat)
 
-        nidx_exp = np.array([21, 6, 0])
+        nidx_exp = np.array([7754 + delta.eta.shape[1] - 1,
+                             7743 + -delta.eta.shape[1],
+                             0])
         assert np.all(nidx == nidx_exp)
 
 
@@ -181,15 +173,15 @@ class TestUpdateQFields:
         stepdir = np.array([1, 1, 0])
 
         # run the method
-        qxn = water_tools._update_dirQfield(np.copy(qx), d, inds, astep, stepdir)
-    
+        qxn = water_tools._update_dirQfield(
+            np.copy(qx), d, inds, astep, stepdir)
+
         # compute the expected value
         qxdiff = qxn - qx
         qxdiff_exp = np.array([1, np.sqrt(2) / 2, 0])
-        
+
         # assertions
         assert np.all(qxdiff[3:6] == pytest.approx(qxdiff_exp))
-
 
     def test_update_absQfield(self):
         # configure necessary ingredients
@@ -205,12 +197,12 @@ class TestUpdateQFields:
         qwn = water_tools._update_absQfield(
             np.copy(qw), d, inds, astep,
             Qp_water, dx)
-        
+
         # compute the expected values
         qwdiff = qwn - qw
         diffelem = Qp_water / dx / 2
         qwdiff_exp = np.array([diffelem, diffelem, 0])
-        
+
         # assertions
         assert np.all(qwdiff[3:6] == pytest.approx(qwdiff_exp))
 
@@ -248,7 +240,8 @@ class TestUpdateFlowField:
 
     def test_update_flow_field_time1_iteration0(self, tmp_path):
         """
-        Check that the flow in domain is set as expected when no flow (qx & qy==0)
+        Check that the flow in domain is set as expected when no flow (qx &
+        qy==0)
         """
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
@@ -267,7 +260,7 @@ class TestUpdateFlowField:
         # assertions
         #  not sure what to check here other than that something changed
         assert np.any(delta.qx != qx0)
-        
+
         # check inlet boundary conditon
         assert np.all(delta.qx[0, delta.inlet] == delta.qw0)
         assert np.all(delta.qy[0, delta.inlet] == 0)
@@ -277,7 +270,8 @@ class TestUpdateFlowField:
 
     def test_update_flow_field_time1_iteration1(self, tmp_path):
         """
-        Check that the flow in domain is set as expected when no flow (qx & qy==0)
+        Check that the flow in domain is set as expected when no flow (qx &
+        qy==0)
         """
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
@@ -296,14 +290,13 @@ class TestUpdateFlowField:
         # assertions
         #  not sure what to check here other than that something changed
         assert np.any(delta.qx != qx0)
-        
+
         # check inlet boundary conditon
         assert np.all(delta.qx[0, delta.inlet] == delta.qw0)
         assert np.all(delta.qy[0, delta.inlet] == 0)
         assert np.all(delta.qw[0, delta.inlet] == delta.qw0)
 
         assert delta.log_info.call_count == 1
-
 
     def test_update_velocity_field(self, tmp_path):
         """
@@ -323,8 +316,6 @@ class TestUpdateFlowField:
 
         # assertions
         assert np.all(delta.ux[dmask] != 0)
-        assert np.all(delta.uy[dmask] != 0)
         assert np.all(delta.uw[dmask] != 0)
 
         assert delta.log_info.call_count == 1
-

@@ -10,7 +10,7 @@ from . import utilities
 
 
 class TestGetAndSetRandom:
-    
+
     def test_set_random_get_expected(self, tmp_path):
         """
         Test for function shared_tools.get_random_uniform and
@@ -21,7 +21,7 @@ class TestGetAndSetRandom:
 
         # get back an expected value
         got = shared_tools.get_random_uniform(1)
-        
+
         # assertion against expected value
         _exp = 0.5488135039273248
         assert got == pytest.approx(_exp)
