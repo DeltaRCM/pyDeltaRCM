@@ -492,6 +492,17 @@ class TestPreprocessorParallelJobsSetups:
 
 class TestPreprocessorRunJobs:
 
+    def test_dryrun(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        pp = preprocessor.Preprocessor(p)
+
+        pp._dryrun = True
+
+        # run the method
+        pp.run_jobs()
+
+        assert pp._is_completed is False
+
     def test_run_single_serial_job(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp = preprocessor.Preprocessor(p)
@@ -522,6 +533,9 @@ class TestPreprocessorRunJobs:
         assert len(pp.job_list) == 2
         assert pp._is_completed is True
 
+    @pytest.mark.skipif(
+        platform.system() != 'Linux',
+        reason='Parallel support only on Linux OS.')
     def test_run_five_parallel_jobs_bool(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp = preprocessor.Preprocessor(p, parallel=True)
@@ -538,10 +552,15 @@ class TestPreprocessorRunJobs:
 
         # assertions
         assert ptch.call_count == 5
-        sem.assert_called_with(5)
+        # can only assert sem was called:
+        #   number called with will depend on number of cpu cores)
+        sem.assert_called()
         assert len(pp.job_list) == 5
         assert pp._is_completed is True
 
+    @pytest.mark.skipif(
+        platform.system() != 'Linux',
+        reason='Parallel support only on Linux OS.')
     def test_run_five_parallel_jobs_int_two(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp = preprocessor.Preprocessor(p, parallel=2)
@@ -562,6 +581,9 @@ class TestPreprocessorRunJobs:
         assert len(pp.job_list) == 5
         assert pp._is_completed is True
 
+    @pytest.mark.skipif(
+        platform.system() != 'Linux',
+        reason='Parallel support only on Linux OS.')
     def test_run_five_parallel_jobs_bad_types(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp_float = preprocessor.Preprocessor(p, parallel=3.33)
@@ -582,13 +604,18 @@ class TestPreprocessorRunJobs:
                 # run the method
                 pp_str.run_jobs()
 
+    @pytest.mark.skipif(
+        platform.system() == 'Linux',
+        reason='Parallel support only on Linux OS.')
+    def test_run_parallel_notimplemented_nonlinux(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        pp = preprocessor.Preprocessor(p, parallel=True)
 
-class DummyDelta(object):
+        # patch jobs and semaphore to check number of processes called
+        with pytest.raises(NotImplementedError):
 
-    def __init__(self, dt=1, time=0):
-        raise RuntimeError
-        self._dt = dt
-        self._time = time
+            # run the method
+            pp.run_jobs()
 
 
 @mock.patch.multiple(pyDeltaRCM.preprocessor._BaseJob,
@@ -663,13 +690,12 @@ class TestSerialJob:
         sj.deltamodel._checkpoint_dt = 2 * sj.deltamodel._dt
 
         # mock top-level methods, verify call was made to each
-        sj.deltamodel.record_stratigraphy = mock.MagicMock()
-        sj.deltamodel.output_data = mock.MagicMock()
         sj.deltamodel.run_one_timestep = mock.MagicMock()
         sj.deltamodel.apply_subsidence = mock.MagicMock()
         sj.deltamodel.finalize_timestep = mock.MagicMock()
         sj.deltamodel.log_model_time = mock.MagicMock()
         sj.deltamodel.logger = mock.MagicMock()
+        sj.deltamodel.output_data = mock.MagicMock()
         sj.deltamodel.output_checkpoint = mock.MagicMock()
         sj.deltamodel.finalize = mock.MagicMock()
 
@@ -678,13 +704,12 @@ class TestSerialJob:
 
         # assertions
         assert sj.deltamodel._time_iter == 10
-        assert sj.deltamodel.record_stratigraphy.call_count == 5
-        assert sj.deltamodel.output_data.call_count == 5
+        assert sj.deltamodel.output_data.call_count == 10
         assert sj.deltamodel.run_one_timestep.call_count == 10
         assert sj.deltamodel.apply_subsidence.call_count == 10
         assert sj.deltamodel.finalize_timestep.call_count == 10
         assert sj.deltamodel.log_model_time.call_count == 10
-        assert sj.deltamodel.output_checkpoint.call_count == 4
+        assert sj.deltamodel.output_checkpoint.call_count == 10
         assert sj.deltamodel.finalize.call_count == 1
 
         # check the log outputs for successes
@@ -704,13 +729,12 @@ class TestSerialJob:
         sj.deltamodel._checkpoint_dt = 2 * sj.deltamodel._dt
 
         # mock top-level methods, verify call was made to each
-        sj.deltamodel.record_stratigraphy = mock.MagicMock()
-        sj.deltamodel.output_data = mock.MagicMock()
         sj.deltamodel.run_one_timestep = mock.MagicMock()
         sj.deltamodel.apply_subsidence = mock.MagicMock()
         sj.deltamodel.finalize_timestep = mock.MagicMock()
         sj.deltamodel.log_model_time = mock.MagicMock()
         sj.deltamodel.logger = mock.MagicMock()
+        sj.deltamodel.output_data = mock.MagicMock()
         sj.deltamodel.output_checkpoint = mock.MagicMock(
             side_effect=RuntimeError('error!'))
         sj.deltamodel.finalize = mock.MagicMock()
@@ -719,13 +743,12 @@ class TestSerialJob:
         sj.run()
 
         # assertions
-        assert sj.deltamodel._time_iter == 2
-        assert sj.deltamodel.record_stratigraphy.call_count == 2
-        assert sj.deltamodel.output_data.call_count == 2
-        assert sj.deltamodel.run_one_timestep.call_count == 2
-        assert sj.deltamodel.apply_subsidence.call_count == 2
-        assert sj.deltamodel.finalize_timestep.call_count == 2
-        assert sj.deltamodel.log_model_time.call_count == 2
+        assert sj.deltamodel._time_iter == 1
+        assert sj.deltamodel.run_one_timestep.call_count == 1
+        assert sj.deltamodel.apply_subsidence.call_count == 1
+        assert sj.deltamodel.finalize_timestep.call_count == 1
+        assert sj.deltamodel.log_model_time.call_count == 1
+        assert sj.deltamodel.output_data.call_count == 1
         assert sj.deltamodel.output_checkpoint.call_count == 1
         assert sj.deltamodel.finalize.call_count == 1
 
@@ -748,13 +771,12 @@ class TestSerialJob:
         sj.deltamodel._checkpoint_dt = 2 * sj.deltamodel._dt
 
         # mock top-level methods, verify call was made to each
-        sj.deltamodel.record_stratigraphy = mock.MagicMock()
-        sj.deltamodel.output_data = mock.MagicMock()
         sj.deltamodel.run_one_timestep = mock.MagicMock()
         sj.deltamodel.apply_subsidence = mock.MagicMock()
         sj.deltamodel.finalize_timestep = mock.MagicMock()
         sj.deltamodel.log_model_time = mock.MagicMock()
         sj.deltamodel.logger = mock.MagicMock()
+        sj.deltamodel.output_data = mock.MagicMock()
         sj.deltamodel.output_checkpoint = mock.MagicMock()
         sj.deltamodel.finalize = mock.MagicMock(
             side_effect=RuntimeError('error!'))
@@ -764,13 +786,12 @@ class TestSerialJob:
 
         # assertions
         assert sj.deltamodel._time_iter == 10
-        assert sj.deltamodel.record_stratigraphy.call_count == 5
-        assert sj.deltamodel.output_data.call_count == 5
         assert sj.deltamodel.run_one_timestep.call_count == 10
         assert sj.deltamodel.apply_subsidence.call_count == 10
         assert sj.deltamodel.finalize_timestep.call_count == 10
         assert sj.deltamodel.log_model_time.call_count == 10
-        assert sj.deltamodel.output_checkpoint.call_count == 4
+        assert sj.deltamodel.output_data.call_count == 10
+        assert sj.deltamodel.output_checkpoint.call_count == 10
         assert sj.deltamodel.finalize.call_count == 1
 
         # check the log outputs for success/failure
@@ -782,7 +803,147 @@ class TestSerialJob:
 
 
 class TestParallelJob:
-    pass
+
+    def test_run(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+
+        Q = mock.MagicMock()
+        S = mock.MagicMock()
+
+        pj = preprocessor._ParallelJob(
+            i=0, queue=Q, sema=S, input_file=p,
+            cli_dict={}, yaml_dict={'timesteps': 10})
+
+        # modify the save interval to be twice dt
+        pj.deltamodel._save_dt = 2 * pj.deltamodel._dt
+        pj.deltamodel._checkpoint_dt = 2 * pj.deltamodel._dt
+
+        # mock top-level methods, verify call was made to each
+        pj.deltamodel.run_one_timestep = mock.MagicMock()
+        pj.deltamodel.apply_subsidence = mock.MagicMock()
+        pj.deltamodel.finalize_timestep = mock.MagicMock()
+        pj.deltamodel.log_model_time = mock.MagicMock()
+        pj.deltamodel.logger = mock.MagicMock()
+        pj.deltamodel.output_data = mock.MagicMock()
+        pj.deltamodel.output_checkpoint = mock.MagicMock()
+        pj.deltamodel.finalize = mock.MagicMock()
+
+        # run the method (call update 10 times)
+        pj.run()
+
+        # assertions
+        assert pj.deltamodel._time_iter == 10
+        assert pj.deltamodel.run_one_timestep.call_count == 10
+        assert pj.deltamodel.apply_subsidence.call_count == 10
+        assert pj.deltamodel.finalize_timestep.call_count == 10
+        assert pj.deltamodel.log_model_time.call_count == 10
+        assert pj.deltamodel.output_data.call_count == 10
+        assert pj.deltamodel.output_checkpoint.call_count == 10
+        assert pj.deltamodel.finalize.call_count == 1
+
+        # check the log outputs for successes
+        _calls = [mock.call({'job': 0, 'stage': 0, 'code': 0}),
+                  mock.call({'job': 0, 'stage': 1, 'code': 0}),
+                  mock.call({'job': 0, 'stage': 2, 'code': 0})]
+        Q.put.assert_has_calls(_calls)
+
+    def test_run_error_update(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+
+        Q = mock.MagicMock()
+        S = mock.MagicMock()
+
+        pj = preprocessor._ParallelJob(
+            i=99, queue=Q, sema=S, input_file=p,
+            cli_dict={}, yaml_dict={'timesteps': 10})
+
+        # modify the save interval to be twice dt
+        pj.deltamodel._save_dt = 2 * pj.deltamodel._dt
+        pj.deltamodel._checkpoint_dt = 2 * pj.deltamodel._dt
+
+        # mock top-level methods, verify call was made to each
+        pj.deltamodel.run_one_timestep = mock.MagicMock()
+        pj.deltamodel.apply_subsidence = mock.MagicMock()
+        pj.deltamodel.finalize_timestep = mock.MagicMock()
+        pj.deltamodel.log_model_time = mock.MagicMock()
+        pj.deltamodel.logger = mock.MagicMock()
+        pj.deltamodel.output_data = mock.MagicMock()
+        pj.deltamodel.output_checkpoint = mock.MagicMock(
+            side_effect=RuntimeError('error!'))
+        pj.deltamodel.finalize = mock.MagicMock()
+
+        # run the method (error on `output_checkpoint`)
+        pj.run()
+
+        # assertions
+        assert pj.deltamodel._time_iter == 1
+        assert pj.deltamodel.run_one_timestep.call_count == 1
+        assert pj.deltamodel.apply_subsidence.call_count == 1
+        assert pj.deltamodel.finalize_timestep.call_count == 1
+        assert pj.deltamodel.log_model_time.call_count == 1
+        assert pj.deltamodel.output_data.call_count == 1
+        assert pj.deltamodel.output_checkpoint.call_count == 1
+        assert pj.deltamodel.finalize.call_count == 1
+
+        # check the log outputs for success/failure
+        _info_calls = [mock.call({'job': 99, 'stage': 0, 'code': 0}),
+                       mock.call({'job': 99, 'stage': 2, 'code': 0})]
+        _error_calls = [mock.call({'job': 99, 'stage': 1,
+                                   'code': 1, 'msg': 'error!'})]
+        Q.put.assert_has_calls(_info_calls, any_order=True)
+        Q.put.assert_has_calls(_error_calls)
+        pj.deltamodel.logger.error.assert_has_calls(
+            [mock.call('error!')])
+        pj.deltamodel.logger.exception.assert_called_once()
+
+    def test_run_error_finalize(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+
+        Q = mock.MagicMock()
+        S = mock.MagicMock()
+
+        pj = preprocessor._ParallelJob(
+            i=0, queue=Q, sema=S, input_file=p,
+            cli_dict={}, yaml_dict={'timesteps': 10})
+
+        # modify the save interval to be twice dt
+        pj.deltamodel._save_dt = 2 * pj.deltamodel._dt
+        pj.deltamodel._checkpoint_dt = 2 * pj.deltamodel._dt
+
+        # mock top-level methods, verify call was made to each
+        pj.deltamodel.run_one_timestep = mock.MagicMock()
+        pj.deltamodel.apply_subsidence = mock.MagicMock()
+        pj.deltamodel.finalize_timestep = mock.MagicMock()
+        pj.deltamodel.log_model_time = mock.MagicMock()
+        pj.deltamodel.logger = mock.MagicMock()
+        pj.deltamodel.output_data = mock.MagicMock()
+        pj.deltamodel.output_checkpoint = mock.MagicMock()
+        pj.deltamodel.finalize = mock.MagicMock(
+            side_effect=RuntimeError('error!'))
+
+        # run the method (error on `output_checkpoint`)
+        pj.run()
+
+        # assertions
+        assert pj.deltamodel._time_iter == 10
+        assert pj.deltamodel.run_one_timestep.call_count == 10
+        assert pj.deltamodel.apply_subsidence.call_count == 10
+        assert pj.deltamodel.finalize_timestep.call_count == 10
+        assert pj.deltamodel.log_model_time.call_count == 10
+        assert pj.deltamodel.output_data.call_count == 10
+        assert pj.deltamodel.output_checkpoint.call_count == 10
+        assert pj.deltamodel.finalize.call_count == 1
+
+        # check the log outputs for success/failure
+        _info_calls = [mock.call({'job': 0, 'stage': 0, 'code': 0}),
+                       mock.call({'job': 0, 'stage': 1, 'code': 0})]
+        _error_calls = [mock.call({'job': 0, 'stage': 2,
+                                   'code': 1, 'msg': 'error!'})]
+        Q.put.assert_has_calls(_info_calls, any_order=True)
+        Q.put.assert_has_calls(_error_calls)
+        pj.deltamodel.logger.error.assert_has_calls(
+            [mock.call('error!')])
+        pj.deltamodel.logger.exception.assert_called_once()
 
 
 class TestPreprocessorImported:

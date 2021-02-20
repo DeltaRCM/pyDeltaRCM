@@ -57,6 +57,34 @@ class iteration_tools(abc.ABC):
         self.log_info(_msg, verbosity=2)
         self.sed_route()
 
+    def apply_subsidence(self):
+        """Apply subsidence pattern.
+
+        Apply subsidence to domain if toggle_subsidence is True, and
+        :obj:`~pyDeltaRCM.DeltaModel.time` is ``>=``
+        :obj:`~pyDeltaRCM.DeltaModel.start_subsidence`. Note, that the
+        configuration of the :obj:`~pyDeltaRCM.DeltaModel.update()` method
+        determines that the subsidence may be applied before the model time
+        is incremented, such that subsidence will begin on the step
+        *following* the time step that brings the model to ``time ==
+        start_subsidence``.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        """
+        if self._toggle_subsidence:
+
+            if self._time >= self._start_subsidence:
+
+                _msg = 'Applying subsidence'
+                self.log_info(_msg, verbosity=1)
+
+                self.eta[:] = self.eta - self.sigma
+
     def finalize_timestep(self):
         """Finalize timestep.
 
@@ -111,6 +139,49 @@ class iteration_tools(abc.ABC):
         if self._verbose > 0:
             print(_timemsg)
 
+    def output_data(self):
+        """Output grids and figures if needed.
+
+        """
+        if self._save_time_since_data >= self.save_dt:
+
+            self.save_stratigraphy()
+            self.save_grids_and_figs()
+
+            self._save_iter += int(1)
+            self._save_time_since_data = 0
+
+    def output_checkpoint(self):
+        """Output checkpoint if needed.
+
+        Save checkpoint data (including rng state) so that the model can be
+        resumed from this time.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        """
+        if self._save_time_since_checkpoint >= self.checkpoint_dt:
+
+            if self._save_checkpoint:
+
+                _msg = 'Saving checkpoint'
+                self.log_info(_msg, verbosity=1)
+
+                self.save_the_checkpoint()
+
+                if self._checkpoint_dt != self._save_dt:
+                    _msg = ('Grid save interval and checkpoint interval are '
+                            'not identical, this may result in duplicate '
+                            'entries in the output NetCDF4 after resuming '
+                            'the model run.')
+                    self.logger.warning(_msg)
+
+            self._save_time_since_checkpoint = 0
+
     def expand_stratigraphy(self):
         """Expand stratigraphy array sizes.
 
@@ -131,11 +202,13 @@ class iteration_tools(abc.ABC):
         self.strata_sand_frac = hstack([self.strata_sand_frac, lil_blank],
                                        format='lil')
 
-    def record_stratigraphy(self):
-        """Save stratigraphy to file.
+    def save_stratigraphy(self):
+        """Save stratigraphy to an attribute of the delta.
 
         Saves the sand fraction of deposited sediment into a sparse array
-        created by :obj:`~pyDeltaRCM.DeltaModel.init_stratigraphy()`.
+        created by :obj:`~pyDeltaRCM.DeltaModel.init_stratigraphy()`. Note
+        that the actual record in the netcdf file is not made until
+        `finalize()`.
 
         Only runs if :obj:`~pyDeltaRCM.DeltaModel.save_strata` is True.
 
@@ -153,7 +226,6 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-
         if self.save_strata:
 
             if self.strata_counter >= self.strata_eta.shape[1]:
@@ -208,35 +280,7 @@ class iteration_tools(abc.ABC):
 
             self.strata_counter += 1
 
-    def apply_subsidence(self):
-        """Apply subsidence pattern.
-
-        Apply subsidence to domain if toggle_subsidence is True, and
-        :obj:`~pyDeltaRCM.DeltaModel.time` is ``>=``
-        :obj:`~pyDeltaRCM.DeltaModel.start_subsidence`. Note, that the
-        configuration of the :obj:`~pyDeltaRCM.DeltaModel.update()` method
-        determines that the subsidence may be applied before the model time
-        is incremented, such that subsidence will begin on the step
-        *following* the time step that brings the model to ``time ==
-        start_subsidence``.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-
-        """
-        if self._toggle_subsidence:
-
-            if self._time >= self._start_subsidence:
-
-                _msg = 'Applying subsidence'
-                self.log_info(_msg, verbosity=1)
-
-                self.eta[:] = self.eta - self.sigma
-
-    def output_data(self):
+    def save_grids_and_figs(self):
         """Save grids and figures.
 
         Save grids and/or plots of specified variables (``eta``, `discharge``,
@@ -356,36 +400,8 @@ class iteration_tools(abc.ABC):
 
             self.output_netcdf.sync()
 
-    def output_checkpoint(self):
-        """Save checkpoint.
-
-        Save checkpoint data (including rng state) so that the model can be
-        resumed from this time.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-
-        """
-        if self._save_checkpoint:
-
-            _msg = 'Saving checkpoint'
-            self.log_info(_msg, verbosity=1)
-
-            self.save_the_checkpoint()
-
-            if self._checkpoint_dt != self._save_dt:
-                _msg = 'Grid save interval and checkpoint interval are not ' \
-                       'identical, this may result in duplicate entries in ' \
-                       'the output NetCDF4 after resuming the model run.'
-                self.logger.warning(_msg)
-
-            self._save_time_since_checkpoint = 0
-
-    def output_strata(self):
-        """Save stratigraphy as sparse matrix to file.
+    def record_final_stratigraphy(self):
+        """Save the stratigraphy as sparse matrix to file.
 
         Saves the stratigraphy (sand fraction) sparse matrices into output
         netcdf file.
@@ -585,7 +601,7 @@ class iteration_tools(abc.ABC):
         np.savez_compressed(ckp_file, time=self.time, H_SL=self._H_SL,
                             time_iter=_time_iter,
                             save_iter=self._save_iter,
-                            save_time_since_last=self._save_time_since_last,
+                            save_time_since_last=self._save_time_since_data,
                             uw=self.uw, ux=self.ux, uy=self.uy,
                             qw=self.qw, qx=self.qx, qy=self.qy,
                             depth=self.depth, stage=self.stage,

@@ -173,7 +173,7 @@ class TestApplyingSubsidence:
 
 class TestOutputCheckpoint:
 
-    def test_save_a_checkpoint_checkpoint_false(self, tmp_path):
+    def test_save_a_checkpoint_checkpoint_False(self, tmp_path):
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_checkpoint': False})
@@ -181,12 +181,13 @@ class TestOutputCheckpoint:
 
         # mock the actual save checkpoint function to see if it was called
         _delta.save_the_checkpoint = mock.MagicMock()
+        _delta.log_info = mock.MagicMock()
 
         _delta.output_checkpoint()
 
         # assertions
         assert (_delta.save_the_checkpoint.called is False)
-        assert (_delta._save_time_since_checkpoint == 0)
+        assert (_delta.log_info.called is False)
 
     def test_save_a_checkpoint_checkpoint_true(self, tmp_path):
         # create a delta with subsidence parameters
@@ -194,15 +195,19 @@ class TestOutputCheckpoint:
                                      {'save_checkpoint': True})
         _delta = DeltaModel(input_file=p)
 
+        # force the time to be greater than the checkpoint interval
+        _delta._save_time_since_checkpoint = 2 * _delta._checkpoint_dt
+
         # mock the actual save checkpoint function to see if it was called
         _delta.save_the_checkpoint = mock.MagicMock()
+        _delta.log_info = mock.MagicMock()
 
         # run the output checkpoint func
         _delta.output_checkpoint()
 
         # assertions
         assert (_delta.save_the_checkpoint.call_count == 1)
-        assert (_delta._save_time_since_checkpoint == 0)
+        assert (_delta.log_info.call_count == 1)
 
     def test_save_a_checkpoint_checkpoint_true_timewarning(self, tmp_path):
         # create a delta with subsidence parameters
@@ -210,6 +215,9 @@ class TestOutputCheckpoint:
                                      {'save_checkpoint': True,
                                       'checkpoint_dt': 864000000})
         _delta = DeltaModel(input_file=p)
+
+        # force the time to be greater than the checkpoint interval
+        _delta._save_time_since_checkpoint = 2 * _delta._checkpoint_dt
 
         # mock the actual save checkpoint function to see if it was called
         _delta.save_the_checkpoint = mock.MagicMock()
@@ -223,7 +231,6 @@ class TestOutputCheckpoint:
         # assertions
         assert (_delta.save_the_checkpoint.call_count == 1)
         assert (_delta.logger.warning.call_count == 1)
-        assert (_delta._save_time_since_checkpoint == 0)
 
 
 class TestExpandingStratigraphy:
@@ -238,7 +245,7 @@ class TestExpandingStratigraphy:
         # check initials
         assert _delta.dt == 25000
         assert _delta.n_steps == 15
-        assert _delta.strata_counter == 0
+        assert _delta.strata_counter == 1  # init output
         assert _delta.strata_eta.getnnz() == 0
 
         # check size before
@@ -255,9 +262,9 @@ class TestExpandingStratigraphy:
         assert (_delta.log_info.call_count == 1)
 
 
-class TestRecordStratigraphy:
+class TestSaveStratigraphy:
 
-    def test_record_stratigraphy_false(self, tmp_path):
+    def test_save_stratigraphy_false(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_strata': False})
         _delta = DeltaModel(input_file=p)
@@ -270,13 +277,13 @@ class TestRecordStratigraphy:
         assert not hasattr(_delta, 'strata_eta')
 
         # should do nothing, because save_strata False
-        _delta.record_stratigraphy()
+        _delta.save_stratigraphy()
 
         # assertions
         assert (_delta.log_info.called is False)
         assert (_delta.expand_stratigraphy.called is False)
 
-    def test_record_stratigraphy(self, tmp_path):
+    def test_save_stratigraphy(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -286,23 +293,23 @@ class TestRecordStratigraphy:
 
         assert _delta.dt == 25000
         assert _delta.n_steps == 15
-        assert _delta.strata_counter == 0
+        assert _delta.strata_counter == 1  # exported once at init
         assert _delta.strata_sand_frac.getnnz() == 0
 
         # update the sand frac field so something is filled
         _rand = np.random.uniform(0, 1, size=_delta.eta.shape)
         _delta.Vp_dep_sand += _rand
 
-        # should record
-        _delta.record_stratigraphy()
+        # should save
+        _delta.save_stratigraphy()
 
-        assert _delta.strata_counter == 1
+        assert _delta.strata_counter == 2
         assert _delta.strata_sand_frac.getnnz() > 0  # filled
 
         assert _delta.log_info.call_count == 1
         assert _delta.expand_stratigraphy.call_count == 0
 
-    def test_record_stratigraphy_calls_expand(self, tmp_path):
+    def test_save_stratigraphy_calls_expand(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -316,21 +323,21 @@ class TestRecordStratigraphy:
             side_effect=NotImplementedError)
 
         assert _delta.n_steps == 15
-        assert _delta.strata_counter == 0
+        assert _delta.strata_counter == 1  # exported once at init
         assert _delta.strata_eta.shape[1] == 15
 
         # change counter to trigger expanding
         _delta.strata_counter = (_delta.n_steps)
 
-        # should record
+        # should save
         with pytest.raises(NotImplementedError):
-            _delta.record_stratigraphy()
+            _delta.save_stratigraphy()
 
         # should call expanding
         assert _delta.expand_stratigraphy.call_count == 1
 
 
-class TestOutputData:
+class TestSaveGridsAndFigs:
 
     def test_save_no_figs_no_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -354,7 +361,7 @@ class TestOutputData:
         # update the delta a few times
         for _t in range(0, 4):
             _delta._time = (_t * _delta._dt)
-            _delta.output_data()
+            _delta.save_grids_and_figs()
 
         # check nothing after a number of iterations, greater than dt
         assert _delta._time > _delta.save_dt
@@ -387,7 +394,7 @@ class TestOutputData:
 
         # update the delta a few times
         for _t in range(0, 5):
-            _delta.output_data()
+            _delta.save_grids_and_figs()
             _delta._save_iter += 1
 
         _delta.make_figure.call_count == 5
@@ -409,24 +416,24 @@ class TestOutputData:
         _delta.save_figure = mock.MagicMock()
         _delta.save_grids = mock.MagicMock()
 
+        assert (_delta._save_eta_grids is True)
+        assert (_delta._save_metadata is True)
+
         # check for the netcdf file
         exp_path_nc = os.path.join(
             tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
         assert os.path.isfile(exp_path_nc)
         nc_size_before = os.path.getsize(exp_path_nc)
-        assert nc_size_before > 0
+        assert nc_size_before > 0  # saved once already / inited
 
         # update a couple times, should increase on each save
         for _t in range(0, 5):
-            _delta.output_data()
+            _delta.save_grids_and_figs()
             _delta._save_iter += 1
 
         _delta.make_figure.call_count == 5
         _delta.save_figure.call_count == 5
         _delta.save_grids.call_count == 5
-
-        nc_size_after = os.path.getsize(exp_path_nc)
-        assert nc_size_after > nc_size_before
 
     def test_save_all_figures_no_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -453,7 +460,7 @@ class TestOutputData:
         assert not os.path.isfile(exp_path_nc)
 
         for _t in range(0, 5):
-            _delta.output_data()
+            _delta.save_grids_and_figs()
             _delta._save_iter += 1
             _delta._time += _delta._dt
 
@@ -489,7 +496,7 @@ class TestOutputData:
         assert os.path.isfile(exp_path_nc)
 
         for _t in range(0, 3):
-            _delta.output_data()
+            _delta.save_grids_and_figs()
             _delta._save_iter += 1
 
         # close the file and connect
@@ -498,7 +505,7 @@ class TestOutputData:
 
         # assertions
         assert not ('eta' in ds.variables)
-        assert ds['meta']['H_SL'].shape[0] == 3
+        assert ds['meta']['H_SL'].shape[0] == 4  # init + 3
         assert ds['meta']['L0'][:] == 3
 
     def test_save_metadata_and_grids(self, tmp_path):
@@ -523,7 +530,7 @@ class TestOutputData:
         assert os.path.isfile(exp_path_nc)
 
         for _t in range(0, 3):
-            _delta.output_data()
+            _delta.save_grids_and_figs()
             _delta._save_iter += 1
 
         # close the file and connect
@@ -533,7 +540,7 @@ class TestOutputData:
         # assertions
         assert ('eta' in ds.variables)
         assert ('velocity' in ds.variables)
-        assert ds['meta']['H_SL'].shape[0] == 3
+        assert ds['meta']['H_SL'].shape[0] == 4  # init + 3
         assert ds['meta']['L0'][:] == 3
         assert np.all(ds['meta']['f_bedload'][:] == 0.25)
 
@@ -558,7 +565,7 @@ class TestOutputData:
         assert os.path.isfile(exp_path_nc)
 
         for _t in range(0, 6):
-            _delta.output_data()
+            _delta.save_grids_and_figs()
             _delta._save_iter += 1
 
         # close the file and connect
@@ -801,13 +808,3 @@ class TestSaveGrids:
         assert _arr.shape[1] == _delta.qs.shape[0]
         assert _arr.shape[2] == _delta.qs.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
-
-
-class TestOutputStrata:
-
-    def test_output_strata_error_if_no_updates(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
-        _delta = DeltaModel(input_file=p)
-        with pytest.raises(RuntimeError,
-                           match=r'Model has no computed strat.*'):
-            _delta.output_strata()

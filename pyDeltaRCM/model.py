@@ -63,9 +63,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         """
         self._time = 0.
         self._time_iter = int(0)
-        self._save_time_since_last = float("inf")  # force save on t==0
+        self._save_time_since_data = float("inf")  # force save on t==0
         self._save_iter = int(0)
-        self._save_time_since_checkpoint = 0
+        self._save_time_since_checkpoint = float("inf")  # force save on t==0
 
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
@@ -97,6 +97,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.log_info(_msg)
         self.log_model_time()
 
+        # record initial conditions
+        self.output_data()
+        self.output_checkpoint()
+
     def update(self):
         """Run the model for one full instance.
 
@@ -124,18 +128,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if self._is_finalized:
             raise RuntimeError('Cannot update model, model already finalized!')
 
-        # record the state of the model
-        if self._save_time_since_last >= self.save_dt:
-            self.record_stratigraphy()
-            self.output_data()
-            self._save_iter += int(1)
-            self._save_time_since_last = 0
-
-        # save a checkpoint if needed
-        if self._save_time_since_checkpoint >= self.checkpoint_dt:
-            self.output_checkpoint()
-            self._save_time_since_checkpoint = 0
-
         # update the model, i.e., the actual model morphodynamics
         self.run_one_timestep()
         self.apply_subsidence()
@@ -143,10 +135,16 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         # update time-tracking fields
         self._time += self.dt
-        self._save_time_since_last += self.dt
+        self._save_time_since_data += self.dt
         self._save_time_since_checkpoint += self.dt
         self._time_iter += int(1)
         self.log_model_time()
+
+        # record the state of the model if needed
+        self.output_data()
+
+        # save a checkpoint if needed
+        self.output_checkpoint()
 
     def finalize(self):
         """Finalize the model run.
@@ -169,14 +167,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
                                'model already finalized!')
 
         # get the final timestep recorded, if needed.
-        if self._save_time_since_last >= self.save_dt:
-            self.record_stratigraphy()
-            self.output_data()
+        self.output_data()
+        self.output_checkpoint()
 
-        if self._save_time_since_checkpoint >= self.checkpoint_dt:
-            self.output_checkpoint()
-
-        self.output_strata()
+        self.record_final_stratigraphy()
 
         try:
             self.output_netcdf.close()
@@ -1070,12 +1064,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._time_iter
 
     @property
-    def save_time_since_last(self):
+    def save_time_since_data(self):
         """Time since data last output.
 
         The number of times the :obj:`update` method has been called.
         """
-        return self._save_time_since_last
+        return self._save_time_since_data
 
     @property
     def save_time_since_checkpoint(self):
