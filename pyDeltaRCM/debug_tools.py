@@ -1,5 +1,6 @@
 
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import mpl_toolkits.axes_grid1 as axtk
@@ -120,20 +121,21 @@ class debug_tools(abc.ABC):
         else:
             plot_ind(ind, shape=_shape, *args, **kwargs)
 
-    def show_line(self, ind, *args, **kwargs):
+    def show_line(self, ind, *args, multiline=False, **kwargs):
         """Show line within the model domain.
 
         Show the location of lines (a series of connected indices) within the
-        model domain. Can show points as tuple ``(x, y)``, flat index ``idx``,
-        list of tuples ``[(x1, y1), (x2, y2)]``, or list of flat indices
-        ``[idx1, idx2]``. Method takes arbitrary `matplotlib` arguments to
-        `plot` the points as Matlab-style args (``'r*'``) or keyword arguments
-        (``marker='s'``).
+        model domain. Can show points as a list/array of flat index ``[i0, i1,
+        i2]``, list of tuples ``[(x1, y1), (x2, y2)]``, array of pairs ``[[x1,
+        y1], [x2, y2]]``, or array of lines if given as flat index ``[[l0i0,
+        l1i0, l2i0], [l0i1, l1i1, l2i1]]``. Method takes arbitrary
+        `matplotlib` arguments to `plot` the points as Matlab-style args
+        (``'r*'``) or keyword arguments (``marker='s'``).
 
         Parameters
         ----------
-        ind : :obj:`tuple`, `int`, `list` of `tuple`, `list` of `int`, `list` of `int` and `tuple`
-            Indicies to plot
+        ind : :obj: Nx2 `ndarray`, `list` of `tuple`, `list` of `int`, `ndarray` of `int`
+            Indicies to plot.
 
         ax : :obj:`matplotlib.Axes` object, optional
             Which axes to render point into. Uses ``gca()`` if no axis is
@@ -160,10 +162,14 @@ class debug_tools(abc.ABC):
             if ind.ndim > 2:
                 raise NotImplementedError('Not implemented for arrays > 2d.')
             elif ind.ndim > 1:
-                # travel along axis, extracting lines
-                for i in np.arange(ind.shape[0]):
-                    plot_line(ind[i, :],
-                              shape=_shape, *args, **kwargs)
+                if multiline:
+                    # travel along axis, extracting lines
+                    cm = matplotlib.cm.get_cmap('tab10')
+                    for i in np.arange(ind.shape[1]):
+                        plot_line(ind[:, i], *args, multiline=multiline,
+                                  shape=_shape, color=cm(i), **kwargs)
+                else:
+                    plot_line(ind, *args, **kwargs)
             else:
                 plot_line(ind.flatten(),
                           shape=_shape, *args, **kwargs)
@@ -266,6 +272,7 @@ def plot_line(_ind, *args, shape=None, **kwargs):
     """
     ax = kwargs.pop('ax', None)
     block = kwargs.pop('block', False)
+    multiline = kwargs.pop('multiline', False)
 
     _shape = shape
 
@@ -280,12 +287,16 @@ def plot_line(_ind, *args, shape=None, **kwargs):
         #     raise ValueError('Expected tuple length to be 2, but was %s'
         #                      % str(len(_ind)))
     else:
-        if (_shape is None):
-            raise ValueError('Shape of array must be given to unravel index.')
         if isinstance(_ind, np.ndarray):
-            pxpys = np.zeros((_ind.shape[0], 2))
-            for i in range(_ind.shape[0]):
-                pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
+            if multiline:
+                if (_shape is None):
+                    raise ValueError(
+                        'Shape of array must be given to unravel index.')
+                pxpys = np.zeros((_ind.shape[0], 2))
+                for i in range(_ind.shape[0]):
+                    pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
+            else:
+                pxpys = np.fliplr(_ind)
 
     ax.plot(pxpys[:, 1], pxpys[:, 0], *args, **kwargs)
 
