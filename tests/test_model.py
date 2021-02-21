@@ -273,8 +273,6 @@ class TestUpdate:
         # assert times / counters
         assert _delta.time_iter == int(1)
         assert _delta.time == _delta.dt
-        assert _delta.save_time_since_data == _delta.dt
-        assert _delta._save_time_since_checkpoint == _delta.dt
 
         # run another step
         #   * should call all steps again
@@ -291,8 +289,6 @@ class TestUpdate:
         # assert times / counters
         assert _delta.time_iter == int(2)
         assert _delta.time == 2 * _delta.dt
-        assert _delta.save_time_since_data == 2 * _delta.dt
-        assert _delta._save_time_since_checkpoint == 2 * _delta.dt
 
     def test_update_is_finalized(self, tmp_path):
         # create a delta with different itermax
@@ -324,9 +320,12 @@ class TestFinalize:
         # assert calls
         #  should hit all options since no saves
         assert _delta.log_info.call_count == 2
-        assert _delta.output_data.call_count == 1
-        assert _delta.output_checkpoint.call_count == 1
         assert _delta.record_final_stratigraphy.call_count == 1
+
+        # these were originally included in `finalize`, but no longer.
+        #   the checks for no call are here to ensure we don't revert
+        assert _delta.output_data.call_count == 0
+        assert _delta.output_checkpoint.call_count == 0
 
         assert _delta._is_finalized is True
 

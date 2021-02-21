@@ -837,8 +837,8 @@ class TestParallelJob:
         assert pj.deltamodel.apply_subsidence.call_count == 10
         assert pj.deltamodel.finalize_timestep.call_count == 10
         assert pj.deltamodel.log_model_time.call_count == 10
-        assert pj.deltamodel.output_data.call_count == 10
-        assert pj.deltamodel.output_checkpoint.call_count == 10
+        assert pj.deltamodel.output_data.call_count == 11  # once in init
+        assert pj.deltamodel.output_checkpoint.call_count == 11  # once in init
         assert pj.deltamodel.finalize.call_count == 1
 
         # check the log outputs for successes
@@ -865,11 +865,11 @@ class TestParallelJob:
         pj.deltamodel.run_one_timestep = mock.MagicMock()
         pj.deltamodel.apply_subsidence = mock.MagicMock()
         pj.deltamodel.finalize_timestep = mock.MagicMock()
-        pj.deltamodel.log_model_time = mock.MagicMock()
+        pj.deltamodel.log_model_time = mock.MagicMock(
+            side_effect=RuntimeError('error!'))
         pj.deltamodel.logger = mock.MagicMock()
         pj.deltamodel.output_data = mock.MagicMock()
-        pj.deltamodel.output_checkpoint = mock.MagicMock(
-            side_effect=RuntimeError('error!'))
+        pj.deltamodel.output_checkpoint = mock.MagicMock()
         pj.deltamodel.finalize = mock.MagicMock()
 
         # run the method (error on `output_checkpoint`)
@@ -930,8 +930,8 @@ class TestParallelJob:
         assert pj.deltamodel.apply_subsidence.call_count == 10
         assert pj.deltamodel.finalize_timestep.call_count == 10
         assert pj.deltamodel.log_model_time.call_count == 10
-        assert pj.deltamodel.output_data.call_count == 10
-        assert pj.deltamodel.output_checkpoint.call_count == 10
+        assert pj.deltamodel.output_data.call_count == 11  # once in init
+        assert pj.deltamodel.output_checkpoint.call_count == 11  # once in init
         assert pj.deltamodel.finalize.call_count == 1
 
         # check the log outputs for success/failure

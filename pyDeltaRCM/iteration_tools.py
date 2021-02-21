@@ -226,7 +226,7 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        if self.save_strata and self._time > 0:
+        if self.save_strata:
 
             if self.strata_counter >= self.strata_eta.shape[1]:
                 self.expand_stratigraphy()

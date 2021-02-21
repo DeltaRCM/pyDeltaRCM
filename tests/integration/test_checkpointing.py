@@ -159,7 +159,7 @@ class TestCheckpointingIntegrations:
 
         # extract and compare the number of times exported data
         resume_n_export = resumeModel.strata_counter
-        assert resume_n_export == (base_n_export * 2)
+        assert resume_n_export == (base_n_export * 2) - 1
 
         # assert that output netCDF4 exists
         exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')

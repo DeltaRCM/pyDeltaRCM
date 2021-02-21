@@ -150,7 +150,7 @@ class TestModelIsReprodicible:
         assert ModelA.time == ModelB.time
         assert ModelA._time_iter == ModelB._time_iter
         assert ModelA._save_iter == ModelB._save_iter
-        assert ModelA._save_time_since_last == ModelB._save_time_since_last
+        assert ModelA._save_time_since_data == ModelB._save_time_since_data
         assert np.all(ModelA.uw == ModelB.uw)
         assert np.all(ModelA.ux == ModelB.ux)
         assert np.all(ModelA.uy == ModelB.uy)
