@@ -50,7 +50,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             NetCDF file creation unitl the simualtion is assigned to the core
             it will compute on, so that the DeltaModel object remains
             pickle-able. Note, you will need to manually trigger the
-            :obj:`init_output_file` method if `defer_output` is `True`.
+            :obj:`init_output_file`, :obj:`output_data`, and
+            :obj:`output_checkpoint` method if `defer_output` is `True`.
 
         Returns
         -------
@@ -86,20 +87,24 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
+            # load values from the checkpoint and don't init final features
             self.load_checkpoint()
 
         else:
+            # initialize the stratigraphy infrastructure
             self.init_stratigraphy()
+
+            # initialize the output file
             if not defer_output:
                 self.init_output_file()
+
+                # record initial conditions
+                self.output_data()
+                self.output_checkpoint()
 
         _msg = 'Model initialization complete'
         self.log_info(_msg)
         self.log_model_time()
-
-        # record initial conditions
-        self.output_data()
-        self.output_checkpoint()
 
     def update(self):
         """Run the model for one full instance.
@@ -165,10 +170,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if self._is_finalized:
             raise RuntimeError('Cannot finalize model, '
                                'model already finalized!')
-
-        # get the final timestep recorded, if needed.
-        self.output_data()
-        self.output_checkpoint()
 
         self.record_final_stratigraphy()
 

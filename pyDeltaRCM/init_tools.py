@@ -630,7 +630,7 @@ class init_tools(abc.ABC):
         self.H_SL = float(checkpoint['H_SL'])
         self._time_iter = int(checkpoint['time_iter'])
         self._save_iter = int(checkpoint['save_iter'])
-        self._save_time_since_last = int(checkpoint['save_time_since_last'])
+        self._save_time_since_data = int(checkpoint['save_time_since_data'])
         self.uw = checkpoint['uw']
         self.ux = checkpoint['ux']
         self.uy = checkpoint['uy']

@@ -180,7 +180,7 @@ class iteration_tools(abc.ABC):
                             'the model run.')
                     self.logger.warning(_msg)
 
-            self._save_time_since_checkpoint = 0
+                self._save_time_since_checkpoint = 0
 
     def expand_stratigraphy(self):
         """Expand stratigraphy array sizes.
@@ -226,7 +226,7 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        if self.save_strata:
+        if self.save_strata and self._time > 0:
 
             if self.strata_counter >= self.strata_eta.shape[1]:
                 self.expand_stratigraphy()
@@ -269,6 +269,7 @@ class iteration_tools(abc.ABC):
 
             eta_sparse = csc_matrix((data_s, (row_s, col_s)),
                                     shape=(self.L * self.W, 1))
+
             self.strata_eta[:, self.strata_counter] = eta_sparse
 
             if self._toggle_subsidence and (self._time >= self._start_subsidence):
@@ -591,8 +592,7 @@ class iteration_tools(abc.ABC):
         # convert sparse arrays to csr type so they are easier to save
         csr_strata_eta = self.strata_eta.tocsr()
         csr_strata_sand_frac = self.strata_sand_frac.tocsr()
-        # advance _time_iter since this is before update step fully finishes
-        _time_iter = self._time_iter + int(1)
+        _time_iter = self._time_iter
         # get rng state
         rng_state_list = shared_tools.get_random_state()
         rng_state = np.array(rng_state_list,
@@ -601,7 +601,7 @@ class iteration_tools(abc.ABC):
         np.savez_compressed(ckp_file, time=self.time, H_SL=self._H_SL,
                             time_iter=_time_iter,
                             save_iter=self._save_iter,
-                            save_time_since_last=self._save_time_since_data,
+                            save_time_since_data=self._save_time_since_data,
                             uw=self.uw, ux=self.ux, uy=self.uy,
                             qw=self.qw, qx=self.qx, qy=self.qy,
                             depth=self.depth, stage=self.stage,
