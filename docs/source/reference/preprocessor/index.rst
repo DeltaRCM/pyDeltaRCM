@@ -20,6 +20,15 @@ Preprocessor classes and API
     Preprocessor
     BasePreprocessor
 
+Internally, jobs condifugred by the preprocessors are handled by `Job` classes. You likely do not need to interact with these classes, unless you are trying to implement a different execution of the model; for example, trying to run the model until a given deposit thickness is reached, rather than time or number of timesteps.
+
+.. autosummary:: 
+    :toctree: ../../_autosummary
+
+    _SerialJob
+    _ParallelJob
+    _BaseJob
+
 Preprocessor function and utilities
 -----------------------------------
 

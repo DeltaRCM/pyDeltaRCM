@@ -68,7 +68,8 @@ jobs:
       run: |
         pip install -e .
     - name: Disable jitted for coverage
-      run: export NUMBA_DISABLE_JIT=1
+      run: |
+        echo "DISABLE_JIT: 1" > .numba_config.yaml
     - name: Test with pytest
       run: |
         pytest --ignore=tests/integration/ --cov=pyDeltaRCM/ --cov-report=xml --mpl --mpl-baseline-path=tests/imgs_baseline

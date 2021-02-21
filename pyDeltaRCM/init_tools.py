@@ -11,7 +11,6 @@ from scipy.sparse import lil_matrix, csr_matrix
 from netCDF4 import Dataset
 import time as time_lib
 import yaml
-import re
 import abc
 
 from . import shared_tools
