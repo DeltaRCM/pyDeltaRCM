@@ -90,10 +90,24 @@ def test_DeltaModel(tmp_path):
 
 
 class FastIteratingDeltaModel:
+    """A Fast iterating DeltaModel
+
+    This class is useful in patching the DeltaModel for timing tests. The
+    patched DeltaModel uses the random number generation internally, so it
+    will verify functionality in any checkpointing scenarios, and overwriting
+    only the `run_one_timestep` method removes most of the jitting compilation
+    time and much of the actual computation time.
+    """
 
     def run_one_timestep(self):
+        """PATCH"""
 
         def _get_random_field(shp):
+            """Get a field or randoms using the shared function.
+
+            It is critical to use the `shared_tools.get_random_uniform` for
+            reproducibility.
+            """
             field = np.zeros(shp, dtype=np.float32)
             for i in range(shp[0]):
                 for j in range(shp[1]):
