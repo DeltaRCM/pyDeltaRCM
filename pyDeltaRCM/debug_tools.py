@@ -121,7 +121,7 @@ class debug_tools(abc.ABC):
         else:
             plot_ind(ind, shape=_shape, *args, **kwargs)
 
-    def show_line(self, ind, *args, multiline=False, **kwargs):
+    def show_line(self, ind, *args, multiline=False, nozeros=False, **kwargs):
         """Show line within the model domain.
 
         Show the location of lines (a series of connected indices) within the
@@ -157,7 +157,8 @@ class debug_tools(abc.ABC):
         if isinstance(ind, list):
             for _, iind in enumerate(ind):
                 plot_line(iind.flatten(),
-                          shape=_shape, *args, **kwargs)
+                          shape=_shape, nozeros=nozeros,
+                          *args, **kwargs)
         elif isinstance(ind, np.ndarray):
             if ind.ndim > 2:
                 raise NotImplementedError('Not implemented for arrays > 2d.')
@@ -167,12 +168,13 @@ class debug_tools(abc.ABC):
                     cm = matplotlib.cm.get_cmap('tab10')
                     for i in np.arange(ind.shape[1]):
                         plot_line(ind[:, i], *args, multiline=multiline,
-                                  shape=_shape, color=cm(i), **kwargs)
+                                  nozeros=nozeros, shape=_shape, color=cm(i), **kwargs)
                 else:
-                    plot_line(ind, *args, **kwargs)
+                    plot_line(ind, *args, nozeros=nozeros, **kwargs)
             else:
                 plot_line(ind.flatten(),
-                          shape=_shape, *args, **kwargs)
+                          shape=_shape, nozeros=nozeros,
+                          *args, **kwargs)
 
         else:
             raise NotImplementedError
@@ -209,8 +211,14 @@ def plot_domain(attr, ax=None, grid=True, block=False, label=None, **kwargs):
     if not ax:
         ax = plt.gca()
 
+    cmap = kwargs.pop('cmap', None)
+    if (cmap is None):
+        cmap = plt.get_cmap('viridis')
+    # else:
+        # cmap = plt.get_cmap(cmap)
+
     cobj = ax.imshow(attr,
-                     cmap=plt.get_cmap('viridis'),
+                     cmap=cmap,
                      interpolation='none',
                      **kwargs)
     divider = axtk.axes_divider.make_axes_locatable(ax)
@@ -266,7 +274,7 @@ def plot_ind(_ind, *args, shape=None, **kwargs):
         plt.show()
 
 
-def plot_line(_ind, *args, shape=None, **kwargs):
+def plot_line(_ind, *args, shape=None, nozeros=False, **kwargs):
     """Plot a line within the model domain.
 
     Method called by :obj:`show_line`.
@@ -295,7 +303,13 @@ def plot_line(_ind, *args, shape=None, **kwargs):
                         'Shape of array must be given to unravel index.')
                 pxpys = np.zeros((_ind.shape[0], 2))
                 for i in range(_ind.shape[0]):
-                    pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
+                    if _ind[i] == 0:
+                        if nozeros:
+                            pxpys[i, :] = np.nan, np.nan
+                        else:
+                            pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
+                    else:
+                        pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
             else:
                 pxpys = np.fliplr(_ind)
 

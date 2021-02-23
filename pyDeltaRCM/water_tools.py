@@ -153,6 +153,11 @@ class water_tools(abc.ABC):
         function :obj:`accumulate_free_surface_walks`. Following this
         computation, the free surface is smoothed by steps in
         :obj:`finalize_free_surface`.
+
+        Examples
+        --------
+
+        .. plot:: water_tools/compute_free_surface.py
         """
         _msg = 'Computing free surface from water parcels'
         self.log_info(_msg, verbosity=2)

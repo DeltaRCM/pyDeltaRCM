@@ -63,4 +63,8 @@ for i in range(n):
     ax2.plot(delta.stage.flat[walk], '-', color=cm(i))
 
 plt.tight_layout()
-plt.show()
+
+if __name__ == '__main__':
+    plt.savefig('_accumulate_free_surface_walks.png', transparent=True, dpi=300)
+else:
+    plt.show()

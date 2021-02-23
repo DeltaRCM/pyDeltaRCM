@@ -19,7 +19,7 @@ _shp = delta.eta.shape
 
 
 # determine the index to plot at
-pidx = 22 #5, 8, 15, 22, 
+pidx = 22
 
 
 # run an interation from the checkpoint
@@ -46,7 +46,6 @@ for pidx in range(200):
                     new_direction,
                     delta.ravel_walk_flat)
 
-
     # copy inputs and then run the function to get new outputs
     new_inds0 = np.copy(new_inds)
     new_inds, looped = water_tools._check_for_loops(
@@ -64,6 +63,7 @@ for pidx in range(200):
     # if np.any(looped):
     if whr_neq.size > 0:
         breakpoint()
+
 
 # make a function to plot each point of interest as two points and an arrow
 def _plot_a_point(i):

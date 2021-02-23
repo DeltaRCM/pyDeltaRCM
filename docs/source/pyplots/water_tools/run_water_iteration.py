@@ -50,39 +50,56 @@ fig, ax = plt.subplots(2, 4, sharex=True, sharey=True, figsize=(10, 5))
 vmin, vmax = delta.eta.min(), delta.eta.max()
 
 # fill in axis0
-pyDeltaRCM.debug_tools.plot_domain(delta.eta, ax=ax[0, 0], grid=False)
+pyDeltaRCM.debug_tools.plot_domain(
+    delta.eta, ax=ax[0, 0], grid=False)
 _plot_idxs_walks_to_step(delta.free_surf_walk_inds, _step=ps[0], _idxs=idxs, _ax=ax[0, 0])
 ax[0, 0].set_title('after {} steps'.format(ps[0]))
-pyDeltaRCM.debug_tools.plot_domain(delta_later.eta, ax=ax[1, 0], grid=False, vmin=vmin, vmax=vmax)
+pyDeltaRCM.debug_tools.plot_domain(
+    delta_later.eta, ax=ax[1, 0], grid=False, vmin=vmin, vmax=vmax)
 _plot_idxs_walks_to_step(delta_later.free_surf_walk_inds, _step=ps[0], _idxs=idxs, _ax=ax[1, 0])
 # ax[1, 0].set_title('after {} steps'.format(ps[0]))
 
 
 # fill in axis1
-pyDeltaRCM.debug_tools.plot_domain(delta.eta, ax=ax[0, 1], grid=False)
-_plot_idxs_walks_to_step(delta.free_surf_walk_inds, _step=ps[1], _idxs=idxs, _ax=ax[0, 1])
+pyDeltaRCM.debug_tools.plot_domain(
+    delta.eta, ax=ax[0, 1], grid=False)
+_plot_idxs_walks_to_step(
+    delta.free_surf_walk_inds, _step=ps[1], _idxs=idxs, _ax=ax[0, 1])
 ax[0, 1].set_title('after {} steps'.format(ps[1]))
-pyDeltaRCM.debug_tools.plot_domain(delta_later.eta, ax=ax[1, 1], grid=False, vmin=vmin, vmax=vmax)
-_plot_idxs_walks_to_step(delta_later.free_surf_walk_inds, _step=ps[1], _idxs=idxs, _ax=ax[1, 1])
+pyDeltaRCM.debug_tools.plot_domain(
+    delta_later.eta, ax=ax[1, 1], grid=False, vmin=vmin, vmax=vmax)
+_plot_idxs_walks_to_step(
+    delta_later.free_surf_walk_inds, _step=ps[1], _idxs=idxs, _ax=ax[1, 1])
 # ax[1, 1].set_title('after {} steps'.format(ps[1]))
 
 # fill in axis2
-pyDeltaRCM.debug_tools.plot_domain(delta.eta, ax=ax[0, 2], grid=False)
-_plot_idxs_walks_to_step(delta.free_surf_walk_inds, _step=ps[2], _idxs=idxs, _ax=ax[0, 2])
+pyDeltaRCM.debug_tools.plot_domain(
+    delta.eta, ax=ax[0, 2], grid=False)
+_plot_idxs_walks_to_step(
+    delta.free_surf_walk_inds, _step=ps[2], _idxs=idxs, _ax=ax[0, 2])
 ax[0, 2].set_title('after {} steps'.format(ps[2]))
-pyDeltaRCM.debug_tools.plot_domain(delta_later.eta, ax=ax[1, 2], grid=False, vmin=vmin, vmax=vmax)
-_plot_idxs_walks_to_step(delta_later.free_surf_walk_inds, _step=ps[2], _idxs=idxs, _ax=ax[1, 2])
+pyDeltaRCM.debug_tools.plot_domain(
+    delta_later.eta, ax=ax[1, 2], grid=False, vmin=vmin, vmax=vmax)
+_plot_idxs_walks_to_step(
+    delta_later.free_surf_walk_inds, _step=ps[2], _idxs=idxs, _ax=ax[1, 2])
 # ax[1, 2].set_title('after {} steps'.format(ps[2]))
 
 
 # fill in axis3
-pyDeltaRCM.debug_tools.plot_domain(delta.eta, ax=ax[0, 3], grid=False)
-_plot_idxs_walks_to_step(delta.free_surf_walk_inds, _step=ps[3], _idxs=idxs, _ax=ax[0, 3])
+pyDeltaRCM.debug_tools.plot_domain(
+    delta.eta, ax=ax[0, 3], grid=False)
+_plot_idxs_walks_to_step(
+    delta.free_surf_walk_inds, _step=ps[3], _idxs=idxs, _ax=ax[0, 3])
 ax[0, 3].set_title('after {} steps'.format(ps[3]))
-pyDeltaRCM.debug_tools.plot_domain(delta_later.eta, ax=ax[1, 3], grid=False, vmin=vmin, vmax=vmax)
-_plot_idxs_walks_to_step(delta_later.free_surf_walk_inds, _step=ps[3], _idxs=idxs, _ax=ax[1, 3])
+pyDeltaRCM.debug_tools.plot_domain(
+    delta_later.eta, ax=ax[1, 3], grid=False, vmin=vmin, vmax=vmax)
+_plot_idxs_walks_to_step(
+    delta_later.free_surf_walk_inds, _step=ps[3], _idxs=idxs, _ax=ax[1, 3])
 # ax[1, 3].set_title('after {} steps'.format(ps[3]))
 
 
 plt.tight_layout()
-plt.show()
+if __name__ == '__main__':
+    plt.savefig('run_water_iteration.png', transparent=True, dpi=300)
+else:
+    plt.show()
