@@ -36,11 +36,6 @@ class iteration_tools(abc.ABC):
 
         Returns
         -------
-
-        Raises
-        ------
-        RuntimeError
-            If model has already been finalized via :meth:`finalize`.
         """
         # start the model operations
         #   water iterations

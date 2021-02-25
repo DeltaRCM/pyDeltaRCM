@@ -129,6 +129,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         Returns
         -------
 
+        Raises
+        ------
+        RuntimeError
+            If model has already been finalized via :meth:`finalize`.
+
         """
         if self._is_finalized:
             raise RuntimeError('Cannot update model, model already finalized!')
