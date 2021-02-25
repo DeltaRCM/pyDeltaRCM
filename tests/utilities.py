@@ -2,8 +2,11 @@ import sys
 import os
 import glob
 
+import numpy as np
+
 import pytest
 from pyDeltaRCM.model import DeltaModel
+from pyDeltaRCM import shared_tools
 
 # utilities for file writing
 
@@ -32,8 +35,13 @@ def write_matrix_to_file(f, keys, lists):
             f.write('    ' + '- ' + str(lists[i][j]) + '\n')
 
 
-def yaml_from_dict(tmp_path, file_name, _dict):
+def yaml_from_dict(tmp_path, file_name, _dict=None):
     p, f = create_temporary_file(tmp_path, file_name)
+    if (_dict is None):
+        _dict = {'out_dir': tmp_path / 'out_dir'}
+    else:
+        _dict['out_dir'] = tmp_path / 'out_dir'
+
     for k in _dict.keys():
         write_parameter_to_file(f, k, _dict[k])
     f.close()
@@ -79,6 +87,40 @@ def test_DeltaModel(tmp_path):
     f.close()
     _delta = DeltaModel(input_file=p)
     return _delta
+
+
+class FastIteratingDeltaModel:
+    """A Fast iterating DeltaModel
+
+    This class is useful in patching the DeltaModel for timing tests. The
+    patched DeltaModel uses the random number generation internally, so it
+    will verify functionality in any checkpointing scenarios, and overwriting
+    only the `run_one_timestep` method removes most of the jitting compilation
+    time and much of the actual computation time.
+    """
+
+    def run_one_timestep(self):
+        """PATCH"""
+
+        def _get_random_field(shp):
+            """Get a field or randoms using the shared function.
+
+            It is critical to use the `shared_tools.get_random_uniform` for
+            reproducibility.
+            """
+            field = np.zeros(shp, dtype=np.float32)
+            for i in range(shp[0]):
+                for j in range(shp[1]):
+                    field[i, j] = shared_tools.get_random_uniform(1)
+            return field
+
+        shp = self.eta.shape
+        self.eta += _get_random_field(shp)
+        self.uw += _get_random_field(shp)
+        self.ux += _get_random_field(shp)
+        self.uy += _get_random_field(shp)
+        self.depth += _get_random_field(shp)
+        self.stage += _get_random_field(shp)
 
 
 def read_endtime_from_log(log_folder):
