@@ -44,15 +44,16 @@
       ~DeltaModel.make_figure
       ~DeltaModel.output_checkpoint
       ~DeltaModel.output_data
-      ~DeltaModel.output_strata
       ~DeltaModel.process_input_to_model
-      ~DeltaModel.record_stratigraphy
+      ~DeltaModel.record_final_stratigraphy
       ~DeltaModel.route_all_mud_parcels
       ~DeltaModel.route_all_sand_parcels
       ~DeltaModel.run_one_timestep
       ~DeltaModel.run_water_iteration
       ~DeltaModel.save_figure
       ~DeltaModel.save_grids
+      ~DeltaModel.save_grids_and_figs
+      ~DeltaModel.save_stratigraphy
       ~DeltaModel.save_the_checkpoint
       ~DeltaModel.sed_route
       ~DeltaModel.set_constants
@@ -127,7 +128,7 @@
       ~DeltaModel.save_stage_grids
       ~DeltaModel.save_strata
       ~DeltaModel.save_time_since_checkpoint
-      ~DeltaModel.save_time_since_last
+      ~DeltaModel.save_time_since_data
       ~DeltaModel.save_velocity_components
       ~DeltaModel.save_velocity_figs
       ~DeltaModel.save_velocity_grids

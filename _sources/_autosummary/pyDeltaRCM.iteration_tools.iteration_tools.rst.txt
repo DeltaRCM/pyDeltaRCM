@@ -22,11 +22,12 @@
       ~iteration_tools.make_figure
       ~iteration_tools.output_checkpoint
       ~iteration_tools.output_data
-      ~iteration_tools.output_strata
-      ~iteration_tools.record_stratigraphy
+      ~iteration_tools.record_final_stratigraphy
       ~iteration_tools.run_one_timestep
       ~iteration_tools.save_figure
       ~iteration_tools.save_grids
+      ~iteration_tools.save_grids_and_figs
+      ~iteration_tools.save_stratigraphy
       ~iteration_tools.save_the_checkpoint
    
    

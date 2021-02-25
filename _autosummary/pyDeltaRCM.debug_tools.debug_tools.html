@@ -85,7 +85,7 @@ these tools interactively at that breakpoint. Note, for Python &lt; 3.7 use
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.debug_tools.debug_tools.show_ind" title="pyDeltaRCM.debug_tools.debug_tools.show_ind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_ind</span></code></a>(ind, *args, **kwargs)</p></td>
 <td><p>Show points within the model domain.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.debug_tools.debug_tools.show_line" title="pyDeltaRCM.debug_tools.debug_tools.show_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_line</span></code></a>(ind, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.debug_tools.debug_tools.show_line" title="pyDeltaRCM.debug_tools.debug_tools.show_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_line</span></code></a>(ind, *args[, multiline])</p></td>
 <td><p>Show line within the model domain.</p></td>
 </tr>
 </tbody>
@@ -141,18 +141,19 @@ show automatically).</p></li>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.debug_tools.debug_tools.show_line">
-<code class="sig-name descname"><span class="pre">show_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.debug_tools.debug_tools.show_line" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">show_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.debug_tools.debug_tools.show_line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show line within the model domain.</p>
 <p>Show the location of lines (a series of connected indices) within the
-model domain. Can show points as tuple <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code>, flat index <code class="docutils literal notranslate"><span class="pre">idx</span></code>,
-list of tuples <code class="docutils literal notranslate"><span class="pre">[(x1,</span> <span class="pre">y1),</span> <span class="pre">(x2,</span> <span class="pre">y2)]</span></code>, or list of flat indices
-<code class="docutils literal notranslate"><span class="pre">[idx1,</span> <span class="pre">idx2]</span></code>. Method takes arbitrary <cite>matplotlib</cite> arguments to
-<cite>plot</cite> the points as Matlab-style args (<code class="docutils literal notranslate"><span class="pre">'r*'</span></code>) or keyword arguments
-(<code class="docutils literal notranslate"><span class="pre">marker='s'</span></code>).</p>
+model domain. Can show points as a list/array of flat index <code class="docutils literal notranslate"><span class="pre">[i0,</span> <span class="pre">i1,</span>
+<span class="pre">i2]</span></code>, list of tuples <code class="docutils literal notranslate"><span class="pre">[(x1,</span> <span class="pre">y1),</span> <span class="pre">(x2,</span> <span class="pre">y2)]</span></code>, array of pairs <code class="docutils literal notranslate"><span class="pre">[[x1,</span>
+<span class="pre">y1],</span> <span class="pre">[x2,</span> <span class="pre">y2]]</span></code>, or array of lines if given as flat index <code class="docutils literal notranslate"><span class="pre">[[l0i0,</span>
+<span class="pre">l1i0,</span> <span class="pre">l2i0],</span> <span class="pre">[l0i1,</span> <span class="pre">l1i1,</span> <span class="pre">l2i1]]</span></code>. Method takes arbitrary
+<cite>matplotlib</cite> arguments to <cite>plot</cite> the points as Matlab-style args
+(<code class="docutils literal notranslate"><span class="pre">'r*'</span></code>) or keyword arguments (<code class="docutils literal notranslate"><span class="pre">marker='s'</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ind</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code>, <cite>int</cite>, <cite>list</cite> of <cite>tuple</cite>, <cite>list</cite> of <cite>int</cite>, <cite>list</cite> of <cite>int</cite> and <cite>tuple</cite>) – Indicies to plot</p></li>
+<li><p><strong>ind</strong> – Indicies to plot.</p></li>
 <li><p><strong>ax</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.Axes</span></code> object, optional) – Which axes to render point into. Uses <code class="docutils literal notranslate"><span class="pre">gca()</span></code> if no axis is
 provided.</p></li>
 <li><p><strong>block</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Whether to show the plot automatically. Default is <cite>False</cite> (do not

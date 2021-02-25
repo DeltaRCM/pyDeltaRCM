@@ -78,7 +78,8 @@ However, for parallel simulations it may be necessary to defer the
 NetCDF file creation unitl the simualtion is assigned to the core
 it will compute on, so that the DeltaModel object remains
 pickle-able. Note, you will need to manually trigger the
-<a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.init_output_file" title="pyDeltaRCM.model.DeltaModel.init_output_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_output_file</span></code></a> method if <cite>defer_output</cite> is <cite>True</cite>.</p></li>
+<a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.init_output_file" title="pyDeltaRCM.model.DeltaModel.init_output_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_output_file</span></code></a>, <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.output_data" title="pyDeltaRCM.model.DeltaModel.output_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_data</span></code></a>, and
+<a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.output_checkpoint" title="pyDeltaRCM.model.DeltaModel.output_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_checkpoint</span></code></a> method if <cite>defer_output</cite> is <cite>True</cite>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -182,69 +183,72 @@ pickle-able. Note, you will need to manually trigger the
 <td><p>Create a figure.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.output_checkpoint" title="pyDeltaRCM.model.DeltaModel.output_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_checkpoint</span></code></a>()</p></td>
-<td><p>Save checkpoint.</p></td>
+<td><p>Output checkpoint if needed.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.output_data" title="pyDeltaRCM.model.DeltaModel.output_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_data</span></code></a>()</p></td>
-<td><p>Save grids and figures.</p></td>
+<td><p>Output grids and figures if needed.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.output_strata" title="pyDeltaRCM.model.DeltaModel.output_strata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_strata</span></code></a>()</p></td>
-<td><p>Save stratigraphy as sparse matrix to file.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.process_input_to_model" title="pyDeltaRCM.model.DeltaModel.process_input_to_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_input_to_model</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.process_input_to_model" title="pyDeltaRCM.model.DeltaModel.process_input_to_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_input_to_model</span></code></a>()</p></td>
 <td><p>Process input file to model variables.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.record_stratigraphy" title="pyDeltaRCM.model.DeltaModel.record_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_stratigraphy</span></code></a>()</p></td>
-<td><p>Save stratigraphy to file.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.record_final_stratigraphy" title="pyDeltaRCM.model.DeltaModel.record_final_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_final_stratigraphy</span></code></a>()</p></td>
+<td><p>Save the stratigraphy as sparse matrix to file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.route_all_mud_parcels" title="pyDeltaRCM.model.DeltaModel.route_all_mud_parcels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_all_mud_parcels</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.route_all_mud_parcels" title="pyDeltaRCM.model.DeltaModel.route_all_mud_parcels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_all_mud_parcels</span></code></a>()</p></td>
 <td><p>Route mud parcels.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.route_all_sand_parcels" title="pyDeltaRCM.model.DeltaModel.route_all_sand_parcels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_all_sand_parcels</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.route_all_sand_parcels" title="pyDeltaRCM.model.DeltaModel.route_all_sand_parcels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_all_sand_parcels</span></code></a>()</p></td>
 <td><p>Route sand parcels; topo diffusion.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.run_one_timestep" title="pyDeltaRCM.model.DeltaModel.run_one_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_one_timestep</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.run_one_timestep" title="pyDeltaRCM.model.DeltaModel.run_one_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_one_timestep</span></code></a>()</p></td>
 <td><p>Run the timestep once.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.run_water_iteration" title="pyDeltaRCM.model.DeltaModel.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.run_water_iteration" title="pyDeltaRCM.model.DeltaModel.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>()</p></td>
 <td><p>Run a single iteration of travel paths for all water parcels.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_figure" title="pyDeltaRCM.model.DeltaModel.save_figure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_figure</span></code></a>(fig, directory, filename_root, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_figure" title="pyDeltaRCM.model.DeltaModel.save_figure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_figure</span></code></a>(fig, directory, filename_root, …)</p></td>
 <td><p>Save a figure.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_grids" title="pyDeltaRCM.model.DeltaModel.save_grids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_grids</span></code></a>(var_name, var, ts)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_grids" title="pyDeltaRCM.model.DeltaModel.save_grids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_grids</span></code></a>(var_name, var, ts)</p></td>
 <td><p>Save a grid into an existing netCDF file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_the_checkpoint" title="pyDeltaRCM.model.DeltaModel.save_the_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_the_checkpoint</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_grids_and_figs" title="pyDeltaRCM.model.DeltaModel.save_grids_and_figs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_grids_and_figs</span></code></a>()</p></td>
+<td><p>Save grids and figures.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_stratigraphy" title="pyDeltaRCM.model.DeltaModel.save_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_stratigraphy</span></code></a>()</p></td>
+<td><p>Save stratigraphy to an attribute of the delta.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_the_checkpoint" title="pyDeltaRCM.model.DeltaModel.save_the_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_the_checkpoint</span></code></a>()</p></td>
 <td><p>Save checkpoint files.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.sed_route" title="pyDeltaRCM.model.DeltaModel.sed_route"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sed_route</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.sed_route" title="pyDeltaRCM.model.DeltaModel.sed_route"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sed_route</span></code></a>()</p></td>
 <td><p>Sediment routing main method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_constants</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_constants</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.show_attribute" title="pyDeltaRCM.model.DeltaModel.show_attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_attribute</span></code></a>(attribute, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.show_attribute" title="pyDeltaRCM.model.DeltaModel.show_attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_attribute</span></code></a>(attribute, **kwargs)</p></td>
 <td><p>Show an attribute over the model domain.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.show_ind" title="pyDeltaRCM.model.DeltaModel.show_ind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_ind</span></code></a>(ind, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.show_ind" title="pyDeltaRCM.model.DeltaModel.show_ind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_ind</span></code></a>(ind, *args, **kwargs)</p></td>
 <td><p>Show points within the model domain.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.show_line" title="pyDeltaRCM.model.DeltaModel.show_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_line</span></code></a>(ind, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.show_line" title="pyDeltaRCM.model.DeltaModel.show_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_line</span></code></a>(ind, *args[, multiline])</p></td>
 <td><p>Show line within the model domain.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.topo_diffusion" title="pyDeltaRCM.model.DeltaModel.topo_diffusion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topo_diffusion</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.topo_diffusion" title="pyDeltaRCM.model.DeltaModel.topo_diffusion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topo_diffusion</span></code></a>()</p></td>
 <td><p>Diffuse topography after routing.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update" title="pyDeltaRCM.model.DeltaModel.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update" title="pyDeltaRCM.model.DeltaModel.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>()</p></td>
 <td><p>Run the model for one full instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update_Q" title="pyDeltaRCM.model.DeltaModel.update_Q"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_Q</span></code></a>(dist, current_inds, next_inds, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update_Q" title="pyDeltaRCM.model.DeltaModel.update_Q"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_Q</span></code></a>(dist, current_inds, next_inds, …)</p></td>
 <td><p>Update discharge field values.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update_flow_field" title="pyDeltaRCM.model.DeltaModel.update_flow_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_flow_field</span></code></a>(iteration)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update_flow_field" title="pyDeltaRCM.model.DeltaModel.update_flow_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_flow_field</span></code></a>(iteration)</p></td>
 <td><p>Update water discharge.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update_velocity_field" title="pyDeltaRCM.model.DeltaModel.update_velocity_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_velocity_field</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update_velocity_field" title="pyDeltaRCM.model.DeltaModel.update_velocity_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_velocity_field</span></code></a>()</p></td>
 <td><p>Update flow velocity fields.</p></td>
 </tr>
 </tbody>
@@ -418,7 +422,7 @@ pickle-able. Note, you will need to manually trigger the
 <tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_time_since_checkpoint" title="pyDeltaRCM.model.DeltaModel.save_time_since_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_time_since_checkpoint</span></code></a></p></td>
 <td><p>Time since last data checkpoint was saved.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_time_since_last" title="pyDeltaRCM.model.DeltaModel.save_time_since_last"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_time_since_last</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_time_since_data" title="pyDeltaRCM.model.DeltaModel.save_time_since_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_time_since_data</span></code></a></p></td>
 <td><p>Time since data last output.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_velocity_components" title="pyDeltaRCM.model.DeltaModel.save_velocity_components"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_velocity_components</span></code></a></p></td>
@@ -1038,7 +1042,7 @@ directory in which the model outputs should be saved.</p>
 <dl class="py method">
 <dt id="pyDeltaRCM.model.DeltaModel.output_checkpoint">
 <code class="sig-name descname"><span class="pre">output_checkpoint</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.output_checkpoint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save checkpoint.</p>
+<dd><p>Output checkpoint if needed.</p>
 <p>Save checkpoint data (including rng state) so that the model can be
 resumed from this time.</p>
 </dd></dl>
@@ -1046,18 +1050,7 @@ resumed from this time.</p>
 <dl class="py method">
 <dt id="pyDeltaRCM.model.DeltaModel.output_data">
 <code class="sig-name descname"><span class="pre">output_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.output_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save grids and figures.</p>
-<p>Save grids and/or plots of specified variables (<code class="docutils literal notranslate"><span class="pre">eta</span></code>, <cite>discharge`</cite>,
-<code class="docutils literal notranslate"><span class="pre">velocity</span></code>, <code class="docutils literal notranslate"><span class="pre">depth</span></code>, and <code class="docutils literal notranslate"><span class="pre">stage</span></code>, depending on configuration of
-the relevant flags in the YAML configuration file.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.model.DeltaModel.output_strata">
-<code class="sig-name descname"><span class="pre">output_strata</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.output_strata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save stratigraphy as sparse matrix to file.</p>
-<p>Saves the stratigraphy (sand fraction) sparse matrices into output
-netcdf file.</p>
+<dd><p>Output grids and figures if needed.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1075,19 +1068,11 @@ values specified into the log file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyDeltaRCM.model.DeltaModel.record_stratigraphy">
-<code class="sig-name descname"><span class="pre">record_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.record_stratigraphy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save stratigraphy to file.</p>
-<p>Saves the sand fraction of deposited sediment into a sparse array
-created by <code class="xref py py-obj docutils literal notranslate"><span class="pre">init_stratigraphy()</span></code>.</p>
-<p>Only runs if <code class="xref py py-obj docutils literal notranslate"><span class="pre">save_strata</span></code> is True.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This routine needs a complete description of the algorithm,
-additionally, it should be ported to a routine in DeltaMetrics,
-probably the new and preferred method of computing and storing
-straitgraphy cubes.</p>
-</div>
+<dt id="pyDeltaRCM.model.DeltaModel.record_final_stratigraphy">
+<code class="sig-name descname"><span class="pre">record_final_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.record_final_stratigraphy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the stratigraphy as sparse matrix to file.</p>
+<p>Saves the stratigraphy (sand fraction) sparse matrices into output
+netcdf file.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1132,11 +1117,6 @@ water surface calculation and sediment parcel routing routines.</p>
 <p class="admonition-title">Note</p>
 <p>Will print the current time to stdout, if <code class="docutils literal notranslate"><span class="pre">verbose</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>RuntimeError</strong> – If model has already been finalized via <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.finalize" title="pyDeltaRCM.model.DeltaModel.finalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code></a>.</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1253,6 +1233,15 @@ sure to include the ‘.’ before the extension.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt id="pyDeltaRCM.model.DeltaModel.save_grids_and_figs">
+<code class="sig-name descname"><span class="pre">save_grids_and_figs</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_grids_and_figs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save grids and figures.</p>
+<p>Save grids and/or plots of specified variables (<code class="docutils literal notranslate"><span class="pre">eta</span></code>, <cite>discharge`</cite>,
+<code class="docutils literal notranslate"><span class="pre">velocity</span></code>, <code class="docutils literal notranslate"><span class="pre">depth</span></code>, and <code class="docutils literal notranslate"><span class="pre">stage</span></code>, depending on configuration of
+the relevant flags in the YAML configuration file.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="pyDeltaRCM.model.DeltaModel.save_iter">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">save_iter</span></code><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_iter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of times data has been saved.</p>
@@ -1303,6 +1292,24 @@ run.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="pyDeltaRCM.model.DeltaModel.save_stratigraphy">
+<code class="sig-name descname"><span class="pre">save_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_stratigraphy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save stratigraphy to an attribute of the delta.</p>
+<p>Saves the sand fraction of deposited sediment into a sparse array
+created by <code class="xref py py-obj docutils literal notranslate"><span class="pre">init_stratigraphy()</span></code>. Note
+that the actual record in the netcdf file is not made until
+<cite>finalize()</cite>.</p>
+<p>Only runs if <code class="xref py py-obj docutils literal notranslate"><span class="pre">save_strata</span></code> is True.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This routine needs a complete description of the algorithm,
+additionally, it should be ported to a routine in DeltaMetrics,
+probably the new and preferred method of computing and storing
+straitgraphy cubes.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt id="pyDeltaRCM.model.DeltaModel.save_the_checkpoint">
 <code class="sig-name descname"><span class="pre">save_the_checkpoint</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_the_checkpoint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save checkpoint files.</p>
@@ -1330,8 +1337,8 @@ with either a frequency of <cite>checkpoint_dt</cite> or <cite>save_dt</cite> if
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyDeltaRCM.model.DeltaModel.save_time_since_last">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">save_time_since_last</span></code><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_time_since_last" title="Permalink to this definition">¶</a></dt>
+<dt id="pyDeltaRCM.model.DeltaModel.save_time_since_data">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">save_time_since_data</span></code><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_time_since_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Time since data last output.</p>
 <p>The number of times the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update" title="pyDeltaRCM.model.DeltaModel.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a> method has been called.</p>
 </dd></dl>
@@ -1449,18 +1456,19 @@ show automatically).</p></li>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.model.DeltaModel.show_line">
-<code class="sig-name descname"><span class="pre">show_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.show_line" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">show_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.show_line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show line within the model domain.</p>
 <p>Show the location of lines (a series of connected indices) within the
-model domain. Can show points as tuple <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code>, flat index <code class="docutils literal notranslate"><span class="pre">idx</span></code>,
-list of tuples <code class="docutils literal notranslate"><span class="pre">[(x1,</span> <span class="pre">y1),</span> <span class="pre">(x2,</span> <span class="pre">y2)]</span></code>, or list of flat indices
-<code class="docutils literal notranslate"><span class="pre">[idx1,</span> <span class="pre">idx2]</span></code>. Method takes arbitrary <cite>matplotlib</cite> arguments to
-<cite>plot</cite> the points as Matlab-style args (<code class="docutils literal notranslate"><span class="pre">'r*'</span></code>) or keyword arguments
-(<code class="docutils literal notranslate"><span class="pre">marker='s'</span></code>).</p>
+model domain. Can show points as a list/array of flat index <code class="docutils literal notranslate"><span class="pre">[i0,</span> <span class="pre">i1,</span>
+<span class="pre">i2]</span></code>, list of tuples <code class="docutils literal notranslate"><span class="pre">[(x1,</span> <span class="pre">y1),</span> <span class="pre">(x2,</span> <span class="pre">y2)]</span></code>, array of pairs <code class="docutils literal notranslate"><span class="pre">[[x1,</span>
+<span class="pre">y1],</span> <span class="pre">[x2,</span> <span class="pre">y2]]</span></code>, or array of lines if given as flat index <code class="docutils literal notranslate"><span class="pre">[[l0i0,</span>
+<span class="pre">l1i0,</span> <span class="pre">l2i0],</span> <span class="pre">[l0i1,</span> <span class="pre">l1i1,</span> <span class="pre">l2i1]]</span></code>. Method takes arbitrary
+<cite>matplotlib</cite> arguments to <cite>plot</cite> the points as Matlab-style args
+(<code class="docutils literal notranslate"><span class="pre">'r*'</span></code>) or keyword arguments (<code class="docutils literal notranslate"><span class="pre">marker='s'</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ind</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code>, <cite>int</cite>, <cite>list</cite> of <cite>tuple</cite>, <cite>list</cite> of <cite>int</cite>, <cite>list</cite> of <cite>int</cite> and <cite>tuple</cite>) – Indicies to plot</p></li>
+<li><p><strong>ind</strong> – Indicies to plot.</p></li>
 <li><p><strong>ax</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.Axes</span></code> object, optional) – Which axes to render point into. Uses <code class="docutils literal notranslate"><span class="pre">gca()</span></code> if no axis is
 provided.</p></li>
 <li><p><strong>block</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Whether to show the plot automatically. Default is <cite>False</cite> (do not
@@ -1601,12 +1609,17 @@ model time-tracking attributes. This method calls, in sequence:</p>
 and sediment routing, <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.run_one_timestep" title="pyDeltaRCM.model.DeltaModel.run_one_timestep"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run_one_timestep()</span></code></a>)</p></li>
 <li><p>the basin subsidence update pattern (<a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.apply_subsidence" title="pyDeltaRCM.model.DeltaModel.apply_subsidence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_subsidence()</span></code></a>)</p></li>
 <li><p>the timestep finalization routine (<a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.finalize_timestep" title="pyDeltaRCM.model.DeltaModel.finalize_timestep"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize_timestep()</span></code></a>)</p></li>
-<li><p>straigraphy updating routine (<a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.record_stratigraphy" title="pyDeltaRCM.model.DeltaModel.record_stratigraphy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">record_stratigraphy()</span></code></a>)</p></li>
+<li><p>straigraphy updating routine (<code class="xref py py-meth docutils literal notranslate"><span class="pre">record_stratigraphy()</span></code>)</p></li>
 </ul>
 </div></blockquote>
 <p>If you attempt to override the <code class="docutils literal notranslate"><span class="pre">update</span></code> routine, you must implement
 these operations at a minimum. More likely, you can implement what you
 need to by just overriding one of the methods called by <cite>update</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If model has already been finalized via <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.finalize" title="pyDeltaRCM.model.DeltaModel.finalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

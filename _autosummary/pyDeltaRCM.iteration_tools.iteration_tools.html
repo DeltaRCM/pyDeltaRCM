@@ -88,27 +88,30 @@ these operations largely occur when saving and updating the model.</p>
 <td><p>Create a figure.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint" title="pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_checkpoint</span></code></a>()</p></td>
-<td><p>Save checkpoint.</p></td>
+<td><p>Output checkpoint if needed.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_data" title="pyDeltaRCM.iteration_tools.iteration_tools.output_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_data</span></code></a>()</p></td>
-<td><p>Save grids and figures.</p></td>
+<td><p>Output grids and figures if needed.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_strata" title="pyDeltaRCM.iteration_tools.iteration_tools.output_strata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_strata</span></code></a>()</p></td>
-<td><p>Save stratigraphy as sparse matrix to file.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy" title="pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_final_stratigraphy</span></code></a>()</p></td>
+<td><p>Save the stratigraphy as sparse matrix to file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.record_stratigraphy" title="pyDeltaRCM.iteration_tools.iteration_tools.record_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_stratigraphy</span></code></a>()</p></td>
-<td><p>Save stratigraphy to file.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_one_timestep</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_one_timestep</span></code></a>()</p></td>
 <td><p>Run the timestep once.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_figure" title="pyDeltaRCM.iteration_tools.iteration_tools.save_figure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_figure</span></code></a>(fig, directory, filename_root, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_figure" title="pyDeltaRCM.iteration_tools.iteration_tools.save_figure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_figure</span></code></a>(fig, directory, filename_root, …)</p></td>
 <td><p>Save a figure.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids" title="pyDeltaRCM.iteration_tools.iteration_tools.save_grids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_grids</span></code></a>(var_name, var, ts)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids" title="pyDeltaRCM.iteration_tools.iteration_tools.save_grids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_grids</span></code></a>(var_name, var, ts)</p></td>
 <td><p>Save a grid into an existing netCDF file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint" title="pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_the_checkpoint</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs" title="pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_grids_and_figs</span></code></a>()</p></td>
+<td><p>Save grids and figures.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_stratigraphy" title="pyDeltaRCM.iteration_tools.iteration_tools.save_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_stratigraphy</span></code></a>()</p></td>
+<td><p>Save stratigraphy to an attribute of the delta.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint" title="pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_the_checkpoint</span></code></a>()</p></td>
 <td><p>Save checkpoint files.</p></td>
 </tr>
 </tbody>
@@ -186,7 +189,7 @@ looked up via <cite>getattr</cite>.</p>
 <dl class="py method">
 <dt id="pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint">
 <code class="sig-name descname"><span class="pre">output_checkpoint</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save checkpoint.</p>
+<dd><p>Output checkpoint if needed.</p>
 <p>Save checkpoint data (including rng state) so that the model can be
 resumed from this time.</p>
 </dd></dl>
@@ -194,34 +197,15 @@ resumed from this time.</p>
 <dl class="py method">
 <dt id="pyDeltaRCM.iteration_tools.iteration_tools.output_data">
 <code class="sig-name descname"><span class="pre">output_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save grids and figures.</p>
-<p>Save grids and/or plots of specified variables (<code class="docutils literal notranslate"><span class="pre">eta</span></code>, <cite>discharge`</cite>,
-<code class="docutils literal notranslate"><span class="pre">velocity</span></code>, <code class="docutils literal notranslate"><span class="pre">depth</span></code>, and <code class="docutils literal notranslate"><span class="pre">stage</span></code>, depending on configuration of
-the relevant flags in the YAML configuration file.</p>
+<dd><p>Output grids and figures if needed.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyDeltaRCM.iteration_tools.iteration_tools.output_strata">
-<code class="sig-name descname"><span class="pre">output_strata</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_strata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save stratigraphy as sparse matrix to file.</p>
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy">
+<code class="sig-name descname"><span class="pre">record_final_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the stratigraphy as sparse matrix to file.</p>
 <p>Saves the stratigraphy (sand fraction) sparse matrices into output
 netcdf file.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.iteration_tools.iteration_tools.record_stratigraphy">
-<code class="sig-name descname"><span class="pre">record_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.record_stratigraphy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save stratigraphy to file.</p>
-<p>Saves the sand fraction of deposited sediment into a sparse array
-created by <code class="xref py py-obj docutils literal notranslate"><span class="pre">init_stratigraphy()</span></code>.</p>
-<p>Only runs if <code class="xref py py-obj docutils literal notranslate"><span class="pre">save_strata</span></code> is True.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This routine needs a complete description of the algorithm,
-additionally, it should be ported to a routine in DeltaMetrics,
-probably the new and preferred method of computing and storing
-straitgraphy cubes.</p>
-</div>
 </dd></dl>
 
 <dl class="py method">
@@ -234,11 +218,6 @@ water surface calculation and sediment parcel routing routines.</p>
 <p class="admonition-title">Note</p>
 <p>Will print the current time to stdout, if <code class="docutils literal notranslate"><span class="pre">verbose</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>RuntimeError</strong> – If model has already been finalized via <code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code>.</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -274,6 +253,33 @@ sure to include the ‘.’ before the extension.</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs">
+<code class="sig-name descname"><span class="pre">save_grids_and_figs</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save grids and figures.</p>
+<p>Save grids and/or plots of specified variables (<code class="docutils literal notranslate"><span class="pre">eta</span></code>, <cite>discharge`</cite>,
+<code class="docutils literal notranslate"><span class="pre">velocity</span></code>, <code class="docutils literal notranslate"><span class="pre">depth</span></code>, and <code class="docutils literal notranslate"><span class="pre">stage</span></code>, depending on configuration of
+the relevant flags in the YAML configuration file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.save_stratigraphy">
+<code class="sig-name descname"><span class="pre">save_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_stratigraphy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save stratigraphy to an attribute of the delta.</p>
+<p>Saves the sand fraction of deposited sediment into a sparse array
+created by <code class="xref py py-obj docutils literal notranslate"><span class="pre">init_stratigraphy()</span></code>. Note
+that the actual record in the netcdf file is not made until
+<cite>finalize()</cite>.</p>
+<p>Only runs if <code class="xref py py-obj docutils literal notranslate"><span class="pre">save_strata</span></code> is True.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This routine needs a complete description of the algorithm,
+additionally, it should be ported to a routine in DeltaMetrics,
+probably the new and preferred method of computing and storing
+straitgraphy cubes.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
