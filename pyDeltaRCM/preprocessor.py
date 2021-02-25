@@ -95,8 +95,12 @@ class BasePreprocessor(abc.ABC):
         if (input_file is None):
             return {}  # return an empty dict
         else:
+            # get the special loader from the shared tools
+            loader = shared_tools.custom_yaml_loader()
+
+            # open the file with the loader
             user_file = open(input_file, mode='r')
-            yaml_dict = yaml.load(user_file, Loader=yaml.FullLoader)
+            yaml_dict = yaml.load(user_file, Loader=loader)
             user_file.close()
             return yaml_dict
 
@@ -334,7 +338,9 @@ class BasePreprocessor(abc.ABC):
             elif (isinstance(_parallel_flag, int)):
                 num_parallel_processes = _parallel_flag
             else:
-                num_parallel_processes = 1
+                raise ValueError('Parallel flag must be boolean or integer, '
+                                 'but was {}, {}.'.format(type(_parallel_flag),
+                                                          str(_parallel_flag)))
             # number of parallel processes is never greater than number of jobs
             num_parallel_processes = np.minimum(
                 num_parallel_processes, num_total_processes)
@@ -406,7 +412,7 @@ class BasePreprocessor(abc.ABC):
         self._is_completed = True
 
 
-class _BaseJob(object):
+class _BaseJob(abc.ABC):
     """Base class for individual jobs to run via the preprocessor.
 
     The base class handles setting options for the run time duration, based on
@@ -563,16 +569,15 @@ class _SerialJob(_BaseJob):
 
         # if the model run fails
         except (RuntimeError, ValueError) as e:
-            _msg = ','.join(['job:', str(self.i), 'stage:', '1',
-                             'code:', '1', 'msg:', str(e)])
+            _msg = ', '.join(['job: ' + str(self.i), 'stage: ' + '1',
+                             'code: ' + '1', 'msg: ' + str(e)])
             self.deltamodel.logger.error(_msg)
             self.deltamodel.logger.exception(e)
-            warnings.warn(UserWarning(_msg))
 
         # if the model run succeeds
         else:
-            _msg = ','.join(['job:', str(self.i), 'stage:', '1',
-                             'code:', '0'])
+            _msg = ', '.join(['job: ' + str(self.i), 'stage: ' + '1',
+                             'code: ' + '0'])
             self.deltamodel.logger.info(_msg)
 
         # try to finalize the model
@@ -581,16 +586,15 @@ class _SerialJob(_BaseJob):
 
         # if the model finalization fails
         except (RuntimeError, ValueError) as e:
-            _msg = ','.join(['job:', str(self.i), 'stage:', '2',
-                             'code:', '1', 'msg:', str(e)])
+            _msg = ', '.join(['job: ' + str(self.i), 'stage: ' + '2',
+                             'code: ' + '1', 'msg: ' + str(e)])
             self.deltamodel.logger.error(_msg)
             self.deltamodel.logger.exception(e)
-            warnings.warn(UserWarning(_msg))
 
         # if the finalization succeeds
         else:
-            _msg = ','.join(['job:', str(self.i), 'stage:', '2',
-                             'code:', '0'])
+            _msg = ', '.join(['job: ' + str(self.i), 'stage: ' + '2',
+                             'code: ' + '0'])
             self.deltamodel.logger.info(_msg)
 
 
@@ -639,7 +643,10 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
                 if self.deltamodel.resume_checkpoint:
                     self.deltamodel.load_checkpoint()
                 else:
+                    # infrastructure deferred, need to trigger manually
                     self.deltamodel.init_output_file()
+                    self.deltamodel.output_data()
+                    self.deltamodel.output_checkpoint()
 
                 # run the simualtion
                 while self.deltamodel._time < self._job_end_time:
