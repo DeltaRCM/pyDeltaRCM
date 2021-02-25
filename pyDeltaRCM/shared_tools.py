@@ -1,5 +1,7 @@
 
 import numpy as np
+import yaml
+import re
 
 from numba import njit, _helperlib
 
@@ -131,6 +133,25 @@ def _get_version():
     """
     from . import _version
     return _version.__version__()
+
+
+def custom_yaml_loader():
+    """A custom YAML loader to handle scientific notation.
+
+    We are waiting for upstream fix here:
+        https://github.com/yaml/pyyaml/pull/174
+    """
+    loader = yaml.SafeLoader
+    loader.add_implicit_resolver(
+        u'tag:yaml.org,2002:float',
+        re.compile(r'''^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+]?[0-9]+)?
+                       |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
+                       |\.[0-9_]+(?:[eE][-+]?[0-9]+)?
+                       |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*
+                       |[-+]?\.(?:inf|Inf|INF)
+                       |\.(?:nan|NaN|NAN))$''', re.X),
+        list(u'-+0123456789.'))
+    return loader
 
 
 def scale_model_time(time, If=1, units='seconds'):

@@ -50,7 +50,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             NetCDF file creation unitl the simualtion is assigned to the core
             it will compute on, so that the DeltaModel object remains
             pickle-able. Note, you will need to manually trigger the
-            :obj:`init_output_file` method if `defer_output` is `True`.
+            :obj:`init_output_file`, :obj:`output_data`, and
+            :obj:`output_checkpoint` method if `defer_output` is `True`.
 
         Returns
         -------
@@ -63,9 +64,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         """
         self._time = 0.
         self._time_iter = int(0)
-        self._save_time_since_last = float("inf")  # force save on t==0
+        self._save_time_since_data = float("inf")  # force save on t==0
         self._save_iter = int(0)
-        self._save_time_since_checkpoint = 0
+        self._save_time_since_checkpoint = float("inf")  # force save on t==0
 
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
@@ -86,12 +87,20 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
+            # load values from the checkpoint and don't init final features
             self.load_checkpoint()
 
         else:
+            # initialize the stratigraphy infrastructure
             self.init_stratigraphy()
+
+            # initialize the output file
             if not defer_output:
                 self.init_output_file()
+
+                # record initial conditions
+                self.output_data()
+                self.output_checkpoint()
 
         _msg = 'Model initialization complete'
         self.log_info(_msg)
@@ -120,13 +129,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         Returns
         -------
 
+        Raises
+        ------
+        RuntimeError
+            If model has already been finalized via :meth:`finalize`.
+
         """
-        # record the state of the model
-        if self._save_time_since_last >= self.save_dt:
-            self.record_stratigraphy()
-            self.output_data()
-            self._save_iter += int(1)
-            self._save_time_since_last = 0
+        if self._is_finalized:
+            raise RuntimeError('Cannot update model, model already finalized!')
 
         # update the model, i.e., the actual model morphodynamics
         self.run_one_timestep()
@@ -135,15 +145,16 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         # update time-tracking fields
         self._time += self.dt
-        self._save_time_since_last += self.dt
+        self._save_time_since_data += self.dt
         self._save_time_since_checkpoint += self.dt
         self._time_iter += int(1)
         self.log_model_time()
 
+        # record the state of the model if needed
+        self.output_data()
+
         # save a checkpoint if needed
-        if self._save_time_since_checkpoint >= self.checkpoint_dt:
-            self.output_checkpoint()
-            self._save_time_since_checkpoint = 0
+        self.output_checkpoint()
 
     def finalize(self):
         """Finalize the model run.
@@ -161,15 +172,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         _msg = 'Finalize the model run'
         self.log_info(_msg)
 
-        # get the final timestep recorded, if needed.
-        if self._save_time_since_last >= self.save_dt:
-            self.record_stratigraphy()
-            self.output_data()
+        if self._is_finalized:
+            raise RuntimeError('Cannot finalize model, '
+                               'model already finalized!')
 
-        if self._save_time_since_checkpoint >= self.checkpoint_dt:
-            self.output_checkpoint()
-
-        self.output_strata()
+        self.record_final_stratigraphy()
 
         try:
             self.output_netcdf.close()
@@ -1063,12 +1070,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._time_iter
 
     @property
-    def save_time_since_last(self):
+    def save_time_since_data(self):
         """Time since data last output.
 
         The number of times the :obj:`update` method has been called.
         """
-        return self._save_time_since_last
+        return self._save_time_since_data
 
     @property
     def save_time_since_checkpoint(self):
@@ -1094,13 +1101,18 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def channel_width(self):
         """Get channel width."""
-        return self.N0_meters
+        return self.N0 * self._dx
 
     @channel_width.setter
-    def channel_width(self, new_N0):
-        self.N0_meters = new_N0
+    def channel_width(self, new_N0_meters):
+        self.N0_meters = new_N0_meters
         self.create_other_variables()
         self.init_sediment_routers()
+        if self.channel_width != new_N0_meters:
+            warnings.warn(UserWarning(
+                'Channel width was updated to {0} m, rather than input {1},'
+                'due to grid resolution or imposed domain '
+                'restrictions.'.format(self.channel_width, new_N0_meters)))
 
     @property
     def channel_flow_depth(self):
@@ -1146,8 +1158,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self.C0_percent
 
     @influx_sediment_concentration.setter
-    def influx_sediment_concentration(self, new_u0):
-        self.C0_percent = new_u0
+    def influx_sediment_concentration(self, new_C0):
+        self.C0_percent = new_C0 * 100
         self.create_other_variables()
         self.init_sediment_routers()
 

@@ -11,7 +11,6 @@ from scipy.sparse import lil_matrix, csr_matrix
 from netCDF4 import Dataset
 import time as time_lib
 import yaml
-import re
 import abc
 
 from . import shared_tools
@@ -67,19 +66,8 @@ class init_tools(abc.ABC):
         # user-specified file and the internal defaults.
         input_file_vars = dict()
 
-        # Define a loader to handle scientific notation.
-        #   waiting for upstream fix here:
-        #      https://github.com/yaml/pyyaml/pull/174
-        loader = yaml.SafeLoader
-        loader.add_implicit_resolver(
-            u'tag:yaml.org,2002:float',
-            re.compile(r'''^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+]?[0-9]+)?
-                           |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
-                           |\.[0-9_]+(?:[eE][-+]?[0-9]+)?
-                           |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*
-                           |[-+]?\.(?:inf|Inf|INF)
-                           |\.(?:nan|NaN|NAN))$''', re.X),
-            list(u'-+0123456789.'))
+        # get the special loader from the shared tools
+        loader = shared_tools.custom_yaml_loader()
 
         # Open and access both yaml files --> put in dictionaries
         # parse default yaml and find expected types
@@ -641,7 +629,7 @@ class init_tools(abc.ABC):
         self.H_SL = float(checkpoint['H_SL'])
         self._time_iter = int(checkpoint['time_iter'])
         self._save_iter = int(checkpoint['save_iter'])
-        self._save_time_since_last = int(checkpoint['save_time_since_last'])
+        self._save_time_since_data = int(checkpoint['save_time_since_data'])
         self.uw = checkpoint['uw']
         self.ux = checkpoint['ux']
         self.uy = checkpoint['uy']
