@@ -865,7 +865,7 @@ class PreprocessorCLI(BasePreprocessor):
 
         You probably do not need to interact with this class directly.
         Instead, you can use the command line API as it is described in the
-        :doc:`User Guide <../guides/userguide>` or the python API
+        :doc:`User Guide </guides/user_guide>` or the python API
         :class:`~pyDeltaRCM.preprocessor.Preprocessor`.
 
         When the class is called from the command line the instantiated
@@ -988,7 +988,7 @@ class Preprocessor(BasePreprocessor):
 
     This is the python high-level API class that is callable from a python
     script. For complete documentation on the API configurations, see the
-    :doc:`User Guide <../guides/userguide>`.
+    :doc:`User Guide <../guides/user_guide>`.
 
     The class gives a way to configure and run multiple jobs from a python
     script.

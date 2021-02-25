@@ -8,18 +8,19 @@ from .iteration_tools import iteration_tools
 from .sed_tools import sed_tools
 from .water_tools import water_tools
 from .init_tools import init_tools
+from .hook_tools import hook_tools
 from .debug_tools import debug_tools
 
 
 class DeltaModel(iteration_tools, sed_tools, water_tools,
-                 init_tools, debug_tools, object):
+                 init_tools, hook_tools, debug_tools, object):
     """Main model class.
 
     Instantiating the model class is described in the :meth:`__init__` method
     below in detail, but generally model instantiation occurs via a model run
     YAML configuration file. These YAML configuration files define model
     parameters which are used in the run; read more about creating input YAML
-    configuration files in the :doc:`../../guides/userguide`.
+    configuration files in the :doc:`/guides/user_guide`.
 
     Once the model has been instantiated, the model is updated via the
     :meth:`update`. This method coordinates the hydrology, sediment transport,
@@ -67,7 +68,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         Notes
         -----
         For more information regarding input configuration files, see the
-        :doc:`../../guides/userguide`.
+        :doc:`/guides/user_guide`.
 
         """
         self._time = 0.
@@ -79,6 +80,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
         self.default_file = os.path.join(_src_dir, 'default.yml')
+
+        self.hook_import_files()  # user hook
         self.import_files(kwargs)
 
         self.init_output_infrastructure()

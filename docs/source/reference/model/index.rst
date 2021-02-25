@@ -27,3 +27,4 @@ Model configuration reference
     :maxdepth: 1
 
     yaml_defaults
+    model_hooks
