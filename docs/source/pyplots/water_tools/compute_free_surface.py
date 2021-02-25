@@ -50,12 +50,12 @@ pyDeltaRCM.debug_tools.plot_domain(
 pyDeltaRCM.debug_tools.plot_domain(
     delta.eta, ax=ax[0, 1], grid=False, cmap='cividis',
     label='bed elevation (m)')
-delta.show_line(delta.free_surf_walk_inds[::10, :], 'r-',
+delta.show_line(delta.free_surf_walk_inds[::10, :], 'k-',
                 ax=ax[0, 1], alpha=0.1, nozeros=True)
 
 
 pyDeltaRCM.debug_tools.plot_domain(
-    delta.sfc_visit, ax=ax[1, 0], grid=False, cmap='Reds',
+    delta.sfc_visit, ax=ax[1, 0], grid=False, cmap='Greys',
     label='sfc_visit (-)')
 pyDeltaRCM.debug_tools.plot_domain(
     delta.sfc_sum, ax=ax[1, 1], grid=False, cmap='Blues',

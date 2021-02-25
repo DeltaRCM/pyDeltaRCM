@@ -166,9 +166,12 @@ class debug_tools(abc.ABC):
                 if multiline:
                     # travel along axis, extracting lines
                     cm = matplotlib.cm.get_cmap('tab10')
+                    lines = []
                     for i in np.arange(ind.shape[1]):
-                        plot_line(ind[:, i], *args, multiline=multiline,
-                                  nozeros=nozeros, shape=_shape, color=cm(i), **kwargs)
+                        _l = plot_line(ind[:, i], *args, multiline=multiline,
+                                       nozeros=nozeros, shape=_shape,
+                                       color=cm(i), **kwargs)
+                        lines.append(_l)
                 else:
                     plot_line(ind, *args, nozeros=nozeros, **kwargs)
             else:
@@ -178,6 +181,7 @@ class debug_tools(abc.ABC):
 
         else:
             raise NotImplementedError
+        return lines
 
 
 def plot_domain(attr, ax=None, grid=True, block=False, label=None, **kwargs):
@@ -313,7 +317,9 @@ def plot_line(_ind, *args, shape=None, nozeros=False, **kwargs):
             else:
                 pxpys = np.fliplr(_ind)
 
-    ax.plot(pxpys[:, 1], pxpys[:, 0], *args, **kwargs)
+    _l, = ax.plot(pxpys[:, 1], pxpys[:, 0], *args, **kwargs)
 
     if block:
         plt.show()
+
+    return _l
