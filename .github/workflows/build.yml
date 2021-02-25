@@ -5,16 +5,22 @@ name: build
 on: [push, pull_request]
 
 jobs:
-  build:
+
+
+  test:
+
     runs-on: ${{ matrix.os }}
+
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6, 3.7, 3.8]
+
     env:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python-version }}
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -24,25 +30,62 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pytest-cov pytest-mpl coveralls
+        pip install pytest pytest-mpl
         pip install -r requirements.txt
     - name: Install pyDeltaRCM
       run: |
         pip install -e .
     - name: Test with pytest
       run: |
-        pytest --cov=pyDeltaRCM/ --cov-report=xml --mpl --mpl-baseline-path=tests/imgs_baseline
+        pytest --mpl --mpl-baseline-path=tests/imgs_baseline
+
+
+  coverage:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON: 3.8
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ env.PYTHON }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ env.PYTHON }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pytest-mpl coveralls
+        pip install -r requirements.txt
+    - name: Install pyDeltaRCM
+      run: |
+        pip install -e .
+    - name: Disable jitted for coverage
+      run: |
+        echo "DISABLE_JIT: 1" > .numba_config.yaml
+    - name: Test with pytest
+      run: |
+        pytest --ignore=tests/integration/ --cov=pyDeltaRCM/ --cov-report=xml --mpl --mpl-baseline-path=tests/imgs_baseline
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml
-        env_vars: OS,PYTHON
+        env_vars: OS
         name: codecov-umbrella
         fail_ci_if_error: true
 
+
   docs:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout
       uses: actions/checkout@v2
