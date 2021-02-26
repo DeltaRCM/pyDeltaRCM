@@ -47,7 +47,7 @@
 <h1>pyDeltaRCM.model.DeltaModel<a class="headerlink" href="#pydeltarcm-model-deltamodel" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pyDeltaRCM.model.DeltaModel">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.model.</span></code><code class="sig-name descname"><span class="pre">DeltaModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.model.</span></code><code class="sig-name descname"><span class="pre">DeltaModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Main model class.</p>
 <p>Instantiating the model class is described in the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.__init__" title="pyDeltaRCM.model.DeltaModel.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a> method
 below in detail, but generally model instantiation occurs via a model run
@@ -64,7 +64,7 @@ finalized (<a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.fina
 closed and written to disk.</p>
 <dl class="py method">
 <dt id="pyDeltaRCM.model.DeltaModel.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates an instance of the pyDeltaRCM model.</p>
 <p>This method handles setting up the run, including parsing input files,
 initializing arrays, and initializing output routines.</p>
@@ -80,6 +80,12 @@ it will compute on, so that the DeltaModel object remains
 pickle-able. Note, you will need to manually trigger the
 <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.init_output_file" title="pyDeltaRCM.model.DeltaModel.init_output_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_output_file</span></code></a>, <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.output_data" title="pyDeltaRCM.model.DeltaModel.output_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_data</span></code></a>, and
 <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.output_checkpoint" title="pyDeltaRCM.model.DeltaModel.output_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_checkpoint</span></code></a> method if <cite>defer_output</cite> is <cite>True</cite>.</p></li>
+<li><p><strong>**kwargs</strong> – Optionally, any parameter typically specified in the YAML file can
+be passed as a keyword argument to the instantiation of the
+DeltaModel. Keywords will override the specification of any value
+in the YAML file. This functionality is intended for advanced use
+cases, and should not be preffered to specifying all inputs in a
+YAML configuration file.</p></li>
 </ul>
 </dd>
 </dl>
@@ -146,8 +152,8 @@ pickle-able. Note, you will need to manually trigger the
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.get_wet_mask_nh" title="pyDeltaRCM.model.DeltaModel.get_wet_mask_nh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_wet_mask_nh</span></code></a>()</p></td>
 <td><p>Get wet mask.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_files</span></code>()</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.import_files" title="pyDeltaRCM.model.DeltaModel.import_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_files</span></code></a>([kwargs_dict])</p></td>
+<td><p>Import the input files.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.init_logger" title="pyDeltaRCM.model.DeltaModel.init_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_logger</span></code></a>()</p></td>
 <td><p>Initialize a logger.</p></td>
@@ -895,6 +901,28 @@ parameter must be an <em>integer</em> or <em>float</em>. h0 defines
 the depth of water in the inlet channel. One-tenth of the value of h0
 defines the “dry-depth” or the depth at which cells are considered to
 be non-wet (dry).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.model.DeltaModel.import_files">
+<code class="sig-name descname"><span class="pre">import_files</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.import_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import the input files.</p>
+<p>This method handles the parsing and validation of any options supplied
+via the configuration.</p>
+<dl class="simple">
+<dt>:param kwargs_dict <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>: A dictionary with keys matching valid model parameter names that</dt><dd><p>can be specified in a configuration YAML file. Keys given in this
+dictionary will supercede values specified in the YAML
+configuration.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>optional</strong> – A dictionary with keys matching valid model parameter names that
+can be specified in a configuration YAML file. Keys given in this
+dictionary will supercede values specified in the YAML
+configuration.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

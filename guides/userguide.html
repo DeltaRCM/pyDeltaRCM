@@ -157,7 +157,14 @@ The simplest case to use the low-level API is to do</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>However, you can also inspect/modify the <code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code> method, and change the order of operations, or add operations, as desired.</p>
+<p>However, you can also inspect/modify the <code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code> method, and change the order of operations, or add operations, as desired.
+If you are working with the low-level API, you can optionally pass any valid key in the YAML configuration file as a keyword argument during model instantiation.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span> <span class="o">=</span> <span class="n">DeltaModel</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="s1">&#39;model_configuration.yml&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                   <span class="n">SLR</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Keyword arguments supplied at this point will supersede values specified in the YAML configuration.</p>
 </div>
 </div>
 <div class="section" id="advanced-model-configurations">
