@@ -79,7 +79,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
         self.default_file = os.path.join(_src_dir, 'default.yml')
-        self.import_files()
+        self.import_files(kwargs)
 
         self.init_output_infrastructure()
         self.init_logger()
