@@ -169,6 +169,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             raise RuntimeError('Cannot update model, model already finalized!')
 
         # update the model, i.e., the actual model morphodynamics
+        self.hook_run_one_timestep()
         self.run_one_timestep()
 
         self.hook_apply_subsidence()

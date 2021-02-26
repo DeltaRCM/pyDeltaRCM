@@ -56,6 +56,14 @@ class hook_tools(abc.ABC):
         """
         pass
 
+    def hook_run_one_timestep(self):
+        """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep`.
+
+        Called immediately before
+        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep`.
+        """
+        pass
+
     def hook_output_data(self):
         """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.output_data`.
 
@@ -152,10 +160,10 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_output_strata(self):
-        """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.output_strata`.
+    def hook_record_final_stratigraphy(self):
+        """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy`.
 
         Called immediately before
-        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.output_strata`.
+        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy`.
         """
         pass
