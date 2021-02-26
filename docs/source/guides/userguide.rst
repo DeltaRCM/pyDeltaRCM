@@ -162,6 +162,16 @@ The simplest case to use the low-level API is to do
     >>> delta.finalize()
 
 However, you can also inspect/modify the :obj:`~pyDeltaRCM.DeltaModel.update` method, and change the order of operations, or add operations, as desired.
+If you are working with the low-level API, you can optionally pass any valid key in the YAML configuration file as a keyword argument during model instantiation. 
+For example:
+
+.. code::
+
+    >>> delta = DeltaModel(input_file='model_configuration.yml',
+    ...                    SLR=1e-9)
+
+
+Keyword arguments supplied at this point will supersede values specified in the YAML configuration.
 
 
 =============================

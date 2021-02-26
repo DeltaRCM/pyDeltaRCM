@@ -60,11 +60,24 @@ class init_tools(abc.ABC):
         _msg = 'Output log file initialized.'
         self.log_info(_msg, verbosity=0)
 
-    def import_files(self, kwargs_dict):
+    def import_files(self, kwargs_dict={}):
         """Import the input files.
 
         This method handles the parsing and validation of any options supplied
         via the configuration.
+
+        Parameters
+        ----------
+        kwargs_dict :obj:`dict`, optional
+
+            A dictionary with keys matching valid model parameter names that
+            can be specified in a configuration YAML file. Keys given in this
+            dictionary will supercede values specified in the YAML
+            configuration.
+
+        Returns
+        -------
+
         """
 
         # This dictionary serves as a container to hold values for both the
