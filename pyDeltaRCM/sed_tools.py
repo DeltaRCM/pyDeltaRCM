@@ -27,14 +27,17 @@ class sed_tools(abc.ABC):
 
         _msg = 'Beginning sand parcel routing'
         self.log_info(_msg, verbosity=2)
+        self.hook_route_all_sand_parcels()
         self.route_all_sand_parcels()
 
         _msg = 'Beginning topographic diffusion'
         self.log_info(_msg, verbosity=2)
+        self.hook_topo_diffusion()
         self.topo_diffusion()
 
         _msg = 'Beginning mud parcel routing'
         self.log_info(_msg, verbosity=2)
+        self.hook_route_all_mud_parcels()
         self.route_all_mud_parcels()
 
     def route_all_sand_parcels(self):
