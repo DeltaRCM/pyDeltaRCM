@@ -145,6 +145,15 @@ class debug_tools(abc.ABC):
             Whether to show the plot automatically. Default is `False` (do not
             show automatically).
 
+        multiline : :obj:`bool`, optional
+            When a 2D array is passed as `ind`, this boolean indicates whether
+            to treat each column of the array as a separate line. Default is
+            `False`.
+
+        nozeros : :obj:`bool`, optional
+            Whether to show segements of lines with a flat index `== 0 `.
+            Default is `False`.
+
         Other Parameters
         ----------------
         *args : :obj:`str`, optional
@@ -152,17 +161,26 @@ class debug_tools(abc.ABC):
 
         **kwargs : optional
             Any `kwargs` supported by `matplotlib.pyplot.plt`.
+
+        Returns
+        -------
+        lines : :obj:`list`
+            Lines plotted by call to `show_line`, returned as a list, even if
+            only one line plotted.
+
         """
         _shape = self.depth.shape
         if isinstance(ind, list):
             for _, iind in enumerate(ind):
-                plot_line(iind.flatten(),
-                          shape=_shape, nozeros=nozeros,
-                          *args, **kwargs)
+                _l = plot_line(iind.flatten(),
+                               shape=_shape, nozeros=nozeros,
+                               *args, **kwargs)
+                lines = [_l]
         elif isinstance(ind, np.ndarray):
             if ind.ndim > 2:
                 raise NotImplementedError('Not implemented for arrays > 2d.')
             elif ind.ndim > 1:
+                breakpoint()
                 if multiline:
                     # travel along axis, extracting lines
                     cm = matplotlib.cm.get_cmap('tab10')
@@ -173,11 +191,13 @@ class debug_tools(abc.ABC):
                                        color=cm(i), **kwargs)
                         lines.append(_l)
                 else:
-                    plot_line(ind, *args, nozeros=nozeros, **kwargs)
+                    _l = plot_line(ind, *args, nozeros=nozeros, **kwargs)
+                    lines = [_l]
             else:
-                plot_line(ind.flatten(),
-                          shape=_shape, nozeros=nozeros,
-                          *args, **kwargs)
+                _l = plot_line(ind.flatten(),
+                               shape=_shape, nozeros=nozeros,
+                               *args, **kwargs)
+                lines = [_l]
 
         else:
             raise NotImplementedError
