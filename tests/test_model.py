@@ -48,6 +48,30 @@ class Test__init__:
         assert delta.S0 == 0.005
         assert delta.Np_sed == 2
 
+    def test_override_single_default_kwarg(self, tmp_path):
+        _out_dir = str(tmp_path / 'out_dir')
+        delta = DeltaModel(out_dir=_out_dir, S0=0.005)
+        assert delta.S0 == 0.005
+
+    def test_override_two_defaults_kwargs(self, tmp_path):
+        _out_dir = str(tmp_path / 'out_dir')
+        delta = DeltaModel(
+            out_dir=_out_dir,
+            S0=0.005,
+            Np_sed=2)
+        assert delta.S0 == 0.005
+        assert delta.Np_sed == 2
+
+    def test_override_yaml_with_kwarg(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+        utilities.write_parameter_to_file(f, 'S0', 0.005)
+        f.close()
+        with pytest.warns(UserWarning):
+            delta = DeltaModel(input_file=p, S0=0.0333)
+        assert delta.S0 == 0.0333
+
     def test_override_bad_type_float_string(self, tmp_path):
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
