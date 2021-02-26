@@ -32,7 +32,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     closed and written to disk.
     """
 
-    def __init__(self, input_file=None, defer_output=False):
+    def __init__(self, input_file=None, defer_output=False, **kwargs):
         """Creates an instance of the pyDeltaRCM model.
 
         This method handles setting up the run, including parsing input files,
@@ -53,6 +53,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             :obj:`init_output_file`, :obj:`output_data`, and
             :obj:`output_checkpoint` method if `defer_output` is `True`.
 
+        **kwargs
+            Optionally, any parameter typically specified in the YAML file can
+            be passed as a keyword argument to the instantiation of the
+            DeltaModel. Keywords will override the specification of any value
+            in the YAML file. This functionality is intended for advanced use
+            cases, and should not be preffered to specifying all inputs in a
+            YAML configuration file.
+
         Returns
         -------
 
@@ -71,7 +79,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
         self.default_file = os.path.join(_src_dir, 'default.yml')
-        self.import_files()
+        self.import_files(kwargs)
 
         self.init_output_infrastructure()
         self.init_logger()
