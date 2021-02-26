@@ -32,7 +32,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     closed and written to disk.
     """
 
-    def __init__(self, input_file=None, defer_output=False):
+    def __init__(self, input_file=None, defer_output=False, **kwargs):
         """Creates an instance of the pyDeltaRCM model.
 
         This method handles setting up the run, including parsing input files,

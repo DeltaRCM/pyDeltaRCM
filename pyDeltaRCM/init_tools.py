@@ -60,7 +60,12 @@ class init_tools(abc.ABC):
         _msg = 'Output log file initialized.'
         self.log_info(_msg, verbosity=0)
 
-    def import_files(self):
+    def import_files(self, kwargs_dict):
+        """Import the input files.
+
+        This method handles the parsing and validation of any options supplied
+        via the configuration.
+        """
 
         # This dictionary serves as a container to hold values for both the
         # user-specified file and the internal defaults.
@@ -90,6 +95,15 @@ class init_tools(abc.ABC):
                 raise e
         else:
             user_dict = dict()
+
+        # replace values in the user yaml file with anything specifed in the
+        #   **kwargs input
+        for kwk, kwv in kwargs_dict.items():
+            if kwk in user_dict.keys():
+                warnings.warn(UserWarning(
+                    'A keyword specification was also found in the '
+                    'user specified input YAML file: %s' % kwk))
+            user_dict[kwk] = kwv
 
         # go through and populate input vars with user and default values,
         # checking user values for correct type.
