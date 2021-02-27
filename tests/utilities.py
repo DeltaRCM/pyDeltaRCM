@@ -13,12 +13,9 @@ from pyDeltaRCM import shared_tools
 
 def create_temporary_file(tmp_path, file_name):
     d = tmp_path / 'configs'
-    try:
-        d.mkdir()
-    except Exception:
-        pass
+    d.mkdir(parents=True, exist_ok=True)
     p = d / file_name
-    f = open(p, "a")
+    f = open(p, "w")
     return p, f
 
 

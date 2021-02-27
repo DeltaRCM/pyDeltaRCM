@@ -93,15 +93,15 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.init_sediment_routers()
         self.init_subsidence()
 
+        # initialize the stratigraphy infrastructure
+        self.init_stratigraphy()
+
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
             # load values from the checkpoint and don't init final features
             self.load_checkpoint()
 
         else:
-            # initialize the stratigraphy infrastructure
-            self.init_stratigraphy()
-
             # initialize the output file
             if not defer_output:
                 self.init_output_file()
