@@ -63,6 +63,15 @@ class BasePreprocessor(abc.ABC):
         else:
             raise ValueError('Invalid input file argument.')
 
+        if 'set' in self.yaml_dict.keys():
+            self._has_set = True
+            if ('ensemble' in self.yaml_dict.keys() or
+                    'matrix' in self.yaml_dict.keys()):
+                raise ValueError(
+                    'Cannot spec other expansions with "set" option.')
+        else:
+            self._has_set = False
+
         if 'ensemble' in self.yaml_dict.keys():
             self._has_ensemble = True
             self.expand_yaml_ensemble()
@@ -139,7 +148,7 @@ class BasePreprocessor(abc.ABC):
         _matrix['seed'] = seed_list
         self.yaml_dict['matrix'] = _matrix
 
-    def write_yaml_config(self, i, ith_config, ith_dir, ith_id):
+    def write_yaml_config(self, i, config):
         """Write full config to file in output folder.
 
         Write the entire yaml configuation for the configured job out to a
@@ -148,18 +157,26 @@ class BasePreprocessor(abc.ABC):
         if self.verbose > 0:
             print('Writing YAML file for job ' + str(int(i)))
 
-        d = Path(ith_dir)
-        if d.is_dir():
+        # breakpoint()
+        ith_config = config['config']
+        ith_id = config['id']
+        ith_dir = Path(ith_config['out_dir'])
+
+        # create the output directory if needed
+        if ith_dir.is_dir():
             if 'resume_checkpoint' in self.yaml_dict and \
               self.yaml_dict['resume_checkpoint'] is True:
                 pass
             else:
                 raise FileExistsError(
-                    'Job output directory (%s) already exists.' % str(p))
+                    'Job output directory (%s) already exists.' % str(ith_dir))
         else:
-            d.mkdir()
-        ith_p = d / (str(ith_id) + '.yml')
+            ith_dir.mkdir()
+
+        # write the file into the output directory
+        ith_p = ith_dir / (str(ith_id) + '.yml')
         write_yaml_config_to_file(ith_config, ith_p)
+
         return ith_p
 
     def expand_yaml_ensemble(self):
@@ -181,13 +198,85 @@ class BasePreprocessor(abc.ABC):
             # then the seed values must be added to the matrix
             self._seed_matrix(_ensemble)
 
+    def expand_yaml_set(self):
+
+        # determine the set
+        _set = self.yaml_dict.pop('set')
+        jobs = len(_set)
+        dims = len(_set)
+
+        # check that the length of the set is greater than 1
+        #   DOES IT MATTER???
+        # if not (jobs > 0):
+        #     raise ValueError('Single set specified. Collapse configuration.')
+
+        # check that all sets have the same entries
+        set0_set = set(_set[0].keys())
+        for s in range(1, jobs):
+            if not (set0_set == set(_set[s].keys())):
+                raise ValueError('All keys in all sets must be identical.')
+
+        # print anything??
+        # ...
+
+        # THIS SHOULD BE SET SOMEWHERE MUCH EARLIER!!
+        self.jobs_root = self.yaml_dict['out_dir']  # checked already to exist
+
+        # loop through each and create a config
+        # preallocate the matrix expansion job yamls and output table
+        self.config_list = []  # create job yamls list
+        self.matrix_table = np.empty(  # output table
+            (jobs, dims+1), dtype='O')
+
+        _fixed_config = self.yaml_dict.copy()  # fixed config dict to expand on
+
+        # loop through each job to write out info
+        for i in range(jobs):
+
+            # being with the fixed config
+            ith_config = _fixed_config.copy()
+
+            # find job id and create output file
+            ith_id = 'job_' + str(i).zfill(3)
+            ith_dir = os.path.join(self.jobs_root, ith_id)
+
+            # write the job number into output table
+            self.matrix_table[i, 0] = ith_id
+
+            # get config for this job
+            ith_config['out_dir'] = ith_dir
+
+            # loop through each var of this job
+            for j, (key, val) in enumerate(_set[i].items()):
+
+                # write info into fixed config dict
+                ith_config[key] = val
+
+                # write info into output table
+                self.matrix_table[i, j+1] = val
+
+            # add the configuration to a list to write out below
+            self.config_list.append({'config': ith_config,
+                                     'id': ith_id})
+
+        self.write_job_file_list()
+
+        # store the matrix expansion
+        #   this is useful for references by custom
+        #   Python preprocessing / postprocessing
+        matrix_table_file = os.path.join(self.jobs_root, 'jobs_parameters.txt')
+        self.matrix_table_header = ', '.join(['job_id', *set0_set])
+        np.savetxt(matrix_table_file, self.matrix_table,
+                   fmt='%s', delimiter=',', comments='',
+                   header=self.matrix_table_header)
+
     def expand_yaml_matrix(self):
         """Expand YAML matrix, if given.
 
         Compute the matrix expansion of parameters listed in `matrix` key.
 
         """
-        if self._has_matrix:
+        if self._has_matrix:  # THIS CAN BE REMOVED?
             # extract and remove 'matrix' from config
             _matrix = self.yaml_dict.pop('matrix')
 
@@ -233,21 +322,11 @@ class BasePreprocessor(abc.ABC):
                        '  dims {_dims}\n' +
                        '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
 
-            # create directory at root
-            self.jobs_root = self.yaml_dict['out_dir']  # checked above for exist
-            p = Path(self.jobs_root)
-            if p.is_dir():
-                if 'resume_checkpoint' in self.yaml_dict and \
-                  self.yaml_dict['resume_checkpoint'] is True:
-                    pass
-                else:
-                    raise FileExistsError(
-                        'Job output directory (%s) already exists.' % str(p))
-            else:
-                p.mkdir()
+            # THIS SHOULD BE SET SOMEWHERE MUCH EARLIER!!
+            self.jobs_root = self.yaml_dict['out_dir']  # checked already to exist
 
             # preallocate the matrix expansion job yamls and output table
-            self.file_list = []  # create job yamls list
+            self.config_list = []  # create job yamls list
             self.matrix_table = np.empty(  # output table
                 (jobs, dims+1), dtype='O')
 
@@ -255,7 +334,7 @@ class BasePreprocessor(abc.ABC):
             for i in range(jobs):
 
                 # being with the fixed config
-                _ith_config = _fixed_config.copy()
+                ith_config = _fixed_config.copy()
 
                 # find job id and create output file
                 ith_id = 'job_' + str(i).zfill(3)
@@ -265,20 +344,22 @@ class BasePreprocessor(abc.ABC):
                 self.matrix_table[i, 0] = ith_id
 
                 # get config for this job
-                _ith_config['out_dir'] = ith_dir
+                ith_config['out_dir'] = ith_dir
 
                 # loop through each var of this job
                 for j, val in enumerate(_combs[i]):
 
                     # write info into fixed config dict
-                    _ith_config[var_list[j]] = val
+                    ith_config[var_list[j]] = val
 
                     # write info into output table
                     self.matrix_table[i, j+1] = val
 
-                # write out the job specific yaml file
-                ith_p = self.write_yaml_config(i, _ith_config, ith_dir, ith_id)
-                self.file_list.append(ith_p)
+                # add the configuration to a list to write out below
+                self.config_list.append({'config': ith_config,
+                                         'id': ith_id})
+
+            self.write_job_file_list()
 
             # store the matrix expansion
             #   this is useful for references by custom
@@ -289,6 +370,31 @@ class BasePreprocessor(abc.ABC):
                        fmt='%s', delimiter=',', comments='',
                        header=self.matrix_table_header)
 
+    def write_job_file_list(self):
+
+        if len(self.config_list) == 0:
+            raise ValueError('Config list empty!')
+
+        # create directory at root
+        p = Path(self.jobs_root)
+        if p.is_dir():
+            if 'resume_checkpoint' in self.yaml_dict and \
+              self.yaml_dict['resume_checkpoint'] is True:
+                pass
+            else:
+                raise FileExistsError(
+                    'Job output directory (%s) already exists.' % str(p))
+        else:
+            p.mkdir()
+
+        self.file_list = []  # create job yamls list
+        # loop through each job to write out info
+        for c, config in enumerate(self.config_list):
+
+            # write out the job specific yaml file
+            ith_p = self.write_yaml_config(c, config)
+            self.file_list.append(ith_p)
+
     def construct_job_file_list(self):
         """Construct the job list.
 
@@ -297,6 +403,8 @@ class BasePreprocessor(abc.ABC):
         """
         if self._has_matrix:
             self.expand_yaml_matrix()  # creates self.file_list
+        elif self._has_set:
+            self.expand_yaml_set()
         else:
             self.file_list = [self.input_file]
 
@@ -879,6 +987,7 @@ class Preprocessor(BasePreprocessor):
             self.input_file = None
             self.yaml_dict = {}
             self._has_matrix = False
+            self._has_set = False
 
         self.construct_job_file_list()
 
