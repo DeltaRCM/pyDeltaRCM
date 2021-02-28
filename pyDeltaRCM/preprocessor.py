@@ -662,6 +662,7 @@ class _BaseJob(abc.ABC):
             self._time_config = config_dict['timesteps']
 
             # compute the end time
+            print(config_dict['timesteps'])
             self._job_end_time = _curr_time + \
                 ((config_dict['timesteps'] * self.deltamodel._dt))
 
@@ -955,7 +956,21 @@ class PreprocessorCLI(BasePreprocessor):
         args = parser.parse_args()
         args_dict = vars(args)
 
-        # clean out the junk values in the dictionary
+        # convert arguments to valid types for preprocessor
+        if not (args_dict['timesteps'] is None):
+            args_dict['timesteps'] = int(args_dict['timesteps'])
+        else:
+            args_dict.pop('timesteps')
+        if not (args_dict['time'] is None):
+            args_dict['time'] = float(args_dict['time'])
+        else:
+            args_dict.pop('time')
+        if not (args_dict['time_years'] is None):
+            args_dict['time_years'] = float(args_dict['time_years'])
+        else:
+            args_dict.pop('time_years')
+
+        # set defaults as needed
         args_dict['parallel'] = args_dict['parallel'] or False
         args_dict['If'] = args_dict['If'] or 1.0
 
