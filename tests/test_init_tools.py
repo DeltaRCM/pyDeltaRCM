@@ -202,6 +202,9 @@ class TestLoadCheckpoint:
         _delta.logger = mock.MagicMock()
         _delta.init_output_file = mock.MagicMock()
 
+        # close the file so can be safely opened in load
+        _delta.output_netcdf.close()
+
         # check checkpoint exists
         assert os.path.isfile(os.path.join(
             _delta.prefix, 'checkpoint.npz'))
@@ -244,6 +247,9 @@ class TestLoadCheckpoint:
         _delta.log_info = mock.MagicMock()
         _delta.logger = mock.MagicMock()
         _delta.init_output_file = mock.MagicMock()
+
+        # close the file so can be safely opened in load
+        _delta.output_netcdf.close()
 
         # check checkpoint exists
         assert os.path.isfile(os.path.join(
@@ -332,6 +338,9 @@ class TestLoadCheckpoint:
         _delta.log_info = mock.MagicMock()
         _delta.logger = mock.MagicMock()
         _delta.init_output_file = mock.MagicMock()
+
+        # close the file so can be safely opened in load
+        _delta.output_netcdf.close()
 
         # check that files exist, and then delete nc
         assert os.path.isfile(os.path.join(
