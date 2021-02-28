@@ -100,7 +100,7 @@ The duration of a model run configured with the high-level API can be set up wit
 Using the high-level API, you can specify the duration to run the model by two mechanisms: 1) the number of timesteps to run the model, or 2) the duration of time to run the model.
 
 The former case is straightforward, insofar that the model determines the timestep duration and the high-level API simply iterates for the specified number of timestep iterations.
-To specify the number of timesteps to run the model, use the argument ``--timesteps`` at the command line (or ``timesteps:`` in the configuration YAML file).
+To specify the number of timesteps to run the model, use the argument ``--timesteps`` at the command line (or ``timesteps:`` in the configuration YAML file, or ``timesteps=`` with the Python :obj:`~pyDeltaRCM.Preprocessor`).
 
 .. code:: bash
     
@@ -111,8 +111,8 @@ In this case, the model run end condition is that the elapsed model time is *equ
 Importantly, this means that the duration of the model run is unlikely to exactly match the input condition, because the model timestep is unlikely to be a factor of the specified time.
 Again, refer to the complete description of model time :doc:`../info/modeltime` for more information.
 
-To specify the duration of time to run the model in *seconds*, simply use the argument ``--time`` at the command line (or ``time:`` in the configuration YAML file).
-It is also possible to specify the input run duration in units of years with the similarly named argument ``--time_years`` (``time_years:``).
+To specify the duration of time to run the model in *seconds*, simply use the argument ``--time`` at the command line (or ``time:`` in the configuration YAML file, or ``time=`` with the Python :obj:`~pyDeltaRCM.Preprocessor`).
+It is also possible to specify the input run duration in units of years with the similarly named argument ``--time_years`` (``time_years:``, ``time_years=``).
 
 .. code:: bash
     
@@ -126,7 +126,7 @@ would each run a simulation for :math:`(86400 * 365.25)` seconds, or 1 year.
     Do not specify both time arguments, or specify time arguments with the timesteps argument.
     In the case of multiple argument specification, precedence is given in the order `timesteps` > `time` > `time_years`.
 
-When specifying the time to run the simulation, an additional parameter determining the intermittency factor (:math:`I_f`) may be specified ``--If`` at the command line (or ``If:`` in the YAML configuration file).
+When specifying the time to run the simulation, an additional parameter determining the intermittency factor (:math:`I_f`) may be specified ``--If`` at the command line (``If:`` in the YAML configuration file, ``If=`` with the Python :obj:`~pyDeltaRCM.Preprocessor`).
 This argument will scale the specified time-to-model-time, such that the *scaled time* is equal to the input argument time.
 Specifying the :math:`I_f`  value is essential when using the model duration run specifications.
 See :doc:`../info/modeltime` for complete information on the scaling between model time and elapsed simulation time.
@@ -135,7 +135,7 @@ Running simulations in parallel
 -------------------------------
 
 The high-level API provides the ability to run simulations in parallel on Linux environments. 
-This option is only useful in the case where you are running multiple jobs with the :ref:`matrix expansion <matrix_expansion_tag>` or :ref:`ensemble expansion <ensemble_expansion_tag>` tools.
+This option is only useful in the case where you are running multiple jobs with the :ref:`matrix expansion <matrix_expansion_tag>`, :ref:`ensemble expansion <ensemble_expansion_tag>`, or :ref:`set expansion <set_expansion_tag>` tools.
 
 To run jobs in parallel simply specify the `--parallel` flag to the command line interface.
 Optionally, you can specify the number of simulations to run at once by following the flag with a number.
@@ -267,5 +267,25 @@ The ensemble expansion can be applied to configuration files that include a matr
 
 The above configuration file would produce 6 model runs, 3 with a basin depth (`h0`) of 1.0, and 3 with a basin depth of 2.0.
 
+.. _set_expansion_tag:
+
+Set expansion
+-------------
+
+Set expansion enables user-configured parameter sets to take advantage of the :obj:`~pyDeltaRCM.Preprocessor` infrastructure (such as the job output preparation and ability to run jobs in parallel), while also enabling flexible configurations for parameter sets than cannot be configured via `matrix` expansion.
+For example, to vary `Qw0` while holding `Qs0` fixed requires modifying both `C0_percent` and some water-discharge-controlling parameter *simultaneously*; i.e., this cannot be achieved with `matrix` expansion. 
+
+To use set expansion, add the `set` key to a configuration file, and define a *list* of *dictionaries* which set the parameters of each run to be completed.
+For example, to configure two model runs, the first with parameters ``u0: 1.0`` and ``h0: 1.0``, and the second with parameters ``u0: 1.2`` and ``h0: 1.2``:
+
+.. code:: yaml
+
+    set:
+      - {u0: 1.0, h0: 1.0}
+      - {u0: 1.2., h0: 1.2}
+
+
+All jobs in the `set` specification must have the exact same set of keys.
+Moreover, additional `ensemble` or `matrix` specifications are not supported with the `set` specification. 
 
 .. include:: subsidenceguide.rst
