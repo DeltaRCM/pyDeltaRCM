@@ -359,6 +359,82 @@ class TestPreprocessorMatrixJobsSetups:
         assert '  jobs 6' in captd.out
 
 
+class TestPreprocessorSetJobsSetups:
+
+    def test_py_hlvl_set_two_sets(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_set_to_file(f, [{'f_bedload': 0.2, 'u0': 1},
+                                        {'f_bedload': 0.4, 'u0': 2}])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+        assert pp._has_set is True
+        assert pp._has_matrix is False
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 2
+        assert pp._is_completed is False
+
+        f_bedload_list = pp._matrix_table[:, 1]
+
+        assert sum([j == 0.2 for j in f_bedload_list]) == 1
+        assert sum([j == 0.4 for j in f_bedload_list]) == 1
+        assert pp.config_dict['timesteps'] == 3
+
+    def test_py_hlvl_set_one_sets(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_set_to_file(f, [{'f_bedload': 0.77, 'u0': 1}])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+        assert pp._has_set is True
+        assert pp._has_matrix is False
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        f_bedload_list = pp._matrix_table[:, 1]
+
+        assert sum([j == 0.77 for j in f_bedload_list]) == 1
+        assert pp.config_dict['timesteps'] == 3
+
+    def test_py_hlvl_set_two_mismatched_sets(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_set_to_file(f, [{'f_bedload': 0.2, 'u0': 1},
+                                        {'h0': 0.4, 'u0': 2}])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'All keys in all sets *.'):  # noqa: E127
+            _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_py_hlvl_set_bad_not_list(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        # utilities.write_set_to_file(f, [{'f_bedload': 0.77, 'u0': 1}])
+        utilities.write_parameter_to_file(f, 'set', 'astring!')
+        f.close()
+        with pytest.raises(TypeError,
+                           match=r'Set list must be *.'):
+            _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_py_hlvl_set_bad_colon(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_set_to_file(f, [{'f_bedload:': 0.77, 'u0': 1}])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'Colon operator found '
+                                  'in matrix expansion key.'):  # noqa: E127
+            _ = preprocessor.Preprocessor(input_file=p)
+
+
 class TestPreprocessorEnsembleJobsSetups:
 
     def test_py_hlvl_ensemble(self, tmp_path):

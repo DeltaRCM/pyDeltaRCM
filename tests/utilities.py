@@ -32,6 +32,15 @@ def write_matrix_to_file(f, keys, lists):
             f.write('    ' + '- ' + str(lists[i][j]) + '\n')
 
 
+def write_set_to_file(f, set_list):
+    f.write('set' + ': ' + '\n')
+    for i, _set in enumerate(set_list):
+        f.write('  - {')
+        for j, (k, v) in enumerate(_set.items()):
+            f.write(k + ': ' + str(v) + ', ')
+        f.write('}' + '\n')
+
+
 def yaml_from_dict(tmp_path, file_name, _dict=None):
     p, f = create_temporary_file(tmp_path, file_name)
     if (_dict is None):

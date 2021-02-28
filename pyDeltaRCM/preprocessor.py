@@ -285,20 +285,29 @@ class BasePreprocessor(abc.ABC):
 
         # determine the set
         _set = self.config_dict.pop('set')
-        jobs = len(_set)
-        dims = len(_set[0])
 
         # check that all sets are dictionaries
+        if not isinstance(_set, list):
+            raise TypeError(
+                'Set list must be type `list` but was {}.'.format(type(_set)))
         for i, d in enumerate(_set):  # check validity of keys, depth == 1
             if not isinstance(d, dict):
                 raise TypeError(
                     'Set must specify as a list of dictionaries')
+            for k in d.keys():  # check validity of keys, depth == 1
+                if ':' in k:
+                    raise ValueError(
+                        'Colon operator found in matrix expansion key.')
 
         # check that all sets have the same entries
         set0_set = set(_set[0].keys())
-        for s in range(1, jobs):
+        for s in range(1, len(_set)):
             if not (set0_set == set(_set[s].keys())):
                 raise ValueError('All keys in all sets must be identical.')
+
+        # extract dimensionality of set
+        jobs = len(_set)
+        dims = len(_set[0])
 
         if self.verbose > 0:
             print(('Set expansion:\n' +
