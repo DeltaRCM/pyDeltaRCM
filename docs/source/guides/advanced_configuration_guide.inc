@@ -151,38 +151,59 @@ We then can initialize our new model type, and see that this model has all of th
 
 Hooks are methods in the model sequence that do nothing by default, but can be augmented to provide arbitrary desired behavior in the model.
 Hooks have been integrated throughout the model initialization and update sequences, to allow the users to achieve complex behavior at various stages of the model sequence.
-For example, ``after_init()`` is a hook which occurs after the default model initialization is complete.
-To utilize the hooks, we simply define a method in our subclass with the name corresponding to the hook we want to augment to achieve the desired behavior.
+For example, ``hook_run_one_timestep`` is a hook which occurs immediately before the  model :obj:`run_one_timestep` method.
 
-So, as an example we don't recommend trying out, change the number of steps a water or sediment parcel could take by changing the model definition from above:
+To utilize the hooks, we simply define a method in our subclass with the name corresponding to the hook we want to augment to achieve the desired behavior.
+For example, to change the behavior of the subsidence field to vary randomly in magnitude on each iteration:
 
 .. doctest::
 
-    >>> class TenStepDeltaModel(pyDeltaRCM.DeltaModel):
-    ...     def __init__(self, input_file=None):
+    >>> from pyDeltaRCM.shared_tools import get_random_uniform
+
+    >>> class RandomSubsidenceModel(pyDeltaRCM.DeltaModel):
+    ...     def __init__(self, input_file=None, **kwargs):
     ...
     ...         # inherit base DeltaModel methods
-    ...         super().__init__(input_file)
+    ...         super().__init__(input_file, **kwargs)
+    ...         
+    ...         # turn on subsidence and initialize the field
+    ...         self.toggle_subsidence = True
+    ...         self.init_subsidence()
     ...
-    ...     def after_init(self):
+    ...     def hook_apply_subsidence(self):
     ...
-    ...         # default is (2 x (L + W))
-    ...         self.itmax = 10  # always 10
+    ...         # get new random value between 0 and sigma_max
+    ...         new_sigma = get_random_uniform(self.sigma_max)
+    ...         print("new_sigma:", new_sigma)
+    ...
+    ...         # change the subsidence field
+    ...         self.sigma = self.subsidence_mask * new_sigma * self.dt
 
-Now, during the initializing of a `TenStepDeltaModel` instance, our implementation of `after_init()` will be called and `self.itmax` will be adjusted accordingly. 
+Now, on every iteration of the model, our hooked method will be called immediately before :obj:`apply_subsidence`, and will modify the subsidence field that is then applied during :obj:`apply_subsidence`. 
 
 .. doctest::
 
-    >>> mdl = TenStepDeltaModel()
-    >>> mdl.itmax
-    10
+    >>> mdl = RandomSubsidenceModel()
+    >>> mdl.sigma_max  # default value
+    2e-09
+    >>> mdl.update()
+    new_sigma: ...
 
 This is a somewhat contrived example to give you a sense of how you can implement changes to the model to achieve desired behavior. 
 
-A complete list of model hooks is available here, but model hooks all follow the convention of beginning with the prefix `hook_` and include the name of the method they *immediately precede* in the model; for example `hook_run_water_iteration` is called immediately before `run_water_iteration` is called.
+A complete :doc:`list of model hooks is available here </reference/model/model_hooks>`, but model hooks all follow the convention of beginning with the prefix `hook_` and include the name of the method they *immediately precede* in the model; for example `hook_run_water_iteration` is called immediately before `run_water_iteration` is called.
+
+.. note::
+    
+    While we could overwrite :obj:`apply_subsidence` to achieve a similar behavior, using hooks makes it easy for others to see which components of the model you have changed behavior for; this is essential to reproducible science.
+
+.. important::
+
+    In order for model subclasses to be reproducible, it is imperitive to use the :obj:`~pyDeltaRCM.shared_tools.get_random_uniform` function every time you need randomness in the model. Rescale to different distributions as necessary. Using any `numpy` or `scipy` random number generators will result in a model that is not reproducible. 
 
 There may be cases where hooks are insufficient for the modifications you need to make to the model.
-In this case
+In this case, you should subclass the model, as depicted above, and reimplement entire methods, as necessary, by copying code from the package to your own subclass.
+However, for stability and forwards compatability, you should try hard to minimize copied code.
 
 
 Subclassing examples
