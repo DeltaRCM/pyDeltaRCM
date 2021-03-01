@@ -649,26 +649,47 @@ class init_tools(abc.ABC):
         checkpoint = np.load(ckp_file, allow_pickle=True)
 
         # write saved variables back to the model
-        _msg = 'Loading variables into model'
+        _msg = 'Loading variables and grids into model'
         self.log_info(_msg, verbosity=2)
 
+        # load time and counter vars
         self._time = float(checkpoint['time'])
         self.H_SL = float(checkpoint['H_SL'])
         self._time_iter = int(checkpoint['time_iter'])
         self._save_iter = int(checkpoint['save_iter'])
         self._save_time_since_data = int(checkpoint['save_time_since_data'])
+
+        # load grids
+        self.eta = checkpoint['eta']
+        self.depth = checkpoint['depth']
+        self.stage = checkpoint['stage']
         self.uw = checkpoint['uw']
         self.ux = checkpoint['ux']
         self.uy = checkpoint['uy']
         self.qw = checkpoint['qw']
         self.qx = checkpoint['qx']
         self.qy = checkpoint['qy']
-        self.depth = checkpoint['depth']
-        self.stage = checkpoint['stage']
-        self.eta = checkpoint['eta']
-        self.n_steps = checkpoint['n_steps']
-        self.init_eta = checkpoint['init_eta']
-        self.strata_counter = checkpoint['strata_counter']
+
+        if self.save_strata:
+            # load the stratigraphy info from the file
+            _msg = 'Loading stratigraphy arrays'
+            self.log_info(_msg, verbosity=2)
+
+            self.n_steps = checkpoint['n_steps']
+            self.init_eta = checkpoint['init_eta']
+            self.strata_counter = checkpoint['strata_counter']
+
+            # reconstruct the strata arrays
+            strata_eta_csr = csr_matrix((checkpoint['eta_data'],
+                                         checkpoint['eta_indices'],
+                                         checkpoint['eta_indptr']),
+                                        shape=checkpoint['eta_shape'])
+            self.strata_eta = strata_eta_csr.tolil()
+            strata_sand_csr = csr_matrix((checkpoint['sand_data'],
+                                          checkpoint['sand_indices'],
+                                          checkpoint['sand_indptr']),
+                                         shape=checkpoint['sand_shape'])
+            self.strata_sand_frac = strata_sand_csr.tolil()
 
         # load and set random state to continue as if run hadn't stopped
         _msg = 'Loading random state'
@@ -676,74 +697,76 @@ class init_tools(abc.ABC):
         rng_state = tuple(checkpoint['rng_state'])
         shared_tools.set_random_state(rng_state)
 
-        # reconstruct the strata arrays
-        _msg = 'Loading stratigraphy arrays'
-        self.log_info(_msg, verbosity=2)
-        strata_eta_csr = csr_matrix((checkpoint['eta_data'],
-                                    checkpoint['eta_indices'],
-                                    checkpoint['eta_indptr']),
-                                    shape=checkpoint['eta_shape'])
-        self.strata_eta = strata_eta_csr.tolil()
-        # get strata_sand_frac
-        strata_sand_csr = csr_matrix((checkpoint['sand_data'],
-                                     checkpoint['sand_indices'],
-                                     checkpoint['sand_indptr']),
-                                     shape=checkpoint['sand_shape'])
-        self.strata_sand_frac = strata_sand_csr.tolil()
+        # handle the case with a netcdf file
+        if (self._save_any_grids or self._save_metadata or self._save_strata):
 
-        # rename the old netCDF4 file
-        _msg = 'Renaming old NetCDF4 output file'
-        self.log_info(_msg, verbosity=2)
-        file_path = os.path.join(self.prefix, 'pyDeltaRCM_output.nc')
-        _tmp_name = os.path.join(self.prefix, 'old_pyDeltaRCM_output.nc')
-        os.rename(file_path, _tmp_name)
+            # check if the file exists already
+            #    if it does, it needs to be flushed of certain fields
+            file_path = os.path.join(self.prefix, 'pyDeltaRCM_output.nc')
+            if not os.path.isfile(file_path):
+                _msg = ('NetCDF4 output file not found, but was expected. '
+                        'Creating a new output file.')
+                self.logger.warning(_msg)
+                warnings.warn(UserWarning(_msg))
 
-        # write dims / attributes / variables to new netCDF file
-        # except the things defined by output_strata()
-        _msg = 'Creating NetCDF4 output file'
-        self.log_info(_msg, verbosity=2)
+                # create a new file
+                self.init_output_file()
 
-        # list of things to not copy over
-        dimtoignore = ['total_strata_age']
-        vartoignore = ['strata_age', 'strata_sand_frac', 'strata_depth']
+                # note we do not output data and a new checkpoint here!
 
-        # copy data from old netCDF4 into new one
-        with Dataset(_tmp_name) as src, Dataset(file_path, 'w',
-                                                format='NETCDF4') as dst:
-            # copy attributes
-            for name in src.ncattrs():
-                dst.setncattr(name, src.getncattr(name))
-            # copy dimensions
-            for name, dimension in src.dimensions.items():
-                if name not in dimtoignore:
-                    if dimension.isunlimited():
-                        dst.createDimension(name, None)
-                    else:
-                        dst.createDimension(name, len(dimension))
-            # copy groups (meta)
-            for name in src.groups.keys():
-                dst.createGroup(name)
-                for vname, variable in src.groups[name].variables.items():
-                    _mname = name + '/' + vname
-                    dst.createVariable(_mname, variable.datatype,
-                                       variable.dimensions)
-                    dst.groups[name].variables[vname][:] = \
-                        src.groups[name].variables[vname][:]
-            # copy variables except ones to exclude
-            for name, variable in src.variables.items():
-                if name not in vartoignore:
-                    dst.createVariable(name, variable.datatype,
-                                       variable.dimensions)
-                    dst.variables[name][:] = src.variables[name][:]
+            else:
+                # rename the old netCDF4 file
+                _msg = 'Renaming old NetCDF4 output file'
+                self.log_info(_msg, verbosity=2)
+                _tmp_name = os.path.join(self.prefix, 'old_pyDeltaRCM_output.nc')
+                os.rename(file_path, _tmp_name)
 
-        _msg = 'Successfully loaded checkpoint and created new NetCDF file.'
+                # write dims / attributes / variables to new netCDF file
+                # except the things defined by output_strata()
+                _msg = 'Creating NetCDF4 output file'
+                self.log_info(_msg, verbosity=2)
+
+                # list of things to not copy over
+                dimtoignore = ['total_strata_age']
+                vartoignore = ['strata_age', 'strata_sand_frac', 'strata_depth']
+
+                # copy data from old netCDF4 into new one
+                with Dataset(_tmp_name) as src, Dataset(file_path, 'w',
+                                                        format='NETCDF4') as dst:
+                    # copy attributes
+                    for name in src.ncattrs():
+                        dst.setncattr(name, src.getncattr(name))
+                    # copy dimensions
+                    for name, dimension in src.dimensions.items():
+                        if name not in dimtoignore:
+                            if dimension.isunlimited():
+                                dst.createDimension(name, None)
+                            else:
+                                dst.createDimension(name, len(dimension))
+                    # copy groups (meta)
+                    for name in src.groups.keys():
+                        dst.createGroup(name)
+                        for vname, variable in src.groups[name].variables.items():
+                            _mname = name + '/' + vname
+                            dst.createVariable(_mname, variable.datatype,
+                                               variable.dimensions)
+                            dst.groups[name].variables[vname][:] = \
+                                src.groups[name].variables[vname][:]
+                    # copy variables except ones to exclude
+                    for name, variable in src.variables.items():
+                        if name not in vartoignore:
+                            dst.createVariable(name, variable.datatype,
+                                               variable.dimensions)
+                            dst.variables[name][:] = src.variables[name][:]
+
+                # set object attribute for model
+                self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4')
+
+                # synch netcdf file
+                self.output_netcdf.sync()
+
+                # delete old netCDF4 file
+                os.remove(_tmp_name)
+
+        _msg = 'Successfully loaded checkpoint.'
         self.log_info(_msg, verbosity=1)
-
-        # set object attribute for model
-        self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4')
-
-        # synch netcdf file
-        self.output_netcdf.sync()
-
-        # delete old netCDF4 file
-        os.remove(_tmp_name)

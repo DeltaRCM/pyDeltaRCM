@@ -571,44 +571,69 @@ class iteration_tools(abc.ABC):
         initiated from this point. The timestep of the checkpoint is also
         saved. The values from the model that are saved to the checkpoint.npz
         are the following:
+
         - Model time
         - Flow velocity and its components
         - Water depth
         - Water stage
         - Topography
         - Current random seed state
-        - Stratigraphic 'topography' in 'strata_eta.npz'
-        - Stratigraphic sand fraction in 'strata_sand_frac.npz'
+        - Stratigraphic 'topography' in 'strata_eta'
+        - Stratigraphic sand fraction in 'strata_sand_frac'
+
         If `save_checkpoint` is turned on, checkpoints are re-written
         with either a frequency of `checkpoint_dt` or `save_dt` if
         `checkpoint_dt` has not been explicitly defined.
         """
         ckp_file = os.path.join(self.prefix, 'checkpoint.npz')
-        # convert sparse arrays to csr type so they are easier to save
-        csr_strata_eta = self.strata_eta.tocsr()
-        csr_strata_sand_frac = self.strata_sand_frac.tocsr()
-        _time_iter = self._time_iter
+
+        # handle checkpoint which needs stratigraphy info
+        strata_dict = {}
+        if self.save_strata:
+            # convert sparse arrays to csr type so they are easier to save
+            csr_strata_eta = self.strata_eta.tocsr()
+            csr_strata_sand_frac = self.strata_sand_frac.tocsr()
+
+            strata_dict.update(
+                {'eta_data': csr_strata_eta.data,
+                 'eta_indices': csr_strata_eta.indices,
+                 'eta_indptr': csr_strata_eta.indptr,
+                 'eta_shape': csr_strata_eta.shape,
+                 'sand_data': csr_strata_sand_frac.data,
+                 'sand_indices': csr_strata_sand_frac.indices,
+                 'sand_indptr': csr_strata_sand_frac.indptr,
+                 'sand_shape': csr_strata_sand_frac.shape,
+                 'n_steps': self.n_steps,
+                 'init_eta': self.init_eta,
+                 'strata_counter': self.strata_counter
+                 }
+                )
+
         # get rng state
         rng_state_list = shared_tools.get_random_state()
         rng_state = np.array(rng_state_list,
                              dtype=object)  # convert to object before saving
 
-        np.savez_compressed(ckp_file, time=self.time, H_SL=self._H_SL,
-                            time_iter=_time_iter,
-                            save_iter=self._save_iter,
-                            save_time_since_data=self._save_time_since_data,
-                            uw=self.uw, ux=self.ux, uy=self.uy,
-                            qw=self.qw, qx=self.qx, qy=self.qy,
-                            depth=self.depth, stage=self.stage,
-                            eta=self.eta, strata_counter=self.strata_counter,
-                            rng_state=rng_state,
-                            eta_data=csr_strata_eta.data,
-                            eta_indices=csr_strata_eta.indices,
-                            eta_indptr=csr_strata_eta.indptr,
-                            eta_shape=csr_strata_eta.shape,
-                            sand_data=csr_strata_sand_frac.data,
-                            sand_indices=csr_strata_sand_frac.indices,
-                            sand_indptr=csr_strata_sand_frac.indptr,
-                            sand_shape=csr_strata_sand_frac.shape,
-                            n_steps=self.n_steps,
-                            init_eta=self.init_eta)
+        np.savez_compressed(
+            ckp_file,
+            # time and counter variables
+            time=self.time,
+            time_iter=self._time_iter,
+            save_iter=self._save_iter,
+            save_time_since_data=self._save_time_since_data,
+            # grids
+            eta=self.eta,
+            depth=self.depth,
+            stage=self.stage,
+            uw=self.uw,
+            ux=self.ux,
+            uy=self.uy,
+            qw=self.qw,
+            qx=self.qx,
+            qy=self.qy,
+            # boundary condition / state variables
+            H_SL=self._H_SL,
+            rng_state=rng_state,
+            # stratigraphy related variables
+            **strata_dict
+            )
