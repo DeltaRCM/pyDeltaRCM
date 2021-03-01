@@ -108,7 +108,7 @@ Jobs are then run with:</p>
 </div>
 <p>Using the high-level API, you can specify the duration to run the model by two mechanisms: 1) the number of timesteps to run the model, or 2) the duration of time to run the model.</p>
 <p>The former case is straightforward, insofar that the model determines the timestep duration and the high-level API simply iterates for the specified number of timestep iterations.
-To specify the number of timesteps to run the model, use the argument <code class="docutils literal notranslate"><span class="pre">--timesteps</span></code> at the command line (or <code class="docutils literal notranslate"><span class="pre">timesteps:</span></code> in the configuration YAML file).</p>
+To specify the number of timesteps to run the model, use the argument <code class="docutils literal notranslate"><span class="pre">--timesteps</span></code> at the command line (or <code class="docutils literal notranslate"><span class="pre">timesteps:</span></code> in the configuration YAML file, or <code class="docutils literal notranslate"><span class="pre">timesteps=</span></code> with the Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code>).</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pyDeltaRCM --config model_configuration.yml --timesteps <span class="m">5000</span>
 </pre></div>
 </div>
@@ -116,8 +116,8 @@ To specify the number of timesteps to run the model, use the argument <code clas
 In this case, the model run end condition is that the elapsed model time is <em>equal to or greater than</em> the specified input time.
 Importantly, this means that the duration of the model run is unlikely to exactly match the input condition, because the model timestep is unlikely to be a factor of the specified time.
 Again, refer to the complete description of model time <a class="reference internal" href="../info/modeltime.html"><span class="doc">Time in pyDeltaRCM</span></a> for more information.</p>
-<p>To specify the duration of time to run the model in <em>seconds</em>, simply use the argument <code class="docutils literal notranslate"><span class="pre">--time</span></code> at the command line (or <code class="docutils literal notranslate"><span class="pre">time:</span></code> in the configuration YAML file).
-It is also possible to specify the input run duration in units of years with the similarly named argument <code class="docutils literal notranslate"><span class="pre">--time_years</span></code> (<code class="docutils literal notranslate"><span class="pre">time_years:</span></code>).</p>
+<p>To specify the duration of time to run the model in <em>seconds</em>, simply use the argument <code class="docutils literal notranslate"><span class="pre">--time</span></code> at the command line (or <code class="docutils literal notranslate"><span class="pre">time:</span></code> in the configuration YAML file, or <code class="docutils literal notranslate"><span class="pre">time=</span></code> with the Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code>).
+It is also possible to specify the input run duration in units of years with the similarly named argument <code class="docutils literal notranslate"><span class="pre">--time_years</span></code> (<code class="docutils literal notranslate"><span class="pre">time_years:</span></code>, <code class="docutils literal notranslate"><span class="pre">time_years=</span></code>).</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pyDeltaRCM --config model_configuration.yml --time <span class="m">31557600</span>
 pyDeltaRCM --config model_configuration.yml --time_years <span class="m">1</span>
 </pre></div>
@@ -128,7 +128,7 @@ pyDeltaRCM --config model_configuration.yml --time_years <span class="m">1</span
 <p>Do not specify both time arguments, or specify time arguments with the timesteps argument.
 In the case of multiple argument specification, precedence is given in the order <cite>timesteps</cite> &gt; <cite>time</cite> &gt; <cite>time_years</cite>.</p>
 </div>
-<p>When specifying the time to run the simulation, an additional parameter determining the intermittency factor (<img class="math" src="../_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>) may be specified <code class="docutils literal notranslate"><span class="pre">--If</span></code> at the command line (or <code class="docutils literal notranslate"><span class="pre">If:</span></code> in the YAML configuration file).
+<p>When specifying the time to run the simulation, an additional parameter determining the intermittency factor (<img class="math" src="../_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>) may be specified <code class="docutils literal notranslate"><span class="pre">--If</span></code> at the command line (<code class="docutils literal notranslate"><span class="pre">If:</span></code> in the YAML configuration file, <code class="docutils literal notranslate"><span class="pre">If=</span></code> with the Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code>).
 This argument will scale the specified time-to-model-time, such that the <em>scaled time</em> is equal to the input argument time.
 Specifying the <img class="math" src="../_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>  value is essential when using the model duration run specifications.
 See <a class="reference internal" href="../info/modeltime.html"><span class="doc">Time in pyDeltaRCM</span></a> for complete information on the scaling between model time and elapsed simulation time.</p>
@@ -136,7 +136,7 @@ See <a class="reference internal" href="../info/modeltime.html"><span class="doc
 <div class="section" id="running-simulations-in-parallel">
 <h4>Running simulations in parallel<a class="headerlink" href="#running-simulations-in-parallel" title="Permalink to this headline">¶</a></h4>
 <p>The high-level API provides the ability to run simulations in parallel on Linux environments.
-This option is only useful in the case where you are running multiple jobs with the <a class="reference internal" href="#matrix-expansion-tag"><span class="std std-ref">matrix expansion</span></a> or <a class="reference internal" href="#ensemble-expansion-tag"><span class="std std-ref">ensemble expansion</span></a> tools.</p>
+This option is only useful in the case where you are running multiple jobs with the <a class="reference internal" href="#matrix-expansion-tag"><span class="std std-ref">matrix expansion</span></a>, <a class="reference internal" href="#ensemble-expansion-tag"><span class="std std-ref">ensemble expansion</span></a>, or <a class="reference internal" href="#set-expansion-tag"><span class="std std-ref">set expansion</span></a> tools.</p>
 <p>To run jobs in parallel simply specify the <cite>–parallel</cite> flag to the command line interface.
 Optionally, you can specify the number of simulations to run at once by following the flag with a number.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pyDeltaRCM --config model_configuration.yml --timesteps <span class="m">5000</span> --parallel
@@ -239,6 +239,20 @@ The ensemble expansion can be applied to configuration files that include a matr
 </div>
 <p>The above configuration file would produce 6 model runs, 3 with a basin depth (<cite>h0</cite>) of 1.0, and 3 with a basin depth of 2.0.</p>
 </div>
+<div class="section" id="set-expansion">
+<span id="set-expansion-tag"></span><h4>Set expansion<a class="headerlink" href="#set-expansion" title="Permalink to this headline">¶</a></h4>
+<p>Set expansion enables user-configured parameter sets to take advantage of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code> infrastructure (such as the job output preparation and ability to run jobs in parallel), while also enabling flexible configurations for parameter sets than cannot be configured via <cite>matrix</cite> expansion.
+For example, to vary <cite>Qw0</cite> while holding <cite>Qs0</cite> fixed requires modifying both <cite>C0_percent</cite> and some water-discharge-controlling parameter <em>simultaneously</em>; i.e., this cannot be achieved with <cite>matrix</cite> expansion.</p>
+<p>To use set expansion, add the <cite>set</cite> key to a configuration file, and define a <em>list</em> of <em>dictionaries</em> which set the parameters of each run to be completed.
+For example, to configure two model runs, the first with parameters <code class="docutils literal notranslate"><span class="pre">u0:</span> <span class="pre">1.0</span></code> and <code class="docutils literal notranslate"><span class="pre">h0:</span> <span class="pre">1.0</span></code>, and the second with parameters <code class="docutils literal notranslate"><span class="pre">u0:</span> <span class="pre">1.2</span></code> and <code class="docutils literal notranslate"><span class="pre">h0:</span> <span class="pre">1.2</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">set</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nt">u0</span><span class="p">:</span> <span class="nv">1.0</span><span class="p p-Indicator">,</span><span class="nt"> h0</span><span class="p">:</span> <span class="nv">1.0</span><span class="p p-Indicator">}</span>
+  <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nt">u0</span><span class="p">:</span> <span class="nv">1.2.</span><span class="p p-Indicator">,</span><span class="nt"> h0</span><span class="p">:</span> <span class="nv">1.2</span><span class="p p-Indicator">}</span>
+</pre></div>
+</div>
+<p>All jobs in the <cite>set</cite> specification must have the exact same set of keys.
+Moreover, additional <cite>ensemble</cite> or <cite>matrix</cite> specifications are not supported with the <cite>set</cite> specification.</p>
+</div>
 </div>
 </div>
 <div class="section" id="working-with-subsidence">
@@ -324,6 +338,7 @@ parameter controls the time (in seconds) at which the subsidence will be turned
 <li><a class="reference internal" href="#configuring-multiple-model-runs-from-a-single-yaml-file">Configuring multiple model runs from a single YAML file</a><ul>
 <li><a class="reference internal" href="#matrix-expansion">Matrix expansion</a></li>
 <li><a class="reference internal" href="#ensemble-expansion">Ensemble expansion</a></li>
+<li><a class="reference internal" href="#set-expansion">Set expansion</a></li>
 </ul>
 </li>
 </ul>

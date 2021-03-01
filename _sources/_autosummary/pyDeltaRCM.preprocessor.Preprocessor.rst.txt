@@ -14,15 +14,20 @@
    .. autosummary::
    
       ~Preprocessor.__init__
-      ~Preprocessor.construct_job_file_list
-      ~Preprocessor.expand_yaml_ensemble
-      ~Preprocessor.expand_yaml_matrix
-      ~Preprocessor.preliminary_yaml_parsing
+      ~Preprocessor.construct_file_list
+      ~Preprocessor.open_input_file_to_dict
       ~Preprocessor.run_jobs
-      ~Preprocessor.write_yaml_config
    
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Preprocessor.config_list
+      ~Preprocessor.file_list
+      ~Preprocessor.job_list
    
    

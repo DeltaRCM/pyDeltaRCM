@@ -82,34 +82,56 @@ during instantiation of the class.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.__init__" title="pyDeltaRCM.preprocessor.PreprocessorCLI.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
 <td><p>Initialize the CLI preprocessor.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_file_list" title="pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_file_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">construct_job_file_list</span></code></a>()</p></td>
-<td><p>Construct the job list.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.construct_file_list" title="pyDeltaRCM.preprocessor.PreprocessorCLI.construct_file_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">construct_file_list</span></code></a>()</p></td>
+<td><p>Construct the file list.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_ensemble" title="pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_ensemble"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_yaml_ensemble</span></code></a>()</p></td>
-<td><p>Create ensemble random seeds and put into matrix.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_matrix" title="pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_yaml_matrix</span></code></a>()</p></td>
-<td><p>Expand YAML matrix, if given.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.preliminary_yaml_parsing" title="pyDeltaRCM.preprocessor.PreprocessorCLI.preliminary_yaml_parsing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preliminary_yaml_parsing</span></code></a>()</p></td>
-<td><p>Preliminary YAML parsing.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.open_input_file_to_dict" title="pyDeltaRCM.preprocessor.PreprocessorCLI.open_input_file_to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open_input_file_to_dict</span></code></a>(input_file)</p></td>
+<td><p>Open an input file and convert it to a dictionary.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.process_arguments" title="pyDeltaRCM.preprocessor.PreprocessorCLI.process_arguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_arguments</span></code></a>()</p></td>
 <td><p>Process the command line arguments.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs" title="pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_jobs</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs" title="pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_jobs</span></code></a>([DeltaModel])</p></td>
 <td><p>Run the set of jobs.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.write_yaml_config" title="pyDeltaRCM.preprocessor.PreprocessorCLI.write_yaml_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_yaml_config</span></code></a>(i, ith_config, ith_dir, ith_id)</p></td>
-<td><p>Write full config to file in output folder.</p></td>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.config_list" title="pyDeltaRCM.preprocessor.PreprocessorCLI.config_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_list</span></code></a></p></td>
+<td><p>Configuration list.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.file_list" title="pyDeltaRCM.preprocessor.PreprocessorCLI.file_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">file_list</span></code></a></p></td>
+<td><p>File list.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.job_list" title="pyDeltaRCM.preprocessor.PreprocessorCLI.job_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">job_list</span></code></a></p></td>
+<td><p>Job list.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI._create_matrix">
-<code class="sig-name descname"><span class="pre">_create_matrix</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._create_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a matrix if not already in the yaml.</p>
-<p>Note that this is only needed for ensemble expansion.</p>
+<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI._expand_ensemble">
+<code class="sig-name descname"><span class="pre">_expand_ensemble</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._expand_ensemble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create ensemble random seeds and put into matrix.</p>
+<p>Ensemble expansion is implemented as a special class of matrix
+expansion where the matrix key is set for the <cite>seed</cite> field of the
+model. This setting ensures that the runs will have different
+outcomes, while allowing all other parameters to remain fixed, and
+supporting additional keys in the matrix.</p>
+<p>In implementation, if the matrix does not yet exist (e.g., only
+ensemble specified), then the matrix is created.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI._expand_matrix">
+<code class="sig-name descname"><span class="pre">_expand_matrix</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._expand_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expand YAML matrix.</p>
+<p>Compute the matrix expansion of parameters listed in <cite>matrix</cite> key.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -130,50 +152,72 @@ during instantiation of the class.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI._seed_matrix">
-<code class="sig-name descname"><span class="pre">_seed_matrix</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_ensembles</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._seed_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate random integers to be used as seeds for ensemble runs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n_ensembles</strong> (<cite>int</cite>) – Number of ensembles which is the number of seeds to generate.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_file_list">
-<code class="sig-name descname"><span class="pre">construct_job_file_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.construct_job_file_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct the job list.</p>
-<p>The job list is constructed by expanding the <code class="docutils literal notranslate"><span class="pre">.yml</span></code> matrix, and
-forming ensemble runs as needed.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_ensemble">
-<code class="sig-name descname"><span class="pre">expand_yaml_ensemble</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_ensemble" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create ensemble random seeds and put into matrix.</p>
-<p>Seed the yaml configuration based on the number of ensembles specified.
-If matrix exists add seeds there, if not, create matrix and add seeds.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_matrix">
-<code class="sig-name descname"><span class="pre">expand_yaml_matrix</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Expand YAML matrix, if given.</p>
-<p>Compute the matrix expansion of parameters listed in <cite>matrix</cite> key.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.preliminary_yaml_parsing">
-<code class="sig-name descname"><span class="pre">preliminary_yaml_parsing</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.preliminary_yaml_parsing" title="Permalink to this definition">¶</a></dt>
-<dd><p>Preliminary YAML parsing.</p>
+<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI._prelim_config_parsing">
+<code class="sig-name descname"><span class="pre">_prelim_config_parsing</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._prelim_config_parsing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preliminary configuration parsing.</p>
 <p>Extract <code class="docutils literal notranslate"><span class="pre">.yml</span></code> file (<code class="docutils literal notranslate"><span class="pre">self.input_file</span></code>) into a dictionary, if
 provided. This dictionary provides a few keys used throughout the
 code.</p>
 <p>Here, we check whether the file is valid yaml,
 and place it into a dictionary.</p>
 <p>Additionally, set the <code class="docutils literal notranslate"><span class="pre">self._has_matrix</span></code> flag, which is used in the
-<a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_matrix" title="pyDeltaRCM.preprocessor.PreprocessorCLI.expand_yaml_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expand_yaml_matrix()</span></code></a>.</p>
+<a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI._expand_matrix" title="pyDeltaRCM.preprocessor.PreprocessorCLI._expand_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_expand_matrix()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.config_list">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">config_list</span></code><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.config_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configuration list.</p>
+<p>A list of <cite>dict</cite> containing the input configurations for jobs
+constructed by the preprocessor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.construct_file_list">
+<code class="sig-name descname"><span class="pre">construct_file_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.construct_file_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct the file list.</p>
+<p>The job list is constructed by expanding the various multi-job
+specifications. For example, <cite>matrix</cite>, <cite>set</cite>, and
+ensemble yaml files are created in this stage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.file_list">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">file_list</span></code><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.file_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>File list.</p>
+<p>A list of <cite>Path</cite> to input YAML files for jobs constructed by the
+preprocessor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.job_list">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">job_list</span></code><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.job_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Job list.</p>
+<p>A list of jobs, type <code class="xref py py-obj docutils literal notranslate"><span class="pre">_SerialJob</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">_ParallelJob</span></code>, from
+the jobs executed by the preprocessor.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This will be an empty list before <a class="reference internal" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs" title="pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_jobs</span></code></a> has been called.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.open_input_file_to_dict">
+<code class="sig-name descname"><span class="pre">open_input_file_to_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.open_input_file_to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open an input file and convert it to a dictionary.</p>
+<p>This method is used by subclassing Preprocessors to complete the first
+import of the yaml configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input_file</strong> – Path to the input file as string, or Pathlib <cite>Path</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input file converted to a dictionary.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>yaml_dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -189,19 +233,11 @@ any way.</p>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs">
-<code class="sig-name descname"><span class="pre">run_jobs</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">run_jobs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DeltaModel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the set of jobs.</p>
 <p>This method can be seen as the actual execution stage of the
 preprocessor. If <cite>–parallel</cite> is specified in the command line or YAML
 file, the jobs will run in parallel.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.preprocessor.PreprocessorCLI.write_yaml_config">
-<code class="sig-name descname"><span class="pre">write_yaml_config</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ith_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ith_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ith_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.PreprocessorCLI.write_yaml_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write full config to file in output folder.</p>
-<p>Write the entire yaml configuation for the configured job out to a
-file in the job output foler.</p>
 </dd></dl>
 
 </dd></dl>
