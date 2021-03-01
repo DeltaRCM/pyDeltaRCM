@@ -56,7 +56,7 @@ class BasePreprocessor(abc.ABC):
     def file_list(self):
         """File list.
 
-        A list of `Path`s to input YAML files for jobs constructed by the
+        A list of `Path` to input YAML files for jobs constructed by the
         preprocessor.
         """
         return self._file_list
@@ -65,7 +65,7 @@ class BasePreprocessor(abc.ABC):
     def config_list(self):
         """Configuration list.
 
-        A list of `dict`s containing the input configurations for jobs
+        A list of `dict` containing the input configurations for jobs
         constructed by the preprocessor.
         """
         return self._config_list
