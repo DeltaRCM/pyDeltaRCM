@@ -1344,16 +1344,18 @@ straitgraphy cubes.</p>
 <p>Saves the grids to a .npz file so that the model can be
 initiated from this point. The timestep of the checkpoint is also
 saved. The values from the model that are saved to the checkpoint.npz
-are the following:
-- Model time
-- Flow velocity and its components
-- Water depth
-- Water stage
-- Topography
-- Current random seed state
-- Stratigraphic ‘topography’ in ‘strata_eta.npz’
-- Stratigraphic sand fraction in ‘strata_sand_frac.npz’
-If <cite>save_checkpoint</cite> is turned on, checkpoints are re-written
+are the following:</p>
+<ul class="simple">
+<li><p>Model time</p></li>
+<li><p>Flow velocity and its components</p></li>
+<li><p>Water depth</p></li>
+<li><p>Water stage</p></li>
+<li><p>Topography</p></li>
+<li><p>Current random seed state</p></li>
+<li><p>Stratigraphic ‘topography’ in ‘strata_eta’</p></li>
+<li><p>Stratigraphic sand fraction in ‘strata_sand_frac’</p></li>
+</ul>
+<p>If <cite>save_checkpoint</cite> is turned on, checkpoints are re-written
 with either a frequency of <cite>checkpoint_dt</cite> or <cite>save_dt</cite> if
 <cite>checkpoint_dt</cite> has not been explicitly defined.</p>
 </dd></dl>
