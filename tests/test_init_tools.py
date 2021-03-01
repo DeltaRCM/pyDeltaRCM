@@ -363,6 +363,7 @@ class TestLoadCheckpoint:
         # check that fields match
         assert np.all(_delta.eta == _eta0)
         assert not hasattr(_delta, 'strata_counter')
+        assert _delta._save_iter == 0
 
         # assertions on function calls
         _delta.log_info.assert_called()
