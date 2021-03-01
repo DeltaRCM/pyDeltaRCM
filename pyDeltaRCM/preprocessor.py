@@ -14,7 +14,7 @@ import yaml
 import numpy as np
 
 from . import shared_tools
-from .model import DeltaModel
+from .model import DeltaModel as BaseDeltaModel
 
 
 _ver = ' '.join(('pyDeltaRCM', shared_tools._get_version()))
@@ -38,10 +38,115 @@ class BasePreprocessor(abc.ABC):
     def __init__(self):
         """Initialize the base preprocessor.
         """
+        self._input_file = None  # initialize empty
+
+        self._has_ensemble = False
+        self._has_set = False
+        self._has_matrix = False
+
+        self._file_list = []    # list of yaml files for jobs
+        self._config_list = []  # list of dict configs for jobs
+        self._job_list = []     # list of _Job objects
+
+        self._dryrun = False
+
         self._is_completed = False
 
-    def preliminary_yaml_parsing(self):
-        """Preliminary YAML parsing.
+    @property
+    def file_list(self):
+        """File list.
+
+        A list of `Path` to input YAML files for jobs constructed by the
+        preprocessor.
+        """
+        return self._file_list
+
+    @property
+    def config_list(self):
+        """Configuration list.
+
+        A list of `dict` containing the input configurations for jobs
+        constructed by the preprocessor.
+        """
+        return self._config_list
+
+    @property
+    def job_list(self):
+        """Job list.
+
+        A list of jobs, type :obj:`_SerialJob` or :obj:`_ParallelJob`, from
+        the jobs executed by the preprocessor.
+
+        .. note::
+
+            This will be an empty list before :obj:`run_jobs` has been called.
+        """
+        return self._job_list
+
+    def open_input_file_to_dict(self, input_file):
+        """Open an input file and convert it to a dictionary.
+
+        This method is used by subclassing Preprocessors to complete the first
+        import of the yaml configuration.
+
+        Parameters
+        ----------
+        input_file
+            Path to the input file as string, or Pathlib `Path`.
+
+        Returns
+        -------
+        yaml_dict
+            Input file converted to a dictionary.
+        """
+        # handle complex preprocessor cases where already is a dict
+        if isinstance(input_file, dict):
+            yaml_dict = input_file
+
+        # simple cases will be string/path
+        elif (isinstance(input_file, str) or
+              isinstance(input_file, Path)):
+            yaml_dict = self._open_yaml(input_file)
+
+        # something wrong with input
+        else:
+            raise ValueError('Invalid input file argument.')
+
+        return yaml_dict
+
+    def construct_file_list(self):
+        """Construct the file list.
+
+        The job list is constructed by expanding the various multi-job
+        specifications. For example, `matrix`, `set`, and
+        ensemble yaml files are created in this stage.
+        """
+        # complete a preliminary parsing of the yaml for high-level controls
+        self._prelim_config_parsing()
+
+        # if there is an ensemble specification, expand it first
+        if self._has_ensemble:
+            self._expand_ensemble()
+
+        if self._has_ensemble or self._has_set or self._has_matrix:
+            self._prepare_multijob_output()
+
+        # if there is a matrix or set specification
+        if self._has_matrix:
+            self._expand_matrix()  # creates self.file_list
+        elif self._has_set:
+            self._expand_set()
+        # otherwise convert to a simple list on input file
+        else:
+            self._file_list = [self._input_file]
+            self._config_list = [self.config_dict]
+
+        # write the job configs to file, if needed
+        if self._has_ensemble or self._has_set or self._has_matrix:
+            self._write_job_configs()
+
+    def _prelim_config_parsing(self):
+        """Preliminary configuration parsing.
 
         Extract ``.yml`` file (``self.input_file``) into a dictionary, if
         provided. This dictionary provides a few keys used throughout the
@@ -51,33 +156,33 @@ class BasePreprocessor(abc.ABC):
         and place it into a dictionary.
 
         Additionally, set the ``self._has_matrix`` flag, which is used in the
-        :meth:`expand_yaml_matrix`.
+        :meth:`_expand_matrix`.
 
         """
-        # open the file, an error will be thrown if invalid yaml?
-        if isinstance(self.input_file, dict):
-            self.yaml_dict = self.input_file
-        elif (isinstance(self.input_file, str) or
-              isinstance(self.input_file, Path)):
-            self.yaml_dict = self._open_yaml(self.input_file)
-        else:
-            raise ValueError('Invalid input file argument.')
+        if 'set' in self.config_dict.keys():
+            # set found
+            self._has_set = True
+            # can't specify anything else in present implementation
+            if ('ensemble' in self.config_dict.keys() or
+                    'matrix' in self.config_dict.keys()):
+                raise ValueError(
+                    'Cannot spec other expansions with "set" option.')
 
-        if 'ensemble' in self.yaml_dict.keys():
+        if 'ensemble' in self.config_dict.keys():
+            # ensemble found
             self._has_ensemble = True
-            self.expand_yaml_ensemble()
 
-        if 'matrix' in self.yaml_dict.keys():
+        if 'matrix' in self.config_dict.keys():
+            # matrix found
             self._has_matrix = True
-        else:
-            self._has_matrix = False
 
-        if 'verbose' in self.yaml_dict.keys():
-            self.verbose = self.yaml_dict['verbose']
+        if 'verbose' in self.config_dict.keys():
+            self.verbose = self.config_dict['verbose']
         else:
             self.verbose = 0
 
-        return self.yaml_dict
+        if 'dryrun' in self.config_dict.keys():
+            self._dryrun = self.config_dict['dryrun']
 
     def _open_yaml(self, input_file):
         """Safely open, read, and close a yaml file.
@@ -104,203 +209,280 @@ class BasePreprocessor(abc.ABC):
             user_file.close()
             return yaml_dict
 
-    def _create_matrix(self):
-        """Create a matrix if not already in the yaml.
+    def _prepare_multijob_output(self):
+        if 'out_dir' not in self.config_dict.keys():
+            raise ValueError(
+                'You must specify "out_dir" in YAML to use any '
+                'multi-job expansion tools.')
 
-        Note that this is only needed for ensemble expansion.
+        self._jobs_root = self.config_dict['out_dir']
+
+        # create directory at root
+        p = Path(self._jobs_root)
+        if p.is_dir():
+            if 'resume_checkpoint' in self.config_dict and \
+              self.config_dict['resume_checkpoint'] is True:
+                pass
+            else:
+                raise FileExistsError(
+                    'Job output directory (%s) already exists.' % str(p))
+        else:
+            p.mkdir()
+
+    def _expand_ensemble(self):
+        """Create ensemble random seeds and put into matrix.
+
+        Ensemble expansion is implemented as a special class of matrix
+        expansion where the matrix key is set for the `seed` field of the
+        model. This setting ensures that the runs will have different
+        outcomes, while allowing all other parameters to remain fixed, and
+        supporting additional keys in the matrix.
+
+        In implementation, if the matrix does not yet exist (e.g., only
+        ensemble specified), then the matrix is created.
         """
-        _matrix = dict()
-        self.yaml_dict['matrix'] = _matrix
+        # extract the ensemble key
+        _ensemble = self.config_dict.pop('ensemble')
 
-    def _seed_matrix(self, n_ensembles):
-        """Generate random integers to be used as seeds for ensemble runs.
+        # ensemble must be integer - check if valid
+        if not isinstance(_ensemble, int):
+            raise TypeError('Invalid ensemble type, must be an integer.')
 
-        Parameters
-        ----------
-        n_ensembles : `int`
-            Number of ensembles which is the number of seeds to generate.
+        # if matrix does not exist, then it must be created
+        if 'matrix' not in self.config_dict.keys():
+            _matrix = {}
+        else:
+            # self.config_dict['matrix'] = _matrix
+            _matrix = self.config_dict.pop('matrix')
 
-        """
-        _matrix = self.yaml_dict.pop('matrix')
+        # check type of matrix
+        #   is this needed here? Do earlier? Let it error naturally?
         if not isinstance(_matrix, dict):
             raise ValueError(
                 'Invalid matrix specification, was not evaluated to "dict".')
 
+        # check for invalid specs
         if 'seed' in _matrix.keys():
             raise ValueError('Random seeds cannot be specified in the matrix, '
                              'if an "ensemble" number is specified as well.')
 
         # generate list of random seeds
         seed_list = []
+        n_ensembles = _ensemble
         for i in range(n_ensembles):
             seed_list.append(np.random.randint((2**32) - 1, dtype='u8'))
 
         # add list of random seeds to the matrix
         _matrix['seed'] = seed_list
-        self.yaml_dict['matrix'] = _matrix
 
-    def write_yaml_config(self, i, ith_config, ith_dir, ith_id):
-        """Write full config to file in output folder.
+        # write it back to the total configuration
+        self.config_dict['matrix'] = _matrix
 
-        Write the entire yaml configuation for the configured job out to a
-        file in the job output foler.
-        """
-        if self.verbose > 0:
-            print('Writing YAML file for job ' + str(int(i)))
+        # change the variable to expand matrix on future step
+        self._has_matrix = True
 
-        d = Path(ith_dir)
-        if d.is_dir():
-            if 'resume_checkpoint' in self.yaml_dict and \
-              self.yaml_dict['resume_checkpoint'] is True:
-                pass
-            else:
-                raise FileExistsError(
-                    'Job output directory (%s) already exists.' % str(p))
-        else:
-            d.mkdir()
-        ith_p = d / (str(ith_id) + '.yml')
-        write_yaml_config_to_file(ith_config, ith_p)
-        return ith_p
+    def _expand_set(self):
 
-    def expand_yaml_ensemble(self):
-        """Create ensemble random seeds and put into matrix.
+        # determine the set
+        _set = self.config_dict.pop('set')
 
-        Seed the yaml configuration based on the number of ensembles specified.
-        If matrix exists add seeds there, if not, create matrix and add seeds.
-        """
-        if self._has_ensemble:
-            # ensemble must be integer - check if valid
-            _ensemble = self.yaml_dict.pop('ensemble')
-            if not isinstance(_ensemble, int):
-                raise TypeError('Invalid ensemble type, must be an integer.')
-
-            # if matrix does not exist, then it must be created
-            if 'matrix' not in self.yaml_dict.keys():
-                self._create_matrix()
-
-            # then the seed values must be added to the matrix
-            self._seed_matrix(_ensemble)
-
-    def expand_yaml_matrix(self):
-        """Expand YAML matrix, if given.
-
-        Compute the matrix expansion of parameters listed in `matrix` key.
-
-        """
-        if self._has_matrix:
-            # extract and remove 'matrix' from config
-            _matrix = self.yaml_dict.pop('matrix')
-
-            # check validity of matrix specs
-            if not isinstance(_matrix, dict):
-                raise ValueError(
-                    'Invalid matrix specification, was not evaluated to "dict".')
-            if 'out_dir' not in self.yaml_dict.keys():
-                raise ValueError(
-                    'You must specify "out_dir" in YAML to use matrix expansion.')
-            if 'out_dir' in _matrix.keys():
-                raise ValueError(
-                    'You cannot specify "out_dir" as a matrix expansion key.')
-            for k in _matrix.keys():  # check validity of keys, depth == 1
-                if len(_matrix[k]) == 1:
-                    raise ValueError(
-                        'Length of matrix key "%s" was 1, '
-                        'relocate to fixed configuration.' % str(k))
-                for v in _matrix[k]:
-                    if isinstance(v, list):
-                        raise ValueError(
-                            'Depth of matrix expansion must not be > 1')
+        # check that all sets are dictionaries
+        if not isinstance(_set, list):
+            raise TypeError(
+                'Set list must be type `list` but was {}.'.format(type(_set)))
+        for i, d in enumerate(_set):  # check validity of keys, depth == 1
+            if not isinstance(d, dict):
+                raise TypeError(
+                    'Set must specify as a list of dictionaries')
+            for k in d.keys():  # check validity of keys, depth == 1
                 if ':' in k:
                     raise ValueError(
                         'Colon operator found in matrix expansion key.')
-                if k in self.yaml_dict.keys():
+
+        # check that all sets have the same entries
+        set0_set = set(_set[0].keys())
+        for s in range(1, len(_set)):
+            if not (set0_set == set(_set[s].keys())):
+                raise ValueError('All keys in all sets must be identical.')
+
+        # extract dimensionality of set
+        jobs = len(_set)
+        dims = len(_set[0])
+
+        if self.verbose > 0:
+            print(('Set expansion:\n' +
+                   '  dims {_dims}\n' +
+                   '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
+
+        # preallocate the matrix expansion job yamls and output table
+        self._matrix_table = np.empty(  # output table
+            (jobs, dims+1), dtype='O')
+
+        _fixed_config = self.config_dict.copy()  # fixed config dict
+
+        # loop through each and create a config and add to _config_list
+        for i in range(jobs):
+
+            # being with the fixed config
+            ith_config = _fixed_config.copy()
+
+            # find job id and create output file
+            ith_id = 'job_' + str(i).zfill(3)
+            ith_dir = os.path.join(self._jobs_root, ith_id)
+
+            # write the job number into output table
+            self._matrix_table[i, 0] = ith_id
+
+            # get config for this job
+            ith_config['out_dir'] = ith_dir
+
+            # loop through each var of this job
+            for j, (key, val) in enumerate(_set[i].items()):
+
+                # write info into fixed config dict
+                ith_config[key] = val
+
+                # write info into output table
+                self._matrix_table[i, j+1] = val
+
+            # add the configuration to a list to write out below
+            self._config_list.append(ith_config)
+
+        # store the matrix expansion
+        #   this is useful for references by custom
+        #   Python preprocessing / postprocessing
+        matrix_table_file = os.path.join(
+            self._jobs_root, 'jobs_parameters.txt')
+        self._matrix_table_header = ', '.join(['job_id', *set0_set])
+        np.savetxt(matrix_table_file, self._matrix_table,
+                   fmt='%s', delimiter=',', comments='',
+                   header=self._matrix_table_header)
+
+    def _expand_matrix(self):
+        """Expand YAML matrix.
+
+        Compute the matrix expansion of parameters listed in `matrix` key.
+        """
+        # extract and remove 'matrix' from config
+        _matrix = self.config_dict.pop('matrix')
+
+        # check validity of matrix specs
+        if not isinstance(_matrix, dict):
+            raise ValueError(
+                'Invalid matrix specification, was not evaluated to "dict".')
+        if 'out_dir' in _matrix.keys():
+            raise ValueError(
+                'You cannot specify "out_dir" as a matrix expansion key.')
+        for k in _matrix.keys():  # check validity of keys, depth == 1
+            if len(_matrix[k]) == 1:
+                raise ValueError(
+                    'Length of matrix key "%s" was 1, '
+                    'relocate to fixed configuration.' % str(k))
+            for v in _matrix[k]:
+                if isinstance(v, list):
                     raise ValueError(
-                        'You cannot specify the same key in the matrix '
-                        'configuration and fixed configuration. '
-                        'Key "%s" was specified in both.' % str(k))
+                        'Depth of matrix expansion must not be > 1')
+            if ':' in k:
+                raise ValueError(
+                    'Colon operator found in matrix expansion key.')
+            if k in self.config_dict.keys():
+                raise ValueError(
+                    'You cannot specify the same key in the matrix '
+                    'configuration and fixed configuration. '
+                    'Key "%s" was specified in both.' % str(k))
 
-            # compute the expansion
-            var_list = [k for k in _matrix.keys()]
-            lil = [_matrix[v] for k, v in enumerate(var_list)]
-            dims = len(lil)
-            pts = [len(l) for l in lil]
-            jobs = np.prod(pts)
-            _combs = list(itertools.product(*lil))  # actual matrix expansion
-            _fixed_config = self.yaml_dict.copy()  # fixed config dict to expand on
+        # compute the expansion
+        var_list = [k for k in _matrix.keys()]
+        lil = [_matrix[v] for k, v in enumerate(var_list)]
+        dims = len(lil)
+        pts = [len(lst) for lst in lil]
+        jobs = np.prod(pts)
+        _combs = list(itertools.product(*lil))  # actual matrix expansion
+        _fixed_config = self.config_dict.copy()  # fixed config dict
 
+        if self.verbose > 0:
+            print(('Matrix expansion:\n' +
+                   '  dims {_dims}\n' +
+                   '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
+
+        # preallocate the matrix expansion job yamls and output table
+        self._matrix_table = np.empty(  # output table
+            (jobs, dims+1), dtype='O')
+
+        # loop through each and create a config and add to _config_list
+        for i in range(jobs):
+
+            # begin with the fixed config
+            ith_config = _fixed_config.copy()
+
+            # find job id and create output file
+            ith_id = 'job_' + str(i).zfill(3)
+            ith_dir = os.path.join(self._jobs_root, ith_id)
+
+            # write the job number into output table
+            self._matrix_table[i, 0] = ith_id
+
+            # get config for this job
+            ith_config['out_dir'] = ith_dir
+
+            # loop through each var of this job
+            for j, val in enumerate(_combs[i]):
+
+                # write info into fixed config dict
+                ith_config[var_list[j]] = val
+
+                # write info into output table
+                self._matrix_table[i, j+1] = val
+
+            # add the configuration to a list to write out below
+            self._config_list.append(ith_config)
+
+        # store the matrix expansion
+        #   this is useful for references by custom
+        #   Python preprocessing / postprocessing
+        matrix_table_file = os.path.join(
+            self._jobs_root, 'jobs_parameters.txt')
+        self._matrix_table_header = ', '.join(['job_id', *var_list])
+        np.savetxt(matrix_table_file, self._matrix_table,
+                   fmt='%s', delimiter=',', comments='',
+                   header=self._matrix_table_header)
+
+    def _write_job_configs(self):
+
+        if len(self._config_list) == 0:
+            raise ValueError('Config list empty!')
+
+        # loop through each job to write out info
+        for c, config in enumerate(self.config_list):
+
+            # write out the job specific yaml file
+            # ith_p = self._write_yaml_config(c, config)
             if self.verbose > 0:
-                print(('Matrix expansion:\n' +
-                       '  dims {_dims}\n' +
-                       '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
+                print('Writing YAML file for job ' + str(int(c)))
 
-            # create directory at root
-            self.jobs_root = self.yaml_dict['out_dir']  # checked above for exist
-            p = Path(self.jobs_root)
-            if p.is_dir():
-                if 'resume_checkpoint' in self.yaml_dict and \
-                  self.yaml_dict['resume_checkpoint'] is True:
+            # ith_config = config['config']
+            ith_dir = Path(config['out_dir'])       # job output folder
+            ith_id = ith_dir.parts[-1]              # job id
+
+            # create the output directory if needed
+            if ith_dir.is_dir():
+                if 'resume_checkpoint' in self.config_dict and \
+                  self.config_dict['resume_checkpoint'] is True:
                     pass
                 else:
                     raise FileExistsError(
-                        'Job output directory (%s) already exists.' % str(p))
+                        'Job output directory (%s) already exists.' % str(ith_dir))
             else:
-                p.mkdir()
+                ith_dir.mkdir()
 
-            # preallocate the matrix expansion job yamls and output table
-            self.file_list = []  # create job yamls list
-            self.matrix_table = np.empty(  # output table
-                (jobs, dims+1), dtype='O')
+            # write the file into the output directory
+            ith_p = ith_dir / (str(ith_id) + '.yml')
+            _write_yaml_config_to_file(config, ith_p)
 
-            # loop through each job to write out info
-            for i in range(jobs):
+            # append to the file list
+            self._file_list.append(ith_p)
 
-                # being with the fixed config
-                _ith_config = _fixed_config.copy()
-
-                # find job id and create output file
-                ith_id = 'job_' + str(i).zfill(3)
-                ith_dir = os.path.join(self.jobs_root, ith_id)
-
-                # write the job number into output table
-                self.matrix_table[i, 0] = ith_id
-
-                # get config for this job
-                _ith_config['out_dir'] = ith_dir
-
-                # loop through each var of this job
-                for j, val in enumerate(_combs[i]):
-
-                    # write info into fixed config dict
-                    _ith_config[var_list[j]] = val
-
-                    # write info into output table
-                    self.matrix_table[i, j+1] = val
-
-                # write out the job specific yaml file
-                ith_p = self.write_yaml_config(i, _ith_config, ith_dir, ith_id)
-                self.file_list.append(ith_p)
-
-            # store the matrix expansion
-            #   this is useful for references by custom
-            #   Python preprocessing / postprocessing
-            matrix_table_file = os.path.join(self.jobs_root, 'jobs_parameters.txt')
-            self.matrix_table_header = ', '.join(['job_id', *var_list])
-            np.savetxt(matrix_table_file, self.matrix_table,
-                       fmt='%s', delimiter=',', comments='',
-                       header=self.matrix_table_header)
-
-    def construct_job_file_list(self):
-        """Construct the job list.
-
-        The job list is constructed by expanding the ``.yml`` matrix, and
-        forming ensemble runs as needed.
-        """
-        if self._has_matrix:
-            self.expand_yaml_matrix()  # creates self.file_list
-        else:
-            self.file_list = [self.input_file]
-
-    def run_jobs(self):
+    def run_jobs(self, DeltaModel=None):
         """Run the set of jobs.
 
         This method can be seen as the actual execution stage of the
@@ -310,23 +492,29 @@ class BasePreprocessor(abc.ABC):
         if self._dryrun:
             return
 
+        # process the special DeltaModel argument
+        #  if not None, it is a class to be used by the Jobs
+        if (DeltaModel is None):
+            DeltaModel = BaseDeltaModel
+
         # initialize empty list to maintain reference to all Job instances
         num_total_processes = len(self.file_list)
-        self.job_list = list()
 
         # NOTE: multiprocessing infrastructure is only available on linux.
         #       We only use parallel approach if the --parallel flag is given
         #       and we are running on linux.
-        _parallel_flag = _optional_input(
-            'parallel', cli_dict=self.cli_dict, yaml_dict=self.yaml_dict,
-            default=False)
-        _os = platform.system()
+        if 'parallel' in self.config_dict.keys():
+            # and not (self.config_dict['parallel'] is None)):
+            _parallel_flag = self.config_dict['parallel']
+        else:
+            _parallel_flag = False
 
         # if the parallel flag is given use the parallel infrastructure
         #   NOTE: the following evaluates to true for boolean `True` or
         #         any `int` > 0
         if _parallel_flag:
             # validate that os is Linux, otherwise error
+            _os = platform.system()
             if _os != 'Linux':
                 raise NotImplementedError(
                     'Parallel simulations only implemented on Linux.')
@@ -362,16 +550,22 @@ class BasePreprocessor(abc.ABC):
                 # open yaml file for specific job
                 job_yaml = self._open_yaml(self.file_list[i])
 
+                # apply job yaml to config dict
+                #   enables complex job setups, where configs are edited
+                #   between writing and .run_jobs()
+                job_config = self.config_list[i].copy()
+                job_config.update(job_yaml)
+
                 # instantiate the job
                 p = _ParallelJob(i=i, queue=q, sema=s,
                                  input_file=self.file_list[i],
-                                 cli_dict=self.cli_dict,
-                                 yaml_dict=job_yaml)
-                self.job_list.append(p)
+                                 config_dict=job_config,
+                                 DeltaModel=DeltaModel)
+                self._job_list.append(p)
                 p.start()
 
             # join processes to prevent ending the jobs before moving forward
-            for i in self.job_list:
+            for i in self._job_list:
                 i.join()
 
             # read from the queue and report (asynchronous...buggy...)
@@ -393,14 +587,20 @@ class BasePreprocessor(abc.ABC):
                 # open yaml file for specific job
                 job_yaml = self._open_yaml(self.file_list[i])
 
+                # apply job yaml to config dict
+                #   enables complex job setups, where configs are edited
+                #   between writing and .run_jobs()
+                job_config = self.config_list[i].copy()
+                job_config.update(job_yaml)
+
                 p = _SerialJob(i=i,
                                input_file=self.file_list[i],
-                               cli_dict=self.cli_dict,
-                               yaml_dict=job_yaml)
-                self.job_list.append(p)
+                               config_dict=job_config,
+                               DeltaModel=DeltaModel)
+                self._job_list.append(p)
 
             # run the job(s)
-            for i, job in enumerate(self.job_list):
+            for i, job in enumerate(self._job_list):
                 if self.verbose > 0:
                     print("Starting job %s" % str(i))
                 job.run()
@@ -423,7 +623,8 @@ class _BaseJob(abc.ABC):
     .. note:: You probably don't need to interact with this class directly.
     """
 
-    def __init__(self, i, input_file, cli_dict, yaml_dict, defer_output=False):
+    def __init__(self, i, input_file, config_dict,
+                 DeltaModel=None, defer_output=False):
         """Initialize a job.
 
         The `input_file` argument is passed to the DeltaModel for
@@ -437,24 +638,51 @@ class _BaseJob(abc.ABC):
         self.i = i
         self.input_file = input_file
 
+        # if 'DeltaModel' in config_dict.keys():
+        #     _DM = config_dict['DeltaModel']
+        # else:
+        #     _DM = DeltaModel
+        if (DeltaModel is None):
+            DeltaModel = BaseDeltaModel
+
         self.deltamodel = DeltaModel(input_file=input_file,
                                      defer_output=defer_output)
         _curr_time = self.deltamodel._time
 
-        self.timesteps = ('timesteps', cli_dict, yaml_dict)
-        self.time = ('time', cli_dict, yaml_dict)
-        self.time_years = ('time_years', cli_dict, yaml_dict)
-        self.If = ('If', cli_dict, yaml_dict)
+        # process If
+        if 'If' in config_dict.keys():
+            self._If = float(config_dict['If'])
+        else:
+            self._If = 1.0
 
         # determine job end time, *in model time*
-        if not (self.timesteps is None):
+        if ('timesteps' in config_dict.keys()):
+            # fill informational fields
+            self._time_type = 'timesteps'
+            self._time_config = config_dict['timesteps']
+
+            # compute the end time
+            print(config_dict['timesteps'])
             self._job_end_time = _curr_time + \
-                ((self.timesteps * self.deltamodel._dt))
-        elif not (self.time is None):
-            self._job_end_time = _curr_time + ((self.time) * self.If)
-        elif not (self.time_years is None):
+                ((config_dict['timesteps'] * self.deltamodel._dt))
+
+        elif ('time' in config_dict.keys()):
+            # fill informational fields
+            self._time_type = 'time'
+            self._time_config = config_dict['time']
+
+            # compute the end time
             self._job_end_time = _curr_time + \
-                ((self.time_years) * self.If * 86400 * 365.25)
+                (config_dict['time'] * self._If)
+
+        elif ('time_years' in config_dict.keys()):
+            # fill informational fields
+            self._time_type = 'time_years'
+            self._time_config = config_dict['time_years']
+
+            # compute the end time
+            self._job_end_time = _curr_time + \
+                (config_dict['time_years'] * self._If * 86400 * 365.25)
         else:
             raise ValueError(
                 'You must specify a run duration configuration in either '
@@ -471,66 +699,6 @@ class _BaseJob(abc.ABC):
         """
         ...
 
-    @property
-    def timesteps(self):
-        """Timesteps to run the job for.
-
-        Potentially an empty value, depends on inputs to CLI and YAML.
-        """
-        return self._timesteps
-
-    @timesteps.setter
-    def timesteps(self, arg_tuple):
-        _timesteps = _optional_input(
-            arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2],
-            type_func=int)
-        self._timesteps = _timesteps
-
-    @property
-    def time(self):
-        """Model time to run the job for.
-
-        Potentially an empty value, depends on inputs to CLI and YAML.
-        """
-        return self._time
-
-    @time.setter
-    def time(self, arg_tuple):
-        _time = _optional_input(
-            arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2],
-            type_func=float)
-        self._time = _time
-
-    @property
-    def time_years(self):
-        """Model time to run the job for, in years.
-
-        Potentially an empty value, depends on inputs to CLI and YAML.
-        """
-        return self._time_years
-
-    @time_years.setter
-    def time_years(self, arg_tuple):
-        _time_years = _optional_input(
-            arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2],
-            type_func=float)
-        self._time_years = _time_years
-
-    @property
-    def If(self):
-        """Intermittency of model time to real-world time for the job.
-
-        Default value is 1, value depends on inputs to CLI and YAML.
-        """
-        return self._If
-
-    @If.setter
-    def If(self, arg_tuple):
-        _If = _optional_input(
-            arg_tuple[0], cli_dict=arg_tuple[1], yaml_dict=arg_tuple[2],
-            default=1, type_func=float)
-        self._If = _If
-
 
 class _SerialJob(_BaseJob):
     """Serial job run by the preprocessor.
@@ -541,19 +709,18 @@ class _SerialJob(_BaseJob):
     .. note:: You probably don't need to interact with this class directly.
     """
 
-    def __init__(self, i, input_file, cli_dict, yaml_dict):
+    def __init__(self, i, input_file, config_dict, DeltaModel=None,):
         """Initialize a serial job.
 
         The `input_file` argument is passed to the DeltaModel for
         instantiation.
 
         The various model run duration parameters are passed from the
-        `cli_dict` and `yaml_dict` arguments, and are processed into a
-        single value for the run time. Precedence is given to values
-        specified in the command line interface.
+        `config_dict` argument, and are processed into a single value for the
+        run time.
         """
-        super().__init__(i, input_file, cli_dict, yaml_dict,
-                         defer_output=False)
+        super().__init__(i, input_file, config_dict,
+                         DeltaModel=DeltaModel, defer_output=False)
 
     def run(self):
         """Loop the model.
@@ -607,20 +774,20 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
     .. note:: You probably don't need to interact with this class directly.
     """
 
-    def __init__(self, i, queue, sema, input_file, cli_dict, yaml_dict):
+    def __init__(self, i, queue, sema,
+                 input_file, config_dict, DeltaModel=None):
         """Initialize a parallel job.
 
         The `input_file` argument is passed to the DeltaModel for
         instantiation.
 
         The various model run duration parameters are passed from the
-        `cli_dict` and `yaml_dict` arguments, and are processed into a
-        single value for the run time. Precedence is given to values
-        specified in the command line interface.
+        `config_dict` argument, and are processed into a single value for the
+        run time.
         """
-        # super().__init__()
-        _BaseJob.__init__(self, i, input_file, cli_dict, yaml_dict,
-                          defer_output=True)
+        # inherit with explicit method resolution order
+        _BaseJob.__init__(self, i, input_file, config_dict,
+                          DeltaModel=DeltaModel, defer_output=True)
         multiprocessing.Process.__init__(self)
 
         self.queue = queue
@@ -685,33 +852,6 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
             self.sema.release()
 
 
-def _optional_input(argument, cli_dict=None, yaml_dict=None,
-                    default=None, type_func=lambda x: x):
-    """
-    Processor function to be used on the optional choices, of the _Job
-    for determining the hierachy of options and setting a single
-    value.
-
-    Hierarchy is to use CLI/preprocessor options first, then yaml.
-
-    Both inputs should be `dict`!
-
-    If default is not `None`, this value is used if no parameter
-    specified in the cli or yaml.
-
-    If type_func is given, this function is applied to the parsed value,
-    before returning.
-    """
-    if argument in cli_dict.keys() and not (cli_dict[argument] is None):
-        return type_func(cli_dict[argument])
-    elif argument in yaml_dict.keys():
-        return type_func(yaml_dict[argument])
-    elif not (default is None):
-        return default
-    else:
-        return None
-
-
 class PreprocessorCLI(BasePreprocessor):
     """Command line preprocessor.
 
@@ -742,23 +882,24 @@ class PreprocessorCLI(BasePreprocessor):
         """
         super().__init__()
 
-        self.process_arguments()
+        # process command line to a dictionary
+        cli_dict = self.process_arguments()
 
-        if self.cli_dict['config']:
-            self.input_file = self.cli_dict['config']
-            self.preliminary_yaml_parsing()
+        # process the input file to a dictionary (or empty if none)
+        if 'config' in cli_dict.keys():
+            input_file = cli_dict['config']
+            yaml_dict = self.open_input_file_to_dict(input_file)
+            self._input_file = input_file  # fill field
         else:
-            self.verbose = 0  # no verbosity by defauly
-            self.input_file = None
-            self.yaml_dict = {}
-            self._has_matrix = False
+            yaml_dict = {}
 
-        if self.cli_dict['dryrun']:
-            self._dryrun = True
-        else:
-            self._dryrun = False
+        # combine the dicts into a single config
+        self.config_dict = {}
+        self.config_dict.update(yaml_dict)
+        self.config_dict.update(cli_dict)
 
-        self.construct_job_file_list()
+        # construct file list (expansions)
+        self.construct_file_list()
 
     def process_arguments(self):
         """Process the command line arguments.
@@ -807,15 +948,33 @@ class PreprocessorCLI(BasePreprocessor):
             'on system specs as (ncores - 1). Specify an integer value to '
             'specify the number of cores to be used. '
             'Optional, default value is False.')
-        #    Note: the default value for the parallel option is assigned
-        #        during arg parsing of the yaml file.
         parser.add_argument(
             '--version', action='version',
             version=_ver, help='Print pyDeltaRCM version.')
 
+        # parse and convert to dict
         args = parser.parse_args()
+        args_dict = vars(args)
 
-        self.cli_dict = vars(args)
+        # convert arguments to valid types for preprocessor
+        if not (args_dict['timesteps'] is None):
+            args_dict['timesteps'] = int(args_dict['timesteps'])
+        else:
+            args_dict.pop('timesteps')
+        if not (args_dict['time'] is None):
+            args_dict['time'] = float(args_dict['time'])
+        else:
+            args_dict.pop('time')
+        if not (args_dict['time_years'] is None):
+            args_dict['time_years'] = float(args_dict['time_years'])
+        else:
+            args_dict.pop('time_years')
+
+        # set defaults as needed
+        args_dict['parallel'] = args_dict['parallel'] or False
+        args_dict['If'] = args_dict['If'] or 1.0
+
+        return args_dict
 
 
 class Preprocessor(BasePreprocessor):
@@ -836,7 +995,7 @@ class Preprocessor(BasePreprocessor):
 
     .. code::
 
-        >>> pp = preprocessor.Preprocessor(input_file=p, timesteps=2)
+        >>> pp = preprocessor.Preprocessor(input_file=p, timesteps=500)
         >>> pp.run_jobs()
 
     """
@@ -865,22 +1024,27 @@ class Preprocessor(BasePreprocessor):
 
         """
         super().__init__()
-        self._dryrun = False
 
         if not input_file and len(kwargs.keys()) == 0:
             raise ValueError('Cannot use Preprocessor with no arguments.')
 
-        self.cli_dict = kwargs
+        # process "command line" to a dict (already is)
+        cli_dict = kwargs
 
-        if input_file:
-            self.input_file = input_file
-            self.preliminary_yaml_parsing()
+        # process the input yaml file to a dict
+        if input_file is None:
+            yaml_dict = {}
         else:
-            self.input_file = None
-            self.yaml_dict = {}
-            self._has_matrix = False
+            yaml_dict = self.open_input_file_to_dict(input_file)
+            self._input_file = input_file  # fill field
 
-        self.construct_job_file_list()
+        # combine the dicts into a single config
+        self.config_dict = {}
+        self.config_dict.update(yaml_dict)
+        self.config_dict.update(cli_dict)
+
+        # construct file list (expansions)
+        self.construct_file_list()
 
 
 def preprocessor_wrapper():
@@ -898,7 +1062,7 @@ def preprocessor_wrapper():
     pp.run_jobs()
 
 
-def write_yaml_config_to_file(_config, _path):
+def _write_yaml_config_to_file(_config, _path):
     """Write a config to file in output folder.
 
     Write the entire yaml configuation for the configured job out to a
@@ -906,8 +1070,8 @@ def write_yaml_config_to_file(_config, _path):
 
     .. note::
 
-        This fuinction is utilized by the BMI implementation of pyDeltaRCM as
-        well.
+        This function is utilized by the BMI implementation of pyDeltaRCM as
+        well. Please do not move.
     """
     def _write_parameter_to_file(f, varname, varvalue):
         """Write each line, formatted."""
@@ -966,6 +1130,7 @@ def scale_relative_sea_level_rise_rate(mmyr, If=1):
         If, units='years')))
 
 
+# make the connection for running the preprocessor directly
 if __name__ == '__main__':
 
     preprocessor_wrapper()

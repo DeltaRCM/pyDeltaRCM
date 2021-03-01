@@ -68,7 +68,7 @@ class init_tools(abc.ABC):
 
         Parameters
         ----------
-        kwargs_dict :obj:`dict`, optional
+        kwargs_dict : :obj:`dict`, optional
 
             A dictionary with keys matching valid model parameter names that
             can be specified in a configuration YAML file. Keys given in this
@@ -77,9 +77,7 @@ class init_tools(abc.ABC):
 
         Returns
         -------
-
         """
-
         # This dictionary serves as a container to hold values for both the
         # user-specified file and the internal defaults.
         input_file_vars = dict()

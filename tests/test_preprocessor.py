@@ -1,14 +1,6 @@
 
 import pytest
 
-import os
-# import shutil
-# import locale
-# import numpy as np
-# import subprocess
-import glob
-import netCDF4
-# import time
 import platform
 
 import unittest.mock as mock
@@ -37,10 +29,9 @@ class TestPreprocessorSingleJobSetups:
         assert len(pp.file_list) == 1
         assert pp._is_completed is False
 
-        assert pp.yaml_dict['timesteps'] == 50
-        assert not ('timesteps' in pp.cli_dict.keys())
-        assert not ('time' in pp.yaml_dict.keys())
-        assert not ('time' in pp.cli_dict.keys())
+        assert pp.config_dict['timesteps'] == 50
+        assert not ('time' in pp.config_dict.keys())
+        assert not ('time_years' in pp.config_dict.keys())
 
     def test_py_hlvl_time_yml_runjobs_sngle(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -50,10 +41,8 @@ class TestPreprocessorSingleJobSetups:
         assert len(pp.file_list) == 1
         assert pp._is_completed is False
 
-        assert pp.yaml_dict['time'] == 1000
-        assert not ('time' in pp.cli_dict.keys())
-        assert not ('timesteps' in pp.yaml_dict.keys())
-        assert not ('timesteps' in pp.cli_dict.keys())
+        assert pp.config_dict['time'] == 1000
+        assert not ('timesteps' in pp.config_dict.keys())
 
     def test_py_hlvl_time_If_yml_runjobs_sngle(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -64,9 +53,9 @@ class TestPreprocessorSingleJobSetups:
         assert len(pp.file_list) == 1
         assert pp._is_completed is False
 
-        assert pp.yaml_dict['time'] == 10000
-        assert pp.yaml_dict['If'] == 0.1
-        assert not ('time' in pp.cli_dict.keys())
+        assert pp.config_dict['time'] == 10000
+        assert pp.config_dict['If'] == 0.1
+        assert not ('timesteps' in pp.config_dict.keys())
 
     def test_py_hlvl_timeyears_yml_runjobs_sngle(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -76,10 +65,10 @@ class TestPreprocessorSingleJobSetups:
         assert len(pp.file_list) == 1
         assert pp._is_completed is False
 
-        assert pp.yaml_dict['time_years'] == pytest.approx(3.1688087e-05)
-        assert not ('If' in pp.yaml_dict.keys())
-        assert not ('time' in pp.yaml_dict.keys())
-        assert not ('time' in pp.cli_dict.keys())
+        assert pp.config_dict['time_years'] == pytest.approx(3.1688087e-05)
+        assert not ('If' in pp.config_dict.keys())
+        assert not ('time' in pp.config_dict.keys())
+        assert not ('timesteps' in pp.config_dict.keys())
 
     def test_py_hlvl_timeyears_If_yml_runjobs_sngle(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -90,14 +79,14 @@ class TestPreprocessorSingleJobSetups:
         assert len(pp.file_list) == 1
         assert pp._is_completed is False
 
-        assert pp.yaml_dict['time_years'] == pytest.approx(.00031688087814)
-        assert pp.yaml_dict['If'] == 0.1
-        assert not ('time' in pp.yaml_dict.keys())
-        assert not ('time' in pp.cli_dict.keys())
+        assert pp.config_dict['time_years'] == pytest.approx(.00031688087814)
+        assert pp.config_dict['If'] == 0.1
+        assert not ('time' in pp.config_dict.keys())
+        assert not ('timesteps' in pp.config_dict.keys())
 
     def test_py_hlvl_timesteps_and_yaml_argument(self, tmp_path):
         """
-        test calling the python hook command line feature with a config file.
+        Test that timesteps can come from cli, but others from yaml
         """
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_eta_figs': True})
@@ -107,9 +96,49 @@ class TestPreprocessorSingleJobSetups:
         assert len(pp.file_list) == 1
         assert pp._is_completed is False
 
-        assert pp.cli_dict['timesteps'] == 2
-        assert (pp.yaml_dict['save_eta_figs'] is True)
-        assert not ('timesteps' in pp.yaml_dict.keys())
+        assert pp.config_dict['timesteps'] == 2
+        assert (pp.config_dict['save_eta_figs'] is True)
+        assert not ('time' in pp.config_dict.keys())
+
+    def test_py_hlvl_timesteps_yaml_and_cli(self, tmp_path):
+        """
+        Test preference for command line argument
+        """
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_eta_figs': True,
+                                      'timesteps': 20})
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=13)
+
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        assert pp.config_dict['timesteps'] == 13
+        assert (pp.config_dict['save_eta_figs'] is True)
+        assert not ('time' in pp.config_dict.keys())
+
+    def test_py_hlvl_timesteps_and_time_yaml_and_cli(self, tmp_path):
+        """
+        Test that preference is given to command line arguments
+
+        note that time and timesteps both persist, precedence for these args
+        is determined at runtime of run_jobs()
+        """
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_eta_figs': True,
+                                      'timesteps': 20,
+                                      'time': 1000})
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=13, time=13000)
+
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        assert pp.config_dict['timesteps'] == 13
+        assert pp.config_dict['time'] == 13000
+        assert (pp.config_dict['save_eta_figs'] is True)
+        assert ('time' in pp.config_dict.keys())
+        assert ('timesteps' in pp.config_dict.keys())
 
 
 class TestPreprocessorMatrixJobsSetups:
@@ -129,12 +158,11 @@ class TestPreprocessorMatrixJobsSetups:
         assert len(pp.file_list) == 2
         assert pp._is_completed is False
 
-        f_bedload_list = pp.matrix_table[:, 1]
+        f_bedload_list = pp._matrix_table[:, 1]
 
         assert sum([j == 0.2 for j in f_bedload_list]) == 1
         assert sum([j == 0.6 for j in f_bedload_list]) == 1
-        assert pp.cli_dict['timesteps'] == 3
-        assert not ('timesteps' in pp.yaml_dict.keys())
+        assert pp.config_dict['timesteps'] == 3
 
     def test_py_hlvl_mtrx_1list_tsteps_cfg(self, tmp_path):
         file_name = 'user_parameters.yaml'
@@ -152,12 +180,11 @@ class TestPreprocessorMatrixJobsSetups:
         assert len(pp.file_list) == 2
         assert pp._is_completed is False
 
-        f_bedload_list = pp.matrix_table[:, 1]
+        f_bedload_list = pp._matrix_table[:, 1]
 
         assert sum([j == 0.2 for j in f_bedload_list]) == 1
         assert sum([j == 0.6 for j in f_bedload_list]) == 1
-        assert pp.yaml_dict['timesteps'] == 3
-        assert not ('timesteps' in pp.cli_dict.keys())
+        assert pp.config_dict['timesteps'] == 3
 
     def test_py_hlvl_mtrx_2list(self, tmp_path):
         file_name = 'user_parameters.yaml'
@@ -174,8 +201,8 @@ class TestPreprocessorMatrixJobsSetups:
         assert len(pp.file_list) == 9
         assert pp._is_completed is False
 
-        f_bedload_list = pp.matrix_table[:, 1]
-        u0_list = pp.matrix_table[:, 2]
+        f_bedload_list = pp._matrix_table[:, 1]
+        u0_list = pp._matrix_table[:, 2]
 
         assert sum([j == 0.2 for j in f_bedload_list]) == 3
         assert sum([j == 0.5 for j in f_bedload_list]) == 3
@@ -184,7 +211,7 @@ class TestPreprocessorMatrixJobsSetups:
         assert sum([j == 1.5 for j in u0_list]) == 3
         assert sum([j == 2.0 for j in u0_list]) == 3
 
-        comb_list = pp.matrix_table[:, 1:].tolist()
+        comb_list = pp._matrix_table[:, 1:].tolist()
         assert [0.2, 2.0] in comb_list
         assert [0.5, 1.0] in comb_list
         assert not ([0.5, 0.2] in comb_list)
@@ -202,7 +229,7 @@ class TestPreprocessorMatrixJobsSetups:
         # will convert everything to scientific notation
         pp = preprocessor.Preprocessor(input_file=p)
 
-        SLR_list = pp.matrix_table[:, 2]
+        SLR_list = pp._matrix_table[:, 2]
         assert sum([j == 4e-5 for j in SLR_list]) == 3
         assert sum([j == 0.000001 for j in SLR_list]) == 3
 
@@ -233,7 +260,7 @@ class TestPreprocessorMatrixJobsSetups:
         assert pp._has_matrix is True
 
         # verify the directory exists
-        assert pp.jobs_root == str(tmp_path / 'test')
+        assert pp._jobs_root == str(tmp_path / 'test')
         assert (tmp_path / 'test').is_dir()
 
         # try to create another preprocessor at same directory
@@ -332,6 +359,82 @@ class TestPreprocessorMatrixJobsSetups:
         assert '  jobs 6' in captd.out
 
 
+class TestPreprocessorSetJobsSetups:
+
+    def test_py_hlvl_set_two_sets(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_set_to_file(f, [{'f_bedload': 0.2, 'u0': 1},
+                                        {'f_bedload': 0.4, 'u0': 2}])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+        assert pp._has_set is True
+        assert pp._has_matrix is False
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 2
+        assert pp._is_completed is False
+
+        f_bedload_list = pp._matrix_table[:, 1]
+
+        assert sum([j == 0.2 for j in f_bedload_list]) == 1
+        assert sum([j == 0.4 for j in f_bedload_list]) == 1
+        assert pp.config_dict['timesteps'] == 3
+
+    def test_py_hlvl_set_one_sets(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_set_to_file(f, [{'f_bedload': 0.77, 'u0': 1}])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+        assert pp._has_set is True
+        assert pp._has_matrix is False
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        f_bedload_list = pp._matrix_table[:, 1]
+
+        assert sum([j == 0.77 for j in f_bedload_list]) == 1
+        assert pp.config_dict['timesteps'] == 3
+
+    def test_py_hlvl_set_two_mismatched_sets(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_set_to_file(f, [{'f_bedload': 0.2, 'u0': 1},
+                                        {'h0': 0.4, 'u0': 2}])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'All keys in all sets *.'):  # noqa: E127
+            _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_py_hlvl_set_bad_not_list(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        # utilities.write_set_to_file(f, [{'f_bedload': 0.77, 'u0': 1}])
+        utilities.write_parameter_to_file(f, 'set', 'astring!')
+        f.close()
+        with pytest.raises(TypeError,
+                           match=r'Set list must be *.'):
+            _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_py_hlvl_set_bad_colon(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_set_to_file(f, [{'f_bedload:': 0.77, 'u0': 1}])
+        f.close()
+        with pytest.raises(ValueError,
+                           match=r'Colon operator found '
+                                  'in matrix expansion key.'):  # noqa: E127
+            _ = preprocessor.Preprocessor(input_file=p)
+
+
 class TestPreprocessorEnsembleJobsSetups:
 
     def test_py_hlvl_ensemble(self, tmp_path):
@@ -343,6 +446,7 @@ class TestPreprocessorEnsembleJobsSetups:
         pp = preprocessor.Preprocessor(input_file=p)
         # assertions for job creation
         assert pp._has_matrix is True
+        assert pp._has_ensemble is True
         assert type(pp.file_list) is list
         assert len(pp.file_list) == 2
 
@@ -424,7 +528,7 @@ class TestPreprocessorParallelJobsSetups:
         assert len(pp.file_list) == 1
         assert pp._has_matrix is False
 
-        assert pp.yaml_dict['parallel'] is True
+        assert pp.config_dict['parallel'] is True
 
     def test_py_hlvl_parallel_boolean_yaml(self, tmp_path):
         file_name = 'user_parameters.yaml'
@@ -439,8 +543,7 @@ class TestPreprocessorParallelJobsSetups:
         assert len(pp.file_list) == 2
         assert pp._has_matrix is True
 
-        assert pp.yaml_dict['parallel'] is True
-        assert not ('parallel' in pp.cli_dict.keys())
+        assert pp.config_dict['parallel'] is True
 
     def test_py_hlvl_parallel_boolean_cli(self, tmp_path):
         file_name = 'user_parameters.yaml'
@@ -454,8 +557,7 @@ class TestPreprocessorParallelJobsSetups:
         assert len(pp.file_list) == 2
         assert pp._has_matrix is True
 
-        assert pp.cli_dict['parallel'] is True
-        assert not ('parallel' in pp.yaml_dict.keys())
+        assert pp.config_dict['parallel'] is True
 
     def test_py_hlvl_parallel_integer_yaml(self, tmp_path):
         file_name = 'user_parameters.yaml'
@@ -470,8 +572,7 @@ class TestPreprocessorParallelJobsSetups:
         assert len(pp.file_list) == 2
         assert pp._has_matrix is True
 
-        assert pp.yaml_dict['parallel'] == 2
-        assert not ('parallel' in pp.cli_dict.keys())
+        assert pp.config_dict['parallel'] == 2
 
     def test_py_hlvl_parallel_integer_cli(self, tmp_path):
         file_name = 'user_parameters.yaml'
@@ -486,8 +587,7 @@ class TestPreprocessorParallelJobsSetups:
         assert pp._has_matrix is True
         assert pp._is_completed is False
 
-        assert pp.cli_dict['parallel'] == 2
-        assert not ('parallel' in pp.yaml_dict.keys())
+        assert pp.config_dict['parallel'] == 2
 
 
 class TestPreprocessorRunJobs:
@@ -521,7 +621,8 @@ class TestPreprocessorRunJobs:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp = preprocessor.Preprocessor(p)
 
-        pp.file_list = [*pp.file_list] * 2
+        pp._file_list = [*pp.file_list] * 2
+        pp._config_list = [*pp.config_list] * 2
 
         # patch jobs
         with mock.patch('pyDeltaRCM.preprocessor._SerialJob') as ptch:
@@ -541,7 +642,8 @@ class TestPreprocessorRunJobs:
         pp = preprocessor.Preprocessor(p, parallel=True)
 
         # expand the list to include multiples
-        pp.file_list = [*pp.file_list] * 5
+        pp._file_list = [*pp.file_list] * 5
+        pp._config_list = [*pp.config_list] * 5
 
         # patch jobs and semaphore to check number of processes called
         with mock.patch('pyDeltaRCM.preprocessor._ParallelJob') as ptch, \
@@ -566,7 +668,8 @@ class TestPreprocessorRunJobs:
         pp = preprocessor.Preprocessor(p, parallel=2)
 
         # expand the list to include multiples
-        pp.file_list = [*pp.file_list] * 5
+        pp._file_list = [*pp.file_list] * 5
+        pp._config_list = [*pp.config_list] * 5
 
         # patch jobs and semaphore to check number of processes called
         with mock.patch('pyDeltaRCM.preprocessor._ParallelJob') as ptch, \
@@ -635,15 +738,15 @@ class TestBaseJob:
                            match=r'You must specify a run duration *.'):
             _ = preprocessor._BaseJob(
                 i=0, input_file=p,
-                cli_dict={}, yaml_dict={})
+                config_dict={})
 
     def test_timeargs_precedence_tstepsovertime(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         basej = preprocessor._BaseJob(
             i=0, input_file=p,
-            cli_dict={}, yaml_dict={'time': 10000,
-                                    'timesteps': 2})
+            config_dict={'time': 10000,
+                         'timesteps': 2})
 
         assert isinstance(basej.deltamodel, DeltaModel)
         assert basej._job_end_time == basej.deltamodel._dt * 2
@@ -654,8 +757,8 @@ class TestBaseJob:
 
         basej = preprocessor._BaseJob(
             i=0, input_file=p,
-            cli_dict={}, yaml_dict={'time_years': 10000,
-                                    'timesteps': 2})
+            config_dict={'time_years': 10000,
+                         'timesteps': 2})
 
         assert isinstance(basej.deltamodel, DeltaModel)
         assert basej._job_end_time == basej.deltamodel._dt * 2
@@ -667,8 +770,8 @@ class TestBaseJob:
 
         basej = preprocessor._BaseJob(
             i=0, input_file=p,
-            cli_dict={}, yaml_dict={'time_years': 10000,
-                                    'time': 900})
+            config_dict={'time_years': 10000,
+                         'time': 900})
 
         assert isinstance(basej.deltamodel, DeltaModel)
         assert basej._job_end_time == 900
@@ -683,7 +786,7 @@ class TestSerialJob:
 
         sj = preprocessor._SerialJob(
             i=0, input_file=p,
-            cli_dict={}, yaml_dict={'timesteps': 10})
+            config_dict={'timesteps': 10})
 
         # modify the save interval to be twice dt
         sj.deltamodel._save_dt = 2 * sj.deltamodel._dt
@@ -722,7 +825,7 @@ class TestSerialJob:
 
         sj = preprocessor._SerialJob(
             i=99, input_file=p,
-            cli_dict={}, yaml_dict={'timesteps': 10})
+            config_dict={'timesteps': 10})
 
         # modify the save interval to be twice dt
         sj.deltamodel._save_dt = 2 * sj.deltamodel._dt
@@ -764,7 +867,7 @@ class TestSerialJob:
 
         sj = preprocessor._SerialJob(
             i=0, input_file=p,
-            cli_dict={}, yaml_dict={'timesteps': 10})
+            config_dict={'timesteps': 10})
 
         # modify the save interval to be twice dt
         sj.deltamodel._save_dt = 2 * sj.deltamodel._dt
@@ -812,7 +915,7 @@ class TestParallelJob:
 
         pj = preprocessor._ParallelJob(
             i=0, queue=Q, sema=S, input_file=p,
-            cli_dict={}, yaml_dict={'timesteps': 10})
+            config_dict={'timesteps': 10})
 
         # modify the save interval to be twice dt
         pj.deltamodel._save_dt = 2 * pj.deltamodel._dt
@@ -855,7 +958,7 @@ class TestParallelJob:
 
         pj = preprocessor._ParallelJob(
             i=99, queue=Q, sema=S, input_file=p,
-            cli_dict={}, yaml_dict={'timesteps': 10})
+            config_dict={'timesteps': 10})
 
         # modify the save interval to be twice dt
         pj.deltamodel._save_dt = 2 * pj.deltamodel._dt
@@ -904,7 +1007,7 @@ class TestParallelJob:
 
         pj = preprocessor._ParallelJob(
             i=0, queue=Q, sema=S, input_file=p,
-            cli_dict={}, yaml_dict={'timesteps': 10})
+            config_dict={'timesteps': 10})
 
         # modify the save interval to be twice dt
         pj.deltamodel._save_dt = 2 * pj.deltamodel._dt
