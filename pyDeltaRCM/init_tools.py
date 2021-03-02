@@ -709,7 +709,9 @@ class init_tools(abc.ABC):
 
                 # create a new file
                 self.init_output_file()
-                self._save_iter = 0
+                self._save_iter = int(0)
+                if self.save_strata:
+                    self.strata_counter = int(0)
 
                 # note we do not output data and a new checkpoint here!
 
