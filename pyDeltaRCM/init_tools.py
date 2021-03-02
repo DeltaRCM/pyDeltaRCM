@@ -708,10 +708,17 @@ class init_tools(abc.ABC):
                 warnings.warn(UserWarning(_msg))
 
                 # create a new file
-                self.init_output_file()
+                # reset output file counters
                 self._save_iter = int(0)
+                # reset strata fields just loaded from checkpoint
                 if self.save_strata:
                     self.strata_counter = int(0)
+                    self.n_steps = int(max(1, 5 * int(self._save_dt / self.dt)))
+                    self.strata_sand_frac = lil_matrix(
+                        (self.L * self.W, self.n_steps), dtype=np.float32)
+                    self.strata_eta = lil_matrix(
+                        (self.L * self.W, self.n_steps), dtype=np.float32)
+                self.init_output_file()
 
                 # note we do not output data and a new checkpoint here!
 
