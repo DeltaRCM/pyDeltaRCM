@@ -662,7 +662,6 @@ class _BaseJob(abc.ABC):
             self._time_config = config_dict['timesteps']
 
             # compute the end time
-            print(config_dict['timesteps'])
             self._job_end_time = _curr_time + \
                 ((config_dict['timesteps'] * self.deltamodel._dt))
 
