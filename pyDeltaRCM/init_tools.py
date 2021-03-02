@@ -162,11 +162,6 @@ class init_tools(abc.ABC):
         if self.checkpoint_dt is None:
             self.checkpoint_dt = self._save_dt
 
-        # handle a not implemented setup
-        if self.save_checkpoint and self._toggle_subsidence:
-            raise NotImplementedError(
-                'Cannot handle checkpointing with subsidence.')
-
         # write the input file values to the log
         if not self._resume_checkpoint:
             for k, v in list(self._input_file_vars.items()):
