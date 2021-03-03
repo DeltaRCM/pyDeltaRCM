@@ -97,14 +97,11 @@ class TestFinalizeTimestep:
 
 class TestApplyingSubsidence:
 
-    in_idx = (34, 44)
-    out_idx = (34, 45)
-
     def test_subsidence_in_update(self, tmp_path):
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'toggle_subsidence': True,
-                                      'sigma_max': 1e-8,
+                                      'subsidence_rate': 1e-8,
                                       'start_subsidence': 0,
                                       'seed': 0})
         _delta = DeltaModel(input_file=p)
@@ -113,21 +110,22 @@ class TestApplyingSubsidence:
         _delta.run_one_timestep = mock.MagicMock()
 
         assert _delta.dt == 25000
-        assert _delta.sigma_max == 1e-8
-        assert _delta.sigma[self.in_idx] == 0.0  # outside the sigma mask
-        assert _delta.sigma[self.out_idx] == 0.00025  # inside the sigma mask
-        assert np.all(_delta.eta[34, 44:7] == -_delta.h0)
+        assert _delta.subsidence_rate == 1e-8
+        assert np.all(_delta.sigma[:_delta.L0, :] == 0.0)  # outside the sigma mask
+        assert np.all(_delta.sigma[_delta.L0:, :] == 0.00025)  # inside the sigma mask
+        assert np.all(_delta.eta[_delta.L0:, :] == -_delta.h0)
 
         _delta.update()
-        assert _delta.eta[self.in_idx] == pytest.approx(-_delta.h0)
-        assert _delta.eta[self.out_idx] == pytest.approx(-_delta.h0 - 0.00025)
+        assert np.all(_delta.eta[_delta.L0-1, :25] == 0.0)
+        assert np.all(_delta.eta[_delta.L0:, :] ==
+                      pytest.approx(-_delta.h0 - 0.00025))
         _delta.output_netcdf.close()
 
     def test_subsidence_in_update_delayed_start(self, tmp_path):
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'toggle_subsidence': True,
-                                      'sigma_max': 1e-8,
+                                      'subsidence_rate': 1e-8,
                                       'start_subsidence': 25000,
                                       'seed': 0})
         _delta = DeltaModel(input_file=p)
@@ -136,22 +134,21 @@ class TestApplyingSubsidence:
         _delta.run_one_timestep = mock.MagicMock()
 
         assert _delta.dt == 25000
-        assert _delta.sigma_max == 1e-8
-        assert _delta.sigma[self.in_idx] == 0.0  # outside the sigma mask
-        assert _delta.sigma[self.out_idx] == 0.00025  # inside the sigma mask
-        assert np.all(_delta.eta[self.in_idx[0],
-                                 self.in_idx[1]:self.in_idx[1]+5] ==
-                      -_delta.h0)
+        assert _delta.subsidence_rate == 1e-8
+        assert np.all(_delta.sigma[:_delta.L0, :] == 0.0)  # outside the sigma mask
+        assert np.all(_delta.sigma[_delta.L0:, :] == 0.00025)  # inside the sigma mask
+        assert np.all(_delta.eta[_delta.L0:, :] == -_delta.h0)
 
         _delta.update()  # no subsidence applied
         assert _delta.time == 25000
-        assert _delta.eta[self.in_idx] == pytest.approx(-_delta.h0)
-        assert _delta.eta[self.out_idx] == pytest.approx(-_delta.h0)
+        assert np.all(_delta.eta[_delta.L0-1, :25] == 0.0)
+        assert np.all(_delta.eta[_delta.L0:, :] == pytest.approx(-_delta.h0))
 
         _delta.update()
         assert _delta.time == 50000
-        assert _delta.eta[self.in_idx] == pytest.approx(-_delta.h0)
-        assert _delta.eta[self.out_idx] == pytest.approx(-_delta.h0 - 0.00025)
+        assert np.all(_delta.eta[_delta.L0-1, :25] == 0.0)
+        assert np.all(_delta.eta[_delta.L0:, :] ==
+                      pytest.approx(-_delta.h0 - 0.00025))
         _delta.output_netcdf.close()
 
         _delta.run_one_timestep.call_count == 2
@@ -160,14 +157,14 @@ class TestApplyingSubsidence:
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'toggle_subsidence': True,
-                                      'sigma_max': 1e-8})
+                                      'subsidence_rate': 1e-8})
         _delta = DeltaModel(input_file=p)
 
         assert _delta.dt == 25000
-        assert _delta.sigma[self.out_idx] == 0.00025
+        assert np.all(_delta.sigma[_delta.L0:, :] == 0.00025)
         # use the model setter to adjust the timestep
         _delta.time_step = 86400
-        assert _delta.sigma[self.out_idx] == 0.000864
+        assert np.all(_delta.sigma[_delta.L0:, :] == 0.000864)
         _delta.output_netcdf.close()
 
 
