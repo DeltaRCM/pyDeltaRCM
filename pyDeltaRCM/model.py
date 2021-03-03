@@ -99,7 +99,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
             # load values from the checkpoint and don't init final features
-            self.load_checkpoint()
+            self.load_checkpoint(defer_output)
 
         else:
             # initialize the output file

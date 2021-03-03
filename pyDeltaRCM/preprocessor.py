@@ -807,7 +807,9 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
                 # initialize the output files (defer_output=True above)
                 # unless resuming from checkpoint, then load the checkpoint
                 if self.deltamodel.resume_checkpoint:
-                    self.deltamodel.load_checkpoint()
+                    # here we set defer output to false when loading the
+                    #   checkpoint on this thread
+                    self.deltamodel.load_checkpoint(defer_output=False)
                 else:
                     # infrastructure deferred, need to trigger manually
                     self.deltamodel.init_output_file()
