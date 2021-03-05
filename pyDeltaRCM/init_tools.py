@@ -576,17 +576,13 @@ class init_tools(abc.ABC):
                                   vartype='i8', vardims=('length', 'width'))
             # subsidence metadata
             if self._toggle_subsidence:
-                _create_meta_variable('toggle_subsidence',
-                                      self.toggle_subsidence, 'bool')
                 _create_meta_variable('start_subsidence',
                                       self.start_subsidence, 'seconds',
                                       vartype='i8')
-                _create_meta_variable('subsidence_rate',
-                                      self.subsidence_rate,
-                                      'meters per second')
-            else:
-                _create_meta_variable('toggle_subsidence',
-                                      self.toggle_subsidence, 'bool')
+                _create_meta_variable('sigma', self.sigma,
+                                      'meters per timestep',
+                                      vardims=('length', 'width'))
+
             # time-varying metadata
             _create_meta_variable('H_SL', None, 'meters',
                                   vardims=('total_time'))
