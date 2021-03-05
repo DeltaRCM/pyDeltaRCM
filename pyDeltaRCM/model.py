@@ -531,43 +531,15 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._toggle_subsidence = toggle_subsidence
 
     @property
-    def theta1(self):
+    def subsidence_rate(self):
         """
-        theta1 defines the left radial bound for the subsiding region.
-
-        For more information on *theta1* and defining the subsidence pattern,
-        refer to :meth:`init_subsidence`
+        subsidence_rate defines the maximum rate of subsidence.
         """
-        return self._theta1
+        return self._subsidence_rate
 
-    @theta1.setter
-    def theta1(self, theta1):
-        self._theta1 = theta1
-
-    @property
-    def theta2(self):
-        """
-        theta2 defines the right radial bound for the subsiding region.
-
-        For more information on *theta2* and defining the subsidence pattern,
-        refer to :meth:`init_subsidence`
-        """
-        return self._theta2
-
-    @theta2.setter
-    def theta2(self, theta2):
-        self._theta2 = theta2
-
-    @property
-    def sigma_max(self):
-        """
-        sigma_max defines the maximum rate of subsidence.
-        """
-        return self._sigma_max
-
-    @sigma_max.setter
-    def sigma_max(self, sigma_max):
-        self._sigma_max = sigma_max
+    @subsidence_rate.setter
+    def subsidence_rate(self, subsidence_rate):
+        self._subsidence_rate = subsidence_rate
 
     @property
     def start_subsidence(self):
@@ -1065,7 +1037,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
                                       'Delta might evolve very slowly.'))
 
         if self.toggle_subsidence:
-            self.sigma = self.subsidence_mask * self.sigma_max * new_time_step
+            self.sigma = (self.sigma / self._dt) * new_time_step
 
         self._dt = new_time_step
 

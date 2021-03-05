@@ -162,11 +162,6 @@ class init_tools(abc.ABC):
         if self.checkpoint_dt is None:
             self.checkpoint_dt = self._save_dt
 
-        # handle a not implemented setup
-        if self.save_checkpoint and self._toggle_subsidence:
-            raise NotImplementedError(
-                'Cannot handle checkpointing with subsidence.')
-
         # write the input file values to the log
         if not self._resume_checkpoint:
             for k, v in list(self._input_file_vars.items()):
@@ -579,6 +574,15 @@ class init_tools(abc.ABC):
             _create_meta_variable('h0', self.h0, 'meters')
             _create_meta_variable('cell_type', self.cell_type, 'type',
                                   vartype='i8', vardims=('length', 'width'))
+            # subsidence metadata
+            if self._toggle_subsidence:
+                _create_meta_variable('start_subsidence',
+                                      self.start_subsidence, 'seconds',
+                                      vartype='i8')
+                _create_meta_variable('sigma', self.sigma,
+                                      'meters per timestep',
+                                      vardims=('length', 'width'))
+
             # time-varying metadata
             _create_meta_variable('H_SL', None, 'meters',
                                   vardims=('total_time'))
@@ -595,42 +599,25 @@ class init_tools(abc.ABC):
     def init_subsidence(self):
         """Initialize subsidence pattern.
 
-        Initializes patterns of subsidence if
-        toggle_subsidence is True (default False)
+        Initializes patterns of subsidence if toggle_subsidence is True
+        (default False). Default behavior is for the entire basin to subside
+        at a constant rate (with the exception of the land boundary cells along
+        the inlet boundary).
 
-        Uses theta1 and theta2 (defined in yaml) to set the angular bounds for
-        the subsiding region. To create a custom subsidence region, we
-        recommend subclassing the DeltaModel class and defining your own array
-        for self.subsidence_mask (a binary array with 1s in the cells that
-        are subsiding and 0s elswhere), and self.sigma (the subsidence mask
-        multiplied with the vertical rate of subsidence and the timestep size).
+        To customize the subsiding region, or even vary the subsiding region
+        over the course of the model run, we recommend subclassing the
+        DeltaModel class.
 
-        theta1 and theta2 are set in relation to the inlet orientation. The
-        inlet channel is at an angle of 0, if theta1 is -pi/3 radians, this
-        means that the angle to the left of the inlet that will be included
-        in the subsiding region is 30 degrees. theta2 defines the right angular
-        bounds for the subsiding region in a similar fashion.
         """
         _msg = 'Initializing subsidence'
         self.log_info(_msg, verbosity=1)
 
         if self._toggle_subsidence:
 
-            R1 = 0.3 * self.L
-            R2 = 1. * self.L  # radial limits (fractions of L)
-
-            Rloc = np.sqrt((self.y - self.L0)**2 + (self.x - self.W / 2.)**2)
-
-            thetaloc = np.zeros((self.L, self.W))
-            thetaloc[self.y > self.L0 - 1] = np.arctan(
-                (self.x[self.y > self.L0 - 1] - self.W / 2.)
-                / (self.y[self.y > self.L0 - 1] - self.L0 + 1))
-            self.subsidence_mask = ((R1 <= Rloc) & (Rloc <= R2) &
-                                    (self._theta1 <= thetaloc) &
-                                    (thetaloc <= self._theta2))
+            self.subsidence_mask = np.ones((self.L, self.W), dtype=bool)
             self.subsidence_mask[:self.L0, :] = False
 
-            self.sigma = self.subsidence_mask * self._sigma_max * self.dt
+            self.sigma = self.subsidence_mask * self._subsidence_rate * self.dt
 
     def load_checkpoint(self, defer_output=False):
         """Load the checkpoint from the .npz file.

@@ -76,7 +76,7 @@ def test_DeltaModel(tmp_path):
     write_parameter_to_file(f, 'f_bedload', 0.5)
     write_parameter_to_file(f, 'C0_percent', 0.1)
     write_parameter_to_file(f, 'toggle_subsidence', False)
-    write_parameter_to_file(f, 'sigma_max', 0.0)
+    write_parameter_to_file(f, 'subsidence_rate', 0.0)
     write_parameter_to_file(f, 'start_subsidence', 50.)
     write_parameter_to_file(f, 'save_eta_figs', False)
     write_parameter_to_file(f, 'save_stage_figs', False)

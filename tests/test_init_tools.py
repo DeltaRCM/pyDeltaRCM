@@ -149,20 +149,6 @@ class TestModelDomainSetup:
         assert np.any(delta.sfc_sum) == 0
 
 
-class TestInvalidConfigurations:
-
-    def test_cannot_support_checkpointing_subsidence(self, tmp_path):
-
-        file_name = 'user_parameters.yaml'
-        p, f = utilities.create_temporary_file(tmp_path, file_name)
-        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
-        utilities.write_parameter_to_file(f, 'toggle_subsidence', True)
-        utilities.write_parameter_to_file(f, 'save_checkpoint', True)
-        f.close()
-        with pytest.raises(NotImplementedError):
-            _ = DeltaModel(input_file=p)
-
-
 class TestInitSubsidence:
 
     def test_subsidence_bounds(self, tmp_path):
@@ -174,16 +160,15 @@ class TestInitSubsidence:
         utilities.write_parameter_to_file(f, 'Width', 600.)
         utilities.write_parameter_to_file(f, 'dx', 5)
         utilities.write_parameter_to_file(f, 'toggle_subsidence', True)
-        utilities.write_parameter_to_file(f, 'theta1', -np.pi / 2)
-        utilities.write_parameter_to_file(f, 'theta1', 0)
         f.close()
 
         delta = DeltaModel(input_file=p)
         # assert subsidence mask is binary
-        assert np.all(delta.subsidence_mask == delta.subsidence_mask.astype(bool))
+        assert np.all(delta.subsidence_mask ==
+                      delta.subsidence_mask.astype(bool))
         # check specific regions
-        assert np.all(delta.subsidence_mask[75:, 60:] == 1)
-        assert np.all(delta.subsidence_mask[:, :55] == 0)
+        assert np.all(delta.subsidence_mask[delta.L0:, :] == 1)
+        assert np.all(delta.subsidence_mask[:delta.L0, :] == 0)
 
 
 class TestLoadCheckpoint:
@@ -616,32 +601,18 @@ class TestSettingParametersFromYAMLFile:
         _delta = DeltaModel(input_file=p)
         assert _delta.toggle_subsidence is True
 
-    def test_theta1(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'toggle_subsidence': True,
-                                      'theta1': -1.0})
-        _delta = DeltaModel(input_file=p)
-        assert _delta.theta1 == -1
-
-    def test_theta2(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'toggle_subsidence': True,
-                                      'theta2': 2.0})
-        _delta = DeltaModel(input_file=p)
-        assert _delta.theta2 == 2.0
-
     def test_start_subsidence(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'start_subsidence': 12345})
         _delta = DeltaModel(input_file=p)
         assert _delta.start_subsidence == 12345
 
-    def test_sigma_max(self, tmp_path):
+    def test_subsidence_rate(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'toggle_subsidence': True,
-                                      'sigma_max': 1e-9})
+                                      'subsidence_rate': 1e-9})
         _delta = DeltaModel(input_file=p)
-        assert _delta.sigma_max == 1e-9
+        assert _delta.subsidence_rate == 1e-9
         assert np.any(_delta.sigma > 0)
         assert np.all(_delta.sigma <= (1e-9 * _delta.dt))
 
