@@ -176,7 +176,7 @@ YAML configuration file.</p></li>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_water_iteration</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.load_checkpoint" title="pyDeltaRCM.model.DeltaModel.load_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_checkpoint</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.load_checkpoint" title="pyDeltaRCM.model.DeltaModel.load_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_checkpoint</span></code></a>([defer_output])</p></td>
 <td><p>Load the checkpoint from the .npz file.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.log_info" title="pyDeltaRCM.model.DeltaModel.log_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_info</span></code></a>(message[, verbosity])</p></td>
@@ -994,10 +994,39 @@ bounds for the subsiding region in a similar fashion.</p>
 
 <dl class="py method">
 <dt id="pyDeltaRCM.model.DeltaModel.load_checkpoint">
-<code class="sig-name descname"><span class="pre">load_checkpoint</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.load_checkpoint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">load_checkpoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">defer_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.load_checkpoint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the checkpoint from the .npz file.</p>
 <p>Uses the file at the path determined by <cite>self.prefix</cite> and a file named
-<cite>checkpoint.npz</cite>.</p>
+<cite>checkpoint.npz</cite>. There are a few pathways for loading, which depend
+on 1) the status of the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_strata" title="pyDeltaRCM.model.DeltaModel.save_strata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_strata</span></code></a> option, 2) the status of
+additional grid-saving options, 3) the presence of a netCDF output
+file at the expected output location, and 4) the status of the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">defer_output</span></code> parameter passed to this method as an optional
+argument.</p>
+<p>As a standard user, you should not need to worry about any of these
+pathways or options. However, if you are developing pyDeltaRCM or
+customizing the model in any way that involves loadind from
+checkpoints, you should be aware of these pathways.</p>
+<p>For example, loading from checkpoint will succeed if no netCDF4 file
+is found, where one is expected (e.g., because <code class="xref py py-obj docutils literal notranslate"><span class="pre">_save_any_grids</span></code>
+is <cite>True</cite>). In this case, a new output netcdf file will be created,
+after a <cite>UserWarning</cite> is issued.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If you are customing the model and intend to use checkpointing and
+the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code> parallel infrastructure, be sure that
+parameter <code class="xref py py-obj docutils literal notranslate"><span class="pre">defer_output</span></code> is <cite>True</cite> until the
+:obj:<a href="#id1"><span class="problematic" id="id2">`</span></a>load_checkpoint: method can be called from the thread the
+model will execute on. Failure to do so may result in unexpected
+behavior with indexing in the output netCDF4 file.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>defer_output</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Whether to defer any netCDF activities at present. Manipulating
+this variable is critical for parallel operations. See note above.
+Default is <cite>False</cite>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
