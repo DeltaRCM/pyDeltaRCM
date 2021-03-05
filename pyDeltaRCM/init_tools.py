@@ -632,11 +632,42 @@ class init_tools(abc.ABC):
 
             self.sigma = self.subsidence_mask * self._sigma_max * self.dt
 
-    def load_checkpoint(self):
+    def load_checkpoint(self, defer_output=False):
         """Load the checkpoint from the .npz file.
 
         Uses the file at the path determined by `self.prefix` and a file named
-        `checkpoint.npz`.
+        `checkpoint.npz`. There are a few pathways for loading, which depend
+        on 1) the status of the :obj:`save_strata` option, 2) the status of
+        additional grid-saving options, 3) the presence of a netCDF output
+        file at the expected output location, and 4) the status of the
+        :obj:`defer_output` parameter passed to this method as an optional
+        argument.
+
+        As a standard user, you should not need to worry about any of these
+        pathways or options. However, if you are developing pyDeltaRCM or
+        customizing the model in any way that involves loadind from
+        checkpoints, you should be aware of these pathways.
+
+        For example, loading from checkpoint will succeed if no netCDF4 file
+        is found, where one is expected (e.g., because :obj:`_save_any_grids`
+        is `True`). In this case, a new output netcdf file will be created,
+        after a `UserWarning` is issued.
+
+        .. important::
+
+            If you are customing the model and intend to use checkpointing and
+            the :obj:`Preprocessor` parallel infrastructure, be sure that
+            parameter :obj:`defer_output` is `True` until the
+            :obj:`load_checkpoint: method can be called from the thread the
+            model will execute on. Failure to do so may result in unexpected
+            behavior with indexing in the output netCDF4 file.
+
+        Parameters
+        ----------
+        defer_output : :obj:`bool`, optional
+            Whether to defer any netCDF activities at present. Manipulating
+            this variable is critical for parallel operations. See note above.
+            Default is `False`.
         """
         _msg = 'Loading from checkpoint.'
         self.log_info(_msg, verbosity=0)
@@ -696,7 +727,8 @@ class init_tools(abc.ABC):
         shared_tools.set_random_state(rng_state)
 
         # handle the case with a netcdf file
-        if (self._save_any_grids or self._save_metadata or self._save_strata):
+        if ((self._save_any_grids or self._save_metadata or self._save_strata)
+                and not defer_output):
 
             # check if the file exists already
             #    if it does, it needs to be flushed of certain fields
@@ -708,8 +740,12 @@ class init_tools(abc.ABC):
                 warnings.warn(UserWarning(_msg))
 
                 # create a new file
+                # reset output file counters
+                self._save_iter = int(0)
+                # reset strata fields just loaded from checkpoint
+                if self.save_strata:
+                    self.strata_counter = int(0)
                 self.init_output_file()
-                self._save_iter = 0
 
                 # note we do not output data and a new checkpoint here!
 

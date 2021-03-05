@@ -4,6 +4,7 @@ import pytest
 
 import os
 import platform
+import shutil
 import numpy as np
 from netCDF4 import Dataset
 
@@ -532,3 +533,106 @@ class TestCheckpointingCreatingLoading:
 
         # check that fields match
         assert np.all(_delta.eta == _rand_field)
+
+    @mock.patch(
+        'pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep',
+        new=utilities.FastIteratingDeltaModel.run_one_timestep)
+    @pytest.mark.skipif(
+        platform.system() != 'Linux',
+        reason='Parallel support only on Linux OS.')
+    def test_load_ckpt_wo_netcdf_parallel_spinup_to_matrix(self, tmp_path):
+        """
+        Test that multiple matrix runs can be resumed from a single checkpoint
+        file, and take advantage of the preprocessor parallel infrastructure.
+        """
+        # define a yaml with an output and checkpoint
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_checkpoint': True,
+                                      'save_strata': True,
+                                      'save_eta_grids': True})
+        baseModel = DeltaModel(input_file=p)
+
+        # run base for 2 timesteps
+        for _ in range(0, 50):
+            baseModel.update()
+        baseModel.finalize()
+
+        # get the number of times the data has been output in the base file
+        bmsi = baseModel._save_iter
+        assert bmsi > 0
+
+        # check that files exist, and then delete nc
+        assert os.path.isfile(os.path.join(
+            baseModel.prefix, 'pyDeltaRCM_output.nc'))
+        assert os.path.isfile(os.path.join(
+            baseModel.prefix, 'checkpoint.npz'))
+
+        # open the file and check dimensions
+        exp_nc_path = os.path.join(baseModel.prefix, 'pyDeltaRCM_output.nc')
+        output = Dataset(exp_nc_path, 'r', allow_pickle=True)
+        out_vars = output.variables.keys()
+        # check that expected variables are in the file
+        assert 'x' in out_vars
+        assert 'y' in out_vars
+        assert 'time' in out_vars
+        assert 'eta' in out_vars
+        # check attributes of variables
+        assert output['time'].shape[0] == bmsi
+
+        ########################
+
+        # set up a matrix of runs
+        resume_dict = {'save_checkpoint': False,
+                       'resume_checkpoint': True,
+                       'save_strata': True,
+                       'save_eta_grids': True,
+                       'out_dir': os.path.join(tmp_path, 'matrix'),
+                       'parallel': 4}
+        _matrix = {'f_bedload': [0.1, 0.2, 0.5, 1]}
+        resume_dict['matrix'] = _matrix
+
+        # let the preprocessor write the initial matrix and
+        #    create a new output netcdf file
+        pp = preprocessor.Preprocessor(
+            resume_dict,
+            timesteps=25)  # 2000
+
+        # now copy the checkpoint
+        for j, j_file in enumerate(pp.file_list):
+            # get folder
+            j_folder = j_file.parent
+
+            # copy the spinup checkpoint to each of the folders
+            shutil.copy(
+                src=os.path.join(baseModel.prefix, 'checkpoint.npz'),
+                dst=os.path.join(tmp_path, 'matrix', j_folder))
+
+        pp.run_jobs()
+
+        # first job save dimension
+        fjsi = pp.job_list[0].deltamodel._save_iter
+
+        # proceed with assertions
+        for j, j_job in enumerate(pp.job_list):
+            exp_nc_path = os.path.join(
+                tmp_path, 'matrix', j_folder, 'pyDeltaRCM_output.nc')
+            assert os.path.isfile(exp_nc_path)
+
+            # check all jobs have same dimensionality
+            jsi = j_job.deltamodel._save_iter
+            assert jsi == fjsi
+
+            # open the file and check dimensions
+            output = Dataset(exp_nc_path, 'r', allow_pickle=True)
+            out_vars = output.variables.keys()
+            # check that expected variables are in the file
+            assert 'x' in out_vars
+            assert 'y' in out_vars
+            assert 'time' in out_vars
+            assert 'eta' in out_vars
+            # check attributes of variables
+
+            # this is the critical check, that the dimension of the second
+            # netcdf is not expanded to begin at _save_ter from the initial
+            # basemodel
+            assert output['time'].shape[0] <= (bmsi // 2)
