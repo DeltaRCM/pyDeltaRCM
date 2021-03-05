@@ -44,45 +44,29 @@ to get an overview.</p>
 <p>To configure a pyDeltaRCM model with subsidence, the yaml parameter,
 <code class="docutils literal notranslate"><span class="pre">toggle_subsidence</span></code> must be set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 </div>
-<div class="section" id="configuring-lateral-extents-of-subsidence">
-<h2>Configuring Lateral Extents of Subsidence<a class="headerlink" href="#configuring-lateral-extents-of-subsidence" title="Permalink to this headline">¶</a></h2>
-<p>There are two yaml parameters associated with the lateral extents of the
-subsiding region in pyDeltaRCM: <code class="docutils literal notranslate"><span class="pre">theta1</span></code> and <code class="docutils literal notranslate"><span class="pre">theta2</span></code>. <code class="docutils literal notranslate"><span class="pre">theta1</span></code> is
-specified in radians and represents the left boundary of the subsiding region.
-The angle in radians is expressed relative to a datum aligned with the inlet
-channel. <code class="docutils literal notranslate"><span class="pre">theta2</span></code> determines the right boundary of the subsiding region.</p>
-<p>If, for example we wanted the left half of the domain to subside, we would
-write our yaml file with the following parameters:</p>
+<div class="section" id="controlling-subsidence-behavior">
+<h2>Controlling Subsidence Behavior<a class="headerlink" href="#controlling-subsidence-behavior" title="Permalink to this headline">¶</a></h2>
+<p>Two yaml parameters are provided to give users some basic control over
+subsidence behavior. The first is <code class="docutils literal notranslate"><span class="pre">start_subsidence</span></code>, which defines <em>when</em>
+subsidence begins in the model run. This parameter is set in terms of seconds,
+and is set to begin on the step <em>following</em> the time step that brings the
+model to <code class="docutils literal notranslate"><span class="pre">time</span> <span class="pre">==</span> <span class="pre">start_subsidence</span></code>. The second subsidence parameter is the
+<code class="docutils literal notranslate"><span class="pre">subsidence_rate</span></code> yaml parameter. This parameter defines the rate at which
+the basin will subside in meters per second. The default subsiding region is
+the entire delta basin with the exception of the inlet cells and the land cells
+along boundary.</p>
+<p>If, for example we wanted the basin to begin to subside after 2000 seconds
+with a rate of 2e-10 m/s, we would write our yaml file with the following
+parameters:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">toggle_subsidence</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="nt">theta1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">-1.5707963267948966</span>
-<span class="nt">theta2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="nt">start_subsidence</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2000</span>
+<span class="nt">subsidence_rate</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2e-10</span>
 </pre></div>
-</div>
-<p>This specifies <code class="docutils literal notranslate"><span class="pre">theta1</span></code> as negative 90 degrees, and <code class="docutils literal notranslate"><span class="pre">theta2</span></code> as 0 degrees.
-Doing so, will generate a domain that has the a subsiding region as shown in
-yellow in the figure below.</p>
-<p>(<a class="reference external" href="../pyplots/userguide/subsidence_region.png">png</a>, <a class="reference external" href="../pyplots/userguide/subsidence_region.hires.png">hires.png</a>)</p>
-<div class="figure align-default">
-<img alt="../_images/subsidence_region.png" src="../_images/subsidence_region.png" />
-</div>
-</div>
-<div class="section" id="configuring-when-subsidence-occurs">
-<h2>Configuring When Subsidence Occurs<a class="headerlink" href="#configuring-when-subsidence-occurs" title="Permalink to this headline">¶</a></h2>
-<p>To control when subsidence begins over the course of the model run, there is
-another yaml parameter, <code class="docutils literal notranslate"><span class="pre">start_subsidence</span></code>. The value assigned to this
-parameter controls the time (in seconds) at which the subsidence will be turned
-“on” in the model.</p>
-</div>
-<div class="section" id="configuring-the-rate-of-subsidence">
-<h2>Configuring The Rate of Subsidence<a class="headerlink" href="#configuring-the-rate-of-subsidence" title="Permalink to this headline">¶</a></h2>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">Todo</p>
-<p>Add documentation here.</p>
 </div>
 </div>
 <div class="section" id="advanced-subsidence-configurations">
 <h2>Advanced Subsidence Configurations<a class="headerlink" href="#advanced-subsidence-configurations" title="Permalink to this headline">¶</a></h2>
-<div class="admonition-todo admonition" id="id2">
+<div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
 <p>Bit about subclassing and custom configurations</p>
 </div>
@@ -100,9 +84,7 @@ parameter controls the time (in seconds) at which the subsidence will be turned
   <ul>
 <li><a class="reference internal" href="#">Working with subsidence</a><ul>
 <li><a class="reference internal" href="#turning-on-subsidence-in-pydeltarcm">Turning on Subsidence in pyDeltaRCM</a></li>
-<li><a class="reference internal" href="#configuring-lateral-extents-of-subsidence">Configuring Lateral Extents of Subsidence</a></li>
-<li><a class="reference internal" href="#configuring-when-subsidence-occurs">Configuring When Subsidence Occurs</a></li>
-<li><a class="reference internal" href="#configuring-the-rate-of-subsidence">Configuring The Rate of Subsidence</a></li>
+<li><a class="reference internal" href="#controlling-subsidence-behavior">Controlling Subsidence Behavior</a></li>
 <li><a class="reference internal" href="#advanced-subsidence-configurations">Advanced Subsidence Configurations</a></li>
 </ul>
 </li>

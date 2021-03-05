@@ -455,20 +455,14 @@ YAML configuration file.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.seed" title="pyDeltaRCM.model.DeltaModel.seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seed</span></code></a></p></td>
 <td><p>seed defines the random number seed used for the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.sigma_max" title="pyDeltaRCM.model.DeltaModel.sigma_max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma_max</span></code></a></p></td>
-<td><p>sigma_max defines the maximum rate of subsidence.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.start_subsidence" title="pyDeltaRCM.model.DeltaModel.start_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_subsidence</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.start_subsidence" title="pyDeltaRCM.model.DeltaModel.start_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_subsidence</span></code></a></p></td>
 <td><p>start_subsidence defines the start time at which subsidence begins.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.stepmax" title="pyDeltaRCM.model.DeltaModel.stepmax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stepmax</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.stepmax" title="pyDeltaRCM.model.DeltaModel.stepmax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stepmax</span></code></a></p></td>
 <td><p>stepmax is the maximum number of jumps a parcel can make.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.theta1" title="pyDeltaRCM.model.DeltaModel.theta1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">theta1</span></code></a></p></td>
-<td><p>theta1 defines the left radial bound for the subsiding region.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.theta2" title="pyDeltaRCM.model.DeltaModel.theta2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">theta2</span></code></a></p></td>
-<td><p>theta2 defines the right radial bound for the subsiding region.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.subsidence_rate" title="pyDeltaRCM.model.DeltaModel.subsidence_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subsidence_rate</span></code></a></p></td>
+<td><p>subsidence_rate defines the maximum rate of subsidence.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.theta_water" title="pyDeltaRCM.model.DeltaModel.theta_water"><code class="xref py py-obj docutils literal notranslate"><span class="pre">theta_water</span></code></a></p></td>
 <td><p>theta_water is the exponent of depth dependence for weighted routing.</p></td>
@@ -971,19 +965,13 @@ expensive, so we avoid boxing up the constants on each iteration.</p>
 <dt id="pyDeltaRCM.model.DeltaModel.init_subsidence">
 <code class="sig-name descname"><span class="pre">init_subsidence</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.init_subsidence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize subsidence pattern.</p>
-<p>Initializes patterns of subsidence if
-toggle_subsidence is True (default False)</p>
-<p>Uses theta1 and theta2 (defined in yaml) to set the angular bounds for
-the subsiding region. To create a custom subsidence region, we
-recommend subclassing the DeltaModel class and defining your own array
-for self.subsidence_mask (a binary array with 1s in the cells that
-are subsiding and 0s elswhere), and self.sigma (the subsidence mask
-multiplied with the vertical rate of subsidence and the timestep size).</p>
-<p>theta1 and theta2 are set in relation to the inlet orientation. The
-inlet channel is at an angle of 0, if theta1 is -pi/3 radians, this
-means that the angle to the left of the inlet that will be included
-in the subsiding region is 30 degrees. theta2 defines the right angular
-bounds for the subsiding region in a similar fashion.</p>
+<p>Initializes patterns of subsidence if toggle_subsidence is True
+(default False). Default behavior is for the entire basin to subside
+at a constant rate (with the exception of the land boundary cells along
+the inlet boundary).</p>
+<p>To customize the subsiding region, or even vary the subsiding region
+over the course of the model run, we recommend subclassing the
+DeltaModel class.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1538,12 +1526,6 @@ show automatically).</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyDeltaRCM.model.DeltaModel.sigma_max">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sigma_max</span></code><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sigma_max" title="Permalink to this definition">¶</a></dt>
-<dd><p>sigma_max defines the maximum rate of subsidence.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="pyDeltaRCM.model.DeltaModel.start_subsidence">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">start_subsidence</span></code><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.start_subsidence" title="Permalink to this definition">¶</a></dt>
 <dd><p>start_subsidence defines the start time at which subsidence begins.</p>
@@ -1571,19 +1553,9 @@ simulation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyDeltaRCM.model.DeltaModel.theta1">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">theta1</span></code><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.theta1" title="Permalink to this definition">¶</a></dt>
-<dd><p>theta1 defines the left radial bound for the subsiding region.</p>
-<p>For more information on <em>theta1</em> and defining the subsidence pattern,
-refer to <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.init_subsidence" title="pyDeltaRCM.model.DeltaModel.init_subsidence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">init_subsidence()</span></code></a></p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.model.DeltaModel.theta2">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">theta2</span></code><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.theta2" title="Permalink to this definition">¶</a></dt>
-<dd><p>theta2 defines the right radial bound for the subsiding region.</p>
-<p>For more information on <em>theta2</em> and defining the subsidence pattern,
-refer to <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.init_subsidence" title="pyDeltaRCM.model.DeltaModel.init_subsidence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">init_subsidence()</span></code></a></p>
+<dt id="pyDeltaRCM.model.DeltaModel.subsidence_rate">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">subsidence_rate</span></code><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.subsidence_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>subsidence_rate defines the maximum rate of subsidence.</p>
 </dd></dl>
 
 <dl class="py method">

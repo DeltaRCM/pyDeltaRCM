@@ -137,11 +137,9 @@
       ~DeltaModel.sea_surface_mean_elevation
       ~DeltaModel.sed_lag
       ~DeltaModel.seed
-      ~DeltaModel.sigma_max
       ~DeltaModel.start_subsidence
       ~DeltaModel.stepmax
-      ~DeltaModel.theta1
-      ~DeltaModel.theta2
+      ~DeltaModel.subsidence_rate
       ~DeltaModel.theta_water
       ~DeltaModel.time
       ~DeltaModel.time_iter
