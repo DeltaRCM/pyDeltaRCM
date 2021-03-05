@@ -32,7 +32,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     closed and written to disk.
     """
 
-    def __init__(self, input_file=None, defer_output=False):
+    def __init__(self, input_file=None, defer_output=False, **kwargs):
         """Creates an instance of the pyDeltaRCM model.
 
         This method handles setting up the run, including parsing input files,
@@ -50,7 +50,16 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             NetCDF file creation unitl the simualtion is assigned to the core
             it will compute on, so that the DeltaModel object remains
             pickle-able. Note, you will need to manually trigger the
-            :obj:`init_output_file` method if `defer_output` is `True`.
+            :obj:`init_output_file`, :obj:`output_data`, and
+            :obj:`output_checkpoint` method if `defer_output` is `True`.
+
+        **kwargs
+            Optionally, any parameter typically specified in the YAML file can
+            be passed as a keyword argument to the instantiation of the
+            DeltaModel. Keywords will override the specification of any value
+            in the YAML file. This functionality is intended for advanced use
+            cases, and should not be preffered to specifying all inputs in a
+            YAML configuration file.
 
         Returns
         -------
@@ -63,14 +72,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         """
         self._time = 0.
         self._time_iter = int(0)
-        self._save_time_since_last = float("inf")  # force save on t==0
+        self._save_time_since_data = float("inf")  # force save on t==0
         self._save_iter = int(0)
-        self._save_time_since_checkpoint = 0
+        self._save_time_since_checkpoint = float("inf")  # force save on t==0
 
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
         self.default_file = os.path.join(_src_dir, 'default.yml')
-        self.import_files()
+        self.import_files(kwargs)
 
         self.init_output_infrastructure()
         self.init_logger()
@@ -84,14 +93,22 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.init_sediment_routers()
         self.init_subsidence()
 
+        # initialize the stratigraphy infrastructure
+        self.init_stratigraphy()
+
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
-            self.load_checkpoint()
+            # load values from the checkpoint and don't init final features
+            self.load_checkpoint(defer_output)
 
         else:
-            self.init_stratigraphy()
+            # initialize the output file
             if not defer_output:
                 self.init_output_file()
+
+                # record initial conditions
+                self.output_data()
+                self.output_checkpoint()
 
         _msg = 'Model initialization complete'
         self.log_info(_msg)
@@ -120,13 +137,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         Returns
         -------
 
+        Raises
+        ------
+        RuntimeError
+            If model has already been finalized via :meth:`finalize`.
+
         """
-        # record the state of the model
-        if self._save_time_since_last >= self.save_dt:
-            self.record_stratigraphy()
-            self.output_data()
-            self._save_iter += int(1)
-            self._save_time_since_last = 0
+        if self._is_finalized:
+            raise RuntimeError('Cannot update model, model already finalized!')
 
         # update the model, i.e., the actual model morphodynamics
         self.run_one_timestep()
@@ -135,15 +153,16 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         # update time-tracking fields
         self._time += self.dt
-        self._save_time_since_last += self.dt
+        self._save_time_since_data += self.dt
         self._save_time_since_checkpoint += self.dt
         self._time_iter += int(1)
         self.log_model_time()
 
+        # record the state of the model if needed
+        self.output_data()
+
         # save a checkpoint if needed
-        if self._save_time_since_checkpoint >= self.checkpoint_dt:
-            self.output_checkpoint()
-            self._save_time_since_checkpoint = 0
+        self.output_checkpoint()
 
     def finalize(self):
         """Finalize the model run.
@@ -161,15 +180,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         _msg = 'Finalize the model run'
         self.log_info(_msg)
 
-        # get the final timestep recorded, if needed.
-        if self._save_time_since_last >= self.save_dt:
-            self.record_stratigraphy()
-            self.output_data()
+        if self._is_finalized:
+            raise RuntimeError('Cannot finalize model, '
+                               'model already finalized!')
 
-        if self._save_time_since_checkpoint >= self.checkpoint_dt:
-            self.output_checkpoint()
-
-        self.output_strata()
+        self.record_final_stratigraphy()
 
         try:
             self.output_netcdf.close()
@@ -516,43 +531,15 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._toggle_subsidence = toggle_subsidence
 
     @property
-    def theta1(self):
+    def subsidence_rate(self):
         """
-        theta1 defines the left radial bound for the subsiding region.
-
-        For more information on *theta1* and defining the subsidence pattern,
-        refer to :meth:`init_subsidence`
+        subsidence_rate defines the maximum rate of subsidence.
         """
-        return self._theta1
+        return self._subsidence_rate
 
-    @theta1.setter
-    def theta1(self, theta1):
-        self._theta1 = theta1
-
-    @property
-    def theta2(self):
-        """
-        theta2 defines the right radial bound for the subsiding region.
-
-        For more information on *theta2* and defining the subsidence pattern,
-        refer to :meth:`init_subsidence`
-        """
-        return self._theta2
-
-    @theta2.setter
-    def theta2(self, theta2):
-        self._theta2 = theta2
-
-    @property
-    def sigma_max(self):
-        """
-        sigma_max defines the maximum rate of subsidence.
-        """
-        return self._sigma_max
-
-    @sigma_max.setter
-    def sigma_max(self, sigma_max):
-        self._sigma_max = sigma_max
+    @subsidence_rate.setter
+    def subsidence_rate(self, subsidence_rate):
+        self._subsidence_rate = subsidence_rate
 
     @property
     def start_subsidence(self):
@@ -1074,7 +1061,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
                                       'Delta might evolve very slowly.'))
 
         if self.toggle_subsidence:
-            self.sigma = self.subsidence_mask * self.sigma_max * new_time_step
+            self.sigma = (self.sigma / self._dt) * new_time_step
 
         self._dt = new_time_step
 
@@ -1087,12 +1074,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._time_iter
 
     @property
-    def save_time_since_last(self):
+    def save_time_since_data(self):
         """Time since data last output.
 
         The number of times the :obj:`update` method has been called.
         """
-        return self._save_time_since_last
+        return self._save_time_since_data
 
     @property
     def save_time_since_checkpoint(self):
@@ -1118,13 +1105,18 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def channel_width(self):
         """Get channel width."""
-        return self.N0_meters
+        return self.N0 * self._dx
 
     @channel_width.setter
-    def channel_width(self, new_N0):
-        self.N0_meters = new_N0
+    def channel_width(self, new_N0_meters):
+        self.N0_meters = new_N0_meters
         self.create_other_variables()
         self.init_sediment_routers()
+        if self.channel_width != new_N0_meters:
+            warnings.warn(UserWarning(
+                'Channel width was updated to {0} m, rather than input {1},'
+                'due to grid resolution or imposed domain '
+                'restrictions.'.format(self.channel_width, new_N0_meters)))
 
     @property
     def channel_flow_depth(self):
@@ -1170,8 +1162,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self.C0_percent
 
     @influx_sediment_concentration.setter
-    def influx_sediment_concentration(self, new_u0):
-        self.C0_percent = new_u0
+    def influx_sediment_concentration(self, new_C0):
+        self.C0_percent = new_C0 * 100
         self.create_other_variables()
         self.init_sediment_routers()
 

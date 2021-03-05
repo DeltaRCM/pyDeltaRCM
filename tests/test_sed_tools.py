@@ -1,49 +1,108 @@
 # unit tests for sed_tools.py
 
-import pytest
-
-import sys
-import os
 import numpy as np
 
-from utilities import test_DeltaModel
+import unittest.mock as mock
+
+from pyDeltaRCM.model import DeltaModel
+from . import utilities
 
 
-def test_sed_route_padding(test_DeltaModel):
-    """
-    test the function sed_tools.sed_route
-    """
-    test_DeltaModel.pad_cell_type = np.pad(
-        test_DeltaModel.cell_type, 1, 'edge')
-    test_DeltaModel.pad_stage = np.pad(test_DeltaModel.stage, 1, 'edge')
-    test_DeltaModel.pad_depth = np.pad(test_DeltaModel.depth, 1, 'edge')
+class TestSedRoute:
 
-    test_DeltaModel.pad_cell_type = np.pad(
-        test_DeltaModel.cell_type, 1, 'edge')
-    test_DeltaModel.sed_route()
+    def test_sed_route(self, tmp_path):
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
 
-    assert np.all(test_DeltaModel.pad_depth[
-                  1:-1, 1:-1] == test_DeltaModel.depth)
-    assert np.shape(test_DeltaModel.pad_depth) == (12, 12)
+        # alter field for initial values going into function
+        _delta.qs += np.random.uniform(0, 1, size=_delta.eta.shape)
+        _delta.Vp_dep_sand += np.random.uniform(0, 1, size=_delta.eta.shape)
+        _delta.Vp_dep_mud += np.random.uniform(0, 1, size=_delta.eta.shape)
+
+        # mock top-level methods
+        _delta.log_info = mock.MagicMock()
+        _delta.route_all_sand_parcels = mock.MagicMock()
+        _delta.topo_diffusion = mock.MagicMock()
+        _delta.route_all_mud_parcels = mock.MagicMock()
+
+        # run the method
+        _delta.sed_route()
+
+        # assertions
+        assert np.all(_delta.pad_depth[1:-1, 1:-1] == _delta.depth)
+        assert np.all(_delta.qs == 0)
+        assert np.all(_delta.Vp_dep_sand == 0)
+        assert np.all(_delta.Vp_dep_mud == 0)
+
+        # methods called
+        assert (_delta.log_info.call_count == 3)
+        assert (_delta.route_all_sand_parcels.called is True)
+        assert (_delta.topo_diffusion.called is True)
+        assert (_delta.route_all_mud_parcels.called is True)
 
 
-def test_sand_route_updates(test_DeltaModel):
-    # operations at top of sed_route()
-    test_DeltaModel.pad_depth = np.pad(test_DeltaModel.depth, 1, 'edge')
-    test_DeltaModel.qs[:] = 0
-    test_DeltaModel.Vp_dep_sand[:] = 0
-    test_DeltaModel.Vp_dep_mud[:] = 0
+class TestRouteAllSandParcels:
 
-    test_DeltaModel.pad_cell_type = np.pad(
-        test_DeltaModel.cell_type, 1, 'edge')
-    test_DeltaModel.pad_stage = np.pad(test_DeltaModel.stage, 1, 'edge')
-    test_DeltaModel.pad_depth = np.pad(test_DeltaModel.depth, 1, 'edge')
+    def test_route_sand_parcels(self, tmp_path):
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'Np_sed': 1000,
+                                      'f_bedload': 0.6})
+        _delta = DeltaModel(input_file=p)
 
-    # operations at the
-    test_DeltaModel.pad_cell_type = np.pad(
-        test_DeltaModel.cell_type, 1, 'edge')
+        # mock top-level methods / objects
+        _delta.log_info = mock.MagicMock()
+        _delta._sr = mock.MagicMock()
 
-    test_DeltaModel.route_all_sand_parcels()
+        # mock the shared tools start indices
+        def _patched_starts(inlet, inlet_weights, num_starts):
+            return np.random.randint(0, 5, size=(num_starts,))
 
-    # simply check that the sediment transport field is updated
-    assert np.any(test_DeltaModel.qs != 0)
+        patcher = mock.patch(
+            'pyDeltaRCM.shared_tools.get_start_indices',
+            new=_patched_starts)
+        patcher.start()
+
+        # run the method
+        _delta.route_all_sand_parcels()
+
+        # methods called
+        assert (_delta._sr.run.call_count == 1)
+        assert (_delta.log_info.call_count == 3)
+
+        # stop the patch
+        patcher.stop()
+
+
+class TestRouteAllMudParcels:
+
+    def test_route_mud_parcels(self, tmp_path):
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'Np_sed': 1000,
+                                      'f_bedload': 0.6})
+        _delta = DeltaModel(input_file=p)
+
+        # mock top-level methods / objects
+        _delta.log_info = mock.MagicMock()
+        _delta._mr = mock.MagicMock()
+
+        # mock the shared tools start indices
+        def _patched_starts(inlet, inlet_weights, num_starts):
+            return np.random.randint(0, 5, size=(num_starts,))
+
+        patcher = mock.patch(
+            'pyDeltaRCM.shared_tools.get_start_indices',
+            new=_patched_starts)
+        patcher.start()
+
+        # run the method
+        _delta.route_all_mud_parcels()
+
+        # methods called
+        assert (_delta._mr.run.call_count == 1)
+        assert (_delta.log_info.call_count == 3)
+
+        # stop the patch
+        patcher.stop()

@@ -1,5 +1,6 @@
 
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import mpl_toolkits.axes_grid1 as axtk
@@ -114,11 +115,67 @@ class debug_tools(abc.ABC):
 
         """
         _shape = self.depth.shape
-        if isinstance(ind, list):
+        if isinstance(ind, list) or isinstance(ind, np.ndarray):
             for _, iind in enumerate(ind):
                 plot_ind(iind, shape=_shape, *args, **kwargs)
         else:
             plot_ind(ind, shape=_shape, *args, **kwargs)
+
+    def show_line(self, ind, *args, multiline=False, **kwargs):
+        """Show line within the model domain.
+
+        Show the location of lines (a series of connected indices) within the
+        model domain. Can show points as a list/array of flat index ``[i0, i1,
+        i2]``, list of tuples ``[(x1, y1), (x2, y2)]``, array of pairs ``[[x1,
+        y1], [x2, y2]]``, or array of lines if given as flat index ``[[l0i0,
+        l1i0, l2i0], [l0i1, l1i1, l2i1]]``. Method takes arbitrary
+        `matplotlib` arguments to `plot` the points as Matlab-style args
+        (``'r*'``) or keyword arguments (``marker='s'``).
+
+        Parameters
+        ----------
+        ind : :obj: Nx2 `ndarray`, `list` of `tuple`, `list` of `int`, `ndarray` of `int`
+            Indicies to plot.
+
+        ax : :obj:`matplotlib.Axes` object, optional
+            Which axes to render point into. Uses ``gca()`` if no axis is
+            provided.
+
+        block : :obj:`bool`, optional
+            Whether to show the plot automatically. Default is `False` (do not
+            show automatically).
+
+        Other Parameters
+        ----------------
+        *args : :obj:`str`, optional
+            Matlab-style point specifications, e.g., ``'r*'``, ``'bs'``.
+
+        **kwargs : optional
+            Any `kwargs` supported by `matplotlib.pyplot.plt`.
+        """
+        _shape = self.depth.shape
+        if isinstance(ind, list):
+            for _, iind in enumerate(ind):
+                plot_line(iind.flatten(),
+                          shape=_shape, *args, **kwargs)
+        elif isinstance(ind, np.ndarray):
+            if ind.ndim > 2:
+                raise NotImplementedError('Not implemented for arrays > 2d.')
+            elif ind.ndim > 1:
+                if multiline:
+                    # travel along axis, extracting lines
+                    cm = matplotlib.cm.get_cmap('tab10')
+                    for i in np.arange(ind.shape[1]):
+                        plot_line(ind[:, i], *args, multiline=multiline,
+                                  shape=_shape, color=cm(i), **kwargs)
+                else:
+                    plot_line(ind, *args, **kwargs)
+            else:
+                plot_line(ind.flatten(),
+                          shape=_shape, *args, **kwargs)
+
+        else:
+            raise NotImplementedError
 
 
 def plot_domain(attr, ax=None, grid=True, block=False, label=None):
@@ -180,7 +237,7 @@ def plot_domain(attr, ax=None, grid=True, block=False, label=None):
 def plot_ind(_ind, *args, shape=None, **kwargs):
     """Plot points within the model domain.
 
-    Private method called by :obj:`show_ind`.
+    Method called by :obj:`show_ind`.
     """
     ax = kwargs.pop('ax', None)
     block = kwargs.pop('block', False)
@@ -199,8 +256,49 @@ def plot_ind(_ind, *args, shape=None, **kwargs):
     else:
         if (_shape is None):
             raise ValueError('Shape of array must be given to unravel index.')
+        if isinstance(_ind, np.ndarray):
+            _ind = _ind[0]
         _ind = shared_tools.custom_unravel(_ind, _shape)
-    plt.plot(_ind[1], _ind[0], *args, **kwargs)
+    ax.plot(_ind[1], _ind[0], *args, **kwargs)
+
+    if block:
+        plt.show()
+
+
+def plot_line(_ind, *args, shape=None, **kwargs):
+    """Plot a line within the model domain.
+
+    Method called by :obj:`show_line`.
+    """
+    ax = kwargs.pop('ax', None)
+    block = kwargs.pop('block', False)
+    multiline = kwargs.pop('multiline', False)
+
+    _shape = shape
+
+    if not ax:
+        ax = plt.gca()
+
+    if len(args) == 0:
+        args = 'k-',
+    if isinstance(_ind, tuple):
+        raise NotImplementedError
+        # if not len(_ind) == 2:
+        #     raise ValueError('Expected tuple length to be 2, but was %s'
+        #                      % str(len(_ind)))
+    else:
+        if isinstance(_ind, np.ndarray):
+            if multiline:
+                if (_shape is None):
+                    raise ValueError(
+                        'Shape of array must be given to unravel index.')
+                pxpys = np.zeros((_ind.shape[0], 2))
+                for i in range(_ind.shape[0]):
+                    pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
+            else:
+                pxpys = np.fliplr(_ind)
+
+    ax.plot(pxpys[:, 1], pxpys[:, 0], *args, **kwargs)
 
     if block:
         plt.show()

@@ -9,10 +9,10 @@ seed:
   default: null
 Length:
   type: ['float', 'int']
-  default: 1000.
+  default: 5000.
 Width:
   type: ['float', 'int']
-  default: 2000.
+  default: 10000.
 dx:
   type: ['float', 'int']
   default: 50.
@@ -21,10 +21,10 @@ L0_meters:
   default: 150.0
 S0:
   type: ['float', 'int']
-  default: 0.0002
+  default: 0.00015
 itermax:
   type: 'int'
-  default: 1
+  default: 3
 Np_water:
   type: 'int'
   default: 2000
@@ -33,7 +33,7 @@ u0:
   default: 1.0
 N0_meters:
   type: ['float', 'int']
-  default: 200.0
+  default: 250.0
 h0:
   type: ['float', 'int']
   default: 5.0
@@ -45,7 +45,7 @@ SLR:
   default: 0.0
 Np_sed:
   type: 'int'
-  default: 1000
+  default: 2000
 f_bedload:
   type: ['float', 'int']
   default: 0.5
@@ -58,13 +58,7 @@ Csmooth:
 toggle_subsidence:
   type: 'bool'
   default: False
-theta1:
-  type: ['float', 'int']
-  default: -1.0471975511965976
-theta2:
-  type: ['float', 'int']
-  default: 1.0471975511965976
-sigma_max:
+subsidence_rate:
   type: ['float', 'int']
   default: 2e-9
 start_subsidence:
@@ -147,7 +141,7 @@ omega_flow:
   default: 0.9
 Nsmooth:
   type: 'int'
-  default: 5
+  default: 10
 theta_water:
   type: ['float', 'int']
   default: 1.0

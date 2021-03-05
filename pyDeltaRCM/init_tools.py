@@ -3,16 +3,14 @@ import os
 import logging
 import warnings
 
-from math import floor, sqrt, pi
+from math import floor
 import numpy as np
 
 from scipy.sparse import lil_matrix, csr_matrix
-from scipy import ndimage
 
 from netCDF4 import Dataset
 import time as time_lib
 import yaml
-import re
 import abc
 
 from . import shared_tools
@@ -62,25 +60,30 @@ class init_tools(abc.ABC):
         _msg = 'Output log file initialized.'
         self.log_info(_msg, verbosity=0)
 
-    def import_files(self):
+    def import_files(self, kwargs_dict={}):
+        """Import the input files.
 
+        This method handles the parsing and validation of any options supplied
+        via the configuration.
+
+        Parameters
+        ----------
+        kwargs_dict : :obj:`dict`, optional
+
+            A dictionary with keys matching valid model parameter names that
+            can be specified in a configuration YAML file. Keys given in this
+            dictionary will supercede values specified in the YAML
+            configuration.
+
+        Returns
+        -------
+        """
         # This dictionary serves as a container to hold values for both the
         # user-specified file and the internal defaults.
         input_file_vars = dict()
 
-        # Define a loader to handle scientific notation.
-        #   waiting for upstream fix here:
-        #      https://github.com/yaml/pyyaml/pull/174
-        loader = yaml.SafeLoader
-        loader.add_implicit_resolver(
-            u'tag:yaml.org,2002:float',
-            re.compile(r'''^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+]?[0-9]+)?
-                           |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
-                           |\.[0-9_]+(?:[eE][-+]?[0-9]+)?
-                           |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*
-                           |[-+]?\.(?:inf|Inf|INF)
-                           |\.(?:nan|NaN|NAN))$''', re.X),
-            list(u'-+0123456789.'))
+        # get the special loader from the shared tools
+        loader = shared_tools.custom_yaml_loader()
 
         # Open and access both yaml files --> put in dictionaries
         # parse default yaml and find expected types
@@ -103,6 +106,15 @@ class init_tools(abc.ABC):
                 raise e
         else:
             user_dict = dict()
+
+        # replace values in the user yaml file with anything specifed in the
+        #   **kwargs input
+        for kwk, kwv in kwargs_dict.items():
+            if kwk in user_dict.keys():
+                warnings.warn(UserWarning(
+                    'A keyword specification was also found in the '
+                    'user specified input YAML file: %s' % kwk))
+            user_dict[kwk] = kwv
 
         # go through and populate input vars with user and default values,
         # checking user values for correct type.
@@ -150,10 +162,6 @@ class init_tools(abc.ABC):
         if self.checkpoint_dt is None:
             self.checkpoint_dt = self._save_dt
 
-        # handle a not implemented setup
-        if self.save_checkpoint and self._toggle_subsidence:
-            raise NotImplementedError('Cannot handle checkpointing with subsidence.')
-
         # write the input file values to the log
         if not self._resume_checkpoint:
             for k, v in list(self._input_file_vars.items()):
@@ -183,32 +191,38 @@ class init_tools(abc.ABC):
         _msg = 'Setting model constants'
         self.log_info(_msg, verbosity=1)
 
+        # simple constants
         self.g = 9.81   # (gravitation const.)
         sqrt2 = np.sqrt(2)
         sqrt05 = np.sqrt(0.5)
 
-        self.distances = np.array([[sqrt2, 1, sqrt2],
-                                   [1, 1, 1],
-                                   [sqrt2, 1, sqrt2]]).astype(np.float32)
-        self.ivec = np.array([[-sqrt05, 0, sqrt05],
-                              [-1, 0, 1],
-                              [-sqrt05, 0, sqrt05]]).astype(np.float32)
-        self.jvec = np.array([[-sqrt05, -1, -sqrt05],
-                              [0, 0, 0],
-                              [sqrt05, 1, sqrt05]]).astype(np.float32)
-        self.iwalk = shared_tools.get_iwalk()
-        self.jwalk = shared_tools.get_jwalk()
-        self.dxn_iwalk = np.array([1, 1, 0, -1, -1, -1, 0, 1], dtype=np.int64)
-        self.dxn_jwalk = np.array([0, 1, 1, 1, 0, -1, -1, -1], dtype=np.int64)
-        self.dxn_dist = np.sqrt(self.dxn_iwalk**2 + self.dxn_jwalk**2)
-        self.walk_flat = np.array([1, -self.W + 1, -self.W, -self.W - 1,
-                                   -1, self.W - 1, self.W, self.W + 1])
+        # translations arrays
+        self.distances = np.array([[sqrt2,    1,  sqrt2],
+                                   [1,        1,      1],
+                                   [sqrt2,    1,  sqrt2]], dtype=np.float32)
+        self.ivec      = np.array([[-sqrt05,  0,  sqrt05],  # noqa: E221
+                                   [-1,       0,       1],
+                                   [-sqrt05,  0,  sqrt05]], dtype=np.float32)
+        self.jvec      = np.array([[-sqrt05, -1, -sqrt05],  # noqa: E221
+                                   [0,        0,       0],
+                                   [sqrt05,   1,  sqrt05]], dtype=np.float32)
+        self.iwalk     = np.array([[-1,       0,       1],  # noqa: E221
+                                   [-1,       0,       1],
+                                   [-1,       0,       1]], dtype=np.int64)
+        self.jwalk     = np.array([[-1,      -1,      -1],  # noqa: E221
+                                   [0,        0,       0],
+                                   [1,        1,       1]], dtype=np.int64)
+
+        # derivatives of translations
         self.distances_flat = self.distances.flatten()
         self.ivec_flat = self.ivec.flatten()
         self.jvec_flat = self.jvec.flatten()
         self.iwalk_flat = self.iwalk.flatten()
         self.jwalk_flat = self.jwalk.flatten()
+        self.ravel_walk = (self.jwalk * self.W) + self.iwalk  # walk, flattened
+        self.ravel_walk_flat = self.ravel_walk.flatten()
 
+        # kernels for topographic smoothing
         self.kernel1 = np.array([[1, 1, 1],
                                  [1, -8, 1],
                                  [1, 1, 1]]).astype(np.int64)
@@ -258,11 +272,14 @@ class init_tools(abc.ABC):
 
         # (m) critial depth to switch to "dry" node
         self.dry_depth = min(0.1, 0.1 * self._h0)
+
+        # cross-stream center of domain idx
         self.CTR = floor(self.W / 2.) - 1
         if self.CTR <= 1:
             self.CTR = floor(self.W / 2.)
 
-        self.gamma = self.g * self._S0 * self._dx / (self._u0**2)
+        self.gamma = (self.g * self._S0 * self._dx /
+                      (self._u0**2))  # water weighting coeff
 
         # (m^3) reference volume, volume to fill cell to characteristic depth
         self.V0 = self.h0 * (self._dx**2)
@@ -270,12 +287,11 @@ class init_tools(abc.ABC):
 
         # at inlet
         self.qw0 = self._u0 * self.h0  # water unit input discharge
-        self.Qp_water = self.Qw0 / self._Np_water    # volume each water parcel
+        self.Qp_water = self.Qw0 / self._Np_water  # volume each water parcel
         self.qs0 = self.qw0 * self.C0  # sed unit discharge
-        # total amount of sed added to domain per timestep
-        self.dVs = 0.1 * self.N0**2 * self.V0
+        self.dVs = 0.1 * self.N0**2 * self.V0  # total sed added per timestep
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
-        self.Vp_sed = self.dVs / self._Np_sed   # volume of each sediment parcel
+        self.Vp_sed = self.dVs / self._Np_sed  # volume of each sediment parcel
 
         # max number of jumps for parcel
         if self.stepmax is None:
@@ -330,28 +346,27 @@ class init_tools(abc.ABC):
                                      np.arange(0, self.L+1)*self._dx)
 
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int64)
-        self.eta = np.zeros((self.L, self.W)).astype(np.float32)
-        self.stage = np.zeros((self.L, self.W)).astype(np.float32)
-        self.depth = np.zeros((self.L, self.W)).astype(np.float32)
-        self.qx = np.zeros((self.L, self.W))
-        self.qy = np.zeros((self.L, self.W))
-        self.qxn = np.zeros((self.L, self.W))
-        self.qyn = np.zeros((self.L, self.W))
-        self.qwn = np.zeros((self.L, self.W))
-        self.ux = np.zeros((self.L, self.W))
-        self.uy = np.zeros((self.L, self.W))
-        self.uw = np.zeros((self.L, self.W))
-        self.qs = np.zeros((self.L, self.W))
+        self.eta = np.zeros((self.L, self.W), dtype=np.float32)
+        self.stage = np.zeros((self.L, self.W), dtype=np.float32)
+        self.depth = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qx = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qy = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qxn = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qyn = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qwn = np.zeros((self.L, self.W), dtype=np.float32)
+        self.ux = np.zeros((self.L, self.W), dtype=np.float32)
+        self.uy = np.zeros((self.L, self.W), dtype=np.float32)
+        self.uw = np.zeros((self.L, self.W), dtype=np.float32)
+        self.qs = np.zeros((self.L, self.W), dtype=np.float32)
         self.sand_frac = np.zeros((self.L, self.W), dtype=np.float32)
         self.active_layer = np.zeros((self.L, self.W), dtype=np.float32)
-        # self.substrate = np.zeros((self.L, self.W))
-        self.Vp_dep_sand = np.zeros((self.L, self.W))
-        self.Vp_dep_mud = np.zeros((self.L, self.W))
+        self.Vp_dep_sand = np.zeros((self.L, self.W), dtype=np.float32)
+        self.Vp_dep_mud = np.zeros((self.L, self.W), dtype=np.float32)
+
+        # arrays for computing the free surface after water iteration
         self.free_surf_flag = np.zeros((self._Np_water,), dtype=np.int64)
-        self.looped = np.zeros((self._Np_water,), dtype=np.int64)
-        self.free_surf_walk_indices = np.zeros((self._Np_water,
-                                                self.size_indices),
-                                               dtype=np.int64)
+        self.free_surf_walk_inds = np.zeros(
+            (self._Np_water, self.size_indices), dtype=np.int64)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
 
@@ -367,7 +382,8 @@ class init_tools(abc.ABC):
         y_channel_max = channel_inds + self.N0
         self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
 
-        self.stage[:] = np.maximum(0, self.L0 - self.y - 1) * self._dx * self._S0
+        self.stage[:] = (np.maximum(0, self.L0 - self.y - 1) *
+                         self._dx * self._S0)
         self.stage[self.cell_type == cell_ocean] = 0.
 
         self.depth[self.cell_type == cell_ocean] = self.h0
@@ -417,7 +433,7 @@ class init_tools(abc.ABC):
                                        self.u_max, self.U_dep_mud, self.U_ero_mud,
                                        self.ivec_flat, self.jvec_flat,
                                        self.iwalk_flat, self.jwalk_flat,
-                                       self.distances_flat, self.dry_depth, self.gamma,
+                                       self.distances_flat, self.dry_depth,
                                        self._lambda, self._beta,  self.stepmax,
                                        self.theta_mud)
         # initialize the SandRouter object
@@ -426,7 +442,7 @@ class init_tools(abc.ABC):
                                         self._f_bedload,
                                         self.ivec_flat, self.jvec_flat,
                                         self.iwalk_flat, self.jwalk_flat,
-                                        self.distances_flat, self.dry_depth, self.gamma,
+                                        self.distances_flat, self.dry_depth,
                                         self._beta, self.stepmax,
                                         self.theta_sand)
 
@@ -485,9 +501,9 @@ class init_tools(abc.ABC):
             self.output_netcdf.source = 'pyDeltaRCM'
 
             # create master dimensions
-            length = self.output_netcdf.createDimension('length', self.L)
-            width = self.output_netcdf.createDimension('width', self.W)
-            total_time = self.output_netcdf.createDimension('total_time', None)
+            self.output_netcdf.createDimension('length', self.L)
+            self.output_netcdf.createDimension('width', self.W)
+            self.output_netcdf.createDimension('total_time', None)
 
             # create master coordinates (as netCDF variables)
             x = self.output_netcdf.createVariable(
@@ -563,6 +579,15 @@ class init_tools(abc.ABC):
             _create_meta_variable('h0', self.h0, 'meters')
             _create_meta_variable('cell_type', self.cell_type, 'type',
                                   vartype='i8', vardims=('length', 'width'))
+            # subsidence metadata
+            if self._toggle_subsidence:
+                _create_meta_variable('start_subsidence',
+                                      self.start_subsidence, 'seconds',
+                                      vartype='i8')
+                _create_meta_variable('sigma', self.sigma,
+                                      'meters per timestep',
+                                      vardims=('length', 'width'))
+
             # time-varying metadata
             _create_meta_variable('H_SL', None, 'meters',
                                   vardims=('total_time'))
@@ -576,52 +601,65 @@ class init_tools(abc.ABC):
             _msg = 'Output netCDF file created'
             self.log_info(_msg, verbosity=2)
 
-
     def init_subsidence(self):
         """Initialize subsidence pattern.
 
-        Initializes patterns of subsidence if
-        toggle_subsidence is True (default False)
+        Initializes patterns of subsidence if toggle_subsidence is True
+        (default False). Default behavior is for the entire basin to subside
+        at a constant rate (with the exception of the land boundary cells along
+        the inlet boundary).
 
-        Uses theta1 and theta2 (defined in yaml) to set the angular bounds for
-        the subsiding region. To create a custom subsidence region, we
-        recommend subclassing the DeltaModel class and defining your own array
-        for self.subsidence_mask (a binary array with 1s in the cells that
-        are subsiding and 0s elswhere), and self.sigma (the subsidence mask
-        multiplied with the vertical rate of subsidence and the timestep size).
+        To customize the subsiding region, or even vary the subsiding region
+        over the course of the model run, we recommend subclassing the
+        DeltaModel class.
 
-        theta1 and theta2 are set in relation to the inlet orientation. The
-        inlet channel is at an angle of 0, if theta1 is -pi/3 radians, this
-        means that the angle to the left of the inlet that will be included
-        in the subsiding region is 30 degrees. theta2 defines the right angular
-        bounds for the subsiding region in a similar fashion.
         """
         _msg = 'Initializing subsidence'
         self.log_info(_msg, verbosity=1)
 
         if self._toggle_subsidence:
 
-            R1 = 0.3 * self.L
-            R2 = 1. * self.L  # radial limits (fractions of L)
-
-            Rloc = np.sqrt((self.y - self.L0)**2 + (self.x - self.W / 2.)**2)
-
-            thetaloc = np.zeros((self.L, self.W))
-            thetaloc[self.y > self.L0 - 1] = np.arctan(
-                (self.x[self.y > self.L0 - 1] - self.W / 2.)
-                / (self.y[self.y > self.L0 - 1] - self.L0 + 1))
-            self.subsidence_mask = ((R1 <= Rloc) & (Rloc <= R2) &
-                                    (self._theta1 <= thetaloc) &
-                                    (thetaloc <= self._theta2))
+            self.subsidence_mask = np.ones((self.L, self.W), dtype=bool)
             self.subsidence_mask[:self.L0, :] = False
 
-            self.sigma = self.subsidence_mask * self._sigma_max * self.dt
+            self.sigma = self.subsidence_mask * self._subsidence_rate * self.dt
 
-    def load_checkpoint(self):
+    def load_checkpoint(self, defer_output=False):
         """Load the checkpoint from the .npz file.
 
         Uses the file at the path determined by `self.prefix` and a file named
-        `checkpoint.npz`.
+        `checkpoint.npz`. There are a few pathways for loading, which depend
+        on 1) the status of the :obj:`save_strata` option, 2) the status of
+        additional grid-saving options, 3) the presence of a netCDF output
+        file at the expected output location, and 4) the status of the
+        :obj:`defer_output` parameter passed to this method as an optional
+        argument.
+
+        As a standard user, you should not need to worry about any of these
+        pathways or options. However, if you are developing pyDeltaRCM or
+        customizing the model in any way that involves loadind from
+        checkpoints, you should be aware of these pathways.
+
+        For example, loading from checkpoint will succeed if no netCDF4 file
+        is found, where one is expected (e.g., because :obj:`_save_any_grids`
+        is `True`). In this case, a new output netcdf file will be created,
+        after a `UserWarning` is issued.
+
+        .. important::
+
+            If you are customing the model and intend to use checkpointing and
+            the :obj:`Preprocessor` parallel infrastructure, be sure that
+            parameter :obj:`defer_output` is `True` until the
+            :obj:`load_checkpoint: method can be called from the thread the
+            model will execute on. Failure to do so may result in unexpected
+            behavior with indexing in the output netCDF4 file.
+
+        Parameters
+        ----------
+        defer_output : :obj:`bool`, optional
+            Whether to defer any netCDF activities at present. Manipulating
+            this variable is critical for parallel operations. See note above.
+            Default is `False`.
         """
         _msg = 'Loading from checkpoint.'
         self.log_info(_msg, verbosity=0)
@@ -632,26 +670,47 @@ class init_tools(abc.ABC):
         checkpoint = np.load(ckp_file, allow_pickle=True)
 
         # write saved variables back to the model
-        _msg = 'Loading variables into model'
+        _msg = 'Loading variables and grids into model'
         self.log_info(_msg, verbosity=2)
 
+        # load time and counter vars
         self._time = float(checkpoint['time'])
         self.H_SL = float(checkpoint['H_SL'])
         self._time_iter = int(checkpoint['time_iter'])
         self._save_iter = int(checkpoint['save_iter'])
-        self._save_time_since_last = int(checkpoint['save_time_since_last'])
+        self._save_time_since_data = int(checkpoint['save_time_since_data'])
+
+        # load grids
+        self.eta = checkpoint['eta']
+        self.depth = checkpoint['depth']
+        self.stage = checkpoint['stage']
         self.uw = checkpoint['uw']
         self.ux = checkpoint['ux']
         self.uy = checkpoint['uy']
         self.qw = checkpoint['qw']
         self.qx = checkpoint['qx']
         self.qy = checkpoint['qy']
-        self.depth = checkpoint['depth']
-        self.stage = checkpoint['stage']
-        self.eta = checkpoint['eta']
-        self.n_steps = checkpoint['n_steps']
-        self.init_eta = checkpoint['init_eta']
-        self.strata_counter = checkpoint['strata_counter']
+
+        if self.save_strata:
+            # load the stratigraphy info from the file
+            _msg = 'Loading stratigraphy arrays'
+            self.log_info(_msg, verbosity=2)
+
+            self.n_steps = checkpoint['n_steps']
+            self.init_eta = checkpoint['init_eta']
+            self.strata_counter = checkpoint['strata_counter']
+
+            # reconstruct the strata arrays
+            strata_eta_csr = csr_matrix((checkpoint['eta_data'],
+                                         checkpoint['eta_indices'],
+                                         checkpoint['eta_indptr']),
+                                        shape=checkpoint['eta_shape'])
+            self.strata_eta = strata_eta_csr.tolil()
+            strata_sand_csr = csr_matrix((checkpoint['sand_data'],
+                                          checkpoint['sand_indices'],
+                                          checkpoint['sand_indptr']),
+                                         shape=checkpoint['sand_shape'])
+            self.strata_sand_frac = strata_sand_csr.tolil()
 
         # load and set random state to continue as if run hadn't stopped
         _msg = 'Loading random state'
@@ -659,74 +718,82 @@ class init_tools(abc.ABC):
         rng_state = tuple(checkpoint['rng_state'])
         shared_tools.set_random_state(rng_state)
 
-        # reconstruct the strata arrays
-        _msg = 'Loading stratigraphy arrays'
-        self.log_info(_msg, verbosity=2)
-        strata_eta_csr = csr_matrix((checkpoint['eta_data'],
-                                    checkpoint['eta_indices'],
-                                    checkpoint['eta_indptr']),
-                                    shape=checkpoint['eta_shape'])
-        self.strata_eta = strata_eta_csr.tolil()
-        # get strata_sand_frac
-        strata_sand_csr = csr_matrix((checkpoint['sand_data'],
-                                     checkpoint['sand_indices'],
-                                     checkpoint['sand_indptr']),
-                                     shape=checkpoint['sand_shape'])
-        self.strata_sand_frac = strata_sand_csr.tolil()
+        # handle the case with a netcdf file
+        if ((self._save_any_grids or self._save_metadata or self._save_strata)
+                and not defer_output):
 
-        # rename the old netCDF4 file
-        _msg = 'Renaming old NetCDF4 output file'
-        self.log_info(_msg, verbosity=2)
-        file_path = os.path.join(self.prefix, 'pyDeltaRCM_output.nc')
-        _tmp_name = os.path.join(self.prefix, 'old_pyDeltaRCM_output.nc')
-        os.rename(file_path, _tmp_name)
+            # check if the file exists already
+            #    if it does, it needs to be flushed of certain fields
+            file_path = os.path.join(self.prefix, 'pyDeltaRCM_output.nc')
+            if not os.path.isfile(file_path):
+                _msg = ('NetCDF4 output file not found, but was expected. '
+                        'Creating a new output file.')
+                self.logger.warning(_msg)
+                warnings.warn(UserWarning(_msg))
 
-        # write dims / attributes / variables to new netCDF file
-        # except the things defined by output_strata()
-        _msg = 'Creating NetCDF4 output file'
-        self.log_info(_msg, verbosity=2)
+                # create a new file
+                # reset output file counters
+                self._save_iter = int(0)
+                # reset strata fields just loaded from checkpoint
+                if self.save_strata:
+                    self.strata_counter = int(0)
+                self.init_output_file()
 
-        # list of things to not copy over
-        dimtoignore = ['total_strata_age']
-        vartoignore = ['strata_age', 'strata_sand_frac', 'strata_depth']
+                # note we do not output data and a new checkpoint here!
 
-        # copy data from old netCDF4 into new one
-        with Dataset(_tmp_name) as src, Dataset(file_path, 'w',
-                                                format='NETCDF4') as dst:
-            # copy attributes
-            for name in src.ncattrs():
-                dst.setncattr(name, src.getncattr(name))
-            # copy dimensions
-            for name, dimension in src.dimensions.items():
-                if name not in dimtoignore:
-                    if dimension.isunlimited():
-                        dst.createDimension(name, None)
-                    else:
-                        dst.createDimension(name, len(dimension))
-            # copy groups (meta)
-            for name in src.groups.keys():
-                dst.createGroup(name)
-                for vname, variable in src.groups[name].variables.items():
-                    _mname = name + '/' + vname
-                    dst.createVariable(_mname, variable.datatype,
-                                       variable.dimensions)
-                    dst.groups[name].variables[vname][:] = \
-                        src.groups[name].variables[vname][:]
-            # copy variables except ones to exclude
-            for name, variable in src.variables.items():
-                if name not in vartoignore:
-                    dst.createVariable(name, variable.datatype,
-                                       variable.dimensions)
-                    dst.variables[name][:] = src.variables[name][:]
+            else:
+                # rename the old netCDF4 file
+                _msg = 'Renaming old NetCDF4 output file'
+                self.log_info(_msg, verbosity=2)
+                _tmp_name = os.path.join(self.prefix, 'old_pyDeltaRCM_output.nc')
+                os.rename(file_path, _tmp_name)
 
-        _msg = 'Successfully loaded checkpoint and created new NetCDF file.'
+                # write dims / attributes / variables to new netCDF file
+                # except the things defined by output_strata()
+                _msg = 'Creating NetCDF4 output file'
+                self.log_info(_msg, verbosity=2)
+
+                # list of things to not copy over
+                dimtoignore = ['total_strata_age']
+                vartoignore = ['strata_age', 'strata_sand_frac', 'strata_depth']
+
+                # copy data from old netCDF4 into new one
+                with Dataset(_tmp_name) as src, Dataset(file_path, 'w',
+                                                        format='NETCDF4') as dst:
+                    # copy attributes
+                    for name in src.ncattrs():
+                        dst.setncattr(name, src.getncattr(name))
+                    # copy dimensions
+                    for name, dimension in src.dimensions.items():
+                        if name not in dimtoignore:
+                            if dimension.isunlimited():
+                                dst.createDimension(name, None)
+                            else:
+                                dst.createDimension(name, len(dimension))
+                    # copy groups (meta)
+                    for name in src.groups.keys():
+                        dst.createGroup(name)
+                        for vname, variable in src.groups[name].variables.items():
+                            _mname = name + '/' + vname
+                            dst.createVariable(_mname, variable.datatype,
+                                               variable.dimensions)
+                            dst.groups[name].variables[vname][:] = \
+                                src.groups[name].variables[vname][:]
+                    # copy variables except ones to exclude
+                    for name, variable in src.variables.items():
+                        if name not in vartoignore:
+                            dst.createVariable(name, variable.datatype,
+                                               variable.dimensions)
+                            dst.variables[name][:] = src.variables[name][:]
+
+                # set object attribute for model
+                self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4')
+
+                # synch netcdf file
+                self.output_netcdf.sync()
+
+                # delete old netCDF4 file
+                os.remove(_tmp_name)
+
+        _msg = 'Successfully loaded checkpoint.'
         self.log_info(_msg, verbosity=1)
-
-        # set object attribute for model
-        self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4')
-
-        # synch netcdf file
-        self.output_netcdf.sync()
-
-        # delete old netCDF4 file
-        os.remove(_tmp_name)

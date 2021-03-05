@@ -2,20 +2,20 @@ import sys
 import os
 import glob
 
+import numpy as np
+
 import pytest
 from pyDeltaRCM.model import DeltaModel
+from pyDeltaRCM import shared_tools
 
 # utilities for file writing
 
 
 def create_temporary_file(tmp_path, file_name):
     d = tmp_path / 'configs'
-    try:
-        d.mkdir()
-    except Exception:
-        pass
+    d.mkdir(parents=True, exist_ok=True)
     p = d / file_name
-    f = open(p, "a")
+    f = open(p, "w")
     return p, f
 
 
@@ -32,8 +32,22 @@ def write_matrix_to_file(f, keys, lists):
             f.write('    ' + '- ' + str(lists[i][j]) + '\n')
 
 
-def yaml_from_dict(tmp_path, file_name, _dict):
+def write_set_to_file(f, set_list):
+    f.write('set' + ': ' + '\n')
+    for i, _set in enumerate(set_list):
+        f.write('  - {')
+        for j, (k, v) in enumerate(_set.items()):
+            f.write(k + ': ' + str(v) + ', ')
+        f.write('}' + '\n')
+
+
+def yaml_from_dict(tmp_path, file_name, _dict=None):
     p, f = create_temporary_file(tmp_path, file_name)
+    if (_dict is None):
+        _dict = {'out_dir': tmp_path / 'out_dir'}
+    else:
+        _dict['out_dir'] = tmp_path / 'out_dir'
+
     for k in _dict.keys():
         write_parameter_to_file(f, k, _dict[k])
     f.close()
@@ -62,7 +76,7 @@ def test_DeltaModel(tmp_path):
     write_parameter_to_file(f, 'f_bedload', 0.5)
     write_parameter_to_file(f, 'C0_percent', 0.1)
     write_parameter_to_file(f, 'toggle_subsidence', False)
-    write_parameter_to_file(f, 'sigma_max', 0.0)
+    write_parameter_to_file(f, 'subsidence_rate', 0.0)
     write_parameter_to_file(f, 'start_subsidence', 50.)
     write_parameter_to_file(f, 'save_eta_figs', False)
     write_parameter_to_file(f, 'save_stage_figs', False)
@@ -79,6 +93,40 @@ def test_DeltaModel(tmp_path):
     f.close()
     _delta = DeltaModel(input_file=p)
     return _delta
+
+
+class FastIteratingDeltaModel:
+    """A Fast iterating DeltaModel
+
+    This class is useful in patching the DeltaModel for timing tests. The
+    patched DeltaModel uses the random number generation internally, so it
+    will verify functionality in any checkpointing scenarios, and overwriting
+    only the `run_one_timestep` method removes most of the jitting compilation
+    time and much of the actual computation time.
+    """
+
+    def run_one_timestep(self):
+        """PATCH"""
+
+        def _get_random_field(shp):
+            """Get a field or randoms using the shared function.
+
+            It is critical to use the `shared_tools.get_random_uniform` for
+            reproducibility.
+            """
+            field = np.zeros(shp, dtype=np.float32)
+            for i in range(shp[0]):
+                for j in range(shp[1]):
+                    field[i, j] = shared_tools.get_random_uniform(1)
+            return field
+
+        shp = self.eta.shape
+        self.eta += _get_random_field(shp)
+        self.uw += _get_random_field(shp)
+        self.ux += _get_random_field(shp)
+        self.uy += _get_random_field(shp)
+        self.depth += _get_random_field(shp)
+        self.stage += _get_random_field(shp)
 
 
 def read_endtime_from_log(log_folder):

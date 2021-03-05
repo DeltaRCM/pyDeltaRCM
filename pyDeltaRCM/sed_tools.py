@@ -1,6 +1,7 @@
 
 import numpy as np
-from numba import float32, float64, int64
+from numba import njit
+from numba import float32, int64
 from numba.experimental import jitclass
 from scipy import ndimage
 import abc
@@ -28,13 +29,13 @@ class sed_tools(abc.ABC):
         self.log_info(_msg, verbosity=2)
         self.route_all_sand_parcels()
 
-        _msg = 'Beginning mud parcel routing'
-        self.log_info(_msg, verbosity=2)
-        self.route_all_mud_parcels()
-
         _msg = 'Beginning topographic diffusion'
         self.log_info(_msg, verbosity=2)
         self.topo_diffusion()
+
+        _msg = 'Beginning mud parcel routing'
+        self.log_info(_msg, verbosity=2)
+        self.route_all_mud_parcels()
 
     def route_all_sand_parcels(self):
         """Route sand parcels; topo diffusion.
@@ -62,7 +63,6 @@ class sed_tools(abc.ABC):
 
         self._sr.run(start_indices, self.eta, self.stage, self.depth,
                      self.cell_type, self.uw, self.ux, self.uy,
-                     self.pad_stage, self.pad_depth, self.pad_cell_type,
                      self.Vp_dep_mud, self.Vp_dep_sand,
                      self.qw, self.qx, self.qy, self.qs)
 
@@ -108,7 +108,6 @@ class sed_tools(abc.ABC):
 
         self._mr.run(start_indices, self.eta, self.stage, self.depth,
                      self.cell_type, self.uw, self.ux, self.uy,
-                     self.pad_stage, self.pad_depth, self.pad_cell_type,
                      self.Vp_dep_mud, self.Vp_dep_sand,
                      self.qw, self.qx, self.qy)
 
@@ -131,9 +130,7 @@ class sed_tools(abc.ABC):
         """Diffuse topography after routing.
 
         Diffuse topography after routing all coarse sediment parcels. The
-        method uses convolution with a kernel to compute smoother topography,
-        and then adds this different to the current eta to do the smoothing.
-        The operation is repeated `N_crossdiff` times.
+        operation is repeated `N_crossdiff` times.
         """
         for _ in range(self.N_crossdiff):
 
@@ -151,24 +148,74 @@ class sed_tools(abc.ABC):
             self.eta += self.cf
 
 
+@njit
+def _get_weight_at_cell_sediment(ind, weight_int, depth_nbrs, ct_nbrs,
+                                 dry_depth, theta, distances_flat):
+
+    dry = (depth_nbrs <= dry_depth)
+    wall = (ct_nbrs == -2)
+    ctr = (np.arange(9) == 4)
+    drywall = np.logical_or(dry, wall)
+
+    # always set ctr to 0 before rebalancing
+    weight_int[ctr] = 0
+
+    weight = np.copy(weight_int)  # no gamma weighting here
+    weight = (depth_nbrs ** theta) * weight
+
+    # ALWAYS disallow the choice to not move
+    weight[ctr] = 0
+
+    # ALWAYS disallow the choice to go into land or dry cells
+    weight[drywall] = 0
+
+    # sanity check
+    if np.any(np.isnan(weight)):
+        raise RuntimeError('NaN encountered in sediment weighting.'
+                           'Please report error.')
+
+    # correct the weights for random choice
+    if np.sum(weight) == 0:
+        # if no weights
+        #  convert to random walk into any non-wall,
+        #  (incl dry cells), weighted by distance
+        weight[:] = 1 / distances_flat
+
+        # disallow movement into walls
+        weight[wall] = 0
+
+    weight[ctr] = 0  # enforce
+
+    # sanity check
+    weight_sum = np.sum(weight)
+    if weight_sum == 0:
+        raise RuntimeError('No weights encountered in sediment weighting.'
+                           'Please report error.')
+
+    # final rebalance
+    weight = weight / weight_sum
+
+    return weight
+
+
 r_spec = [('_dt', float32), ('_dx', float32),
           ('num_starts', int64), ('start_indices', int64[:]),
           ('stepmax', float32), ('px', int64), ('py', int64),
           ('eta', float32[:, :]), ('stage', float32[:, :]),
           ('depth', float32[:, :]), ('cell_type', int64[:, :]),
-          ('uw', float64[:, :]), ('ux', float64[:, :]), ('uy', float64[:, :]),
+          ('uw', float32[:, :]), ('ux', float32[:, :]), ('uy', float32[:, :]),
           ('pad_stage', float32[:, :]), ('pad_depth', float32[:, :]),
-          ('pad_cell_type', int64[:, :]), ('qw', float64[:, :]),
-          ('qx', float64[:, :]), ('qy', float64[:, :]), ('qs', float64[:, :]),
+          ('pad_cell_type', int64[:, :]), ('qw', float32[:, :]),
+          ('qx', float32[:, :]), ('qy', float32[:, :]), ('qs', float32[:, :]),
           ('ivec_flat', float32[:]), ('jvec_flat', float32[:]),
           ('iwalk_flat', int64[:]), ('jwalk_flat', int64[:]),
           ('distances_flat', float32[:]),
-          ('dry_depth', float32), ('gamma', float32), ('_lambda', float32),
+          ('dry_depth', float32), ('_lambda', float32),
           ('_beta', float32),  ('_f_bedload', float32),
           ('theta_sed', float32), ('u_max', float32),
           ('qs0', float32), ('_u0', float32), ('Vp_sed', float32),
-          ('Vp_res', float32), ('Vp_dep_mud', float64[:, :]),
-          ('Vp_dep_sand', float64[:, :]),
+          ('Vp_res', float32), ('Vp_dep_mud', float32[:, :]),
+          ('Vp_dep_sand', float32[:, :]),
           ('U_dep_mud', float32), ('U_ero_mud', float32),
           ('U_ero_sand', float32)]
 
@@ -209,22 +256,30 @@ class BaseRouter(object):
         cell_type_ind = self.pad_cell_type[
             px:px + 3, py:py + 3]
 
-        weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
+        _, weight_int = shared_tools.get_weight_sfc_int(
             self.stage[px, py], stage_nbrs.ravel(), self.qx[px, py],
             self.qy[px, py], self.ivec_flat, self.jvec_flat,
             self.distances_flat)
-        weights = shared_tools.get_weight_at_cell(
-            (px, py), weight_sfc, weight_int, depth_nbrs.ravel(),
-            cell_type_ind.ravel(), self.dry_depth,
-            self.gamma, self.theta_sed)
+
+        if np.any(np.isnan(weight_int)):
+            raise RuntimeError('NaN in weight_int.')
+
+        if not np.all(np.isfinite(depth_nbrs.ravel())):
+            raise RuntimeError('nonfinite in depth_nbrs.')
+
+        weights = _get_weight_at_cell_sediment(
+            (px, py), weight_int, depth_nbrs.ravel(),
+            cell_type_ind.ravel(), self.dry_depth, self.theta_sed, self.distances_flat)
+
         new_cell = shared_tools.random_pick(weights)
+
         dist, istep, jstep, _ = shared_tools.get_steps(
             new_cell, self.iwalk_flat, self.jwalk_flat)
 
         return istep, jstep, dist
 
     @abc.abstractmethod
-    def _deposit_or_erode(self):
+    def _deposit_or_erode(self, px, py):
         """Determine whether to erode or deposit.
 
         This is the decision making component of the routine, and will be
@@ -330,14 +385,24 @@ class BaseRouter(object):
         return (Vp_sed * (U_loc**beta - U_ero**beta) /
                 U_ero**beta)
 
-    def _limit_Vp_change(self, Vp, stage, eta, dx):
+    def _limit_Vp_change(self, Vp, stage, eta, dx, dep_ero):
         """Limit change in volume to 1/4 of a cell volume.
 
         Function is used by multiple pathways in `mud_dep_ero` and `sand_dep_ero`
         but with different inputs for the sediment volume (:obj:`Vp`).
+
+        dep_ero indicates which pathway we are in, dep==0, ero==1
         """
-        fourth = (stage - eta) / 4 * (dx * dx)
-        return np.minimum(Vp, fourth)
+        depth = stage - eta
+        if depth < 0:
+            if dep_ero == 0:
+                return 0
+            else:
+                fourth = np.abs(depth) / 4 * (dx * dx)
+                return np.minimum(Vp, fourth)
+        else:
+            fourth = depth / 4 * (dx * dx)
+            return np.minimum(Vp, fourth)
 
 
 @jitclass(r_spec)
@@ -359,7 +424,7 @@ class SandRouter(BaseRouter):
     """
     def __init__(self, _dt, dx, Vp_sed, u_max, qs0, u0, U_ero_sand, f_bedload,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
-                 dry_depth, gamma, beta, stepmax, theta_sed):
+                 dry_depth, beta, stepmax, theta_sed):
 
         self._dt = _dt
         self._dx = dx
@@ -376,13 +441,12 @@ class SandRouter(BaseRouter):
         self.distances_flat = distances_flat
 
         self.dry_depth = dry_depth
-        self.gamma = gamma
         self._beta = beta
         self.stepmax = stepmax
         self.theta_sed = theta_sed
 
     def run(self, start_indices, eta, stage, depth, cell_type,
-            uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud, Vp_dep_sand,
+            uw, ux, uy, Vp_dep_mud, Vp_dep_sand,
             qw, qx, qy, qs):
         """The main function to route and deposit/erode sand parcels.
 
@@ -421,9 +485,9 @@ class SandRouter(BaseRouter):
         self.uw = uw
         self.ux = ux
         self.uy = uy
-        self.pad_stage = pad_stage
-        self.pad_depth = pad_depth
-        self.pad_cell_type = pad_cell_type
+        self.pad_stage = shared_tools.custom_pad(stage)
+        self.pad_depth = shared_tools.custom_pad(depth)
+        self.pad_cell_type = shared_tools.custom_pad(cell_type)
         self.Vp_dep_mud = Vp_dep_mud
         self.Vp_dep_sand = Vp_dep_sand
         self.qw = qw
@@ -482,8 +546,8 @@ class SandRouter(BaseRouter):
             # Choose the next location for the parcel to travel
             istep, jstep, dist = self._choose_next_location(px0, py0)
 
-            px = px0 + jstep
-            py = py0 + istep
+            px = (px0 + jstep)
+            py = (py0 + istep)
 
             self._partition_sediment(px0, py0, px, py, dist)
             self._deposit_or_erode(px, py)
@@ -495,7 +559,7 @@ class SandRouter(BaseRouter):
                 sed_continue = False
 
     def _partition_sediment(self, px0, py0, px, py, dist):
-        """Spread sand between two cells.
+        """Spread sediment flux between two cells.
         """
         partition = self.Vp_res / 2. / self._dt / self._dx
         if dist > 0:
@@ -529,7 +593,7 @@ class SandRouter(BaseRouter):
             #     transport capacity of the cell (`qs_cap`), sediment needs to
             #     deposit on the bed.
             Vp_change = self._limit_Vp_change(self.Vp_res, self.stage[px, py],
-                                              self.eta[px, py], self._dx)
+                                              self.eta[px, py], self._dx, 0)
 
         elif (U_loc > self.U_ero_sand) and (qs_loc < qs_cap):
             # Sand erosion
@@ -538,8 +602,9 @@ class SandRouter(BaseRouter):
             #     transport capacity is not yet reached.
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
                                              self.U_ero_sand, self._beta)
-            Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                                self.eta[px, py], self._dx)
+            Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
+                                              self.eta[px, py], self._dx, 1)
+            Vp_change = Vp_change * -1
 
         if Vp_change > 0:  # if deposition
             self.Vp_dep_sand[px, py] = self.Vp_dep_sand[px, py] + Vp_change
@@ -568,7 +633,7 @@ class MudRouter(BaseRouter):
     """
     def __init__(self, _dt, dx, Vp_sed, u_max, U_dep_mud, U_ero_mud,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
-                 dry_depth, gamma, _lambda, beta, stepmax, theta_sed):
+                 dry_depth, _lambda, beta, stepmax, theta_sed):
 
         self._dt = _dt
         self._dx = dx
@@ -583,14 +648,13 @@ class MudRouter(BaseRouter):
         self.distances_flat = distances_flat
 
         self.dry_depth = dry_depth
-        self.gamma = gamma
         self._lambda = _lambda
         self._beta = beta
         self.stepmax = stepmax
         self.theta_sed = theta_sed
 
     def run(self, start_indices, eta, stage, depth, cell_type,
-            uw, ux, uy, pad_stage, pad_depth, pad_cell_type, Vp_dep_mud, Vp_dep_sand,
+            uw, ux, uy, Vp_dep_mud, Vp_dep_sand,
             qw, qx, qy):
         """The main function to route and deposit/erode mud parcels.
 
@@ -603,9 +667,9 @@ class MudRouter(BaseRouter):
         self.uw = uw
         self.ux = ux
         self.uy = uy
-        self.pad_stage = pad_stage
-        self.pad_depth = pad_depth
-        self.pad_cell_type = pad_cell_type
+        self.pad_stage = shared_tools.custom_pad(stage)
+        self.pad_depth = shared_tools.custom_pad(depth)
+        self.pad_cell_type = shared_tools.custom_pad(cell_type)
         self.Vp_dep_mud = Vp_dep_mud
         self.Vp_dep_sand = Vp_dep_sand
         self.qw = qw
@@ -660,13 +724,14 @@ class MudRouter(BaseRouter):
                          (self.U_dep_mud**self._beta - U_loc**self._beta) /
                          (self.U_dep_mud**self._beta))
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                              self.eta[px, py], self._dx)
+                                              self.eta[px, py], self._dx, 0)
 
-        elif U_loc > self.U_ero_mud:
+        if U_loc > self.U_ero_mud:
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
                                              self.U_ero_mud, self._beta)
-            Vp_change = - self._limit_Vp_change(Vp_change, self.stage[px, py],
-                                                self.eta[px, py], self._dx)
+            Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
+                                              self.eta[px, py], self._dx, 1)
+            Vp_change = Vp_change * -1
 
         if Vp_change > 0:  # if deposition
             self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change
