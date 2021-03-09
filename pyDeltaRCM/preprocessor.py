@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import abc
 import time
@@ -971,9 +972,13 @@ class PreprocessorCLI(BasePreprocessor):
         else:
             args_dict.pop('time_years')
 
-        # set defaults as needed
-        args_dict['parallel'] = args_dict['parallel'] or False
-        args_dict['If'] = args_dict['If'] or 1.0
+        # set (or remove) defaults as needed
+        if (args_dict['parallel'] is None):
+            # if not given remove the key from cli spec
+            args_dict.pop('parallel')
+        if (args_dict['If'] is None):
+            # if not given remove the key from cli spec
+            args_dict.pop('If')
 
         return args_dict
 
