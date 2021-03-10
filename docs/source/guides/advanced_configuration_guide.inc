@@ -27,7 +27,7 @@ To use matrix expansion to configure multiple model runs, the dimensions of the 
         - 0.5
         - 0.2
 
-This configuation would produce two model runs, one with bedload fraction (`f_bedload`) 0.5 and another with bedload fraction 0.2, and both with grid spacing (`dx`) 2.0 and basin depth (`h0`) 1.0.
+This configuration would produce two model runs, one with bedload fraction (`f_bedload`) 0.5 and another with bedload fraction 0.2, and both with grid spacing (`dx`) 2.0 and basin depth (`h0`) 1.0.
 The matrix expansions will create two folders at `./out_dir/job_000` and `./out_dir/job_001` that each correspond to a created job.
 Each folder will contain a copy of the configuration file used for that job; for example, the full configuration for `job_000` is:
 
@@ -40,9 +40,9 @@ Each folder will contain a copy of the configuration file used for that job; for
 
 Additionally, a log file for each job is located in the output folder, and any output grid files or images specified by the input configuration will be located in the respective job output folder.
 
-.. note:: You must specify the `out_dir` key in the input YAML configuation to use matrix expansion.
+.. note:: You must specify the `out_dir` key in the input YAML configuration to use matrix expansion.
 
-Multiple dimensional matrix expansion is additionally supported. For example, the following configuation produces six jobs:
+Multiple dimensional matrix expansion is additionally supported. For example, the following configuration produces six jobs:
 
 .. code:: yaml
 
@@ -149,6 +149,8 @@ We then can initialize our new model type, and see that this model has all of th
     >>> hasattr(mdl, 'update')
     True
 
+.. note:: In this basic example, we make no modifications to the delta model behavior.
+
 Hooks are methods in the model sequence that do nothing by default, but can be augmented to provide arbitrary desired behavior in the model.
 Hooks have been integrated throughout the model initialization and update sequences, to allow the users to achieve complex behavior at various stages of the model sequence.
 For example, ``hook_run_one_timestep`` is a hook which occurs immediately before the  model :obj:`run_one_timestep` method.
@@ -186,8 +188,18 @@ Now, on every iteration of the model, our hooked method will be called immediate
     >>> mdl = RandomSubsidenceModel()
     >>> mdl.sigma_max  # default value
     2e-09
+
+.. doctest::
+    :hide:
+
+    >>> pyDeltaRCM.shared_tools.set_random_seed(0)  # for reproducibility
+    
+.. doctest::
+
     >>> mdl.update()
-    new_sigma: ...
+    new_sigma: 1.3125136806997149e-09
+    >>> mdl.update()
+    new_sigma: 6.692607693286315e-10
 
 This is a somewhat contrived example to give you a sense of how you can implement changes to the model to achieve desired behavior. 
 
@@ -203,7 +215,7 @@ A complete :doc:`list of model hooks is available here </reference/model/model_h
 
 There may be cases where hooks are insufficient for the modifications you need to make to the model.
 In this case, you should subclass the model, as depicted above, and reimplement entire methods, as necessary, by copying code from the package to your own subclass.
-However, for stability and forwards compatability, you should try hard to minimize copied code.
+However, for stability and forwards-compatibility, you should try to minimize copied code as much as possible.
 
 
 Subclassing examples

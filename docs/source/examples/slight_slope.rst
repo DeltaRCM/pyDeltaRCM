@@ -12,7 +12,7 @@ Recall that anything added to the end of the the subclass' `__init__` method wil
     :include-source:
 
     class SlightSlopeModel(pyDeltaRCM.DeltaModel):
-        """A simple subclass of DeltaModel.
+        """A subclass of DeltaModel with sloping basin.
     
         This subclass simply modifies the basin geometry
         before any computation has occurred.
