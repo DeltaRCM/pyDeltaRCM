@@ -15,7 +15,11 @@ Modifying initial conditions
 Modifying boundary conditions
 -----------------------------
 
-* none
+.. toctree::
+   :maxdepth: 1
+
+   subsidence_region
+
 
 Modifying internal computations
 -------------------------------

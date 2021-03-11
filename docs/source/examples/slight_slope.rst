@@ -8,7 +8,7 @@ The researcher can easily use subclassing and model hooks to achieve the desired
 Recall that anything added to the end of the the subclass' `__init__` method will be called during instantiation of the subclass.
 
 .. plot::
-    :context:
+    :context: reset
     :include-source:
 
     class SlightSlopeModel(pyDeltaRCM.DeltaModel):

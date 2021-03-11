@@ -645,7 +645,7 @@ class init_tools(abc.ABC):
             If you are customing the model and intend to use checkpointing and
             the :obj:`Preprocessor` parallel infrastructure, be sure that
             parameter :obj:`defer_output` is `True` until the
-            :obj:`load_checkpoint: method can be called from the thread the
+            :obj:`load_checkpoint` method can be called from the thread the
             model will execute on. Failure to do so may result in unexpected
             behavior with indexing in the output netCDF4 file.
 

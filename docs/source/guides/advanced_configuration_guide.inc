@@ -105,7 +105,7 @@ For example, to configure two model runs, the first with parameters ``u0: 1.0`` 
 
     set:
       - {u0: 1.0, h0: 1.0}
-      - {u0: 1.2., h0: 1.2}
+      - {u0: 1.2, h0: 1.2}
 
 
 All jobs in the `set` specification must have the exact same set of keys.

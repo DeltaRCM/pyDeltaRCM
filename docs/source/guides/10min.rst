@@ -29,7 +29,7 @@ That's it! You ran the pyDeltaRCM model for five timesteps.
 
 We can visualize the delta bed elevation, though it's not very exciting after only five timesteps...
 
-.. code::
+.. doctest::
 
     >>> import matplotlib.pyplot as plt
 

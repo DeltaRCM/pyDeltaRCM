@@ -4,8 +4,11 @@ Constraining subsidence to part of the domain
 One case that has been explored in the literature with the DeltaRCM model is the case of subsidence limited to one region of the model domain [1]_.
 This model configuration can be readily achieved with model subclassing.
 
+Setting up the custom subclass
+------------------------------
+
 .. plot::
-    :context:
+    :context: reset
     :include-source:
 
     class ConstrainedSubsidenceModel(pyDeltaRCM.DeltaModel):
@@ -20,10 +23,10 @@ This model configuration can be readily achieved with model subclassing.
             super().__init__(input_file, **kwargs)
 
         def init_subsidence(self):
-            """Initialize subsidence pattern  constrained to a tighter region.
+            """Initialize subsidence pattern constrained to a tighter region.
 
-            Uses `theta1` and `theta2` to set the angular bounds for the
-            subsiding region. `theta1` and `theta2` are set in relation to the
+            Uses theta1 and theta2 to set the angular bounds for the
+            subsiding region. theta1 and theta2 are set in relation to the
             inlet orientation. The inlet channel is at an angle of 0, if
             theta1 is -pi/3 radians, this means that the angle to the left of
             the inlet that will be included in the subsiding region is 30
@@ -39,7 +42,7 @@ This model configuration can be readily achieved with model subclassing.
                 theta2 = 0
 
                 R1 = 0.3 * self.L
-                R2 = 1. * self.L  # radial limits (fractions of L)
+                R2 = 1 * self.L  # radial limits (fractions of L)
 
                 Rloc = np.sqrt((self.y - self.L0)**2 + (self.x - self.W / 2.)**2)
 
@@ -52,7 +55,8 @@ This model configuration can be readily achieved with model subclassing.
                                         (thetaloc <= theta2))
                 self.subsidence_mask[:self.L0, :] = False
 
-                self.sigma = self.subsidence_mask * self._sigma_max * self.dt
+                self.sigma = self.subsidence_mask * self.subsidence_rate * self.dt
+
 
 Now, initialize the model and see the field.
 
@@ -60,12 +64,91 @@ Now, initialize the model and see the field.
     :context:
     :include-source:
 
-    mdl = ConstrainedSubsidenceModel(toggle_subsidence=True)
+    mdl = ConstrainedSubsidenceModel(
+        toggle_subsidence=True)
 
     fig, ax = plt.subplots()
     mdl.show_attribute('sigma', grid=False)
     plt.show()
 
 
+Using the custom subclass with the preprocessor
+-----------------------------------------------
 
-.. _1: Liang, M., Kim, W., and Passalacqua, P. (2016), How much subsidence is enough to change the morphology of river deltas?, Geophys. Res. Lett., 43,  10,266– 10,276, doi:10.1002/2016GL070519.
+We can configure a :obj:`Preprocessor` to handle a set of custom runs in conjunction with out custom `pyDeltaRCM` model subclass.
+For example, in [1]_, the authors explore the impact of subsidence at various rates: 3 mm/yr, 6 mm/yr, 10 mm/yr, 25 mm/yr, 50 mm/yr, and 100 mm/yr.
+We can scale these rates, assuming a model :doc:`intermittency factor </info/modeltime>` of 0.019, representing 7 of 365 days of flooding per year, by using the convenience function :obj:`~pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate`:
+
+.. plot::
+    :context: close-figs
+    :include-source:
+
+    from pyDeltaRCM.preprocessor import scale_relative_sea_level_rise_rate
+
+    _subsidence_mmyr = np.array([3, 6, 10, 25, 50, 100])
+    _subsidence_scaled = scale_relative_sea_level_rise_rate(_subsidence_mmyr, If=0.019)
+
+Now, we use :ref:`matrix expansion <matrix_expansion_tag>` to set up the runs with a preprocessor.
+For example, in a Python script, following the definition of the subclass above, define a dictionary with a `matrix` key and supply to the `Preprocessor`:
+
+.. plot::
+    :context:
+    :include-source:
+
+    # add a matrix with subsidence to the dict
+    param_dict = {}
+    param_dict['matrix'] = {'subsidence_rate': _subsidence_scaled}
+
+    # add other configurations
+    param_dict.update(
+        {'out_dir': 'liang_2016_reproduce',
+         'toggle_subsidence': True,
+         'parallel': 3})  # we can take advantage of parallel jobs
+
+.. code::
+
+    # create the preprocessor
+    pp = pyDeltaRCM.Preprocessor(
+        param_dict,
+        timesteps=10000)
+
+And finally run the jobs by specifying the model subclass as the class to use when instantiating the jobs with the preprocessor.
+
+.. below, we overwrite the above, to make sure we only run for one timestep
+
+.. plot::
+    :context:
+
+    import tempfile
+    import os
+    tmp_path = tempfile.mkdtemp()
+
+    param_dict['out_dir'] = os.path.join(tmp_path, 'matrix')
+    pp = pyDeltaRCM.Preprocessor(
+        param_dict,
+        parallel=False,
+        timesteps=1)
+
+.. plot::
+    :context:
+    :include-source:
+
+    # run the jobs
+    pp.run_jobs(DeltaModel=ConstrainedSubsidenceModel)
+
+
+We can check whether the runs were set up, as expected:
+
+.. plot::
+    :context:
+    :include-source:
+
+    fig, ax = plt.subplots(2, 3)
+    ax = ax.flatten()
+    for i, job in enumerate(pp.job_list):
+        ax[i].imshow(job.deltamodel.sigma, vmax=0.004)
+    plt.show()
+
+
+.. [1] Liang, M., Kim, W., and Passalacqua, P. (2016), How much subsidence is
+   enough to change the morphology of river deltas?, Geophysical Research Letters, 43, 10,266--10,276, doi:10.1002/2016GL070519.
