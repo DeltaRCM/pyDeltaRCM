@@ -41,8 +41,8 @@ Setting up the custom subclass
                 theta1 = -(np.pi / 3)
                 theta2 = 0
 
-                R1 = 0.3 * self.L
-                R2 = 1 * self.L  # radial limits (fractions of L)
+                R1 = 0.3 * self.L  # radial limits (fractions of L)
+                R2 = 0.8 * self.L
 
                 Rloc = np.sqrt((self.y - self.L0)**2 + (self.x - self.W / 2.)**2)
 
@@ -58,14 +58,23 @@ Setting up the custom subclass
                 self.sigma = self.subsidence_mask * self.subsidence_rate * self.dt
 
 
-Now, initialize the model and see the field.
+Now, initialize the model and look at the field.
+Note that the colorscale depicts the magnitude of subsidence in the model *per timestep* (`sigma`, which has units meters).
+
+.. code:: python
+
+    mdl = ConstrainedSubsidenceModel(toggle_subsidence=True)
+
+.. plot::
+    :context:
+
+    with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
+        mdl = ConstrainedSubsidenceModel(toggle_subsidence=True,
+                                         out_dir=output_dir)
 
 .. plot::
     :context:
     :include-source:
-
-    mdl = ConstrainedSubsidenceModel(
-        toggle_subsidence=True)
 
     fig, ax = plt.subplots()
     mdl.show_attribute('sigma', grid=False)
@@ -85,8 +94,8 @@ We can scale these rates, assuming a model :doc:`intermittency factor </info/mod
 
     from pyDeltaRCM.preprocessor import scale_relative_sea_level_rise_rate
 
-    _subsidence_mmyr = np.array([3, 6, 10, 25, 50, 100])
-    _subsidence_scaled = scale_relative_sea_level_rise_rate(_subsidence_mmyr, If=0.019)
+    subsidence_mmyr = np.array([3, 6, 10, 25, 50, 100])
+    subsidence_scaled = scale_relative_sea_level_rise_rate(subsidence_mmyr, If=0.019)
 
 Now, we use :ref:`matrix expansion <matrix_expansion_tag>` to set up the runs with a preprocessor.
 For example, in a Python script, following the definition of the subclass above, define a dictionary with a `matrix` key and supply to the `Preprocessor`:
@@ -97,7 +106,7 @@ For example, in a Python script, following the definition of the subclass above,
 
     # add a matrix with subsidence to the dict
     param_dict = {}
-    param_dict['matrix'] = {'subsidence_rate': _subsidence_scaled}
+    param_dict['matrix'] = {'subsidence_rate': subsidence_scaled}
 
     # add other configurations
     param_dict.update(
@@ -115,27 +124,21 @@ For example, in a Python script, following the definition of the subclass above,
 And finally run the jobs by specifying the model subclass as the class to use when instantiating the jobs with the preprocessor.
 
 .. below, we overwrite the above, to make sure we only run for one timestep
-
 .. plot::
     :context:
 
-    import tempfile
-    import os
-    tmp_path = tempfile.mkdtemp()
+    with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
+        param_dict['out_dir'] = output_dir
+        pp = pyDeltaRCM.Preprocessor(
+            param_dict,
+            parallel=False,
+            timesteps=1)
+        pp.run_jobs(DeltaModel=ConstrainedSubsidenceModel)
 
-    param_dict['out_dir'] = os.path.join(tmp_path, 'matrix')
-    pp = pyDeltaRCM.Preprocessor(
-        param_dict,
-        parallel=False,
-        timesteps=1)
-
-.. plot::
-    :context:
-    :include-source:
+.. code:: python
 
     # run the jobs
     pp.run_jobs(DeltaModel=ConstrainedSubsidenceModel)
-
 
 We can check whether the runs were set up, as expected:
 
@@ -143,10 +146,23 @@ We can check whether the runs were set up, as expected:
     :context:
     :include-source:
 
-    fig, ax = plt.subplots(2, 3)
-    ax = ax.flatten()
+    from matplotlib.colors import Normalize
+
+    fig, ax = plt.subplots(2, 3, sharex=True, sharey=True, figsize=(10, 4))
+    norm = Normalize(vmin=3, vmax=100)
+
     for i, job in enumerate(pp.job_list):
-        ax[i].imshow(job.deltamodel.sigma, vmax=0.004)
+        # first convert the field to a rate
+        subsidence_rate_field = (job.deltamodel.sigma / job.deltamodel.dt)
+
+        # now convert to mm/yr
+        subsidence_rate_field = (subsidence_rate_field * 1000 *
+            pyDeltaRCM.shared_tools._scale_factor(If=0.019, units='years'))
+
+        # and display
+        im = ax.flat[i].imshow(subsidence_rate_field, norm=norm)
+
+    fig.colorbar(im, ax=ax.ravel().tolist())
     plt.show()
 
 

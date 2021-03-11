@@ -8,7 +8,7 @@ Use pyDeltaRCM in ten minutes!
 You can get a model running with three simple lines of code.
 First, we instantiate the main :obj:`~pyDeltaRCM.deltaRCM_driver.pyDeltaRCM` model object.
 
-.. doctest:: 
+.. code:: python
 
     >>> import pyDeltaRCM
 
@@ -18,7 +18,7 @@ Next, since this is just a simple demo, we will run for a few short timesteps.
 The delta model is run forward with a call to the :meth:`~pyDeltaRCM.DeltaModel.update()` method of the delta model.
 So we loop the `update` function, and then finalize the model:
 
-.. doctest::
+.. code:: python
 
     >>> for _ in range(0, 5):
     ...     delta.update()
@@ -29,7 +29,7 @@ That's it! You ran the pyDeltaRCM model for five timesteps.
 
 We can visualize the delta bed elevation, though it's not very exciting after only five timesteps...
 
-.. doctest::
+.. code:: python
 
     >>> import matplotlib.pyplot as plt
 

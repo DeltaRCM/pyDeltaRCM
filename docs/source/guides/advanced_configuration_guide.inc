@@ -174,32 +174,35 @@ For example, to change the behavior of the subsidence field to vary randomly in 
     ...
     ...     def hook_apply_subsidence(self):
     ...
-    ...         # get new random value between 0 and sigma_max
-    ...         new_sigma = get_random_uniform(self.sigma_max)
-    ...         print("new_sigma:", new_sigma)
+    ...         # get new random value between 0 and subsidence_rate
+    ...         new_rate = get_random_uniform(self.subsidence_rate)
+    ...         print("new_rate:", new_rate)
     ...
     ...         # change the subsidence field
-    ...         self.sigma = self.subsidence_mask * new_sigma * self.dt
+    ...         self.sigma = self.subsidence_mask * new_rate * self.dt
 
 Now, on every iteration of the model, our hooked method will be called immediately before :obj:`apply_subsidence`, and will modify the subsidence field that is then applied during :obj:`apply_subsidence`. 
 
-.. doctest::
+.. code::
 
     >>> mdl = RandomSubsidenceModel()
-    >>> mdl.sigma_max  # default value
+    >>> mdl.subsidence_rate  # default value
     2e-09
 
 .. doctest::
     :hide:
+
+    >>> with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
+    ...     mdl = RandomSubsidenceModel(out_dir=output_dir)
 
     >>> pyDeltaRCM.shared_tools.set_random_seed(0)  # for reproducibility
     
 .. doctest::
 
     >>> mdl.update()
-    new_sigma: 1.3125136806997149e-09
+    new_rate: 1.3125136806997149e-09
     >>> mdl.update()
-    new_sigma: 6.692607693286315e-10
+    new_rate: 6.692607693286315e-10
 
 This is a somewhat contrived example to give you a sense of how you can implement changes to the model to achieve desired behavior. 
 
@@ -211,10 +214,10 @@ A complete :doc:`list of model hooks is available here </reference/model/model_h
 
 .. important::
 
-    In order for model subclasses to be reproducible, it is imperitive to use the :obj:`~pyDeltaRCM.shared_tools.get_random_uniform` function every time you need randomness in the model. Rescale to different distributions as necessary. Using any `numpy` or `scipy` random number generators will result in a model that is not reproducible. 
+    In order for model subclasses to be reproducible, it is imperative to use the :obj:`~pyDeltaRCM.shared_tools.get_random_uniform` function every time you need randomness in the model. Rescale to different distributions as necessary. Using any `numpy` or `scipy` random number generators will result in a model that is not reproducible. 
 
 There may be cases where hooks are insufficient for the modifications you need to make to the model.
-In this case, you should subclass the model, as depicted above, and reimplement entire methods, as necessary, by copying code from the package to your own subclass.
+In this case, you should subclass the model, as depicted above, and re-implement entire methods, as necessary, by copying code from the package to your own subclass.
 However, for stability and forwards-compatibility, you should try to minimize copied code as much as possible.
 
 

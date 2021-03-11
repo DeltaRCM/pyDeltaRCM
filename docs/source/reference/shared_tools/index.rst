@@ -28,3 +28,9 @@ Time scaling functions
 
 .. autofunction:: scale_model_time
 .. autofunction:: _scale_factor
+
+
+Utilities
+---------
+
+.. autofunction:: _docs_temp_directory

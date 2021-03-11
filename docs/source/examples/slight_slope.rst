@@ -17,10 +17,10 @@ Recall that anything added to the end of the the subclass' `__init__` method wil
         This subclass simply modifies the basin geometry
         before any computation has occurred.
         """
-        def __init__(self, input_file=None):
+        def __init__(self, input_file=None, **kwargs):
     
              # inherit base DeltaModel methods
-            super().__init__(input_file)
+            super().__init__(input_file, **kwargs)
 
              # modify the basin
             slope = 0.0005  # cross basin slope
@@ -32,11 +32,17 @@ Recall that anything added to the end of the the subclass' `__init__` method wil
 
 Next, we instantiate the model class.
 
-.. plot::
-    :context:
-    :include-source:
+.. code::
 
     mdl = SlightSlopeModel()
+
+
+.. plot::
+    :context:
+
+    with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
+        mdl = SlightSlopeModel(out_dir=output_dir)
+
 
 And finally, make a plot of the initial condition using the :obj:`~pyDeltaRCM.debug_tools.debug_tools.show_attribute` method.
 
@@ -50,3 +56,7 @@ And finally, make a plot of the initial condition using the :obj:`~pyDeltaRCM.de
 
 You can try this out for yourself, and even complete the model run.
 Are the channels steered by the basin slope?
+
+.. important:: 
+
+    In this example, we did not take care to update the model `stage` or `depth` fields. In this simple case it works out fine, because after a single timestep, the fields are correctly computed relative to the modified bed. However, take caution when modifying `DeltaModel` fields directly, and be sure to change *all* relevant fields too.

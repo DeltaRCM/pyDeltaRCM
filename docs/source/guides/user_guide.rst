@@ -135,11 +135,7 @@ Running simulations in parallel
 -------------------------------
 
 The high-level API provides the ability to run simulations in parallel on Linux environments. 
-<<<<<<< HEAD:docs/source/guides/userguide.rst
 This option is only useful in the case where you are running multiple jobs with the :ref:`matrix expansion <matrix_expansion_tag>`, :ref:`ensemble expansion <ensemble_expansion_tag>`, or :ref:`set expansion <set_expansion_tag>` tools.
-=======
-This option is only useful in the case where you are running multiple jobs with the :ref:`matrix expansion <matrix_expansion_tag>` or :ref:`ensemble expansion <matrix_expansion_tag>` tools.
->>>>>>> d047ff9... add template and framework for hooks. Including two basic examples.:docs/source/guides/user_guide.rst
 
 To run jobs in parallel simply specify the `--parallel` flag to the command line interface.
 Optionally, you can specify the number of simulations to run at once by following the flag with a number.

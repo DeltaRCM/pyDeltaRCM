@@ -31,7 +31,7 @@ class debug_tools(abc.ABC):
 
     .. doctest::
 
-        >>> self.show_attribute('cell_type')
+        >>> self.show_attribute('cell_type', grid=False)
         >>> self.show_ind([144, 22, 33, 34, 35])
         >>> self.show_ind((12, 14), 'bs')
         >>> self.show_ind([(11, 4), (11, 5)], 'g^')
