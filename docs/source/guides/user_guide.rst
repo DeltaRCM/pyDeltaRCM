@@ -166,7 +166,6 @@ The simplest case to use the low-level API is to do
     >>> delta.finalize()
 
 However, you can also inspect/modify the :obj:`~pyDeltaRCM.DeltaModel.update` method, and change the order of operations, or add operations, as desired.
-<<<<<<< HEAD:docs/source/guides/userguide.rst
 If you are working with the low-level API, you can optionally pass any valid key in the YAML configuration file as a keyword argument during model instantiation. 
 For example:
 
@@ -177,10 +176,7 @@ For example:
 
 
 Keyword arguments supplied at this point will supersede values specified in the YAML configuration.
-=======
 See :ref:`our guide for model customization <customize_the_model>` for a complete explanation and demonstration for how to modify model behavior.
->>>>>>> d047ff9... add template and framework for hooks. Including two basic examples.:docs/source/guides/user_guide.rst
-
 
 ..
     Advanced model configurations
