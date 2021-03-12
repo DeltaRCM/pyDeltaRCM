@@ -2,6 +2,9 @@
 import numpy as np
 import yaml
 import re
+import contextlib
+import tempfile
+import os
 
 from numba import njit, _helperlib
 
@@ -133,6 +136,26 @@ def _get_version():
     """
     from . import _version
     return _version.__version__()
+
+
+@contextlib.contextmanager
+def _docs_temp_directory():
+    """Helper for creating and tearing down models in documentation.
+
+    This function should be used as a context manager, to create a DeltaModel
+    with a temporary folder as output, rather than anywhere in the project
+    structure.
+
+    Examples
+    --------
+
+        >>> with _docs_temp_directory() as output_dir:
+        ...     delta = pyDeltaRCM.DeltaModel(out_dir=output_dir)
+    """
+    tmpdir = tempfile.TemporaryDirectory()
+    output_path = os.path.join(tmpdir.name, 'output')
+    yield output_path
+    tmpdir.cleanup()
 
 
 def custom_yaml_loader():

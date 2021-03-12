@@ -19,15 +19,17 @@ User documentation
    :maxdepth: 2
 
    guides/getting_started
-   guides/userguide
+   guides/user_guide
    info/index
+   examples/index
+   
 
 
 Developer documentation
 #######################
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
-   guides/devguide
+   guides/developer_guide
    reference/index

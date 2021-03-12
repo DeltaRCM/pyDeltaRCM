@@ -18,6 +18,7 @@ methods.
    water_tools/index
    sed_tools/index
    shared_tools/index
+   hook_tools/index
    debug_tools/index
 
 

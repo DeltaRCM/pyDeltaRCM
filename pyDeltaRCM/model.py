@@ -8,18 +8,19 @@ from .iteration_tools import iteration_tools
 from .sed_tools import sed_tools
 from .water_tools import water_tools
 from .init_tools import init_tools
+from .hook_tools import hook_tools
 from .debug_tools import debug_tools
 
 
 class DeltaModel(iteration_tools, sed_tools, water_tools,
-                 init_tools, debug_tools, object):
+                 init_tools, hook_tools, debug_tools, object):
     """Main model class.
 
     Instantiating the model class is described in the :meth:`__init__` method
     below in detail, but generally model instantiation occurs via a model run
     YAML configuration file. These YAML configuration files define model
     parameters which are used in the run; read more about creating input YAML
-    configuration files in the :doc:`../../guides/userguide`.
+    configuration files in the :doc:`/guides/user_guide`.
 
     Once the model has been instantiated, the model is updated via the
     :meth:`update`. This method coordinates the hydrology, sediment transport,
@@ -67,7 +68,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         Notes
         -----
         For more information regarding input configuration files, see the
-        :doc:`../../guides/userguide`.
+        :doc:`/guides/user_guide`.
 
         """
         self._time = 0.
@@ -79,26 +80,44 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
         self.default_file = os.path.join(_src_dir, 'default.yml')
+
+        # import the input file
+        self.hook_import_files()  # user hook
         self.import_files(kwargs)
 
+        # initialize output folders and logger
         self.init_output_infrastructure()
         self.init_logger()
 
+        # apply the configuration
+        self.hook_process_input_to_model()
         self.process_input_to_model()
+
+        # determine and set the model seed
         self.determine_random_seed()
 
+        # create model variables based on configuration
+        self.hook_create_other_variables()
         self.create_other_variables()
+
+        # create the model domain based on configuration
+        self.hook_create_domain()
         self.create_domain()
 
+        # initialize the sediment router classes
         self.init_sediment_routers()
+
+        # set up the subsidence fields
         self.init_subsidence()
 
         # initialize the stratigraphy infrastructure
+        self.hook_init_stratigraphy()
         self.init_stratigraphy()
 
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
             # load values from the checkpoint and don't init final features
+            self.hook_load_checkpoint()
             self.load_checkpoint(defer_output)
 
         else:
@@ -107,7 +126,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
                 self.init_output_file()
 
                 # record initial conditions
+                self.hook_output_data()
                 self.output_data()
+
+                self.hook_output_checkpoint()
                 self.output_checkpoint()
 
         _msg = 'Model initialization complete'
@@ -147,8 +169,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             raise RuntimeError('Cannot update model, model already finalized!')
 
         # update the model, i.e., the actual model morphodynamics
+        self.hook_run_one_timestep()
         self.run_one_timestep()
+
+        self.hook_apply_subsidence()
         self.apply_subsidence()
+
+        self.hook_finalize_timestep()
         self.finalize_timestep()
 
         # update time-tracking fields
@@ -159,9 +186,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.log_model_time()
 
         # record the state of the model if needed
+        self.hook_output_data()
         self.output_data()
 
         # save a checkpoint if needed
+        self.hook_output_checkpoint()
         self.output_checkpoint()
 
     def finalize(self):
@@ -184,6 +213,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             raise RuntimeError('Cannot finalize model, '
                                'model already finalized!')
 
+        self.hook_record_final_stratigraphy()
         self.record_final_stratigraphy()
 
         try:
