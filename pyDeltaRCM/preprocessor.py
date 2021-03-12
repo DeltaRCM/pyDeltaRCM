@@ -988,7 +988,7 @@ class Preprocessor(BasePreprocessor):
 
     This is the python high-level API class that is callable from a python
     script. For complete documentation on the API configurations, see the
-    :doc:`User Guide <../guides/user_guide>`.
+    :doc:`User Guide </guides/user_guide>`.
 
     The class gives a way to configure and run multiple jobs from a python
     script.

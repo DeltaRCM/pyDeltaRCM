@@ -15,9 +15,9 @@ A complete list of hooks in the model follows:
     :obj:`~hook_tools.hook_create_domain`, :obj:`~hook_tools.hook_init_water_iteration`
     :obj:`~hook_tools.hook_load_checkpoint`, :obj:`~hook_tools.hook_run_water_iteration`
     :obj:`~hook_tools.hook_init_stratigraphy`, :obj:`~hook_tools.hook_compute_free_surface`
-    :obj:`~hook_tools.hook_output_data`, :obj:`~hook_tools.hook_finalize_water_surface`
+    :obj:`~hook_tools.hook_output_data`, :obj:`~hook_tools.finalize_water_iteration`
     :obj:`~hook_tools.hook_output_checkpoint`, :obj:`~hook_tools.hook_sed_route`
-    , :obj:`~hook_route_all_sand_parcels`
-    , :obj:`~hook_topo_diffusion`
-    , :obj:`~hook_route_all_mud_parcels`
+    , :obj:`~hook_tools.hook_route_all_sand_parcels`
+    , :obj:`~hook_tools.hook_topo_diffusion`
+    , :obj:`~hook_tools.hook_route_all_mud_parcels`
     , :obj:`~hook_tools.hook_record_final_stratigraphy`

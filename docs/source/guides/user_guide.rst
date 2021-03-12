@@ -193,4 +193,12 @@ See :ref:`our guide for model customization <customize_the_model>` for a complet
 Supporting documentation and files
 ==================================
 
-   /examples/slight_slope
+Model reference:
+
+    * :doc:`/reference/model/yaml_defaults`
+    * :doc:`/reference/model/model_hooks`
+
+Examples:
+
+    * :doc:`/examples/slight_slope`
+    * :doc:`/examples/subsidence_region`

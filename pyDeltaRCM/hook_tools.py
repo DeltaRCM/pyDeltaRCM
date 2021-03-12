@@ -120,11 +120,11 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_finalize_water_surface(self, iteration):
-        """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.finalize_water_surface`.
+    def hook_finalize_water_iteration(self, iteration):
+        """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.finalize_water_iteration`.
 
         Called immediately before
-        :obj:`~pyDeltaRCM.water_tools.water_tools.self`.
+        :obj:`~pyDeltaRCM.water_tools.water_tools.finalize_water_iteration`.
         """
         pass
 

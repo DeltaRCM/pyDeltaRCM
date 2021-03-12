@@ -56,7 +56,7 @@ class iteration_tools(abc.ABC):
             self.compute_free_surface()
 
             # clean up the water surface and apply boundary conditions
-            self.hook_finalize_water_surface(iteration)
+            self.hook_finalize_water_iteration(iteration)
             self.finalize_water_iteration(iteration)
 
         #  sediment iteration
