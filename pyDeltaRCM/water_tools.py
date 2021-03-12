@@ -150,14 +150,48 @@ class water_tools(abc.ABC):
         during the routing of the water parcels (in
         :obj:`run_water_iteration`) to determine the free surface. The
         operations of the free surface computation are placed in a jitted
-        function :obj:`accumulate_free_surface_walks`. Following this
+        function :obj:`_accumulate_free_surface_walks`. Following this
         computation, the free surface is smoothed by steps in
         :obj:`finalize_free_surface`.
+
+        See [1]_ and [2]_ for a complete description of hydrodynamic
+        assumptions in the DeltaRCM model.
 
         Examples
         --------
 
-        .. plot:: water_tools/compute_free_surface.py
+        The sequence of `compute_free_surface` is depicted in the figures
+        below. The first image depicts the "input" to `compute_free_surface`,
+        which is the current bed elevation, and the path of each water parcel
+        (cyan lines in right image).
+
+        .. plot:: water_tools/compute_free_surface_inputs.py
+
+        The `compute_free_surface` method then calls the
+        :obj:`_accumulate_free_surface_walks` function to determine 1) the
+        number of times each cell has been visited by a water parcel
+        (``sfc_visit``), and 2) the *total sum of expected elevations* of the
+        water surface at each cell (``sfc_sum``).
+
+        The output from :obj:`_accumulate_free_surface_walks` is then used to
+        calculate a new stage surface (``H_new``) based only on the water
+        parcel paths and expected water surface elevations, approximately as
+        ``H_new = sfc_sum / sfc_visit``. Finally, the updated water surface is
+        combined with the previous timestep's water surface and an
+        underrelaxation coefficient :obj:`_omega_sfc`.
+
+        .. plot:: water_tools/compute_free_surface_outputs.py
+
+        .. [1] A reduced-complexity model for river delta formation – Part 1:
+               Modeling deltas with channel dynamics, M. Liang, V. R. Voller,
+               and C. Paola, Earth Surf. Dynam., 3, 67–86, 2015.
+               https://doi.org/10.5194/esurf-3-67-2015
+
+        .. [2] A reduced-complexity model for river delta formation – Part 2:
+               Assessment of the flow routing scheme, M. Liang, N. Geleynse,
+               D. A. Edmonds, and P. Passalacqua, Earth Surf. Dynam., 3,
+               87–104, 2015. https://doi.org/10.5194/esurf-3-87-2015
+
         """
         _msg = 'Computing free surface from water parcels'
         self.log_info(_msg, verbosity=2)
@@ -807,16 +841,16 @@ def _accumulate_free_surface_walks(free_surf_walk_inds, free_surf_flag,
         1. loop through every parcel's directed random walk in series.
 
         2. for a parcel's walk, unravel the indices and determine whether the
-        parcel should contribute to the free surface. Parcels are considered
-        contributors if they have reached the ocean and if they are not looped
-        pathways.
+           parcel should contribute to the free surface. Parcels are
+           considered contributors if they have reached the ocean and if they
+           are not looped pathways.
 
         3. then, we begin at the downstream end of the parcel's walk and
-        iterate up-walk until, determining the `Hnew` for each location.
-        Downstream of the shoreline-ocean boundary, the water surface
-        elevation is set to the sea level. Upstream of the shoreline-ocean
-        boundary, the water surface is determined according to the land-slope
-        (:obj:`S0`) and the parcel pathway.
+           iterate up-walk until, determining the `Hnew` for each location.
+           Downstream of the shoreline-ocean boundary, the water surface
+           elevation is set to the sea level. Upstream of the shoreline-ocean
+           boundary, the water surface is determined according to the
+           land-slope (:obj:`S0`) and the parcel pathway.
 
         4. repeat from 2, for each parcel.
 

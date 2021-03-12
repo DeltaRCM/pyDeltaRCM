@@ -38,33 +38,21 @@ stage_new = delta.eta + delta.depth
 stage_new[sfc_visit > 0] = (sfc_sum[sfc_visit > 0] /
                             sfc_visit[sfc_visit > 0])
 
-# set up axis
-fig, ax = plt.subplots(3, 2, sharex=True, sharey=True, figsize=(9, 7))
 
-# fill in axis
-pyDeltaRCM.debug_tools.plot_domain(
-    delta.eta, ax=ax[0, 0], grid=False, cmap='cividis',
-    label='bed elevation (m)')
-pyDeltaRCM.debug_tools.plot_domain(
-    delta.eta, ax=ax[0, 1], grid=False, cmap='cividis',
-    label='bed elevation (m)')
-delta.show_line(delta.free_surf_walk_inds[::10, :].T, 'k-',
-                ax=ax[0, 1], alpha=0.1,
-                multiline=True, nozeros=True)
+fig, ax = plt.subplots(2, 2, sharex=True, sharey=True, figsize=(9, 4))
 
 pyDeltaRCM.debug_tools.plot_domain(
-    delta.sfc_visit, ax=ax[1, 0], grid=False, cmap='Greys',
+    delta.sfc_visit, ax=ax[0, 0], grid=False, cmap='Greys',
     label='sfc_visit (-)')
 pyDeltaRCM.debug_tools.plot_domain(
-    delta.sfc_sum, ax=ax[1, 1], grid=False, cmap='Blues',
+    delta.sfc_sum, ax=ax[0, 1], grid=False, cmap='Blues',
     label='sfc_sum (m)')
 
 pyDeltaRCM.debug_tools.plot_domain(
-    Hnew, ax=ax[2, 0], grid=False,
+    Hnew, ax=ax[1, 0], grid=False,
     label='H_new (m)')
 pyDeltaRCM.debug_tools.plot_domain(
-    stage_new, ax=ax[2, 1], grid=False,
+    stage_new, ax=ax[1, 1], grid=False,
     label='stage (m)')
 
-plt.tight_layout()
-plt.show()
+fig.show()
