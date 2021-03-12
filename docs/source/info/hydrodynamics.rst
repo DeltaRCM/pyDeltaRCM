@@ -32,7 +32,7 @@ While downstream of the land-ocean boundary (determined by a depth-or-velocity t
 The algorithm tracks the number of times each cell has been visited by a water parcel (``sfc_visit``), and the *total sum of expected elevations* of the water surface at each cell (``sfc_sum``), by adding the predicted surface elevation of each parcel step while iterating through each step of each parcel.
 
 Next, the output from :obj:`_accumulate_free_surface_walks` is used to calculate a new stage surface (``H_new``) based only on the water parcel paths and expected water surface elevations, approximately as ``H_new = sfc_sum / sfc_visit``.
-The updated water surface is combined with the previous timestep's water surface and an underrelaxation coefficient (:obj:`_omega_sfc`).
+The updated water surface is combined with the previous timestep's water surface and an under-relaxation coefficient (:obj:`_omega_sfc`).
 
 .. plot:: water_tools/compute_free_surface_outputs.py
 
