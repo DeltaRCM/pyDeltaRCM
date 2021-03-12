@@ -12,9 +12,10 @@ cm = matplotlib.cm.get_cmap('tab10')
 
 
 # init delta model
-delta = pyDeltaRCM.DeltaModel(
-    '../../_resources/checkpoint.yaml',
-    resume_checkpoint='../../_resources/deltaRCM_Output')
+with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
+    delta = pyDeltaRCM.DeltaModel(
+        out_dir=output_dir,
+        resume_checkpoint='../../_resources/checkpoint')
 _shp = delta.eta.shape
 
 
@@ -61,8 +62,8 @@ for pidx in range(200):
     # idxs = np.random.randint(low=0, high=delta._Np_water, size=10)
 
     # if np.any(looped):
-    if whr_neq.size > 0:
-        breakpoint()
+    # if whr_neq.size > 0:
+    #     breakpoint()
 
 
 # make a function to plot each point of interest as two points and an arrow
@@ -76,8 +77,9 @@ def _plot_a_point(i):
 
 # make the figure
 fig, ax = plt.subplots()
-delta.show_attribute('eta', ax=ax, grid=False)
-for npt in range(n):
-    breakpoint()
-    _plot_a_point(npt)
+delta.show_attribute('eta', ax=ax, grid=False, cmap='cividis')
+if whr_neq.size > 0:
+    for npt in range(n):
+        _plot_a_point(npt)
+
 plt.show()

@@ -9,9 +9,10 @@ cm = matplotlib.cm.get_cmap('tab10')
 
 
 # init delta model
-delta = pyDeltaRCM.DeltaModel(
-    '../../_resources/checkpoint.yaml',
-    resume_checkpoint='../../_resources/deltaRCM_Output')
+with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
+    delta = pyDeltaRCM.DeltaModel(
+        out_dir=output_dir,
+        resume_checkpoint='../../_resources/checkpoint')
 _shp = delta.eta.shape
 
 
@@ -24,10 +25,13 @@ def _plot_idxs_walks_to_step(delta_inds, _step, _idxs, _ax):
     for i in range(len(_idxs)):
         walk = delta_inds[_idxs[i], :]
         walk = walk[:_step]
-        pyDeltaRCM.debug_tools.plot_line(walk, shape=_shp, color=cm(i))
+        # print(walk)
+        pyDeltaRCM.debug_tools.plot_line(
+            walk, shape=_shp, color='r',
+            multiline=True, nozeros=True)
         yend, xend = pyDeltaRCM.shared_tools.custom_unravel(walk[-1], _shp)
         _ax.plot(xend, yend,
-                 marker='o', ms=3, color=cm(i))
+                 marker='o', ms=3, color='r')
 
 
 # declare the idxs to use:
@@ -43,14 +47,19 @@ gs = fig.add_gridspec(2, 2)
 
 # fill in axis0
 ax0 = fig.add_subplot(gs[0, 0])
-pyDeltaRCM.debug_tools.plot_domain(delta.eta, ax=ax0, grid=False)
-_plot_idxs_walks_to_step(delta.free_surf_walk_inds, _step=pidx, _idxs=idxs, _ax=ax0)
+pyDeltaRCM.debug_tools.plot_domain(
+    delta.eta, ax=ax0, grid=False, cmap='cividis')
+_plot_idxs_walks_to_step(
+    delta.free_surf_walk_inds, _step=pidx, _idxs=idxs, _ax=ax0)
+ax0.set_title('bed elevation')
 
 
 # fill in axis0
 ax1 = fig.add_subplot(gs[0, 1])
-pyDeltaRCM.debug_tools.plot_domain(delta.stage, ax=ax1, grid=False)
+pyDeltaRCM.debug_tools.plot_domain(
+    delta.stage, ax=ax1, grid=False)
 _plot_idxs_walks_to_step(delta.free_surf_walk_inds, _step=pidx, _idxs=idxs, _ax=ax1)
+ax1.set_title('water surface (stage)')
 
 
 ax2 = fig.add_subplot(gs[1, :])
@@ -62,9 +71,9 @@ for i in range(n):
     ax2.plot(delta.eta.flat[walk], 'k-')
     ax2.plot(delta.stage.flat[walk], '-', color=cm(i))
 
+ax2.set_ylabel('elevation')
+ax2.set_xlabel('steps along parcel path')
+
 plt.tight_layout()
 
-if __name__ == '__main__':
-    plt.savefig('_accumulate_free_surface_walks.png', transparent=True, dpi=300)
-else:
-    plt.show()
+plt.show()

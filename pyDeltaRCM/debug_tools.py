@@ -180,7 +180,6 @@ class debug_tools(abc.ABC):
             if ind.ndim > 2:
                 raise NotImplementedError('Not implemented for arrays > 2d.')
             elif ind.ndim > 1:
-                breakpoint()
                 if multiline:
                     # travel along axis, extracting lines
                     cm = matplotlib.cm.get_cmap('tab10')
@@ -335,7 +334,21 @@ def plot_line(_ind, *args, shape=None, nozeros=False, **kwargs):
                     else:
                         pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
             else:
-                pxpys = np.fliplr(_ind)
+                if _ind.ndim > 1:
+                    pxpys = np.fliplr(_ind)
+                else:
+                    if (_shape is None):
+                        raise ValueError(
+                            'Shape of array must be given to unravel index.')
+                    pxpys = np.zeros((_ind.shape[0], 2))
+                    for i in range(_ind.shape[0]):
+                        if _ind[i] == 0:
+                            if nozeros:
+                                pxpys[i, :] = np.nan, np.nan
+                            else:
+                                pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
+                        else:
+                            pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
 
     _l, = ax.plot(pxpys[:, 1], pxpys[:, 0], *args, **kwargs)
 

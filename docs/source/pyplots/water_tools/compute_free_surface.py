@@ -9,9 +9,10 @@ cm = matplotlib.cm.get_cmap('tab10')
 
 
 # init delta model
-delta = pyDeltaRCM.DeltaModel(
-    '../../_resources/checkpoint.yaml',
-    resume_checkpoint='../../_resources/deltaRCM_Output')
+with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
+    delta = pyDeltaRCM.DeltaModel(
+        out_dir=output_dir,
+        resume_checkpoint='../../_resources/checkpoint')
 _shp = delta.eta.shape
 
 
@@ -39,9 +40,6 @@ stage_new[sfc_visit > 0] = (sfc_sum[sfc_visit > 0] /
 
 # set up axis
 fig, ax = plt.subplots(3, 2, sharex=True, sharey=True, figsize=(9, 7))
-# fig = plt.figure(constrained_layout=True)
-# gs = fig.add_gridspec(2, 2)
-
 
 # fill in axis
 pyDeltaRCM.debug_tools.plot_domain(
@@ -50,9 +48,9 @@ pyDeltaRCM.debug_tools.plot_domain(
 pyDeltaRCM.debug_tools.plot_domain(
     delta.eta, ax=ax[0, 1], grid=False, cmap='cividis',
     label='bed elevation (m)')
-delta.show_line(delta.free_surf_walk_inds[::10, :], 'k-',
-                ax=ax[0, 1], alpha=0.1, nozeros=True)
-
+delta.show_line(delta.free_surf_walk_inds[::10, :].T, 'k-',
+                ax=ax[0, 1], alpha=0.1,
+                multiline=True, nozeros=True)
 
 pyDeltaRCM.debug_tools.plot_domain(
     delta.sfc_visit, ax=ax[1, 0], grid=False, cmap='Greys',
@@ -61,7 +59,6 @@ pyDeltaRCM.debug_tools.plot_domain(
     delta.sfc_sum, ax=ax[1, 1], grid=False, cmap='Blues',
     label='sfc_sum (m)')
 
-
 pyDeltaRCM.debug_tools.plot_domain(
     Hnew, ax=ax[2, 0], grid=False,
     label='H_new (m)')
@@ -69,10 +66,5 @@ pyDeltaRCM.debug_tools.plot_domain(
     stage_new, ax=ax[2, 1], grid=False,
     label='stage (m)')
 
-
 plt.tight_layout()
-
-if __name__ == '__main__':
-    plt.savefig('compute_free_surface.png', transparent=True, dpi=300)
-else:
-    plt.show()
+plt.show()

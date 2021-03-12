@@ -679,7 +679,7 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
 
     new_inds
         Array recording the new index for each water parcel, if the step is
-        taken. Shape is `(:obj:`Np_water`, 1)`, with each element recording
+        taken. Shape is `(Np_water, 1)`, with each element recording
         the *flat* index into the domain shape.
 
     _step
@@ -824,7 +824,8 @@ def _accumulate_free_surface_walks(free_surf_walk_inds, free_surf_flag,
     Examples
     --------
 
-    The following shows an example of the walk of a few water parcels, along with the resultant computed water surface.
+    The following shows an example of the walk of a few water parcels, along
+    with the resultant computed water surface.
 
     .. plot:: water_tools/_accumulate_free_surface_walks.py
 
@@ -905,6 +906,12 @@ def _smooth_free_surface(Hin, cell_type, Nsmooth, Csmooth):
 
     Csmooth
         Underrelaxation coefficient for smoothing iterations.
+
+    Examples
+    --------
+    The following shows an example of the water surface smoothing process.
+
+    .. plot:: water_tools/_smooth_free_surface.py
     """
     # grab relevant shape information
     L, W = Hin.shape

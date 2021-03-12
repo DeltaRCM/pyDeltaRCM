@@ -824,6 +824,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def resume_checkpoint(self):
         """
         resume_checkpoint controls loading of a checkpoint if run is resuming.
+
+        When setting this option in the YAML or command line, you can specify
+        a `bool` (e.g., `resume_checkpoint: True`) which will search in the
+        :obj:`out_dir` directory for a file named ``checkpoint.npz``.
+        Alternatively, you can specify an alternative folder to search for the
+        checkpoint *as a string* (e.g., `resume_checkpoint:
+        '/some/other/path'`).
         """
         return self._resume_checkpoint
 
@@ -833,7 +840,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             self._checkpoint_folder = resume_checkpoint
             self._resume_checkpoint = True
         else:
-            self._checkpoint_folder = None
+            self._checkpoint_folder = self.prefix
             self._resume_checkpoint = resume_checkpoint
 
     @property
@@ -1060,7 +1067,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         .. math::
 
-            \\Delta t = \\frac{0.1 {N_0}^2 V_0}{Q_{s0}}
+            \\Delta t = \\dfrac{0.1 {N_0}^2 V_0}{Q_{s0}}
 
         where :math:`Q_{s0}` is the sediment discharge into the model domain
         (m:sup:`3`/s), :math:`V_0` is the reference volume, and :math:`N_0` is

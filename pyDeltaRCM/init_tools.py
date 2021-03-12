@@ -661,7 +661,7 @@ class init_tools(abc.ABC):
 
         _msg = 'Locating checkpoint file'
         self.log_info(_msg, verbosity=2)
-        ckp_file = os.path.join(self.prefix, 'checkpoint.npz')
+        ckp_file = os.path.join(self._checkpoint_folder, 'checkpoint.npz')
         checkpoint = np.load(ckp_file, allow_pickle=True)
 
         # write saved variables back to the model
