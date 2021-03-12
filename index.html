@@ -56,11 +56,11 @@
 <li class="toctree-l2"><a class="reference internal" href="guides/10min.html">10-minute tutorial</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="guides/userguide.html">User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="guides/userguide.html#configuring-an-input-yaml-file">Configuring an input YAML file</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guides/userguide.html#starting-model-runs">Starting model runs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guides/userguide.html#advanced-model-configurations">Advanced model configurations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guides/userguide.html#working-with-subsidence">Working with subsidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/user_guide.html#configuring-an-input-yaml-file">Configuring an input YAML file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/user_guide.html#starting-model-runs">Starting model runs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/user_guide.html#advanced-model-configurations">Advanced model configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/user_guide.html#working-with-subsidence">Working with subsidence</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="info/index.html">Model Information</a><ul>
@@ -71,6 +71,13 @@
 <li class="toctree-l2"><a class="reference internal" href="info/outputfile.html">Output File Format</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples of using and working with pyDeltaRCM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/index.html#modifying-initial-conditions">Modifying initial conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/index.html#modifying-boundary-conditions">Modifying boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/index.html#modifying-internal-computations">Modifying internal computations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/index.html#modifying-behavior-of-the-preprocessor">Modifying behavior of the Preprocessor</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -78,16 +85,50 @@
 <h1>Developer documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="guides/devguide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/developer_guide.html">Developer Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/index.html">API reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference/model/index.html">model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference/preprocessor/index.html">Preprocessor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference/iteration_tools/index.html">iteration_tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference/init_tools/index.html">init_tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference/water_tools/index.html">water_tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference/sed_tools/index.html">sed_tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference/shared_tools/index.html">shared_tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference/debug_tools/index.html">debug_tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/model/index.html">model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/model/index.html#the-deltamodel-class-and-all-attributes-and-methods">The DeltaModel class and all attributes and methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/model/index.html#model-configuration-reference">Model configuration reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/preprocessor/index.html">Preprocessor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/preprocessor/index.html#preprocessor-classes-and-api">Preprocessor classes and API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/preprocessor/index.html#preprocessor-function-and-utilities">Preprocessor function and utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/iteration_tools/index.html">iteration_tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/iteration_tools/index.html#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/init_tools/index.html">init_tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/init_tools/index.html#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/water_tools/index.html">water_tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/water_tools/index.html#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/water_tools/index.html#water-tools-helper-functions">water_tools helper functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/sed_tools/index.html">sed_tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/sed_tools/index.html#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/sed_tools/index.html#router-classes">Router classes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/shared_tools/index.html">shared_tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/shared_tools/index.html#shared-functions">Shared functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/shared_tools/index.html#time-scaling-functions">Time scaling functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/shared_tools/index.html#utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/hook_tools/index.html">hook_tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/hook_tools/index.html#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/debug_tools/index.html">debug_tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/debug_tools/index.html#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="reference/index.html#references">References</a></li>
 </ul>
 </li>

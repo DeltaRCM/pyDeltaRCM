@@ -16,7 +16,7 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="debug_tools" href="../debug_tools/index.html" />
+    <link rel="next" title="hook_tools" href="../hook_tools/index.html" />
     <link rel="prev" title="pyDeltaRCM.sed_tools.BaseRouter" href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -26,7 +26,7 @@
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../debug_tools/index.html" title="debug_tools"
+          <a href="../hook_tools/index.html" title="hook_tools"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html" title="pyDeltaRCM.sed_tools.BaseRouter"
@@ -174,6 +174,23 @@ activity. <strong>Must</strong> be in interval (0, 1].</p></li>
 </dd></dl>
 
 </div>
+<div class="section" id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="pyDeltaRCM.shared_tools._docs_temp_directory">
+<code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">_docs_temp_directory</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools._docs_temp_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper for creating and tearing down models in documentation.</p>
+<p>This function should be used as a context manager, to create a DeltaModel
+with a temporary folder as output, rather than anywhere in the project
+structure.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">_docs_temp_directory</span><span class="p">()</span> <span class="k">as</span> <span class="n">output_dir</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">(</span><span class="n">out_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -188,6 +205,7 @@ activity. <strong>Must</strong> be in interval (0, 1].</p></li>
 <li><a class="reference internal" href="#">shared_tools</a><ul>
 <li><a class="reference internal" href="#shared-functions">Shared functions</a></li>
 <li><a class="reference internal" href="#time-scaling-functions">Time scaling functions</a></li>
+<li><a class="reference internal" href="#utilities">Utilities</a></li>
 </ul>
 </li>
 </ul>
@@ -196,8 +214,8 @@ activity. <strong>Must</strong> be in interval (0, 1].</p></li>
   <p class="topless"><a href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html"
                         title="previous chapter">pyDeltaRCM.sed_tools.BaseRouter</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../debug_tools/index.html"
-                        title="next chapter">debug_tools</a></p>
+  <p class="topless"><a href="../hook_tools/index.html"
+                        title="next chapter">hook_tools</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -226,7 +244,7 @@ activity. <strong>Must</strong> be in interval (0, 1].</p></li>
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../debug_tools/index.html" title="debug_tools"
+          <a href="../hook_tools/index.html" title="hook_tools"
              >next</a> |</li>
         <li class="right" >
           <a href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html" title="pyDeltaRCM.sed_tools.BaseRouter"

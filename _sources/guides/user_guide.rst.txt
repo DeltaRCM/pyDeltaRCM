@@ -156,7 +156,7 @@ The simplest case to use the low-level API is to do
 
     >>> delta = DeltaModel(input_file='model_configuration.yml')
 
-    >>> for _ in range(0, 1):
+    >>> for _ in range(0, 5000):
     ...    delta.update()
 
     >>> delta.finalize()
@@ -172,120 +172,33 @@ For example:
 
 
 Keyword arguments supplied at this point will supersede values specified in the YAML configuration.
+See :ref:`our guide for model customization <customize_the_model>` for a complete explanation and demonstration for how to modify model behavior.
+
+..
+    Advanced model configurations
+    =============================
+    ** Advanced model configuration guide is imported from another file. **
+
+.. include:: advanced_configuration_guide.inc
 
 
-=============================
-Advanced model configurations
-=============================
+..
+    Working with Subsidence
+    =======================
+    ** Subsidence guide is imported from another file. **
 
-.. _configuring_multiple_jobs:
-
-Configuring multiple model runs from a single YAML file
-==============================================================
-
-Multiple model runs (referred to as "jobs") can be configured by a single `.yml` configuration file, by using the `matrix` and `ensemble` configuration keys.
-
-.. _matrix_expansion_tag:
-
-Matrix expansion
-----------------
-
-To use matrix expansion to configure multiple model runs, the dimensions of the matrix (i.e., the variables you want to run) should be listed below the `matrix` key. For example, the following configuration is a one-dimensional matrix with the variable `f_bedload`:
-
-.. code:: yaml
-
-    out_dir: 'out_dir'
-    dx: 2.0
-    h0: 1.0
-
-    matrix:
-      f_bedload:
-        - 0.5
-        - 0.2
-
-This configuation would produce two model runs, one with bedload fraction (`f_bedload`) 0.5 and another with bedload fraction 0.2, and both with grid spacing (`dx`) 2.0 and basin depth (`h0`) 1.0.
-The matrix expansions will create two folders at `./out_dir/job_000` and `./out_dir/job_001` that each correspond to a created job.
-Each folder will contain a copy of the configuration file used for that job; for example, the full configuration for `job_000` is:
-
-.. code:: yaml
-
-    out_dir: 'out_dir/job_000'
-    dx: 2.0
-    h0: 1.0
-    f_bedload: 0.5
-
-Additionally, a log file for each job is located in the output folder, and any output grid files or images specified by the input configuration will be located in the respective job output folder.
-
-.. note:: You must specify the `out_dir` key in the input YAML configuation to use matrix expansion.
-
-Multiple dimensional matrix expansion is additionally supported. For example, the following configuation produces six jobs:
-
-.. code:: yaml
-
-    out_dir: 'out_dir'
-
-    matrix:
-      f_bedload:
-        - 0.5
-        - 0.4
-        - 0.2
-      h0:
-        - 1
-        - 5
+.. include:: subsidence_guide.inc
 
 
-.. _ensemble_expansion_tag:
+Supporting documentation and files
+==================================
 
-Ensemble expansion
-------------------
+Model reference:
 
-Ensemble expansion creates replicates of specified model configurations with different random seed values.
-Like the matrix expansion, the `out_dir` key must be specified in the input configuration file.
-The `ensemble` key can be added to any configuration file that does not explicitly define the random seed.
-As an example, two model runs can be generated with the same input sediment fraction using the following configuration `.yml`:
+    * :doc:`/reference/model/yaml_defaults`
+    * :doc:`/reference/model/model_hooks`
 
-.. code:: yaml
+Examples:
 
-    out_dir: 'out_dir'
-
-    f_bedload: 0.5
-    ensemble: 2
-
-This configuration file would produce two model runs that share the same parameters, but have different initial random seed values.
-The ensemble expansion can be applied to configuration files that include a matrix expansion as well:
-
-.. code:: yaml
-
-    out_dir: 'out_dir'
-
-    ensemble: 3
-
-    matrix:
-      h0:
-        - 1.0
-        - 2.0
-
-The above configuration file would produce 6 model runs, 3 with a basin depth (`h0`) of 1.0, and 3 with a basin depth of 2.0.
-
-.. _set_expansion_tag:
-
-Set expansion
--------------
-
-Set expansion enables user-configured parameter sets to take advantage of the :obj:`~pyDeltaRCM.Preprocessor` infrastructure (such as the job output preparation and ability to run jobs in parallel), while also enabling flexible configurations for parameter sets than cannot be configured via `matrix` expansion.
-For example, to vary `Qw0` while holding `Qs0` fixed requires modifying both `C0_percent` and some water-discharge-controlling parameter *simultaneously*; i.e., this cannot be achieved with `matrix` expansion. 
-
-To use set expansion, add the `set` key to a configuration file, and define a *list* of *dictionaries* which set the parameters of each run to be completed.
-For example, to configure two model runs, the first with parameters ``u0: 1.0`` and ``h0: 1.0``, and the second with parameters ``u0: 1.2`` and ``h0: 1.2``:
-
-.. code:: yaml
-
-    set:
-      - {u0: 1.0, h0: 1.0}
-      - {u0: 1.2., h0: 1.2}
-
-
-All jobs in the `set` specification must have the exact same set of keys.
-Moreover, additional `ensemble` or `matrix` specifications are not supported with the `set` specification. 
-
-.. include:: subsidenceguide.rst
+    * :doc:`/examples/slight_slope`
+    * :doc:`/examples/subsidence_region`

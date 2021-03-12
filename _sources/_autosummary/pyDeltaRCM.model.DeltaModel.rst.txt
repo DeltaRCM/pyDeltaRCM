@@ -30,6 +30,26 @@
       ~DeltaModel.flooding_correction
       ~DeltaModel.get_water_weight_array
       ~DeltaModel.get_wet_mask_nh
+      ~DeltaModel.hook_apply_subsidence
+      ~DeltaModel.hook_compute_free_surface
+      ~DeltaModel.hook_create_domain
+      ~DeltaModel.hook_create_other_variables
+      ~DeltaModel.hook_finalize_timestep
+      ~DeltaModel.hook_finalize_water_iteration
+      ~DeltaModel.hook_import_files
+      ~DeltaModel.hook_init_stratigraphy
+      ~DeltaModel.hook_init_water_iteration
+      ~DeltaModel.hook_load_checkpoint
+      ~DeltaModel.hook_output_checkpoint
+      ~DeltaModel.hook_output_data
+      ~DeltaModel.hook_process_input_to_model
+      ~DeltaModel.hook_record_final_stratigraphy
+      ~DeltaModel.hook_route_all_mud_parcels
+      ~DeltaModel.hook_route_all_sand_parcels
+      ~DeltaModel.hook_run_one_timestep
+      ~DeltaModel.hook_run_water_iteration
+      ~DeltaModel.hook_sed_route
+      ~DeltaModel.hook_topo_diffusion
       ~DeltaModel.import_files
       ~DeltaModel.init_logger
       ~DeltaModel.init_output_file

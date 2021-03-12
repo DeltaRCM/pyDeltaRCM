@@ -16,7 +16,7 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="User Guide" href="userguide.html" />
+    <link rel="next" title="User Guide" href="user_guide.html" />
     <link rel="prev" title="Getting Started" href="getting_started.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -26,7 +26,7 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="userguide.html" title="User Guide"
+          <a href="user_guide.html" title="User Guide"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="getting_started.html" title="Getting Started"
@@ -47,7 +47,7 @@
 <p>Use pyDeltaRCM in ten minutes!</p>
 <p>You can get a model running with three simple lines of code.
 First, we instantiate the main <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyDeltaRCM</span></code> model object.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyDeltaRCM</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyDeltaRCM</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">()</span>
 </pre></div>
@@ -55,7 +55,7 @@ First, we instantiate the main <code class="xref py py-obj docutils literal notr
 <p>Next, since this is just a simple demo, we will run for a few short timesteps.
 The delta model is run forward with a call to the <code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code> method of the delta model.
 So we loop the <cite>update</cite> function, and then finalize the model:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">delta</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
@@ -63,7 +63,7 @@ So we loop the <cite>update</cite> function, and then finalize the model:</p>
 </div>
 <p>That’s it! You ran the pyDeltaRCM model for five timesteps.</p>
 <p>We can visualize the delta bed elevation, though it’s not very exciting after only five timesteps…</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">bed_elevation</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
@@ -87,7 +87,7 @@ So we loop the <cite>update</cite> function, and then finalize the model:</p>
   <p class="topless"><a href="getting_started.html"
                         title="previous chapter">Getting Started</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="userguide.html"
+  <p class="topless"><a href="user_guide.html"
                         title="next chapter">User Guide</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -117,7 +117,7 @@ So we loop the <cite>update</cite> function, and then finalize the model:</p>
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="userguide.html" title="User Guide"
+          <a href="user_guide.html" title="User Guide"
              >next</a> |</li>
         <li class="right" >
           <a href="getting_started.html" title="Getting Started"

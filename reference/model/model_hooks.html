@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Available Model Hooks &#8212; pyDeltaRCM 1.2.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Preprocessor" href="../preprocessor/index.html" />
+    <link rel="prev" title="Default Model Variable Values" href="yaml_defaults.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../preprocessor/index.html" title="Preprocessor"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="yaml_defaults.html" title="Default Model Variable Values"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">model</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Available Model Hooks</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="available-model-hooks">
+<h1>Available Model Hooks<a class="headerlink" href="#available-model-hooks" title="Permalink to this headline">¶</a></h1>
+<p>A complete list of hooks in the model follows:</p>
+<table class="colwidths-given docutils align-default" id="id1">
+<caption><span class="caption-text">Available model hooks</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Initializing</p></th>
+<th class="head"><p>Updating</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_import_files" title="pyDeltaRCM.hook_tools.hook_tools.hook_import_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_import_files</span></code></a></p></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_run_one_timestep" title="pyDeltaRCM.hook_tools.hook_tools.hook_run_one_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_run_one_timestep</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_process_input_to_model" title="pyDeltaRCM.hook_tools.hook_tools.hook_process_input_to_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_process_input_to_model</span></code></a></p></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_apply_subsidence" title="pyDeltaRCM.hook_tools.hook_tools.hook_apply_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_apply_subsidence</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_create_other_variables" title="pyDeltaRCM.hook_tools.hook_tools.hook_create_other_variables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_create_other_variables</span></code></a></p></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_finalize_timestep" title="pyDeltaRCM.hook_tools.hook_tools.hook_finalize_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_finalize_timestep</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_create_domain" title="pyDeltaRCM.hook_tools.hook_tools.hook_create_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_create_domain</span></code></a></p></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_init_water_iteration" title="pyDeltaRCM.hook_tools.hook_tools.hook_init_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_init_water_iteration</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_load_checkpoint" title="pyDeltaRCM.hook_tools.hook_tools.hook_load_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_load_checkpoint</span></code></a></p></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_run_water_iteration" title="pyDeltaRCM.hook_tools.hook_tools.hook_run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_run_water_iteration</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_init_stratigraphy" title="pyDeltaRCM.hook_tools.hook_tools.hook_init_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_init_stratigraphy</span></code></a></p></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_compute_free_surface" title="pyDeltaRCM.hook_tools.hook_tools.hook_compute_free_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_compute_free_surface</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_output_data" title="pyDeltaRCM.hook_tools.hook_tools.hook_output_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_output_data</span></code></a></p></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_finalize_water_iteration" title="pyDeltaRCM.hook_tools.hook_tools.hook_finalize_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_finalize_water_iteration</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_output_checkpoint" title="pyDeltaRCM.hook_tools.hook_tools.hook_output_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_output_checkpoint</span></code></a></p></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_sed_route" title="pyDeltaRCM.hook_tools.hook_tools.hook_sed_route"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_sed_route</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_route_all_sand_parcels" title="pyDeltaRCM.hook_tools.hook_tools.hook_route_all_sand_parcels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_route_all_sand_parcels</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_topo_diffusion" title="pyDeltaRCM.hook_tools.hook_tools.hook_topo_diffusion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_topo_diffusion</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_route_all_mud_parcels" title="pyDeltaRCM.hook_tools.hook_tools.hook_route_all_mud_parcels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_route_all_mud_parcels</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools.hook_record_final_stratigraphy" title="pyDeltaRCM.hook_tools.hook_tools.hook_record_final_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_record_final_stratigraphy</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="yaml_defaults.html"
+                        title="previous chapter">Default Model Variable Values</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../preprocessor/index.html"
+                        title="next chapter">Preprocessor</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/reference/model/model_hooks.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../preprocessor/index.html" title="Preprocessor"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="yaml_defaults.html" title="Default Model Variable Values"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >model</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Available Model Hooks</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, The DeltaRCM Team.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Constraining subsidence to part of the domain &#8212; pyDeltaRCM 1.2.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developer Guide" href="../guides/developer_guide.html" />
+    <link rel="prev" title="Slightly sloping basin" href="slight_slope.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../guides/developer_guide.html" title="Developer Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="slight_slope.html" title="Slightly sloping basin"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Examples of using and working with pyDeltaRCM</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Constraining subsidence to part of the domain</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="constraining-subsidence-to-part-of-the-domain">
+<h1>Constraining subsidence to part of the domain<a class="headerlink" href="#constraining-subsidence-to-part-of-the-domain" title="Permalink to this headline">¶</a></h1>
+<p>One case that has been explored in the literature with the DeltaRCM model is the case of subsidence limited to one region of the model domain <a class="footnote-reference brackets" href="#id3" id="id1">1</a>.
+This model configuration can be readily achieved with model subclassing.</p>
+<div class="section" id="setting-up-the-custom-subclass">
+<h2>Setting up the custom subclass<a class="headerlink" href="#setting-up-the-custom-subclass" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ConstrainedSubsidenceModel</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A simple subclass of DeltaModel with subsidence region constrained.</span>
+
+<span class="sd">    This subclass *overwrites* the `init_subsidence` method to</span>
+<span class="sd">    constrain subsidence to only one region of the model domain.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+         <span class="c1"># inherit base DeltaModel methods</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">init_subsidence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize subsidence pattern constrained to a tighter region.</span>
+
+<span class="sd">        Uses theta1 and theta2 to set the angular bounds for the</span>
+<span class="sd">        subsiding region. theta1 and theta2 are set in relation to the</span>
+<span class="sd">        inlet orientation. The inlet channel is at an angle of 0, if</span>
+<span class="sd">        theta1 is -pi/3 radians, this means that the angle to the left of</span>
+<span class="sd">        the inlet that will be included in the subsiding region is 30</span>
+<span class="sd">        degrees. theta2 defines the right angular bounds for the subsiding</span>
+<span class="sd">        region in a similar fashion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_msg</span> <span class="o">=</span> <span class="s1">&#39;Initializing custom subsidence field&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_info</span><span class="p">(</span><span class="n">_msg</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_toggle_subsidence</span><span class="p">:</span>
+
+            <span class="n">theta1</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">theta2</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">R1</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>  <span class="c1"># radial limits (fractions of L)</span>
+            <span class="n">R2</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
+
+            <span class="n">Rloc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">L0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="n">thetaloc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">))</span>
+            <span class="n">thetaloc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">L0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">L0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
+                <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">L0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">L0</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subsidence_mask</span> <span class="o">=</span> <span class="p">((</span><span class="n">R1</span> <span class="o">&lt;=</span> <span class="n">Rloc</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Rloc</span> <span class="o">&lt;=</span> <span class="n">R2</span><span class="p">)</span> <span class="o">&amp;</span>
+                                    <span class="p">(</span><span class="n">theta1</span> <span class="o">&lt;=</span> <span class="n">thetaloc</span><span class="p">)</span> <span class="o">&amp;</span>
+                                    <span class="p">(</span><span class="n">thetaloc</span> <span class="o">&lt;=</span> <span class="n">theta2</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subsidence_mask</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">L0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subsidence_mask</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">subsidence_rate</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
+</pre></div>
+</div>
+<p>Now, initialize the model and look at the field.
+Note that the colorscale depicts the magnitude of subsidence in the model <em>per timestep</em> (<cite>sigma</cite>, which has units meters).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mdl</span> <span class="o">=</span> <span class="n">ConstrainedSubsidenceModel</span><span class="p">(</span><span class="n">toggle_subsidence</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">mdl</span><span class="o">.</span><span class="n">show_attribute</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../examples/subsidence_region-3.png">png</a>, <a class="reference external" href="../examples/subsidence_region-3.hires.png">hires.png</a>)</p>
+<div class="figure align-default">
+<img alt="../_images/subsidence_region-3.png" src="../_images/subsidence_region-3.png" />
+</div>
+</div>
+<div class="section" id="using-the-custom-subclass-with-the-preprocessor">
+<h2>Using the custom subclass with the preprocessor<a class="headerlink" href="#using-the-custom-subclass-with-the-preprocessor" title="Permalink to this headline">¶</a></h2>
+<p>We can configure a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code> to handle a set of custom runs in conjunction with out custom <cite>pyDeltaRCM</cite> model subclass.
+For example, in <a class="footnote-reference brackets" href="#id3" id="id2">1</a>, the authors explore the impact of subsidence at various rates: 3 mm/yr, 6 mm/yr, 10 mm/yr, 25 mm/yr, 50 mm/yr, and 100 mm/yr.
+We can scale these rates, assuming a model <a class="reference internal" href="../info/modeltime.html"><span class="doc">intermittency factor</span></a> of 0.019, representing 7 of 365 days of flooding per year, by using the convenience function <a class="reference internal" href="../reference/preprocessor/index.html#pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate" title="pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_relative_sea_level_rise_rate</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyDeltaRCM.preprocessor</span> <span class="kn">import</span> <span class="n">scale_relative_sea_level_rise_rate</span>
+
+<span class="n">subsidence_mmyr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
+<span class="n">subsidence_scaled</span> <span class="o">=</span> <span class="n">scale_relative_sea_level_rise_rate</span><span class="p">(</span><span class="n">subsidence_mmyr</span><span class="p">,</span> <span class="n">If</span><span class="o">=</span><span class="mf">0.019</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, we use <a class="reference internal" href="../guides/user_guide.html#matrix-expansion-tag"><span class="std std-ref">matrix expansion</span></a> to set up the runs with a preprocessor.
+For example, in a Python script, following the definition of the subclass above, define a dictionary with a <cite>matrix</cite> key and supply to the <cite>Preprocessor</cite>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># add a matrix with subsidence to the dict</span>
+<span class="n">param_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;matrix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;subsidence_rate&#39;</span><span class="p">:</span> <span class="n">subsidence_scaled</span><span class="p">}</span>
+
+<span class="c1"># add other configurations</span>
+<span class="n">param_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="p">{</span><span class="s1">&#39;out_dir&#39;</span><span class="p">:</span> <span class="s1">&#39;liang_2016_reproduce&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;toggle_subsidence&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s1">&#39;parallel&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>  <span class="c1"># we can take advantage of parallel jobs</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># create the preprocessor</span>
+<span class="n">pp</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">Preprocessor</span><span class="p">(</span>
+    <span class="n">param_dict</span><span class="p">,</span>
+    <span class="n">timesteps</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And finally run the jobs by specifying the model subclass as the class to use when instantiating the jobs with the preprocessor.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># run the jobs</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">run_jobs</span><span class="p">(</span><span class="n">DeltaModel</span><span class="o">=</span><span class="n">ConstrainedSubsidenceModel</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can check whether the runs were set up, as expected:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">Normalize</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">job</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pp</span><span class="o">.</span><span class="n">job_list</span><span class="p">):</span>
+    <span class="c1"># first convert the field to a rate</span>
+    <span class="n">subsidence_rate_field</span> <span class="o">=</span> <span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">deltamodel</span><span class="o">.</span><span class="n">sigma</span> <span class="o">/</span> <span class="n">job</span><span class="o">.</span><span class="n">deltamodel</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+
+    <span class="c1"># now convert to mm/yr</span>
+    <span class="n">subsidence_rate_field</span> <span class="o">=</span> <span class="p">(</span><span class="n">subsidence_rate_field</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">*</span>
+        <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">shared_tools</span><span class="o">.</span><span class="n">_scale_factor</span><span class="p">(</span><span class="n">If</span><span class="o">=</span><span class="mf">0.019</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;years&#39;</span><span class="p">))</span>
+
+    <span class="c1"># and display</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">subsidence_rate_field</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../examples/subsidence_region-7.png">png</a>, <a class="reference external" href="../examples/subsidence_region-7.hires.png">hires.png</a>)</p>
+<div class="figure align-default">
+<img alt="../_images/subsidence_region-7.png" src="../_images/subsidence_region-7.png" />
+</div>
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>)</span></dt>
+<dd><p>Liang, M., Kim, W., and Passalacqua, P. (2016), How much subsidence is
+enough to change the morphology of river deltas?, Geophysical Research Letters, 43, 10,266–10,276, doi:10.1002/2016GL070519.</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Constraining subsidence to part of the domain</a><ul>
+<li><a class="reference internal" href="#setting-up-the-custom-subclass">Setting up the custom subclass</a></li>
+<li><a class="reference internal" href="#using-the-custom-subclass-with-the-preprocessor">Using the custom subclass with the preprocessor</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="slight_slope.html"
+                        title="previous chapter">Slightly sloping basin</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../guides/developer_guide.html"
+                        title="next chapter">Developer Guide</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/examples/subsidence_region.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../guides/developer_guide.html" title="Developer Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="slight_slope.html" title="Slightly sloping basin"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Examples of using and working with pyDeltaRCM</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Constraining subsidence to part of the domain</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, The DeltaRCM Team.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+    </div>
+  </body>
+</html>

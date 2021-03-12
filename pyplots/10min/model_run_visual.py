@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 
 import pyDeltaRCM
 
+with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
+    delta = pyDeltaRCM.DeltaModel(out_dir=output_dir)
 
-delta = pyDeltaRCM.DeltaModel()
+    for _t in range(0, 5):
+        delta.update()
 
-for _t in range(0, 5):
-    delta.update()
-
-delta.finalize()
+    delta.finalize()
 
 
 fig, ax = plt.subplots()

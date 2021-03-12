@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slightly sloping basin &#8212; pyDeltaRCM 1.2.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Constraining subsidence to part of the domain" href="subsidence_region.html" />
+    <link rel="prev" title="Examples of using and working with pyDeltaRCM" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="subsidence_region.html" title="Constraining subsidence to part of the domain"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Examples of using and working with pyDeltaRCM"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Examples of using and working with pyDeltaRCM</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Slightly sloping basin</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="slightly-sloping-basin">
+<h1>Slightly sloping basin<a class="headerlink" href="#slightly-sloping-basin" title="Permalink to this headline">¶</a></h1>
+<p>Consider the case where we are a researcher seeking to explore the effects of a receiving basin that is sloped perpendicular to the channel outlet.
+This researcher asks: does this sloped basin cause channels to steer towards the deeper water, where compensation is higher?</p>
+<p>The researcher can easily use subclassing and model hooks to achieve the desired effect.
+Recall that anything added to the end of the the subclass’ <cite>__init__</cite> method will be called during instantiation of the subclass.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SlightSlopeModel</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A subclass of DeltaModel with sloping basin.</span>
+
+<span class="sd">    This subclass simply modifies the basin geometry</span>
+<span class="sd">    before any computation has occurred.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+         <span class="c1"># inherit base DeltaModel methods</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+         <span class="c1"># modify the basin</span>
+        <span class="n">slope</span> <span class="o">=</span> <span class="mf">0.0005</span>  <span class="c1"># cross basin slope</span>
+        <span class="n">eta_line</span> <span class="o">=</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Width</span><span class="p">,</span>
+                                      <span class="n">step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
+        <span class="n">eta_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">eta_line</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">L0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">eta_grid</span> <span class="o">=</span> <span class="n">eta_grid</span> <span class="o">-</span> <span class="p">((</span><span class="n">slope</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Width</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># center at inlet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">L0</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">+=</span> <span class="n">eta_grid</span>
+</pre></div>
+</div>
+<p>Next, we instantiate the model class.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mdl</span> <span class="o">=</span> <span class="n">SlightSlopeModel</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>And finally, make a plot of the initial condition using the <a class="reference internal" href="../_autosummary/pyDeltaRCM.debug_tools.debug_tools.html#pyDeltaRCM.debug_tools.debug_tools.show_attribute" title="pyDeltaRCM.debug_tools.debug_tools.show_attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_attribute</span></code></a> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">mdl</span><span class="o">.</span><span class="n">show_attribute</span><span class="p">(</span><span class="s1">&#39;eta&#39;</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../examples/slight_slope-3.png">png</a>, <a class="reference external" href="../examples/slight_slope-3.hires.png">hires.png</a>)</p>
+<div class="figure align-default">
+<img alt="../_images/slight_slope-3.png" src="../_images/slight_slope-3.png" />
+</div>
+<p>You can try this out for yourself, and even complete the model run.
+Are the channels steered by the basin slope?</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>In this example, we did not take care to update the model <cite>stage</cite> or <cite>depth</cite> fields. In this simple case it works out fine, because after a single timestep, the fields are correctly computed relative to the modified bed. However, take caution when modifying <cite>DeltaModel</cite> fields directly, and be sure to change <em>all</em> relevant fields too.</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Examples of using and working with pyDeltaRCM</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="subsidence_region.html"
+                        title="next chapter">Constraining subsidence to part of the domain</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/examples/slight_slope.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="subsidence_region.html" title="Constraining subsidence to part of the domain"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Examples of using and working with pyDeltaRCM"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Examples of using and working with pyDeltaRCM</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Slightly sloping basin</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, The DeltaRCM Team.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+    </div>
+  </body>
+</html>

@@ -49,7 +49,7 @@ The duration of a timestep is determined during model initialization to maintain
 The model is then iterated timestep by timestep, until an end-run condition is reached</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you are using the <a class="reference internal" href="../guides/userguide.html#high-level-api"><span class="std std-ref">high-level API</span></a>, the model run end condition is that the elapsed model time is <em>equal to or greater than</em> the specified input time. As a result, the model run duration is unlikely to exactly match the input time specification, because the model timestep is unlikely to be a factor of the specified time.</p>
+<p>If you are using the <a class="reference internal" href="../guides/user_guide.html#high-level-api"><span class="std std-ref">high-level API</span></a>, the model run end condition is that the elapsed model time is <em>equal to or greater than</em> the specified input time. As a result, the model run duration is unlikely to exactly match the input time specification, because the model timestep is unlikely to be a factor of the specified time.</p>
 <p>Please keep this in mind when evaluating model results, and especially when comparing  between different model runs.</p>
 </div>
 <p>Over the duration of the model, the water discharge (and thus sediment discharge) are assumed to be at bankfull.
