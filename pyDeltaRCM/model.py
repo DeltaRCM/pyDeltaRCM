@@ -1052,6 +1052,25 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def dt(self):
         """The time step.
 
+        The value of the timestep (:math:`\\Delta t`) is a balance between
+        computation efficiency and model stability [1]_. The :ref:`reference
+        volume </info/morphodynamics/reference_volume>`, which characterizes
+        the volume of an inlet-channel cell, and the sediment discharge to the
+        model domain scale the timestep as:
+
+        .. math::
+
+            \\Delta t = \\frac{0.1 {N_0}^2 V_0}{Q_{s0}}
+
+        where :math:`Q_{s0}` is the sediment discharge into the model domain
+        (m:sup:`3`/s), :math:`V_0` is the reference volume, and :math:`N_0` is
+        the :obj:`inlet width <N0_meters>`.
+
+        .. [1] A reduced-complexity model for river delta formation – Part 1:
+               Modeling deltas with channel dynamics, M. Liang, V. R. Voller,
+               and C. Paola, Earth Surf. Dynam., 3, 67–86, 2015.
+               https://doi.org/10.5194/esurf-3-67-2015
+
         Raises
         ------
         UserWarning
@@ -1088,7 +1107,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def save_time_since_data(self):
         """Time since data last output.
 
-        The number of times the :obj:`update` method has been called.
+        The elapsed time (seconds) since data was output with
+        :obj:`output_data`.
         """
         return self._save_time_since_data
 
