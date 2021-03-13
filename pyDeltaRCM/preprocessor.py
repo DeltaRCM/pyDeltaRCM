@@ -1054,15 +1054,20 @@ class Preprocessor(BasePreprocessor):
 
 
 def preprocessor_wrapper():
-    """Wrapper for CLI interface.
+    """Wrapper for command line interface.
 
-    The entry_points setup of a command line interface requires a function, so
-    we use this simple wrapper to instantiate and run the jobs.
+    The `entry_points` setup of a command line interface requires a function,
+    so we use this simple wrapper to instantiate and run the jobs.
 
-    Works by creating an instance of the
+    This function creates an instance of the
     :obj:`~pyDeltaRCM.preprocessor.PreprocessorCLI` and calls the
     :meth:`~pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs` to execute all
-    jobs.
+    jobs configured in the preprocessor. In code:
+
+    .. code:: python
+
+        pp = PreprocessorCLI()
+        pp.run_jobs()
     """
     pp = PreprocessorCLI()
     pp.run_jobs()

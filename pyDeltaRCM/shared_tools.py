@@ -18,26 +18,51 @@ earth_grav = 9.81
 
 @njit
 def set_random_seed(_seed):
+    """Set the random seed from an integer.
+
+    .. todo:: Description needed. Where is it used?
+
+    """
     np.random.seed(_seed)
 
 
 def get_random_state():
+    """Set the random state as a tuple.
+
+    .. todo:: Description needed. Where is it used?
+
+    """
     ptr = _helperlib.rnd_get_np_state_ptr()
     return _helperlib.rnd_get_state(ptr)
 
 
 def set_random_state(_state_tuple):
+    """Set the random state from a tuple.
+
+    .. todo:: Description needed. Where is it used?
+
+    """
     ptr = _helperlib.rnd_get_np_state_ptr()
     _helperlib.rnd_set_state(ptr, _state_tuple)
 
 
 @njit
 def get_random_uniform(limit):
+    """
+
+    .. todo:: Description needed. Where is it used?
+
+    """
     return np.random.uniform(0, limit)
 
 
 @njit
 def get_start_indices(inlet, inlet_weights, num_starts):
+    """Get start indices.
+
+    .. todo:: Description needed. Where is it used?
+
+    """
     norm_weights = inlet_weights / np.sum(inlet_weights)
     idxs = []
     for _ in np.arange(num_starts):
@@ -48,7 +73,11 @@ def get_start_indices(inlet, inlet_weights, num_starts):
 
 @njit
 def get_steps(new_cells, iwalk, jwalk):
-    """Find the values giving the next step."""
+    """Find the values giving the next step.
+
+    .. todo:: Description needed. Where is it used?
+
+    """
     istep = iwalk[new_cells]
     jstep = jwalk[new_cells]
     dist = np.sqrt(istep * istep + jstep * jstep)
@@ -65,6 +94,12 @@ def random_pick(prob):
     Return the index of the selected weight in array probs
     Takes a numpy array that is the precalculated probability
     around the cell flattened to 1D.
+
+    Examples
+    --------
+
+    .. todo:: Examples needed (pull from tests?).
+
     """
     arr = np.arange(len(prob))
     cumprob = np.cumsum(prob)
@@ -73,7 +108,16 @@ def random_pick(prob):
 
 @njit('UniTuple(int64, 2)(int64, UniTuple(int64, 2))')
 def custom_unravel(i, shape):
-    """Unravel indexes for 2D array."""
+    """Unravel indexes for 2D array.
+
+    .. todo:: Description needed. Where is it used?
+
+    Examples
+    --------
+
+    .. todo:: Examples needed (pull from tests?).
+
+    """
     if i > (shape[1] * shape[0]):
         raise IndexError("Index is out of matrix bounds")
     x = i // shape[1]
@@ -83,7 +127,15 @@ def custom_unravel(i, shape):
 
 @njit('int64(UniTuple(int64, 2), UniTuple(int64, 2))')
 def custom_ravel(tup, shape):
-    """Ravel indexes for 2D array."""
+    """Ravel indexes for 2D array.
+
+    .. todo:: Description needed. Where is it used?
+
+    Examples
+    --------
+
+    .. todo:: Examples needed (pull from tests?).
+    """
     if tup[0] > shape[0] or tup[1] > shape[1]:
         raise IndexError("Index is out of matrix bounds")
     x = tup[0] * shape[1]
@@ -93,7 +145,15 @@ def custom_ravel(tup, shape):
 
 @njit
 def custom_pad(arr):
-    """pad as np.pad(arr, 1, 'edge')
+    """Pad an array as ``np.pad(arr, 1, 'edge')``.
+
+    .. todo:: Description needed. Where is it used?
+
+    Examples
+    --------
+
+    .. todo:: Examples needed (pull from tests?).
+
     """
     old_shape = arr.shape
     new_shape = (old_shape[0]+2, old_shape[1]+2)
@@ -123,6 +183,11 @@ def get_weight_sfc_int(stage, stage_nbrs, qx, qy, ivec, jvec, distances):
 
     Determines the surfaces for weighting the random walks based on the stage
     and discharge fields.
+
+    .. todo::
+
+        Expand description. Where is it used? Include an example? Equations?
+        Link to Hydrodyanmics doc?
     """
     weight_sfc = np.maximum(0, (stage - stage_nbrs) / distances)
     weight_int = np.maximum(0, (qx * jvec + qy * ivec) / distances)
@@ -133,6 +198,13 @@ def _get_version():
     """Extract version from file.
 
     Extract version number from single file, and make it availabe everywhere.
+
+    .. todo:: Description needed. Where is it used?
+
+    Examples
+    --------
+
+    .. todo:: Examples needed (pull from tests?).
     """
     from . import _version
     return _version.__version__()

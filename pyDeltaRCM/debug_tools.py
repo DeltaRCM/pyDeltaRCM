@@ -269,7 +269,14 @@ def plot_domain(attr, ax=None, grid=True, block=False, label=None, **kwargs):
 def plot_ind(_ind, *args, shape=None, **kwargs):
     """Plot points within the model domain.
 
+    .. todo:: write a complete docstring with parameters etc.
+
     Method called by :obj:`show_ind`.
+
+    Examples
+    --------
+
+    .. todo:: add examples, pull from tests.
     """
     ax = kwargs.pop('ax', None)
     block = kwargs.pop('block', False)
@@ -301,6 +308,13 @@ def plot_line(_ind, *args, shape=None, nozeros=False, **kwargs):
     """Plot a line within the model domain.
 
     Method called by :obj:`show_line`.
+
+    .. todo:: write a complete docstring with parameters etc.
+
+    Examples
+    --------
+
+    .. todo:: add examples, pull from tests.
     """
     ax = kwargs.pop('ax', None)
     block = kwargs.pop('block', False)

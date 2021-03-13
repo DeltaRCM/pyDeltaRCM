@@ -4,16 +4,20 @@
 iteration_tools
 ***************
 
+.. currentmodule:: pyDeltaRCM.iteration_tools
 
-The functions are defined in ``pyDeltaRCM.iteration_tools``. 
+.. todo::
+
+    Add paragraph description of the module. What stages are defined here generally? Make a table with the main ones like in water tools?
 
 
 Public API methods attached to model
 ------------------------------------
 
-.. currentmodule:: pyDeltaRCM.iteration_tools
+The following methods are defined in the ``iteration_tools`` class, of the ``pyDeltaRCM.iteration_tools`` module. 
 
 .. autosummary::
-    :toctree: ../../_autosummary
-    
+
     iteration_tools
+
+.. autoclass:: iteration_tools

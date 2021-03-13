@@ -154,7 +154,13 @@ class sed_tools(abc.ABC):
 @njit
 def _get_weight_at_cell_sediment(ind, weight_int, depth_nbrs, ct_nbrs,
                                  dry_depth, theta, distances_flat):
+    """Get neighbor weight array for sediment routing.
 
+    .. todo::
+
+        Expand description. Include example? Equation? Link to Morphodynamics
+        document.
+    """
     dry = (depth_nbrs <= dry_depth)
     wall = (ct_nbrs == -2)
     ctr = (np.arange(9) == 4)
@@ -308,7 +314,8 @@ class BaseRouter(object):
 
             Total sediment mass is preserved, but individual categories
             of sand and mud are not. I.e., it is assumed that there is infinite
-            sand and/or mud to erode at any location where erosion is occuring.
+            sand and/or mud to erode at any location where erosion is
+            occurring.
 
         Parameters
         ----------

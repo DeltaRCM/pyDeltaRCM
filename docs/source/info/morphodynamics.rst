@@ -2,6 +2,8 @@
 Morphodynamics
 **************
 
+.. currentmodule:: pyDeltaRCM.sed_tools
+
 pyDeltaRCM approximates sediment dispersal through the use of a weighted random
 walk dictated by water flux.
 In turn, sediment dispersal drives bed elevation change in the model domain by mass conservation.
@@ -17,6 +19,25 @@ Sediment Transport
 .. note::
    Incomplete.
 
+
+============================
+Changes in the bed elevation
+============================
+
+Change in the channel bed is the result of deposition or erosion by each sediment parcel (:obj:`_update_fields`), dictated by sediment mass conservation (i.e., Exner equation) and is equal to:
+
+.. math::
+
+    \Delta \eta = \Delta V / dx^2
+
+
+.. note::
+
+    Total sediment mass is preserved, but individual categories of sand and mud are not. I.e., it is assumed that there is infinite sand and/or mud to erode at any location where erosion is occurring.
+
+.. todo::
+
+   Incomplete.
 
 ===============
 Model Stability
