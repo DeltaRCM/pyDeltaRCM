@@ -21,20 +21,17 @@ class debug_tools(abc.ABC):
     these tools interactively at that breakpoint. Note, for Python < 3.7 use
     ``pdb.set_trace()``.
 
-    .. testsetup::
-        >>> self = pyDeltaRCM.DeltaModel()
-
     Examples
     --------
 
     Within a debugging shell:
 
-    .. doctest::
+    .. code::
 
         >>> self.show_attribute('cell_type', grid=False)
-        >>> self.show_ind([144, 22, 33, 34, 35])
-        >>> self.show_ind((12, 14), 'bs')
-        >>> self.show_ind([(11, 4), (11, 5)], 'g^')
+        >>> self.show_ind([3378, 9145, 11568, 514, 13558])
+        >>> self.show_ind((42, 94), 'bs')
+        >>> self.show_ind([(41, 8), (42, 10)], 'g^')
         >>> plt.show()
 
     .. plot:: debug_tools/debug_demo.py

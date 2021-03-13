@@ -1,7 +1,12 @@
+import warnings
+
 import matplotlib.pyplot as plt
-import numpy as np
-import pyDeltaRCM
 import matplotlib
+
+import pyDeltaRCM
+
+# filter out the warning raised about no netcdf being found
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 n = 10

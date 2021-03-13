@@ -1,10 +1,16 @@
-import matplotlib.pyplot as plt
+import warnings
+
 import numpy as np
 import matplotlib
+import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 import pyDeltaRCM
 from pyDeltaRCM import water_tools
+
+
+# filter out the warning raised about no netcdf being found
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 n = 10

@@ -1,8 +1,15 @@
+import warnings
+
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib
 
 import pyDeltaRCM
+
+
+# filter out the warning raised about no netcdf being found
+warnings.filterwarnings("ignore", category=UserWarning)
+
 
 n = 10
 cm = matplotlib.cm.get_cmap('tab10')
