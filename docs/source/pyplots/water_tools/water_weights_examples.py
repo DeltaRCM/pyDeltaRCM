@@ -1,97 +1,109 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib
-from mpl_toolkits import mplot3d
 
 import pyDeltaRCM
-from pyDeltaRCM import water_tools
-from pyDeltaRCM import shared_tools
 
-_delta = pyDeltaRCM.DeltaModel()
+n = 10
+cm = matplotlib.cm.get_cmap('tab10')
 
-ivec_flat = _delta.ivec_flat
-jvec_flat = _delta.jvec_flat
-distances_flat = _delta.distances_flat
+# init delta model
+with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
+    delta = pyDeltaRCM.DeltaModel(
+        out_dir=output_dir,
+        resume_checkpoint='../../_resources/checkpoint')
 
-ct_nbrs = np.ones((3, 3))
-theta_water = 1
-gamma = 0.05
-dry_depth = 0.1
-ind = (100, 100)
+_shp = delta.eta.shape
 
 
-def _get_back_weights(eta_nbrs, depth_nbrs, stage_nbrs, _qx, _qy):
-
-    _eta_nbrs = eta_nbrs.ravel()
-    _depth_nbrs = depth_nbrs.ravel()
-    _stage_nbrs = stage_nbrs.ravel()
-    _stage = _stage_nbrs[4]
-
-    weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
-        _stage, _stage_nbrs,
-        _qx, _qy, ivec_flat, jvec_flat,
-        distances_flat)
-
-    water_weights = water_tools._get_weight_at_cell_water(
-        ind, weight_sfc, weight_int,
-        _depth_nbrs, ct_nbrs.ravel(),
-        dry_depth, gamma, theta_water)
-
-    return water_weights
+# manually call only the necessary paths
+delta.init_water_iteration()
+delta.run_water_iteration()
 
 
-# stage_nbrs = pad_stage[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-# depth_nbrs = pad_depth[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-# ct_nbrs = pad_cell_type[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
-
-eta_nbrs = np.array([[2,    1.25, 1.5],
-                     [1.25, 1.0,  1.5],
-                     [1.25, 1.0, 0.75]])
-depth_nbrs = np.array([[3, 3.75, 2.5],
-                       [2.5, 2,  2.],
-                       [2.5, 2, 2]])
-stage_nbrs = eta_nbrs + depth_nbrs
-
-qx = 1
-qy = 0
-
-# wts = _get_back_weights(eta_nbrs, depth_nbrs, stage_nbrs, qx, qy)
-
-
-def _plot_array(_arr, _ax, colspec, **kwargs):
-    if colspec == 'bed':
-        cm = matplotlib.cm.get_cmap('viridis', 10)
-    elif colspec == 'stage':
-        cm = matplotlib.cm.get_cmap('viridis', 10)
-
-    for i in range(_arr.shape[0]):
-        for j in range(_arr.shape[0]):
-            # create x,y
-            xx, yy = np.meshgrid(np.arange(i, i+2), np.arange(j, j+2))
-            # _arr[i:i+2, j:j+2]
-            _p_arr = np.ones((2, 2)) * _arr[i, j]
-            x = _arr[i, j]
-            v = (10-0)*((x-np.min(_arr))/(np.max(_arr)-np.min(_arr)))+0  # rescale value in 1-100
-            _ax.plot_surface(xx, yy, _p_arr, color=cm(int(v)), **kwargs)
-
+NPLOT = 5
+hdr = NPLOT // 2
 
 # fig, ax = plt.subplots()
-fig = plt.figure()
-ax = plt.axes(projection='3d')
-# ax.imshow(wts.reshape(3, 3))
-# _plot_array(eta_nbrs, _ax=ax, colspec='bed')
+fig = plt.figure(constrained_layout=False, figsize=(6, 9))
+gs = fig.add_gridspec(
+    nrows=NPLOT+hdr, ncols=5,
+    left=0.05, right=0.95, top=0.95, bottom=0.05,
+    wspace=0.01, hspace=0.2)
 
-_xx, _yy = np.meshgrid(np.arange(3), np.arange(3))
-x, y = _xx.ravel(), _yy.ravel()
+hdr_ax = fig.add_subplot(gs[:hdr, :])
+pyDeltaRCM.debug_tools.plot_domain(
+    delta.eta, ax=hdr_ax, grid=False, cmap='cividis', vmin=-3, vmax=0.5)
+hdr_ax.set_xticks([])
+hdr_ax.set_yticks([])
+hdr_ax.set_xlim(0, delta.W // 2)
+hdr_ax.set_ylim(delta.L // 2, 0)
 
-top = eta_nbrs.ravel()
-bottom = np.zeros_like(top)
-width = depth = 1
-ax.bar3d(x, y, bottom, width, depth, top, shade=True)
+
+def plot_pxpy_weights(px, py, i):
+
+    hdr_ax.text(py, px, str(i-hdr),
+                fontsize=9, color='white',
+                ha='center', va='center')
+
+    __ax_list = []
+
+    def _make_single_axis(i, j, values, **kwargs):
+        __ax = fig.add_subplot(gs[i, j])
+        __ax.set_xticks([])
+        __ax.set_yticks([])
+        __ax.imshow(values, **kwargs)
+        for _i in range(3):
+            for _j in range(3):
+                __ax.text(
+                    _j, _i, str(np.round(values[_i, _j], 2)),
+                    ha='center', va='center', fontsize=8)
+        return __ax
+
+    # grab the data from the fields and put it into axis
+    _eta_data = delta.eta[px-1:px+2, py-1:py+2]
+    _eta_ax = _make_single_axis(
+        i, 0, _eta_data, cmap='cividis', vmin=-3, vmax=0.5)
+    __ax_list.append(_eta_ax)
+
+    _dpth_data = delta.depth[px-1:px+2, py-1:py+2]
+    _dpth_ax = _make_single_axis(
+        i, 1, _dpth_data, cmap='Blues', vmin=0, vmax=5)
+    __ax_list.append(_dpth_ax)
+
+    _stge_data = delta.stage[px-1:px+2, py-1:py+2]
+    _stge_ax = _make_single_axis(
+        i, 2, _stge_data, cmap='viridis', vmin=0, vmax=5)
+    __ax_list.append(_stge_ax)
+
+    _vel_data = delta.uw[px-1:px+2, py-1:py+2]
+    _vel_ax = _make_single_axis(
+        i, 3, _vel_data, cmap='plasma', vmin=0, vmax=1.5)
+    __ax_list.append(_vel_ax)
+
+    _wght_data = delta.water_weights[px, py, :].reshape((3, 3))
+    _wght_ax = _make_single_axis(
+        i, 4, _wght_data, cmap='YlGn', vmin=0, vmax=1)
+    __ax_list.append(_wght_ax)
+
+    return __ax_list
 
 
-# _plot_array(stage_nbrs, _ax=ax, colspec='stage')
-_xx, _yy = np.meshgrid(np.arange(4), np.arange(4))
-ax.plot_surface(_xx, _yy, stage_nbrs)
-ax.set_zlim(0, 20)
+# plot the points
+ax0 = plot_pxpy_weights(10, 94, hdr+0)
+ax1 = plot_pxpy_weights(10, 80, hdr+1)
+ax2 = plot_pxpy_weights(20, 60, hdr+2)
+ax3 = plot_pxpy_weights(22, 87, hdr+3)
+ax4 = plot_pxpy_weights(35, 15, hdr+4)
+
+# labels
+for a, axx in enumerate([ax0, ax1, ax2, ax3, ax4]):
+    axx[0].set_ylabel(str(a), rotation=0, labelpad=10)
+
+albls = ['bed elevation\n(eta)', 'depth',
+         'stage', 'velocity\n(uw)', 'water weights']
+for a, (axx, albl) in enumerate(zip(ax4, albls)):
+    axx.set_xlabel(albl)
+
+# show
 plt.show()

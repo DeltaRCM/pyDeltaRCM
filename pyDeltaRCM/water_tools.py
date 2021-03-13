@@ -246,6 +246,26 @@ class water_tools(abc.ABC):
 
         This method is called once, before parcels are stepped, because the
         weights do not change during the stepping of parcels.
+
+        See :doc:`/info/hydrodynamics` for a description of the model design
+        and equations/algorithms for how water weights are determined.
+
+        .. note::
+
+            No computation actually occurs in this method. Internally, the
+            method calls the jitted :obj:`_get_water_weight_array`, which in
+            turn loops through all of the cells in the model domain and
+            determines the water weight for that cell with
+            :obj:`get_weight_sfc_int` and :obj:`_get_weight_at_cell_water`.
+
+        Examples
+        --------
+
+        The following figure shows several examples of locations within the
+        model domain, and the corresponding water routing weights determined
+        for that location.
+
+        .. plot:: water_tools/water_weights_examples.py
         """
         _msg = 'Computing water weight array'
         self.log_info(_msg, verbosity=2)
@@ -576,6 +596,20 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
 def _get_water_weight_array(depth, stage, cell_type, qx, qy,
                             ivec_flat, jvec_flat, distances_flat,
                             dry_depth, gamma, theta_water):
+    """Worker for :obj:`_get_water_weight_array`.
+
+    This is a jitted function which handles the actual computation of looping
+    through locations of the model domain and determining the water
+    weighting.
+
+    See :meth:`get_water_weight_array` for more information.
+
+    .. note::
+
+        If you are trying to change water weighting behavior, consider
+        reimplementing this method, which calls a custom version of
+        :func:`_get_weight_at_cell_water`.
+    """
     L, W = depth.shape
     pad_stage = shared_tools.custom_pad(stage)
     pad_depth = shared_tools.custom_pad(depth)
@@ -745,7 +779,8 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
     --------
 
     The following shows an example of how water parcels that looped along
-    their paths would be relocated.
+    their paths would be relocated. Note than in this example, the parcels are
+    artificially forced to loop, just for the sake of demonstration.
 
     .. plot:: water_tools/_check_for_loops.py
 

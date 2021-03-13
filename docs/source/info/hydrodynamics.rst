@@ -16,6 +16,11 @@ Routing individual water parcels
    Incomplete.
 
 
+The following figure shows several examples of locations within the model domain, and the corresponding water routing weights determined for that location.
+
+.. plot:: water_tools/water_weights_examples.py
+
+
 Combining parcels into free surface
 ===================================
 
