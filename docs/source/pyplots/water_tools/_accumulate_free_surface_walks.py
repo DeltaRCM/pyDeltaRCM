@@ -27,16 +27,16 @@ def _plot_idxs_walks_to_step(delta_inds, _step, _idxs, _ax):
         walk = walk[:_step]
         # print(walk)
         pyDeltaRCM.debug_tools.plot_line(
-            walk, shape=_shp, color='r',
+            walk, shape=_shp, color='c',
             multiline=True, nozeros=True)
         yend, xend = pyDeltaRCM.shared_tools.custom_unravel(walk[-1], _shp)
         _ax.plot(xend, yend,
-                 marker='o', ms=3, color='r')
+                 marker='o', ms=3, color='c')
 
 
 # declare the idxs to use:
 idxs = np.random.randint(low=0, high=delta._Np_water, size=n)
-pidx = 60
+pidx = 85
 
 
 # set up axis

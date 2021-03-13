@@ -46,7 +46,7 @@ def _plot_idxs_walks_to_step(delta_inds, _step, _idxs, _ax):
 
 # declare the idxs to use:
 idxs = np.random.randint(low=0, high=delta._Np_water, size=n)
-ps = [5, 20, 60]
+ps = [5, 25, 75]
 
 # set up axis
 fig, ax = plt.subplots(2, 3, sharex=True, sharey=True, figsize=(12, 4))

@@ -6,11 +6,6 @@ water_tools
 
 .. currentmodule:: pyDeltaRCM.water_tools
 
-The tools are defined in ``pyDeltaRCM.water_tools``. 
-
-.. autosummary::
-
-    water_tools
 
 The :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep` routine manages the water routing.
 During :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep`, water iteration is repeated a total of :obj:`~pyDeltaRCM.model.DeltaModel.itermax` times.
@@ -27,15 +22,20 @@ During each of these iterations of the water routing, the following methods are 
 Public API methods attached to model
 ------------------------------------
 
+The following methods are defined in the ``water_tools`` class, of the ``pyDeltaRCM.water_tools`` module. 
+
+.. autosummary::
+
+    water_tools
+
 .. autoclass:: water_tools
 
 
 water_tools helper functions
 ----------------------------
 
-Note that these routines are jitted for speed. They generally take a large
-number of arrays and constants and return a new array(s) to continue with the
-model progression.
+The following routines are jitted for speed.
+They generally take a large number of arrays and constants and return a new array(s) to continue with the model progression within the methods defined above.
 
 .. autofunction:: _get_weight_at_cell_water
 .. autofunction:: _choose_next_directions

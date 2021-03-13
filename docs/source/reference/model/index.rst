@@ -17,8 +17,6 @@ The DeltaModel class and all attributes and methods
 	:toctree: ../../_autosummary
 
 	~DeltaModel
-		:inherited-members:
-		:members:
 
 
 

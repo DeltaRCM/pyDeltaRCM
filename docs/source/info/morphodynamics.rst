@@ -28,7 +28,7 @@ Model stability depends on...
    Incomplete.
 
 
-.. _reference_volume:
+.. _reference-volume:
 
 Reference Volume
 ----------------
@@ -39,7 +39,7 @@ The reference volume (:math:`V_0`) impacts model stability. This volume characte
 
     V_0 = h_0 {\delta_c}^2
 
-where :math:`h_0` is the inlet channel depth (meters) and :math:`\\delta_c` is the cell length (meters).
+where :math:`h_0` is the inlet channel depth (meters) and :math:`\delta_c` is the cell length (meters).
 
 
 References
