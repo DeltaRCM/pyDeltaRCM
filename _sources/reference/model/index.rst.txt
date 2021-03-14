@@ -8,6 +8,7 @@ This is the main model code.
 
 This class is defined in ``pyDeltaRCM.model``. 
 
+
 The DeltaModel class and all attributes and methods
 ---------------------------------------------------
 
@@ -17,6 +18,7 @@ The DeltaModel class and all attributes and methods
 	:toctree: ../../_autosummary
 
 	~DeltaModel
+
 
 
 

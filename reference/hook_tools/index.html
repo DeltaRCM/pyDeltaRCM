@@ -16,7 +16,7 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pyDeltaRCM.hook_tools.hook_tools" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html" />
+    <link rel="next" title="debug_tools" href="../debug_tools/index.html" />
     <link rel="prev" title="shared_tools" href="../shared_tools/index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -26,7 +26,7 @@
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html" title="pyDeltaRCM.hook_tools.hook_tools"
+          <a href="../debug_tools/index.html" title="debug_tools"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../shared_tools/index.html" title="shared_tools"
@@ -44,20 +44,191 @@
             
   <div class="section" id="hook-tools">
 <h1>hook_tools<a class="headerlink" href="#hook-tools" title="Permalink to this headline">¶</a></h1>
-<p>The tools are defined in <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.hook_tools</span></code>.</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Add paragraph description of the module. What stages are defined here generally? Link to relevant documentation about hooks in user guide and model list.</p>
+</div>
 <div class="section" id="public-api-methods-attached-to-model">
 <h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Permalink to this headline">¶</a></h2>
+<p>The following methods are defined in the <code class="docutils literal notranslate"><span class="pre">hook_tools</span></code> class, of the <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.hook_tools</span></code> module.</p>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html#pyDeltaRCM.hook_tools.hook_tools" title="pyDeltaRCM.hook_tools.hook_tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_tools</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.hook_tools.hook_tools" title="pyDeltaRCM.hook_tools.hook_tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_tools</span></code></a>()</p></td>
 <td><p>Tools defining various hooks in the model.</p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py class">
+<dt id="pyDeltaRCM.hook_tools.hook_tools">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.hook_tools.</span></code><code class="sig-name descname"><span class="pre">hook_tools</span></code><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tools defining various hooks in the model.</p>
+<p>For an explanation on model hooks, see the <a class="reference internal" href="../../guides/user_guide.html"><span class="doc">User Guide</span></a>.</p>
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_apply_subsidence">
+<code class="sig-name descname"><span class="pre">hook_apply_subsidence</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_apply_subsidence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_subsidence</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_subsidence</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_compute_free_surface">
+<code class="sig-name descname"><span class="pre">hook_compute_free_surface</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_compute_free_surface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="pyDeltaRCM.water_tools.water_tools.compute_free_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_free_surface</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="pyDeltaRCM.water_tools.water_tools.compute_free_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_free_surface</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_create_domain">
+<code class="sig-name descname"><span class="pre">hook_create_domain</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_create_domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.create_domain" title="pyDeltaRCM.init_tools.init_tools.create_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_domain</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.create_domain" title="pyDeltaRCM.init_tools.init_tools.create_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_domain</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_create_other_variables">
+<code class="sig-name descname"><span class="pre">hook_create_other_variables</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_create_other_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.create_other_variables" title="pyDeltaRCM.init_tools.init_tools.create_other_variables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_other_variables</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.create_other_variables" title="pyDeltaRCM.init_tools.init_tools.create_other_variables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_other_variables</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_finalize_timestep">
+<code class="sig-name descname"><span class="pre">hook_finalize_timestep</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_finalize_timestep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_timestep</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_timestep</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_finalize_water_iteration">
+<code class="sig-name descname"><span class="pre">hook_finalize_water_iteration</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iteration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_finalize_water_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.finalize_water_iteration" title="pyDeltaRCM.water_tools.water_tools.finalize_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_water_iteration</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.finalize_water_iteration" title="pyDeltaRCM.water_tools.water_tools.finalize_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_water_iteration</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_import_files">
+<code class="sig-name descname"><span class="pre">hook_import_files</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_import_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.import_files" title="pyDeltaRCM.init_tools.init_tools.import_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_files</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.import_files" title="pyDeltaRCM.init_tools.init_tools.import_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_files</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_init_stratigraphy">
+<code class="sig-name descname"><span class="pre">hook_init_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_init_stratigraphy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_stratigraphy" title="pyDeltaRCM.init_tools.init_tools.init_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_stratigraphy</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_stratigraphy" title="pyDeltaRCM.init_tools.init_tools.init_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_stratigraphy</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_init_water_iteration">
+<code class="sig-name descname"><span class="pre">hook_init_water_iteration</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_init_water_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.init_water_iteration" title="pyDeltaRCM.water_tools.water_tools.init_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_water_iteration</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.init_water_iteration" title="pyDeltaRCM.water_tools.water_tools.init_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_water_iteration</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_load_checkpoint">
+<code class="sig-name descname"><span class="pre">hook_load_checkpoint</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_load_checkpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.load_checkpoint" title="pyDeltaRCM.init_tools.init_tools.load_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_checkpoint</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.load_checkpoint" title="pyDeltaRCM.init_tools.init_tools.load_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_checkpoint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_output_checkpoint">
+<code class="sig-name descname"><span class="pre">hook_output_checkpoint</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_output_checkpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint" title="pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_checkpoint</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint" title="pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_checkpoint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_output_data">
+<code class="sig-name descname"><span class="pre">hook_output_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_output_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.output_data" title="pyDeltaRCM.iteration_tools.iteration_tools.output_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_data</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.output_data" title="pyDeltaRCM.iteration_tools.iteration_tools.output_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_data</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_process_input_to_model">
+<code class="sig-name descname"><span class="pre">hook_process_input_to_model</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_process_input_to_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.process_input_to_model" title="pyDeltaRCM.init_tools.init_tools.process_input_to_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_input_to_model</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.process_input_to_model" title="pyDeltaRCM.init_tools.init_tools.process_input_to_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_input_to_model</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_record_final_stratigraphy">
+<code class="sig-name descname"><span class="pre">hook_record_final_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_record_final_stratigraphy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy" title="pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_final_stratigraphy</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy" title="pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_final_stratigraphy</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_route_all_mud_parcels">
+<code class="sig-name descname"><span class="pre">hook_route_all_mud_parcels</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_route_all_mud_parcels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels" title="pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_all_mud_parcels</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels" title="pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_all_mud_parcels</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_route_all_sand_parcels">
+<code class="sig-name descname"><span class="pre">hook_route_all_sand_parcels</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_route_all_sand_parcels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels" title="pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_all_sand_parcels</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels" title="pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_all_sand_parcels</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_run_one_timestep">
+<code class="sig-name descname"><span class="pre">hook_run_one_timestep</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_run_one_timestep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_one_timestep</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_one_timestep</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_run_water_iteration">
+<code class="sig-name descname"><span class="pre">hook_run_water_iteration</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_run_water_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="pyDeltaRCM.water_tools.water_tools.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="pyDeltaRCM.water_tools.water_tools.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_sed_route">
+<code class="sig-name descname"><span class="pre">hook_sed_route</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_sed_route" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.sed_route" title="pyDeltaRCM.sed_tools.sed_tools.sed_route"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sed_route</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.sed_route" title="pyDeltaRCM.sed_tools.sed_tools.sed_route"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sed_route</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_topo_diffusion">
+<code class="sig-name descname"><span class="pre">hook_topo_diffusion</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_topo_diffusion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.topo_diffusion" title="pyDeltaRCM.sed_tools.sed_tools.topo_diffusion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topo_diffusion</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.topo_diffusion" title="pyDeltaRCM.sed_tools.sed_tools.topo_diffusion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topo_diffusion</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 
@@ -80,8 +251,8 @@
   <p class="topless"><a href="../shared_tools/index.html"
                         title="previous chapter">shared_tools</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html"
-                        title="next chapter">pyDeltaRCM.hook_tools.hook_tools</a></p>
+  <p class="topless"><a href="../debug_tools/index.html"
+                        title="next chapter">debug_tools</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -110,7 +281,7 @@
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../../_autosummary/pyDeltaRCM.hook_tools.hook_tools.html" title="pyDeltaRCM.hook_tools.hook_tools"
+          <a href="../debug_tools/index.html" title="debug_tools"
              >next</a> |</li>
         <li class="right" >
           <a href="../shared_tools/index.html" title="shared_tools"

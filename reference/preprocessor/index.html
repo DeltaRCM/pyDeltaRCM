@@ -45,8 +45,13 @@
   <div class="section" id="preprocessor">
 <h1>Preprocessor<a class="headerlink" href="#preprocessor" title="Permalink to this headline">¶</a></h1>
 <p>The high-level API is principally defined in <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.preprocessor</span></code>.</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>add paragraph description of the module. What can we do with this? Why does it exist? Link to the relevant documentation in the user guide and examples.</p>
+</div>
 <div class="section" id="preprocessor-classes-and-api">
 <h2>Preprocessor classes and API<a class="headerlink" href="#preprocessor-classes-and-api" title="Permalink to this headline">¶</a></h2>
+<p>The following classes are defined in the <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.preprocessor</span></code> module and enable the high-level model API to work at both the command line and as a Python object.</p>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -67,16 +72,24 @@
 </div>
 <div class="section" id="preprocessor-function-and-utilities">
 <h2>Preprocessor function and utilities<a class="headerlink" href="#preprocessor-function-and-utilities" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Todo</p>
+<p>add description, what are these?</p>
+</div>
 <dl class="py function">
 <dt id="pyDeltaRCM.preprocessor.preprocessor_wrapper">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.preprocessor.</span></code><code class="sig-name descname"><span class="pre">preprocessor_wrapper</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.preprocessor_wrapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wrapper for CLI interface.</p>
-<p>The entry_points setup of a command line interface requires a function, so
-we use this simple wrapper to instantiate and run the jobs.</p>
-<p>Works by creating an instance of the
+<dd><p>Wrapper for command line interface.</p>
+<p>The <cite>entry_points</cite> setup of a command line interface requires a function,
+so we use this simple wrapper to instantiate and run the jobs.</p>
+<p>This function creates an instance of the
 <a class="reference internal" href="../../_autosummary/pyDeltaRCM.preprocessor.PreprocessorCLI.html#pyDeltaRCM.preprocessor.PreprocessorCLI" title="pyDeltaRCM.preprocessor.PreprocessorCLI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PreprocessorCLI</span></code></a> and calls the
-<a class="reference internal" href="../../_autosummary/pyDeltaRCM.preprocessor.PreprocessorCLI.html#pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs" title="pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run_jobs()</span></code></a> to execute all
-jobs.</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">run_jobs()</span></code> to execute all
+jobs configured in the preprocessor. In code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pp</span> <span class="o">=</span> <span class="n">PreprocessorCLI</span><span class="p">()</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">run_jobs</span><span class="p">()</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">

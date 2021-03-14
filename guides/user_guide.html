@@ -44,6 +44,10 @@
   <div class="section" id="user-guide">
 <h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
 <p>Guide to users!</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Incomplete. Needs basic instructions on how to configure the model in a scripting setting. Something like the 10-min guide, just repeated here.</p>
+</div>
 <div class="section" id="configuring-an-input-yaml-file">
 <h2>Configuring an input YAML file<a class="headerlink" href="#configuring-an-input-yaml-file" title="Permalink to this headline">¶</a></h2>
 <p>The configuration for a pyDeltaRCM run is set up by a parameter set, described in the <code class="docutils literal notranslate"><span class="pre">YAML</span></code> markup format.
@@ -379,7 +383,7 @@ parameters:</p>
 </div>
 <div class="section" id="advanced-subsidence-configurations">
 <h3>Advanced Subsidence Configurations<a class="headerlink" href="#advanced-subsidence-configurations" title="Permalink to this headline">¶</a></h3>
-<p>Subsidence behavior can be easily modified by <a class="reference internal" href="#customize-the-model"><span class="std std-ref">creating a subclass</span></a> and overwriting the <a class="reference internal" href="../_autosummary/pyDeltaRCM.init_tools.init_tools.html#pyDeltaRCM.init_tools.init_tools.init_subsidence" title="pyDeltaRCM.init_tools.init_tools.init_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_subsidence</span></code></a> or <a class="reference internal" href="../_autosummary/pyDeltaRCM.iteration_tools.iteration_tools.html#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_subsidence</span></code></a> methods, or even more simply the relevant model hooks.</p>
+<p>Subsidence behavior can be easily modified by <a class="reference internal" href="#customize-the-model"><span class="std std-ref">creating a subclass</span></a> and overwriting the <a class="reference internal" href="../reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_subsidence" title="pyDeltaRCM.init_tools.init_tools.init_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_subsidence</span></code></a> or <a class="reference internal" href="../reference/iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_subsidence</span></code></a> methods, or even more simply the relevant model hooks.</p>
 <p>An example of using subclassing to create a model setup with subsidence confined to only part of the model domain is included in the documentation:</p>
 <p><a class="reference internal" href="../examples/subsidence_region.html"><span class="doc">Constraining subsidence to part of the domain</span></a></p>
 </div>

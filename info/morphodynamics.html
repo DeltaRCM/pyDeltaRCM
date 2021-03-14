@@ -44,11 +44,56 @@
             
   <div class="section" id="morphodynamics">
 <h1>Morphodynamics<a class="headerlink" href="#morphodynamics" title="Permalink to this headline">¶</a></h1>
-<p>pyDeltaRCM approximates morphodynamics through the use of a weighted random
-walk.</p>
+<p>pyDeltaRCM approximates sediment dispersal through the use of a weighted random
+walk dictated by water flux.
+In turn, sediment dispersal drives bed elevation change in the model domain by mass conservation.</p>
+<p>See <a class="footnote-reference brackets" href="#id4" id="id1">1</a> for a complete description of morphodynamic assumptions in the DeltaRCM model.
+In this documentation, we focus on the details of <em>model implementation</em>, rather than <em>model design</em>.</p>
+<div class="section" id="sediment-transport">
+<h2>Sediment Transport<a class="headerlink" href="#sediment-transport" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Incomplete.</p>
+</div>
+</div>
+<div class="section" id="changes-in-the-bed-elevation">
+<h2>Changes in the bed elevation<a class="headerlink" href="#changes-in-the-bed-elevation" title="Permalink to this headline">¶</a></h2>
+<p>Change in the channel bed is the result of deposition or erosion by each sediment parcel (<code class="xref py py-obj docutils literal notranslate"><span class="pre">_update_fields</span></code>), dictated by sediment mass conservation (i.e., Exner equation) and is equal to:</p>
+<div class="math">
+<p><img src="../_images/math/f920a10551bf3adf4f05166c47f238d11605cde0.png" alt="\Delta \eta = \Delta V / dx^2"/></p>
+</div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Total sediment mass is preserved, but individual categories of sand and mud are not. I.e., it is assumed that there is infinite sand and/or mud to erode at any location where erosion is occurring.</p>
+</div>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Todo</p>
+<p>Incomplete.</p>
+</div>
+</div>
+<div class="section" id="model-stability">
+<h2>Model Stability<a class="headerlink" href="#model-stability" title="Permalink to this headline">¶</a></h2>
+<p>Model stability depends on…</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Incomplete.</p>
+</div>
+<div class="section" id="reference-volume">
+<span id="id3"></span><h3>Reference Volume<a class="headerlink" href="#reference-volume" title="Permalink to this headline">¶</a></h3>
+<p>The reference volume (<img class="math" src="../_images/math/3b91308a0751f9601ef49963a6a62565abff8ac7.png" alt="V_0"/>) impacts model stability. This volume characterizes the volume on one inlet-channel cell, from the channel bed to the water surface:</p>
+<div class="math">
+<p><img src="../_images/math/b4e91286a8f51d0b71ddf02c45157553294bd73f.png" alt="V_0 = h_0 {\delta_c}^2"/></p>
+</div><p>where <img class="math" src="../_images/math/6c74a61cdf90a8a3b50f62a58910b84d0fe23678.png" alt="h_0"/> is the inlet channel depth (meters) and <img class="math" src="../_images/math/81509bfb60ff6ac0869c47031aa4e06e50e7184d.png" alt="\delta_c"/> is the cell length (meters).</p>
+<div class="section" id="references">
+<h4>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h4>
+<dl class="footnote brackets">
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>A reduced-complexity model for river delta formation – Part 1: Modeling
+deltas with channel dynamics, M. Liang, V. R. Voller, and C. Paola, Earth
+Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.org/10.5194/esurf-3-67-2015">https://doi.org/10.5194/esurf-3-67-2015</a></p>
+</dd>
+</dl>
+</div>
+</div>
 </div>
 </div>
 
@@ -59,6 +104,22 @@ walk.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Morphodynamics</a><ul>
+<li><a class="reference internal" href="#sediment-transport">Sediment Transport</a></li>
+<li><a class="reference internal" href="#changes-in-the-bed-elevation">Changes in the bed elevation</a></li>
+<li><a class="reference internal" href="#model-stability">Model Stability</a><ul>
+<li><a class="reference internal" href="#reference-volume">Reference Volume</a><ul>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="hydrodynamics.html"
                         title="previous chapter">Hydrodynamics</a></p>

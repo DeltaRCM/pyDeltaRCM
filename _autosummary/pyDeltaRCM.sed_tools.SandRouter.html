@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pyDeltaRCM.sed_tools.MudRouter" href="pyDeltaRCM.sed_tools.MudRouter.html" />
-    <link rel="prev" title="pyDeltaRCM.sed_tools.sed_tools" href="pyDeltaRCM.sed_tools.sed_tools.html" /> 
+    <link rel="prev" title="sed_tools" href="../reference/sed_tools/index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -29,7 +29,7 @@
           <a href="pyDeltaRCM.sed_tools.MudRouter.html" title="pyDeltaRCM.sed_tools.MudRouter"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="pyDeltaRCM.sed_tools.sed_tools.html" title="pyDeltaRCM.sed_tools.sed_tools"
+          <a href="../reference/sed_tools/index.html" title="sed_tools"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
@@ -50,15 +50,15 @@
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.sed_tools.</span></code><code class="sig-name descname"><span class="pre">SandRouter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Jitted class to route sand.</p>
 <p>Initialized in
-<a class="reference internal" href="pyDeltaRCM.init_tools.init_tools.html#pyDeltaRCM.init_tools.init_tools.init_sediment_routers" title="pyDeltaRCM.init_tools.init_tools.init_sediment_routers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_sediment_routers</span></code></a> with a
+<a class="reference internal" href="../reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_sediment_routers" title="pyDeltaRCM.init_tools.init_tools.init_sediment_routers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_sediment_routers</span></code></a> with a
 multitude of constants. The <cite>Router</cite> is then called via the public
-<a class="reference internal" href="#pyDeltaRCM.sed_tools.SandRouter.run" title="pyDeltaRCM.sed_tools.SandRouter.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a> method in the <a class="reference internal" href="pyDeltaRCM.sed_tools.sed_tools.html#pyDeltaRCM.sed_tools.sed_tools.sed_route" title="pyDeltaRCM.sed_tools.sed_tools.sed_route"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sed_route</span></code></a>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code> method in the <a class="reference internal" href="../reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.sed_route" title="pyDeltaRCM.sed_tools.sed_tools.sed_route"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sed_route</span></code></a>
 method.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>A new Router must be initialized if any constants are changed to the
 underlying <cite>DeltaModel</cite> object. Convention is to call
-<a class="reference internal" href="pyDeltaRCM.init_tools.init_tools.html#pyDeltaRCM.init_tools.init_tools.init_sediment_routers" title="pyDeltaRCM.init_tools.init_tools.init_sediment_routers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_sediment_routers</span></code></a> in any
+<a class="reference internal" href="../reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_sediment_routers" title="pyDeltaRCM.init_tools.init_tools.init_sediment_routers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_sediment_routers</span></code></a> in any
 property <cite>setter</cite>.</p>
 </div>
 <dl class="py method">
@@ -77,7 +77,7 @@ property <cite>setter</cite>.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.sed_tools.SandRouter.__init__" title="pyDeltaRCM.sed_tools.SandRouter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(_dt, dx, Vp_sed, u_max, qs0, u0, …)</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.sed_tools.SandRouter.run" title="pyDeltaRCM.sed_tools.SandRouter.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(start_indices, eta, stage, depth, …)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>(start_indices, eta, stage, depth, …)</p></td>
 <td><p>The main function to route and deposit/erode sand parcels.</p></td>
 </tr>
 </tbody>
@@ -94,158 +94,6 @@ property <cite>setter</cite>.</p>
 </tr>
 </tbody>
 </table>
-<dl class="py method">
-<dt id="pyDeltaRCM.sed_tools.SandRouter._compute_Vp_ero">
-<code class="sig-name descname"><span class="pre">_compute_Vp_ero</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Vp_sed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_ero</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter._compute_Vp_ero" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute volume erorded based on velocity.</p>
-<p>The volume of sediment eroded depends on the local flow velocity
-(<code class="xref py py-obj docutils literal notranslate"><span class="pre">U_loc</span></code>), the critical velocity for erosion (<code class="xref py py-obj docutils literal notranslate"><span class="pre">U_ero</span></code>), and
-<cite>beta</cite>.</p>
-<p>Function is used by both sand and mud pathways, but the input value of
-U_ero depends on the pathway.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Vp_sed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Volume of a sediment parcel.</p></li>
-<li><p><strong>U_loc</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Local flow velocity.</p></li>
-<li><p><strong>U_ero</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Critical velocity for erosion.</p></li>
-<li><p><strong>beta</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – unknown.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>Vp_ero</strong> – Volume of eroded sediment.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.sed_tools.SandRouter._deposit_or_erode">
-<code class="sig-name descname"><span class="pre">_deposit_or_erode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter._deposit_or_erode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decide if deposit or erode sand.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Volumetric change is limited to 1/4 local cell water volume.</p>
-</div>
-<dl class="simple">
-<dt>Sand deposition:</dt><dd><p>If more sediment is in transport (<cite>qs_loc</cite>) than the determined
-transport capacity of the cell (<cite>qs_cap</cite>), sediment needs to
-deposit on the bed.</p>
-</dd>
-<dt>Sand erosion:</dt><dd><p>Can only occur if local velocity (<cite>U_loc</cite>) is greater than the
-critical erosion threshold for sand
-(<code class="xref py py-obj docutils literal notranslate"><span class="pre">U_ero_sand</span></code>), <em>and</em> if the local
-transport capacity is not yet reached (<cite>qs_loc &lt; qs_cap</cite>).</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.sed_tools.SandRouter._limit_Vp_change">
-<code class="sig-name descname"><span class="pre">_limit_Vp_change</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Vp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_ero</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter._limit_Vp_change" title="Permalink to this definition">¶</a></dt>
-<dd><p>Limit change in volume to 1/4 of a cell volume.</p>
-<p>Function is used by multiple pathways in <cite>mud_dep_ero</cite> and <cite>sand_dep_ero</cite>
-but with different inputs for the sediment volume (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Vp</span></code>).</p>
-<p>dep_ero indicates which pathway we are in, dep==0, ero==1</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.sed_tools.SandRouter._partition_sediment">
-<code class="sig-name descname"><span class="pre">_partition_sediment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">px0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter._partition_sediment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Spread sediment flux between two cells.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.sed_tools.SandRouter._route_one_parcel">
-<code class="sig-name descname"><span class="pre">_route_one_parcel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter._route_one_parcel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Route one parcel.</p>
-<p>Algorithm is to:</p>
-<blockquote>
-<div><p>1. as input, receive the starting points to use to run a single
-parcel, as <code class="xref py py-obj docutils literal notranslate"><span class="pre">px</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">py</span></code>.</p>
-<p>2. begin a while loop, which counts the number of steps the parcel
-has taken</p>
-<p>3. determine, based on the water surface and flow velocity field,
-which location to travel to next. This determination is named as
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">choose_next_location</span></code>, which utilizes the <cite>shared_tools</cite>
-methods to pick the next location.</p>
-<p>4. call the <a class="reference internal" href="#pyDeltaRCM.sed_tools.SandRouter._deposit_or_erode" title="pyDeltaRCM.sed_tools.SandRouter._deposit_or_erode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_deposit_or_erode</span></code></a> method to detemine whether to
-deposit or erode sediment. This method is implemented
-<em>differently</em> for sand and mud routing, and depends on a multitude
-of different model variables. This step modifies the bed elevation
-and flow depth fields (in subfunction <a class="reference internal" href="#pyDeltaRCM.sed_tools.SandRouter._update_fields" title="pyDeltaRCM.sed_tools.SandRouter._update_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_update_fields</span></code></a>),
-which necessitates finding the new weights for routing on each
-step. Also, the volume of sediment is either increased or
-decreased (erosion or deposition).</p>
-<p>5. repeat from 3, until <cite>stepmax</cite> is reached, or an “edge” cell is
-reached.</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.sed_tools.SandRouter._update_fields">
-<code class="sig-name descname"><span class="pre">_update_fields</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Vp_change</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter._update_fields" title="Permalink to this definition">¶</a></dt>
-<dd><p>Execute deposit of sand or mud.</p>
-<p>Deposit sediment volume <cite>Vp_change</cite>. The change in bed elevation
-depends on the sediment mass conservation (i.e., Exner equation) and
-is equal to:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Vp_change</span> <span class="o">/</span> <span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Following the sediment deposition/erosion, the new values for flow
-depth and flow velocity fields are determined.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Total sediment mass is preserved, but individual categories
-of sand and mud are not. I.e., it is assumed that there is infinite
-sand and/or mud to erode at any location where erosion is occuring.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Vp_change</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Volume of sediment to deposit / erode. If erosion, <cite>Vp_change</cite>
-should be negative.</p></li>
-<li><p><strong>px</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Index.</p></li>
-<li><p><strong>py</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Index.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyDeltaRCM.sed_tools.SandRouter.run">
-<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Vp_dep_mud</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Vp_dep_sand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>The main function to route and deposit/erode sand parcels.</p>
-<p>Algorithm is to:</p>
-<blockquote>
-<div><p>1. as input, receive the current status of fields from the model.
-Additionally, receive a list of the starting points to use to run
-parcels, as <code class="xref py py-obj docutils literal notranslate"><span class="pre">px</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">py</span></code>.</p>
-<ol class="arabic simple" start="2">
-<li><p>begin a <cite>for</cite> loop to run each parcel in series.</p></li>
-</ol>
-<p>3. in the <a class="reference internal" href="#pyDeltaRCM.sed_tools.SandRouter" title="pyDeltaRCM.sed_tools.SandRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SandRouter</span></code></a>, the sediment partitioning from a
-ghost node is executed. This step is skipped for
-<a class="reference internal" href="pyDeltaRCM.sed_tools.MudRouter.html#pyDeltaRCM.sed_tools.MudRouter" title="pyDeltaRCM.sed_tools.MudRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MudRouter</span></code></a>.</p>
-<p>4. call <a class="reference internal" href="#pyDeltaRCM.sed_tools.SandRouter._route_one_parcel" title="pyDeltaRCM.sed_tools.SandRouter._route_one_parcel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_route_one_parcel</span></code></a> method to run a single parcel of
-sediment through all iterations.</p>
-<p>5. repeat from 3, until the correct number of parcels have been
-routed. Note that the number of <em>total</em> parcels is
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">Np_sed</span></code>, and the number of sand or
-mud parcels will depend on the value of
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">f_bedload</span></code>.</p>
-</div></blockquote>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>We are unable to precompute the routing weights, in the way
-we do in <code class="xref py py-obj docutils literal notranslate"><span class="pre">get_water_weight_array</span></code>,
-because the weighting changes with each parcel step (i.e.,
-morphodynamics).</p>
-</div>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -258,8 +106,8 @@ morphodynamics).</p>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="pyDeltaRCM.sed_tools.sed_tools.html"
-                        title="previous chapter">pyDeltaRCM.sed_tools.sed_tools</a></p>
+  <p class="topless"><a href="../reference/sed_tools/index.html"
+                        title="previous chapter">sed_tools</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="pyDeltaRCM.sed_tools.MudRouter.html"
                         title="next chapter">pyDeltaRCM.sed_tools.MudRouter</a></p>
@@ -294,7 +142,7 @@ morphodynamics).</p>
           <a href="pyDeltaRCM.sed_tools.MudRouter.html" title="pyDeltaRCM.sed_tools.MudRouter"
              >next</a> |</li>
         <li class="right" >
-          <a href="pyDeltaRCM.sed_tools.sed_tools.html" title="pyDeltaRCM.sed_tools.sed_tools"
+          <a href="../reference/sed_tools/index.html" title="sed_tools"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>

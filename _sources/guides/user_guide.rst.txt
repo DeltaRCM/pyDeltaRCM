@@ -4,6 +4,10 @@ User Guide
 
 Guide to users!
 
+.. note::
+
+   Incomplete. Needs basic instructions on how to configure the model in a scripting setting. Something like the 10-min guide, just repeated here.
+
 
 ==============================
 Configuring an input YAML file

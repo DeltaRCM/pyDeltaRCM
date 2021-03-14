@@ -16,8 +16,8 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pyDeltaRCM.sed_tools.sed_tools" href="../../_autosummary/pyDeltaRCM.sed_tools.sed_tools.html" />
-    <link rel="prev" title="pyDeltaRCM.water_tools.water_tools" href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html" /> 
+    <link rel="next" title="pyDeltaRCM.sed_tools.SandRouter" href="../../_autosummary/pyDeltaRCM.sed_tools.SandRouter.html" />
+    <link rel="prev" title="water_tools" href="../water_tools/index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -26,10 +26,10 @@
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../../_autosummary/pyDeltaRCM.sed_tools.sed_tools.html" title="pyDeltaRCM.sed_tools.sed_tools"
+          <a href="../../_autosummary/pyDeltaRCM.sed_tools.SandRouter.html" title="pyDeltaRCM.sed_tools.SandRouter"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html" title="pyDeltaRCM.water_tools.water_tools"
+          <a href="../water_tools/index.html" title="water_tools"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">API reference</a> &#187;</li>
@@ -44,23 +44,76 @@
             
   <div class="section" id="sed-tools">
 <h1>sed_tools<a class="headerlink" href="#sed-tools" title="Permalink to this headline">¶</a></h1>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>add paragraph description of the module</p>
+</div>
 <p>The tools are defined in <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.sed_tools</span></code>.</p>
 <div class="section" id="public-api-methods-attached-to-model">
 <h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Permalink to this headline">¶</a></h2>
+<p>The following methods are defined in the <code class="docutils literal notranslate"><span class="pre">sed_tools</span></code> class, of the <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.sed_tools</span></code> module.</p>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.sed_tools.html#pyDeltaRCM.sed_tools.sed_tools" title="pyDeltaRCM.sed_tools.sed_tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sed_tools</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.sed_tools.sed_tools" title="pyDeltaRCM.sed_tools.sed_tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sed_tools</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py class">
+<dt id="pyDeltaRCM.sed_tools.sed_tools">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.sed_tools.</span></code><code class="sig-name descname"><span class="pre">sed_tools</span></code><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels">
+<code class="sig-name descname"><span class="pre">route_all_mud_parcels</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route mud parcels.</p>
+<p>This method largely wraps the <a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.MudRouter.html#pyDeltaRCM.sed_tools.MudRouter" title="pyDeltaRCM.sed_tools.MudRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MudRouter</span></code></a>. First, the number of
+parcels and sand fraction (<code class="xref py py-obj docutils literal notranslate"><span class="pre">f_bedload</span></code>) are used to determine
+starting locations for mud parcels. Next, these locations are sent to
+the <cite>MudRouter</cite>, along with many other model state variables.</p>
+<p>Finally, variables are unpacked from the <cite>MudRouter</cite> and updated in
+the model fields, where they are later used by the water parcel
+routing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels">
+<code class="sig-name descname"><span class="pre">route_all_sand_parcels</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route sand parcels; topo diffusion.</p>
+<p>This method largely wraps the <a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.SandRouter.html#pyDeltaRCM.sed_tools.SandRouter" title="pyDeltaRCM.sed_tools.SandRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SandRouter</span></code></a>. First, the number of
+parcels and sand fraction (<code class="xref py py-obj docutils literal notranslate"><span class="pre">f_bedload</span></code>) are used to determine
+starting locations for sand parcels. Next, these locations are sent to
+the <cite>SandRouter</cite>, along with many other model state variables.</p>
+<p>Finally, variables are unpacked from the <cite>SandRouter</cite> and updated in
+the model fields, where they are later used by the <cite>MudRouter</cite> and the
+water parcel routing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.sed_tools.sed_tools.sed_route">
+<code class="sig-name descname"><span class="pre">sed_route</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.sed_route" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sediment routing main method.</p>
+<p>This is the main method for sediment routing in the model. It is
+called once per <cite>update()</cite> call.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.sed_tools.sed_tools.topo_diffusion">
+<code class="sig-name descname"><span class="pre">topo_diffusion</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.topo_diffusion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Diffuse topography after routing.</p>
+<p>Diffuse topography after routing all coarse sediment parcels. The
+operation is repeated <cite>N_crossdiff</cite> times.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="router-classes">
 <h2>Router classes<a class="headerlink" href="#router-classes" title="Permalink to this headline">¶</a></h2>
+<p>The following classes are defined in the <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.sed_tools</span></code> module. These sediment routing classes are jitted for speed.</p>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -78,11 +131,20 @@
 </tr>
 </tbody>
 </table>
-<p>Additionally, the sediment routing function:</p>
+</div>
+<div class="section" id="sed-tools-helper-functions">
+<h2>sed_tools helper functions<a class="headerlink" href="#sed-tools-helper-functions" title="Permalink to this headline">¶</a></h2>
+<p>Additionally, the sediment parcel step-weighting function is defined at the module level in <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.sed_tools</span></code>.</p>
 <dl class="py function">
 <dt id="pyDeltaRCM.sed_tools._get_weight_at_cell_sediment">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.sed_tools.</span></code><code class="sig-name descname"><span class="pre">_get_weight_at_cell_sediment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_nbrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct_nbrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances_flat</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools._get_weight_at_cell_sediment" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get neighbor weight array for sediment routing.</p>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Todo</p>
+<p>Expand description. Include example? Equation? Link to Morphodynamics
+document.</p>
+</div>
+</dd></dl>
 
 </div>
 </div>
@@ -99,16 +161,17 @@
 <li><a class="reference internal" href="#">sed_tools</a><ul>
 <li><a class="reference internal" href="#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
 <li><a class="reference internal" href="#router-classes">Router classes</a></li>
+<li><a class="reference internal" href="#sed-tools-helper-functions">sed_tools helper functions</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html"
-                        title="previous chapter">pyDeltaRCM.water_tools.water_tools</a></p>
+  <p class="topless"><a href="../water_tools/index.html"
+                        title="previous chapter">water_tools</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../../_autosummary/pyDeltaRCM.sed_tools.sed_tools.html"
-                        title="next chapter">pyDeltaRCM.sed_tools.sed_tools</a></p>
+  <p class="topless"><a href="../../_autosummary/pyDeltaRCM.sed_tools.SandRouter.html"
+                        title="next chapter">pyDeltaRCM.sed_tools.SandRouter</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -137,10 +200,10 @@
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../../_autosummary/pyDeltaRCM.sed_tools.sed_tools.html" title="pyDeltaRCM.sed_tools.sed_tools"
+          <a href="../../_autosummary/pyDeltaRCM.sed_tools.SandRouter.html" title="pyDeltaRCM.sed_tools.SandRouter"
              >next</a> |</li>
         <li class="right" >
-          <a href="../../_autosummary/pyDeltaRCM.water_tools.water_tools.html" title="pyDeltaRCM.water_tools.water_tools"
+          <a href="../water_tools/index.html" title="water_tools"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>

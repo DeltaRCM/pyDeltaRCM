@@ -43,8 +43,12 @@
             
   <div class="section" id="api-reference">
 <h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
-<p>This page gives an overview of all public pyDeltaRCM objects, functions and
-methods.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel</span></code> class, defined in <cite>pyDeltaRCM.model</cite>, is the main class of pyDeltaRCM, which provides the object that is manipulated to evolve the numerical delta model.
+This class uses “mix-in” classes, which are defined in separate files (Python <cite>modules</cite>), that break out logically based on the various stages of model use, and components of the model iteration sequence.
+Most model functionality is organized into the various mix-in classes, that are then inherited by the <cite>DeltaModel</cite>.
+Additionally, several routines of the model are organized into module-level functions, which are “jitted” via the <a class="reference external" href="https://numba.pydata.org/">numba</a>  code optimizer library for Python.</p>
+<p>This index lists the <cite>pyDeltaRCM</cite> organization, hopefully providing enough information to begin to determine where various components of the model are implemented.
+The index includes model classes, methods, and attributes, as well as additionally utility classes and functions.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="model/index.html">model</a><ul>
@@ -73,6 +77,7 @@ methods.</p>
 <li class="toctree-l1"><a class="reference internal" href="sed_tools/index.html">sed_tools</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sed_tools/index.html#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sed_tools/index.html#router-classes">Router classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sed_tools/index.html#sed-tools-helper-functions">sed_tools helper functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="shared_tools/index.html">shared_tools</a><ul>
@@ -87,6 +92,7 @@ methods.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="debug_tools/index.html">debug_tools</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="debug_tools/index.html#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug_tools/index.html#public-plotting-methods">Public plotting methods</a></li>
 </ul>
 </li>
 </ul>
@@ -97,6 +103,12 @@ methods.</p>
 <li><p><a class="reference internal" href="../py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="../search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
+<div class="section" id="search-the-index">
+<h3>Search the Index<a class="headerlink" href="#search-the-index" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="../genindex.html"><span class="std std-ref">Index</span></a></p></li>
+</ul>
+</div>
 </div>
 </div>
 
@@ -110,7 +122,10 @@ methods.</p>
   <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">API reference</a><ul>
-<li><a class="reference internal" href="#references">References</a></li>
+<li><a class="reference internal" href="#references">References</a><ul>
+<li><a class="reference internal" href="#search-the-index">Search the Index</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

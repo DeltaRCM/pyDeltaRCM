@@ -44,12 +44,31 @@
             
   <div class="section" id="minute-tutorial">
 <h1>10-minute tutorial<a class="headerlink" href="#minute-tutorial" title="Permalink to this headline">¶</a></h1>
-<p>Use pyDeltaRCM in ten minutes!</p>
+<p>Use pyDeltaRCM in ten minutes!
+This simple guide will show you the absolute basics of getting a <cite>pyDeltaRCM</cite> model running, and give you some direction on where to go from there.</p>
+<div class="section" id="a-default-model">
+<h2>A default model<a class="headerlink" href="#a-default-model" title="Permalink to this headline">¶</a></h2>
 <p>You can get a model running with three simple lines of code.
 First, we instantiate the main <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyDeltaRCM</span></code> model object.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyDeltaRCM</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">default_delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Instantiating the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel" title="pyDeltaRCM.model.DeltaModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel()</span></code></a> without any arguments will use a set of <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">default parameters</span></a> to configure the model run.
+The default options are a reasonable set for exploring some controls of the model, and would work perfectly well for a simple demonstration here.</p>
+</div>
+<div class="section" id="the-model-with-set-parameters">
+<h2>The model with set parameters<a class="headerlink" href="#the-model-with-set-parameters" title="Permalink to this headline">¶</a></h2>
+<p>To run a simulation with a non-default set of parameters, we can use a configuration file written in the YAML markup language named <cite>10min_tutorial.yaml</cite>.
+For example, we can specify where we would like the output file to be placed with the <cite>out_dir</cite> parameter, ensure that our simulation is easily reproducible by setting the random <cite>seed</cite> parameter, and examine what is the effect of a high fraction of bedload:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;10min_tutorial&#39;</span>
+<span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">451220118313</span>
+<span class="nt">f_bedload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.9</span>
+</pre></div>
+</div>
+<p>Now, we can create a second instance of the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel" title="pyDeltaRCM.model.DeltaModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel()</span></code></a>, this time using the input yaml file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="s1">&#39;10min_tutorial.yaml&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Next, since this is just a simple demo, we will run for a few short timesteps.
@@ -75,6 +94,15 @@ So we loop the <cite>update</cite> function, and then finalize the model:</p>
 <img alt="../_images/model_run_visual.png" src="../_images/model_run_visual.png" />
 </div>
 </div>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<p>Consider reading through the <a class="reference internal" href="user_guide.html"><span class="doc">User Guide</span></a> as a first action, and determine how to set up the model to complete your experiment, including tutorials and examples for customizing the model to achieve any arbitrary behavior you need!</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="user_guide.html"><span class="doc">User Guide</span></a></p></li>
+<li><p><a class="reference internal" href="../reference/model/index.html"><span class="doc">model</span></a></p></li>
+</ul>
+</div>
+</div>
 
 
             <div class="clearer"></div>
@@ -83,6 +111,16 @@ So we loop the <cite>update</cite> function, and then finalize the model:</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">10-minute tutorial</a><ul>
+<li><a class="reference internal" href="#a-default-model">A default model</a></li>
+<li><a class="reference internal" href="#the-model-with-set-parameters">The model with set parameters</a></li>
+<li><a class="reference internal" href="#resources">Resources</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="getting_started.html"
                         title="previous chapter">Getting Started</a></p>
