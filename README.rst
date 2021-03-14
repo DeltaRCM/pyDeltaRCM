@@ -2,7 +2,7 @@
 pyDeltaRCM
 **************
 
-.. image:: https://github.com/DeltaRCM/pyDeltaRCM/workflows/build/badge.svg
+.. image:: https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg
     :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
 
 .. image:: https://badge.fury.io/py/pyDeltaRCM.svg
