@@ -19,6 +19,7 @@ Modifying boundary conditions
    :maxdepth: 1
 
    subsidence_region
+   variable_bedload
 
 
 Modifying internal computations
