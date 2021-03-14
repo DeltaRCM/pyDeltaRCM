@@ -55,9 +55,32 @@
 <dl class="py function">
 <dt id="pyDeltaRCM.shared_tools.get_random_uniform">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">get_random_uniform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.get_random_uniform" title="Permalink to this definition">¶</a></dt>
-<dd><div class="admonition-todo admonition" id="id2">
-<p class="admonition-title">Todo</p>
-<p>Description needed. Where is it used?</p>
+<dd><p>Get a random number from the uniform distribution.</p>
+<p>Get a random number from the uniform distribution, defined over the
+interval <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">limit]</span></code>, where <cite>limit</cite> is an input parameter (often <code class="docutils literal notranslate"><span class="pre">1</span></code>).</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Function returns only a single float. Wrap the call in a simple for
+loop to get many random numbers.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>limit</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Upper limit to distribution to draw from.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Float value from the random number generator in the interval defined.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_random_uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">0.5488135039273248</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_random_uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="go">0.07151893663724194</span>
+</pre></div>
 </div>
 </dd></dl>
 
@@ -65,7 +88,7 @@
 <dt id="pyDeltaRCM.shared_tools.get_start_indices">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">get_start_indices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inlet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inlet_weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_starts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.get_start_indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get start indices.</p>
-<div class="admonition-todo admonition" id="id3">
+<div class="admonition-todo admonition" id="id2">
 <p class="admonition-title">Todo</p>
 <p>Description needed. Where is it used?</p>
 </div>
@@ -75,7 +98,7 @@
 <dt id="pyDeltaRCM.shared_tools.get_steps">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">get_steps</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_cells</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iwalk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jwalk</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.get_steps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the values giving the next step.</p>
-<div class="admonition-todo admonition" id="id4">
+<div class="admonition-todo admonition" id="id3">
 <p class="admonition-title">Todo</p>
 <p>Description needed. Where is it used?</p>
 </div>
@@ -90,7 +113,7 @@ Return the index of the selected weight in array probs
 Takes a numpy array that is the precalculated probability
 around the cell flattened to 1D.</p>
 <p class="rubric">Examples</p>
-<div class="admonition-todo admonition" id="id5">
+<div class="admonition-todo admonition" id="id4">
 <p class="admonition-title">Todo</p>
 <p>Examples needed (pull from tests?).</p>
 </div>
@@ -100,14 +123,34 @@ around the cell flattened to 1D.</p>
 <dt id="pyDeltaRCM.shared_tools.custom_unravel">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">custom_unravel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.custom_unravel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unravel indexes for 2D array.</p>
-<div class="admonition-todo admonition" id="id6">
-<p class="admonition-title">Todo</p>
-<p>Description needed. Where is it used?</p>
-</div>
+<p>This is a jitted function, equivalent to the <cite>numpy</cite> implementation of
+<cite>unravel_index</cite>, but configured to accept only a single integer as
+the index to unravel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Integer index to unravel.</p></li>
+<li><p><strong>shape</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Two element tuple of integers indicating the shape of the
+two-dimensional array from which <code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code> will be unravelled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – <cite>x</cite> index of <code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code> into array of shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code>.</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – <cite>y</cite> index of <code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code> into array of shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="admonition-todo admonition" id="id7">
-<p class="admonition-title">Todo</p>
-<p>Examples needed (pull from tests?).</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>  <span class="c1"># e.g., delta.eta.shape</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="mi">5124</span><span class="p">,</span> <span class="n">_shape</span><span class="p">)</span>
+<span class="go">(25, 124)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_unravel</span><span class="p">(</span><span class="mi">5124</span><span class="p">,</span> <span class="n">_shape</span><span class="p">)</span>
+<span class="go">(25, 124)</span>
+</pre></div>
 </div>
 </dd></dl>
 
@@ -115,29 +158,81 @@ around the cell flattened to 1D.</p>
 <dt id="pyDeltaRCM.shared_tools.custom_ravel">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">custom_ravel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.custom_ravel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ravel indexes for 2D array.</p>
-<div class="admonition-todo admonition" id="id8">
-<p class="admonition-title">Todo</p>
-<p>Description needed. Where is it used?</p>
-</div>
+<p>This is a jitted function, equivalent to the <cite>numpy</cite> implementation of
+<cite>ravel_multi_index</cite>, but configured to accept only a single tuple as
+the index to ravel, and only works for two-dimensional array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tup</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Two element <cite>tuple</cite> with the <cite>x</cite> and <cite>y</cite> index into an array of
+shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code> to ravel.</p></li>
+<li><p><strong>shape</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Two element tuple of integers indicating the shape of the
+two-dimensional array from which <code class="xref py py-obj docutils literal notranslate"><span class="pre">tup</span></code> will be ravelled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>i</strong> – Ravelled integer index into array of shape <code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="admonition-todo admonition" id="id9">
-<p class="admonition-title">Todo</p>
-<p>Examples needed (pull from tests?).</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>  <span class="c1"># e.g., delta.eta.shape</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">ravel_multi_index</span><span class="p">((</span><span class="mi">25</span><span class="p">,</span> <span class="mi">124</span><span class="p">),</span> <span class="n">_shape</span><span class="p">)</span>
+<span class="go">5124</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_ravel</span><span class="p">((</span><span class="mi">25</span><span class="p">,</span> <span class="mi">124</span><span class="p">),</span> <span class="n">_shape</span><span class="p">)</span>
+<span class="go">5124</span>
+</pre></div>
 </div>
 </dd></dl>
 
 <dl class="py function">
 <dt id="pyDeltaRCM.shared_tools.custom_pad">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">custom_pad</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.custom_pad" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pad an array as <code class="docutils literal notranslate"><span class="pre">np.pad(arr,</span> <span class="pre">1,</span> <span class="pre">'edge')</span></code>.</p>
-<div class="admonition-todo admonition" id="id10">
-<p class="admonition-title">Todo</p>
-<p>Description needed. Where is it used?</p>
+<dd><p>Pad an array.</p>
+<p>This is a jitted function, equivalent to the <cite>numpy</cite> implementation of
+<cite>pad</cite> with certain optional parameters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">)</span>
+</pre></div>
 </div>
+<p>In pyDeltaRCM model fields (e.g., <cite>depth</cite>) are frequently padded to enable
+straightforward slicing of the neighbors of a given cell; i.e., padding
+guarantees that all cells will have 9 neighbors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arr</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code>) – Array to pad.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>pad</strong> – Padded array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="admonition-todo admonition" id="id11">
-<p class="admonition-title">Todo</p>
-<p>Examples needed (pull from tests?).</p>
+<p>Consider a model domain of size <cite>(4, 8)</cite></p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np_pad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cust_pad</span> <span class="o">=</span> <span class="n">custom_pad</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np_pad</span> <span class="o">==</span> <span class="n">cust_pad</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cust_pad</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(6, 10)</span>
+</pre></div>
+</div>
+<p>which enables all elements of the original <cite>(4, 8)</cite> array to be safely
+sliced:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">slc</span> <span class="o">=</span> <span class="n">cust_pad</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slc</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># will always be a (3, 3) 9-cell neighborhood</span>
+<span class="go">(3, 3)</span>
+</pre></div>
 </div>
 </dd></dl>
 
@@ -147,7 +242,7 @@ around the cell flattened to 1D.</p>
 <dd><p>Determine random walk weight surfaces.</p>
 <p>Determines the surfaces for weighting the random walks based on the stage
 and discharge fields.</p>
-<div class="admonition-todo admonition" id="id12">
+<div class="admonition-todo admonition" id="id5">
 <p class="admonition-title">Todo</p>
 <p>Expand description. Where is it used? Include an example? Equations?
 Link to Hydrodyanmics doc?</p>
@@ -162,6 +257,22 @@ Link to Hydrodyanmics doc?</p>
 <dt>We are waiting for upstream fix here:</dt><dd><p><a class="reference external" href="https://github.com/yaml/pyyaml/pull/174">https://github.com/yaml/pyyaml/pull/174</a></p>
 </dd>
 </dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>loader</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyyaml.Loader</span></code> with custom resolver</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>The custom loader can be used as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">loader</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">shared_tools</span><span class="o">.</span><span class="n">custom_yaml_loader</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/path/to/file.yaml&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">yaml_as_dict</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">a_file</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">loader</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -242,30 +353,80 @@ activity. <strong>Must</strong> be in interval (0, 1].</p></li>
 <dt id="pyDeltaRCM.shared_tools.set_random_seed">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">set_random_seed</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.set_random_seed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the random seed from an integer.</p>
-<div class="admonition-todo admonition" id="id13">
-<p class="admonition-title">Todo</p>
-<p>Description needed. Where is it used?</p>
+<p>Set the seed of the random number generator with a single integer.
+Importantly, this function will affect the state of the <cite>numba</cite> random
+number generator, rather than the <cite>numpy</cite> generator.</p>
+<p>This function is called during model intialization, but is <strong>not</strong> called
+during loading a model from checkpoint
+(<a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.load_checkpoint" title="pyDeltaRCM.init_tools.init_tools.load_checkpoint"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_checkpoint()</span></code></a>) where the
+random number generator state is configured via the
+<a class="reference internal" href="#pyDeltaRCM.shared_tools.set_random_state" title="pyDeltaRCM.shared_tools.set_random_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_random_state()</span></code></a> function.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This function is preferred to setting the random seed directly. If you
+are working with model subclassing, interacting with the <cite>numpy</cite>
+random number generator directly will lead to a model that is <strong>not
+reproducible!</strong></p>
 </div>
+<p>Internally, the method is simply the below line; however it is <em>crucial</em>
+this happens inside a jitted function, in order to affect the state of the
+<cite>numba</cite> random number generator seed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">_seed</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>_seed</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Integer to use as the random number generator seed. Should be in
+interval <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">2^32]</span></code>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="pyDeltaRCM.shared_tools.get_random_state">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">get_random_state</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.get_random_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the random state as a tuple.</p>
-<div class="admonition-todo admonition" id="id14">
-<p class="admonition-title">Todo</p>
-<p>Description needed. Where is it used?</p>
+<dd><p>Get the random state as a tuple.</p>
+<p>Get the random state from a tuple in the form returned by
+<code class="xref py py-func docutils literal notranslate"><span class="pre">numba._helperlib.rnd_get_state()</span></code>. This tuple contains the
+necessary information for resuming a checkpoint from the exact same random
+number generator state.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>You probably do not need to use this function. Be sure you know
+<em>exactly</em> how you are affecting the random number generator state
+before using this function, or you are likely to create a model that
+cannot be peproduced.</p>
 </div>
+<p>See also <a class="reference internal" href="#pyDeltaRCM.shared_tools.set_random_seed" title="pyDeltaRCM.shared_tools.set_random_seed"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_random_seed()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>state</strong> – Random number generator state as a tuple.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="pyDeltaRCM.shared_tools.set_random_state">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">set_random_state</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_state_tuple</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.set_random_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the random state from a tuple.</p>
-<div class="admonition-todo admonition" id="id15">
-<p class="admonition-title">Todo</p>
-<p>Description needed. Where is it used?</p>
+<p>Set the random state from a tuple in the form returned by
+<code class="xref py py-func docutils literal notranslate"><span class="pre">numba._helperlib.rnd_get_state()</span></code>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>You probably do not need to use this function. Be sure you know
+<em>exactly</em> how you are affecting the random number generator state
+before using this function, or you are likely to create a model that
+cannot be peproduced.</p>
 </div>
+<p>See also <a class="reference internal" href="#pyDeltaRCM.shared_tools.set_random_seed" title="pyDeltaRCM.shared_tools.set_random_seed"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_random_seed()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code>) – Random number generator state as a tuple.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -276,7 +437,7 @@ activity. <strong>Must</strong> be in interval (0, 1].</p></li>
 with a temporary folder as output, rather than anywhere in the project
 structure.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">_docs_temp_directory</span><span class="p">()</span> <span class="k">as</span> <span class="n">output_dir</span><span class="p">:</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">_docs_temp_directory</span><span class="p">()</span> <span class="k">as</span> <span class="n">output_dir</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">(</span><span class="n">out_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -286,15 +447,25 @@ structure.</p>
 <dt id="pyDeltaRCM.shared_tools._get_version">
 <code class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></code><code class="sig-name descname"><span class="pre">_get_version</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools._get_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract version from file.</p>
-<p>Extract version number from single file, and make it availabe everywhere.</p>
-<div class="admonition-todo admonition" id="id16">
-<p class="admonition-title">Todo</p>
-<p>Description needed. Where is it used?</p>
+<p>Extract version number from single file, and make it availabe everywhere.
+This function is used to make sure that when the version number is
+incremented in the <cite>pyDeltaRCM._version</cite> module, it is properly updated
+throughout documentation and version-controlled release.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You probably don’t need to use this function.</p>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>ver_str</strong> – Version number, as a string.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="admonition-todo admonition" id="id17">
-<p class="admonition-title">Todo</p>
-<p>Examples needed (pull from tests?).</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">shared_tools</span><span class="o">.</span><span class="n">_get_version</span><span class="p">()</span>  
+</pre></div>
 </div>
 </dd></dl>
 
