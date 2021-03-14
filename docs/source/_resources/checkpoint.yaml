@@ -1,0 +1,3 @@
+out_dir: 'checkpoint'
+seed: 451220118313
+save_checkpoint: True

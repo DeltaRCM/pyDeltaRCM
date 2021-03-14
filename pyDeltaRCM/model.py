@@ -824,12 +824,24 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def resume_checkpoint(self):
         """
         resume_checkpoint controls loading of a checkpoint if run is resuming.
+
+        When setting this option in the YAML or command line, you can specify
+        a `bool` (e.g., `resume_checkpoint: True`) which will search in the
+        :obj:`out_dir` directory for a file named ``checkpoint.npz``.
+        Alternatively, you can specify an alternative folder to search for the
+        checkpoint *as a string* (e.g., `resume_checkpoint:
+        '/some/other/path'`).
         """
         return self._resume_checkpoint
 
     @resume_checkpoint.setter
     def resume_checkpoint(self, resume_checkpoint):
-        self._resume_checkpoint = resume_checkpoint
+        if isinstance(resume_checkpoint, str):
+            self._checkpoint_folder = resume_checkpoint
+            self._resume_checkpoint = True
+        else:
+            self._checkpoint_folder = self.prefix
+            self._resume_checkpoint = resume_checkpoint
 
     @property
     def omega_sfc(self):
@@ -1047,6 +1059,26 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def dt(self):
         """The time step.
 
+        The value of the timestep (:math:`\\Delta t`) is a balance between
+        computation efficiency and model stability [1]_. The
+        :ref:`reference-volume`, which characterizes the
+        volume of an inlet-channel cell, and the sediment discharge to the
+        model domain scale the timestep as:
+
+        .. math::
+
+            \\Delta t = \\dfrac{0.1 {N_0}^2 V_0}{Q_{s0}}
+
+        where :math:`Q_{s0}` is the sediment discharge into the model domain
+        (m:sup:`3`/s), :math:`V_0` is the reference volume, and :math:`N_0` is
+        the number of cells across the channel (determined by :obj:`N0_meters`
+        and :obj:`dx`).
+
+        .. [1] A reduced-complexity model for river delta formation – Part 1:
+               Modeling deltas with channel dynamics, M. Liang, V. R. Voller,
+               and C. Paola, Earth Surf. Dynam., 3, 67–86, 2015.
+               https://doi.org/10.5194/esurf-3-67-2015
+
         Raises
         ------
         UserWarning
@@ -1056,7 +1088,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @property
     def time_step(self):
-        """Alias for `dt`.
+        """Alias for :obj:`dt`.
         """
         return self._dt
 
@@ -1083,7 +1115,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def save_time_since_data(self):
         """Time since data last output.
 
-        The number of times the :obj:`update` method has been called.
+        The elapsed time (seconds) since data was output with
+        :obj:`output_data`.
         """
         return self._save_time_since_data
 

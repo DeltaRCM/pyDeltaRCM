@@ -68,7 +68,7 @@ napoleon_use_rtype = True
 # Autosummary / Automodapi settings
 autosummary_generate = True
 automodapi_inheritance_diagram = False
-autodoc_default_options = {'members': True, 'inherited-members': True,
+autodoc_default_options = {'members': True, 'inherited-members': False,
                            'private-members': True}
 
 # doctest

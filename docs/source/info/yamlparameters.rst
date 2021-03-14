@@ -58,7 +58,7 @@ Model Domain Parameters
 
 :attr:`pyDeltaRCM.model.DeltaModel.toggle_subsidence`
 
-:attr:`pyDeltaRCM.model.DeltaModel.sigma_max`
+:attr:`pyDeltaRCM.model.DeltaModel.subsidence_rate`
 
 :attr:`pyDeltaRCM.model.DeltaModel.start_subsidence`
 
