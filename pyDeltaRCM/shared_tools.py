@@ -404,8 +404,7 @@ def _get_version():
     --------
     .. doctest::
 
-        >>> pyDeltaRCM.shared_tools._get_version()  # doctest: +ELLIPSIS
-        ...
+        >>> pyDeltaRCM.shared_tools._get_version()  # doctest: +SKIP
     """
     from . import _version
     return _version.__version__()
