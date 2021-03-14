@@ -178,6 +178,44 @@ class TestCustomUnravel:
             x, y = shared_tools.custom_unravel(99, arr.shape)
 
 
+class TestCustomRavel:
+
+    def test_custom_ravel_square(self):
+        arr = np.arange(9).reshape((3, 3))
+        # test upper left corner
+        tup = (0, 0)
+        i = shared_tools.custom_ravel(tup, arr.shape)
+        assert i == 0
+        # test center
+        tup = (1, 1)
+        i = shared_tools.custom_ravel(tup, arr.shape)
+        assert i == 4
+        # test off-center
+        tup = (1, 2)
+        i = shared_tools.custom_ravel(tup, arr.shape)
+        assert i == 5
+        # test lower right corner
+        tup = (2, 2)
+        i = shared_tools.custom_ravel(tup, arr.shape)
+        assert i == 8
+
+    def test_custom_ravel_rectangle(self):
+        arr = np.arange(50).reshape((5, 10))
+        # test a few spots
+        tup = (1, 9)
+        i = shared_tools.custom_ravel(tup, arr.shape)
+        assert i == 19
+        tup = (3, 4)
+        i = shared_tools.custom_ravel(tup, arr.shape)
+        assert i == 34
+
+    def test_custom_ravel_exceed_error(self):
+        arr = np.arange(9).reshape((3, 3))
+        # next line should throw IndexError
+        with pytest.raises(IndexError):
+            _ = shared_tools.custom_ravel((50, 50), arr.shape)
+
+
 class TestGetWeightSfcInt:
 
     def test_get_weight_sfc_int(self, tmp_path):
