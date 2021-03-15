@@ -279,7 +279,11 @@ class TestPreprocessorMatrixJobsSetups:
         f.close()
         with pytest.warns(UserWarning,
                           match=r'Length of matrix key "f_bedload" was 1,'):
-            _ = preprocessor.Preprocessor(input_file=p)
+            pp = preprocessor.Preprocessor(input_file=p)
+
+        # check job length
+        assert pp._has_matrix is True
+        assert len(pp.file_list) == 3
 
     def test_py_hlvl_mtrx_bad_listinlist(self, tmp_path):
         file_name = 'user_parameters.yaml'
