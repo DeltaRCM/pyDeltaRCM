@@ -20,6 +20,7 @@ Modifying boundary conditions
 
    subsidence_region
    variable_bedload
+   variable_velocity
 
 
 Modifying internal computations
