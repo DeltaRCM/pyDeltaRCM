@@ -249,6 +249,14 @@ class BasePreprocessor(abc.ABC):
         if not isinstance(_ensemble, int):
             raise TypeError('Invalid ensemble type, must be an integer.')
 
+        if _ensemble == 1:
+            # there's nothing to do here
+            warnings.warn(UserWarning(
+                    'Ensemble was set to 1. '
+                    'Remove this key from configuration.'))
+            self._has_ensemble = False
+            return
+
         # if matrix does not exist, then it must be created
         if 'matrix' not in self.config_dict.keys():
             _matrix = {}
@@ -376,9 +384,9 @@ class BasePreprocessor(abc.ABC):
                 'You cannot specify "out_dir" as a matrix expansion key.')
         for k in _matrix.keys():  # check validity of keys, depth == 1
             if len(_matrix[k]) == 1:
-                raise ValueError(
+                warnings.warn(UserWarning(
                     'Length of matrix key "%s" was 1, '
-                    'relocate to fixed configuration.' % str(k))
+                    'remove this key from matrix configuration.' % str(k)))
             for v in _matrix[k]:
                 if isinstance(v, list):
                     raise ValueError(

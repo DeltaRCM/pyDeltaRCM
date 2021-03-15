@@ -277,8 +277,8 @@ class TestPreprocessorMatrixJobsSetups:
                                        ['f_bedload', 'u0'],
                                        [[0.2], [0.5, 0.6, 1.25]])
         f.close()
-        with pytest.raises(ValueError,
-                           match=r'Length of matrix key "f_bedload" was 1,'):
+        with pytest.warns(UserWarning,
+                          match=r'Length of matrix key "f_bedload" was 1,'):
             _ = preprocessor.Preprocessor(input_file=p)
 
     def test_py_hlvl_mtrx_bad_listinlist(self, tmp_path):
@@ -449,6 +449,21 @@ class TestPreprocessorEnsembleJobsSetups:
         assert pp._has_ensemble is True
         assert type(pp.file_list) is list
         assert len(pp.file_list) == 2
+
+    def test_py_hlvl_ensemble_1(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'ensemble', 1)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        f.close()
+        with pytest.warns(UserWarning,
+                          match=r'Ensemble was set to 1. *.'):
+            pp = preprocessor.Preprocessor(input_file=p)
+
+        # check that keys were reset and config set correctly
+        assert pp._has_ensemble is False
+        assert pp._has_matrix is False
+        assert len(pp.file_list) == 1
 
     def test_py_hlvl_ensemble_badtype(self, tmp_path):
         file_name = 'user_parameters.yaml'
