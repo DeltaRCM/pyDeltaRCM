@@ -30,6 +30,22 @@ Sediment routing weighting
 .. note::
    Incomplete.
 
+Sediment routing probability for a given cell :math:`j` to neighbor cell :math:`i` is computed according to:
+
+.. math::
+
+    w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},
+
+where :math:`\mathbf{F}` is the local routing direction and :math:`\mathbf{d_i}` is a unit vector pointing to neighbor :math:`i` from cell :math:`j`, and :math:`\Delta_i` is the cellular distance to neighbor :math:`i` (:math:`1` for cells in main compass directions and :math:`\sqrt{2}` for corner cells.
+:math:`R_i` is a resistance estimated as an inverse function of local water depth (:math:`h_i`):
+
+.. math::
+
+    R_i = \frac{1}{{h_i}^\theta}.
+
+Here, :math:`\theta` takes the value of :obj:`~pyDeltaRCM.model.DeltaModel.coeff_theta_sand` for sand routing probabilities, and :obj:`~pyDeltaRCM.model.DeltaModel.coeff_theta_mud` for mud routing.
+
+
 .. plot:: sed_tools/sediment_weights_examples.py
 
 

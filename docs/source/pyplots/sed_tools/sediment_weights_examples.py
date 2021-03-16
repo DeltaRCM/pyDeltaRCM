@@ -93,7 +93,9 @@ hdr_ax.set_xlim(0, delta.W // 2)
 hdr_ax.set_ylim(delta.L // 2, 0)
 
 
-def plot_pxpy_weights(px, py, i):
+def plot_pxpy_weights(pxpy, i):
+
+    px, py = pxpy
 
     hdr_ax.text(py, px, str(i-hdr),
                 fontsize=9, color='white',
@@ -142,12 +144,17 @@ def plot_pxpy_weights(px, py, i):
     return __ax_list
 
 
+# define the example location set
+_ex_set = [(10, 94), (20, 78), (38, 72), (22, 87), (47, 43)]
+
+
 # plot the points
-ax0 = plot_pxpy_weights(10, 94, hdr+0)
-ax1 = plot_pxpy_weights(10, 80, hdr+1)
-ax2 = plot_pxpy_weights(20, 60, hdr+2)
-ax3 = plot_pxpy_weights(22, 87, hdr+3)
-ax4 = plot_pxpy_weights(35, 15, hdr+4)
+ax0 = plot_pxpy_weights(_ex_set[0], hdr+0)
+ax1 = plot_pxpy_weights(_ex_set[1], hdr+1)
+ax2 = plot_pxpy_weights(_ex_set[2], hdr+2)
+ax3 = plot_pxpy_weights(_ex_set[3], hdr+3)
+ax4 = plot_pxpy_weights(_ex_set[4], hdr+4)
+
 
 # labels
 for a, axx in enumerate([ax0, ax1, ax2, ax3, ax4]):
