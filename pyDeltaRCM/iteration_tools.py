@@ -309,10 +309,12 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        _msg = 'Saving data to output file'
-        self.log_info(_msg, verbosity=1)
-
         save_idx = self.save_iter
+
+        _msg = ' '.join((
+            'Saving data to output file:',
+            str(save_idx).zfill(5)))
+        self.log_info(_msg, verbosity=1)
 
         if (self._save_metadata or self._save_any_grids):
             self.output_netcdf.variables['time'][save_idx] = self._time
