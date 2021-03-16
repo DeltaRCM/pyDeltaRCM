@@ -12,6 +12,8 @@ See [1]_ for a complete description of morphodynamic assumptions in the DeltaRCM
 In this documentation, we focus on the details of *model implementation*, rather than *model design*.
 
 
+.. _sediment-transport:
+
 ==================
 Sediment Transport
 ==================
@@ -20,24 +22,52 @@ Sediment Transport
    Incomplete.
 
 
+.. _sediment-routing-weighting:
+
+Sediment routing weighting
+--------------------------
+
+.. note::
+   Incomplete.
+
+.. plot:: sed_tools/sediment_weights_examples.py
+
+
 ============================
 Changes in the bed elevation
 ============================
 
-Change in the channel bed is the result of deposition or erosion by each sediment parcel (:obj:`_update_fields`), dictated by sediment mass conservation (i.e., Exner equation) and is equal to:
+Along the walk of a sediment parcel, the sediment parcel volume is modulated on each step, according to the sediment transport rules described above in :ref:`sediment-transport`.
+As the volume of the sediment parcel changes, the channel bed elevation at the current parcel location is updated to reflect this volume change (:obj:`~sed_tools.BaseRouter._update_fields`), i.e., the bed is eroded or sediment is deposited on the bed.
+The vertical change in the channel bed is dictated by sediment mass conservation (i.e., Exner equation) and is equal to:
 
 .. math::
 
     \Delta \eta = \Delta V / dx^2
 
+where :math:`\Delta V` is the volume of sediment to be eroded or deposited from the bed at a given cell along the parcel walk.
 
 .. note::
 
-    Total sediment mass is preserved, but individual categories of sand and mud are not. I.e., it is assumed that there is infinite sand and/or mud to erode at any location where erosion is occurring.
+    Total sediment mass is preserved, but individual categories of sand and mud are not. I.e., it is assumed that there is an infinite supply of sand and/or mud to erode and entrain at any location in the model domain.
 
-.. todo::
+Following a change in the bed elevation, the local flow depth is updated and then local flow velocity is updated according to fluid mass conservation (i.e., ``uw = qw / h``; :obj:`~sed_tools.BaseRouter._update_fields`; [1]_).
 
-   Incomplete.
+Sediment parcels are routed through the model domain step-by-step and in serial, such that changes in the bed elevation caused by one sediment parcel will affect the weighted random walks of all subsequent sediment parcels (:ref:`sediment-routing-weighting`), due to the updated flow field.
+
+Sediment parcel routing is handled by first routing all sand parcels, applying a topographic diffusion (see below and :meth:`~sed_tools.topo_diffusion`), and then routing all mud parcels.
+The impact of routing *all* sand and mud parcels on bed elevation is shown in the table below.
+
+.. _sand-mud-route-comparison:
+
+.. table::
+
+    +-------------------------------------------+-----------------------------------------------+----------------------------------------------+
+    | initial bed                               | :meth:`~sed_tools.route_all_sand_parcels`     | :meth:`~sed_tools.route_all_mud_parcels`     |
+    +===========================================+===============================================+==============================================+
+    | .. plot:: sed_tools/_initial_bed_state.py | .. plot:: sed_tools/route_all_sand_parcels.py | .. plot:: sed_tools/route_all_mud_parcels.py |
+    +-------------------------------------------+-----------------------------------------------+----------------------------------------------+
+
 
 ===============
 Model Stability
@@ -48,6 +78,25 @@ Model stability depends on...
 .. note::
    Incomplete.
 
+.. topographic-diffusion:
+
+Topographic diffusion
+---------------------
+
+Abrupt change in bed elevation (i.e., steep local bed slope) may lead to numerical instability. 
+To prevent this, a topographic diffusion is applied immediately following the routing of all sand parcels in the model sequence.
+
+.. hint::
+
+    Topographic diffusion is applied between routing sand parcels and routing mud parcels.
+
+In implementation, topographic smoothing convolves topography with `3x3` cell kernels configured to a diffusive behavior.
+The diffusion is repeated over the entire model domain :obj:`~pyDeltaRCM.DeltaModel.N_crossdiff` times.
+In the following example, :obj:`~pyDeltaRCM.DeltaModel.N_crossdiff` takes the :doc:`default value </reference/model/yaml_defaults>`.
+
+.. plot:: sed_tools/topo_diffusion.py
+
+The impact of topographic diffusion is minor compared to the bed elevation change driven by parcel erosion or deposition (:ref:`sand and mud routing effects <sand-mud-route-comparison>`).
 
 .. _reference-volume:
 

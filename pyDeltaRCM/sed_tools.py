@@ -44,13 +44,23 @@ class sed_tools(abc.ABC):
         """Route sand parcels; topo diffusion.
 
         This method largely wraps the :obj:`SandRouter`. First, the number of
-        parcels and sand fraction (:obj:`f_bedload`) are used to determine
-        starting locations for sand parcels. Next, these locations are sent to
-        the `SandRouter`, along with many other model state variables.
+        parcels and sand fraction (:obj:`~pyDeltaRCM.DeltaModel.f_bedload`)
+        are used to determine starting locations for sand parcels. Next, these
+        locations are sent to the `SandRouter`, along with many other model
+        state variables.
 
         Finally, variables are unpacked from the `SandRouter` and updated in
         the model fields, where they are later used by the `MudRouter` and the
         water parcel routing.
+
+        Examples
+        --------
+
+        The cumulative effect of routing all sand parcels:
+
+        +-------------------------------------------+------------------------------------------------+
+        | .. plot:: sed_tools/_initial_bed_state.py | .. plot:: sed_tools/route_all_sand_parcels.py  |
+        +-------------------------------------------+------------------------------------------------+
         """
         _msg = 'Determining sand parcel start indicies'
         self.log_info(_msg, verbosity=2)
@@ -89,13 +99,23 @@ class sed_tools(abc.ABC):
         """Route mud parcels.
 
         This method largely wraps the :obj:`MudRouter`. First, the number of
-        parcels and sand fraction (:obj:`f_bedload`) are used to determine
-        starting locations for mud parcels. Next, these locations are sent to
-        the `MudRouter`, along with many other model state variables.
+        parcels and sand fraction (:obj:`~pyDeltaRCM.DeltaModel.f_bedload`)
+        are used to determine starting locations for mud parcels. Next, these
+        locations are sent to the `MudRouter`, along with many other model
+        state variables.
 
         Finally, variables are unpacked from the `MudRouter` and updated in
         the model fields, where they are later used by the water parcel
         routing.
+
+        Examples
+        --------
+
+        The cumulative effect of routing all sand parcels:
+
+        +-------------------------------------------+------------------------------------------------+
+        | .. plot:: sed_tools/_initial_bed_state.py | .. plot:: sed_tools/route_all_mud_parcels.py   |
+        +-------------------------------------------+------------------------------------------------+
         """
         _msg = 'Determining mud parcel start indicies'
         self.log_info(_msg, verbosity=2)
