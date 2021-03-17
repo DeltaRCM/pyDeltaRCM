@@ -218,7 +218,7 @@ class iteration_tools(abc.ABC):
             self.log_info(_msg, verbosity=2)
 
             # layer attributes at time t
-            actlyr_thick = (self._h0 * 0.5)
+            actlyr_thick = self._active_layer_thickness
             actlyr_top = np.copy(self.eta0)
             actlyr_bot = actlyr_top - actlyr_thick
 
@@ -239,9 +239,27 @@ class iteration_tools(abc.ABC):
                 # update sand_frac to active_layer value
                 self.sand_frac[whr_actero] = self.active_layer[whr_actero]
 
-            # whr_agg = (deta > 0)
+            # separate mud/sand handling with min. mud value matches the
+            # old method used to record deposition in strata_sand_frac exactly
+            # whr_mud = (self.Vp_dep_mud > 0.000001)
+            # if np.any(whr_mud):
+            #     # special case for just mud deposition
+            #     self.sand_frac[whr_mud] = 0.000001
+            #     self.active_layer[whr_mud] = 0.000001
+            #
+            # whr_sand = (self.Vp_dep_sand > 0)
+            # if np.any(whr_sand):
+            #     mixture = (self.Vp_dep_sand[whr_sand] /
+            #                (self.Vp_dep_mud[whr_sand] +
+            #                self.Vp_dep_sand[whr_sand]))
+            #
+            #     self.sand_frac[whr_sand] = mixture
+            #     self.active_layer[whr_sand] = mixture
+
+            # handle aggradation/deposition
+            whr_agg = (deta > 0)
             whr_agg = np.logical_or(
-                (self.Vp_dep_sand > 0), (self.Vp_dep_mud > 0))
+                (self.Vp_dep_sand > 0), (self.Vp_dep_mud > 0.000001))
             if np.any(whr_agg):
                 # sand_frac and active_layer becomes the mixture of the deposit
                 mixture = (self.Vp_dep_sand[whr_agg] /
@@ -322,7 +340,8 @@ class iteration_tools(abc.ABC):
 
             self.strata_eta[:, self.strata_counter] = eta_sparse
 
-            if self._toggle_subsidence and (self._time >= self._start_subsidence):
+            if self._toggle_subsidence and \
+                    (self._time >= self._start_subsidence):
 
                 sigma_change = (self.strata_eta[:, :self.strata_counter]
                                 - self.sigma.flatten()[:, np.newaxis])
@@ -449,7 +468,8 @@ class iteration_tools(abc.ABC):
 
             self.output_netcdf['meta']['H_SL'][save_idx] = self._H_SL
             self.output_netcdf['meta']['f_bedload'][save_idx] = self._f_bedload
-            self.output_netcdf['meta']['C0_percent'][save_idx] = self._C0_percent
+            self.output_netcdf['meta']['C0_percent'][save_idx] = \
+                self._C0_percent
             self.output_netcdf['meta']['u0'][save_idx] = self._u0
 
         # -------------------- sync --------------------

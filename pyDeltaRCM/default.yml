@@ -49,6 +49,9 @@ Np_sed:
 f_bedload:
   type: ['float', 'int']
   default: 0.5
+active_layer_thickness:
+  type: ['float', 'int', 'None']
+  default: null
 C0_percent:
   type: ['float', 'int']
   default: 0.1

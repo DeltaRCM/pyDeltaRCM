@@ -487,6 +487,27 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._f_bedload = f_bedload
 
     @property
+    def active_layer_thickness(self):
+        """
+        Active layer thickness for sand fraction.
+
+        The active layer thickness is the depth to which the sand fraction
+        values are maintained in the event of erosion from one timestep to the
+        next. When erosion exceeds the depth of the active layer, the boundary
+        condition is to fill that cell with a value of 0 (maybe this should be
+        -1 so that it is clear which cells are not truly mud but unknown
+        sediment content based on the active layer thickness?)
+        """
+        return self._active_layer_thickness
+
+    @active_layer_thickness.setter
+    def active_layer_thickness(self, active_layer_thickness):
+        if active_layer_thickness < 0:
+            raise ValueError('active_layer thickness must be greater than'
+                             ' or equal to 0, cannot be negative.')
+        self._active_layer_thickness = active_layer_thickness
+
+    @property
     def C0_percent(self):
         """
         C0_percent is the sediment concentration in the input water supply.

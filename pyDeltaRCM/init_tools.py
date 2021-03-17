@@ -162,6 +162,11 @@ class init_tools(abc.ABC):
         if self.checkpoint_dt is None:
             self.checkpoint_dt = self._save_dt
 
+        # if active_layer is default (None), then set it to half the inlet
+        # channel width, h0
+        if self.active_layer_thickness < 0:
+            self.active_layer_thickness = self._h0 / 2
+
         # write the input file values to the log
         if not self._resume_checkpoint:
             for k, v in list(self._input_file_vars.items()):
@@ -347,6 +352,7 @@ class init_tools(abc.ABC):
 
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int64)
         self.eta = np.zeros((self.L, self.W), dtype=np.float32)
+        self.eta0 = np.copy(self.eta)  # establish eta0 copy
         self.stage = np.zeros((self.L, self.W), dtype=np.float32)
         self.depth = np.zeros((self.L, self.W), dtype=np.float32)
         self.qx = np.zeros((self.L, self.W), dtype=np.float32)
@@ -358,8 +364,10 @@ class init_tools(abc.ABC):
         self.uy = np.zeros((self.L, self.W), dtype=np.float32)
         self.uw = np.zeros((self.L, self.W), dtype=np.float32)
         self.qs = np.zeros((self.L, self.W), dtype=np.float32)
-        self.sand_frac = np.zeros((self.L, self.W), dtype=np.float32)
-        self.active_layer = np.zeros((self.L, self.W), dtype=np.float32)
+        # self.sand_frac = np.zeros((self.L, self.W), dtype=np.float32)
+        self.sand_frac = np.zeros((self.L, self.W), dtype=np.float32) - 1.
+        # self.active_layer = np.zeros((self.L, self.W), dtype=np.float32)
+        self.active_layer = np.zeros((self.L, self.W), dtype=np.float32) - 1.
         self.Vp_dep_sand = np.zeros((self.L, self.W), dtype=np.float32)
         self.Vp_dep_mud = np.zeros((self.L, self.W), dtype=np.float32)
 
