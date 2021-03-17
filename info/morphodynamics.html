@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Morphodynamics &#8212; pyDeltaRCM 1.2.0 documentation</title>
+    <title>Morphodynamics &#8212; pyDeltaRCM 1.3.0 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="hydrodynamics.html" title="Hydrodynamics"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Model Information</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Morphodynamics</a></li> 
       </ul>
@@ -47,38 +47,108 @@
 <p>pyDeltaRCM approximates sediment dispersal through the use of a weighted random
 walk dictated by water flux.
 In turn, sediment dispersal drives bed elevation change in the model domain by mass conservation.</p>
-<p>See <a class="footnote-reference brackets" href="#id4" id="id1">1</a> for a complete description of morphodynamic assumptions in the DeltaRCM model.
+<p>See <a class="footnote-reference brackets" href="#id7" id="id1">1</a> for a complete description of morphodynamic assumptions in the DeltaRCM model.
 In this documentation, we focus on the details of <em>model implementation</em>, rather than <em>model design</em>.</p>
 <div class="section" id="sediment-transport">
-<h2>Sediment Transport<a class="headerlink" href="#sediment-transport" title="Permalink to this headline">¶</a></h2>
+<span id="id2"></span><h2>Sediment Transport<a class="headerlink" href="#sediment-transport" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Incomplete.</p>
 </div>
+<div class="section" id="sediment-routing-weighting">
+<span id="id3"></span><h3>Sediment routing weighting<a class="headerlink" href="#sediment-routing-weighting" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Incomplete.</p>
+</div>
+<p>Sediment routing probability for a given cell <img class="math" src="../_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> to neighbor cell <img class="math" src="../_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> is computed according to:</p>
+<div class="math">
+<p><img src="../_images/math/e30c6e04e007a9386ee17f37a5fd4b36a49a1631.png" alt="w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},"/></p>
+</div><p>where <img class="math" src="../_images/math/d0fdd2411a0ba9823e9ef1ab94256a799bd363f1.png" alt="\mathbf{F}"/> is the local routing direction and <img class="math" src="../_images/math/a91fc0075deda7aa751025e224ca9b225b67511b.png" alt="\mathbf{d_i}"/> is a unit vector pointing to neighbor <img class="math" src="../_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> from cell <img class="math" src="../_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/>, and <img class="math" src="../_images/math/0fa07fac5e639b4533a7931b30c81199768d9599.png" alt="\Delta_i"/> is the cellular distance to neighbor <img class="math" src="../_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> (<img class="math" src="../_images/math/ec830c85a5fbb48028fe797044da6bdfb924c2fa.png" alt="1"/> for cells in main compass directions and <img class="math" src="../_images/math/8db467030dc4a1799b53811c4d3e227c3511fb3f.png" alt="\sqrt{2}"/> for corner cells.
+<img class="math" src="../_images/math/8d47777d070e3b1ae6a9ea0d4918309bc8c942fe.png" alt="R_i"/> is a resistance estimated as an inverse function of local water depth (<img class="math" src="../_images/math/b6e2c1bc7d8a8ef8bc3878348c32e442f102d286.png" alt="h_i"/>):</p>
+<div class="math">
+<p><img src="../_images/math/13c7f33eab6c0cee4f35fdec32c0f28208978dcb.png" alt="R_i = \frac{1}{{h_i}^\theta}."/></p>
+</div><p>Here, <img class="math" src="../_images/math/8a87f04e7d7cca18343c084cceca5237fae62491.png" alt="\theta"/> takes the value of <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_theta_sand" title="pyDeltaRCM.model.DeltaModel.coeff_theta_sand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_theta_sand</span></code></a> for sand routing probabilities, and <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_theta_mud" title="pyDeltaRCM.model.DeltaModel.coeff_theta_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_theta_mud</span></code></a> for mud routing.</p>
+<p>(<a class="reference external" href="../pyplots/sed_tools/sediment_weights_examples.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/sediment_weights_examples.hires.png">hires.png</a>)</p>
+<div class="figure align-default">
+<img alt="../_images/sediment_weights_examples.png" src="../_images/sediment_weights_examples.png" />
+</div>
+</div>
 </div>
 <div class="section" id="changes-in-the-bed-elevation">
 <h2>Changes in the bed elevation<a class="headerlink" href="#changes-in-the-bed-elevation" title="Permalink to this headline">¶</a></h2>
-<p>Change in the channel bed is the result of deposition or erosion by each sediment parcel (<code class="xref py py-obj docutils literal notranslate"><span class="pre">_update_fields</span></code>), dictated by sediment mass conservation (i.e., Exner equation) and is equal to:</p>
+<p>Along the walk of a sediment parcel, the sediment parcel volume is modulated on each step, according to the sediment transport rules described above in <a class="reference internal" href="#sediment-transport"><span class="std std-ref">Sediment Transport</span></a>.
+As the volume of the sediment parcel changes, the channel bed elevation at the current parcel location is updated to reflect this volume change (<code class="xref py py-obj docutils literal notranslate"><span class="pre">_update_fields</span></code>), i.e., the bed is eroded or sediment is deposited on the bed.
+The vertical change in the channel bed is dictated by sediment mass conservation (i.e., Exner equation) and is equal to:</p>
 <div class="math">
 <p><img src="../_images/math/f920a10551bf3adf4f05166c47f238d11605cde0.png" alt="\Delta \eta = \Delta V / dx^2"/></p>
-</div><div class="admonition note">
+</div><p>where <img class="math" src="../_images/math/f465ef3c39d3fcacdb5a0200658903bdad960cc3.png" alt="\Delta V"/> is the volume of sediment to be eroded or deposited from the bed at a given cell along the parcel walk.</p>
+<div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Total sediment mass is preserved, but individual categories of sand and mud are not. I.e., it is assumed that there is infinite sand and/or mud to erode at any location where erosion is occurring.</p>
+<p>Total sediment mass is preserved, but individual categories of sand and mud are not. I.e., it is assumed that there is an infinite supply of sand and/or mud to erode and entrain at any location in the model domain.</p>
 </div>
-<div class="admonition-todo admonition" id="id2">
-<p class="admonition-title">Todo</p>
-<p>Incomplete.</p>
+<p>Following a change in the bed elevation, the local flow depth is updated and then local flow velocity is updated according to fluid mass conservation (i.e., <code class="docutils literal notranslate"><span class="pre">uw</span> <span class="pre">=</span> <span class="pre">qw</span> <span class="pre">/</span> <span class="pre">h</span></code>; <code class="xref py py-obj docutils literal notranslate"><span class="pre">_update_fields</span></code>; <a class="footnote-reference brackets" href="#id7" id="id4">1</a>).</p>
+<p>Sediment parcels are routed through the model domain step-by-step and in serial, such that changes in the bed elevation caused by one sediment parcel will affect the weighted random walks of all subsequent sediment parcels (<a class="reference internal" href="#sediment-routing-weighting"><span class="std std-ref">Sediment routing weighting</span></a>), due to the updated flow field.</p>
+<p>Sediment parcel routing is handled by first routing all sand parcels, applying a topographic diffusion (see below and <a class="reference internal" href="../reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.topo_diffusion" title="pyDeltaRCM.sed_tools.sed_tools.topo_diffusion"><code class="xref py py-meth docutils literal notranslate"><span class="pre">topo_diffusion()</span></code></a>), and then routing all mud parcels.
+The impact of routing <em>all</em> sand and mud parcels on bed elevation is shown in the table below.</p>
+<table class="docutils align-default" id="sand-mud-route-comparison">
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 35%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>initial bed</p></th>
+<th class="head"><p><a class="reference internal" href="../reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels" title="pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels"><code class="xref py py-meth docutils literal notranslate"><span class="pre">route_all_sand_parcels()</span></code></a></p></th>
+<th class="head"><p><a class="reference internal" href="../reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels" title="pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels"><code class="xref py py-meth docutils literal notranslate"><span class="pre">route_all_mud_parcels()</span></code></a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>(<a class="reference external" href="../pyplots/sed_tools/_initial_bed_state.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/_initial_bed_state.hires.png">hires.png</a>)</p>
+<div class="figure align-default">
+<img alt="../_images/_initial_bed_state.png" src="../_images/_initial_bed_state.png" />
 </div>
+</td>
+<td><p>(<a class="reference external" href="../pyplots/sed_tools/route_all_sand_parcels.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/route_all_sand_parcels.hires.png">hires.png</a>)</p>
+<div class="figure align-default">
+<img alt="../_images/route_all_sand_parcels.png" src="../_images/route_all_sand_parcels.png" />
+</div>
+</td>
+<td><p>(<a class="reference external" href="../pyplots/sed_tools/route_all_mud_parcels.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/route_all_mud_parcels.hires.png">hires.png</a>)</p>
+<div class="figure align-default">
+<img alt="../_images/route_all_mud_parcels.png" src="../_images/route_all_mud_parcels.png" />
+</div>
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="model-stability">
-<h2>Model Stability<a class="headerlink" href="#model-stability" title="Permalink to this headline">¶</a></h2>
+<span id="id5"></span><h2>Model Stability<a class="headerlink" href="#model-stability" title="Permalink to this headline">¶</a></h2>
 <p>Model stability depends on…</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Incomplete.</p>
 </div>
+<div class="section" id="topographic-diffusion">
+<h3>Topographic diffusion<a class="headerlink" href="#topographic-diffusion" title="Permalink to this headline">¶</a></h3>
+<p>Abrupt change in bed elevation (i.e., steep local bed slope) may lead to numerical instability.
+To prevent this, a topographic diffusion is applied immediately following the routing of all sand parcels in the model sequence.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Topographic diffusion is applied between routing sand parcels and routing mud parcels.</p>
+</div>
+<p>In implementation, topographic smoothing convolves topography with <cite>3x3</cite> cell kernels configured to a diffusive behavior.
+The diffusion is repeated over the entire model domain <code class="xref py py-obj docutils literal notranslate"><span class="pre">N_crossdiff</span></code> times.
+In the following example, <code class="xref py py-obj docutils literal notranslate"><span class="pre">N_crossdiff</span></code> takes the <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">default value</span></a>.</p>
+<p>(<a class="reference external" href="../pyplots/sed_tools/topo_diffusion.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/topo_diffusion.hires.png">hires.png</a>)</p>
+<div class="figure align-default">
+<img alt="../_images/topo_diffusion.png" src="../_images/topo_diffusion.png" />
+</div>
+<p>The impact of topographic diffusion is minor compared to the bed elevation change driven by parcel erosion or deposition (<a class="reference internal" href="#sand-mud-route-comparison"><span class="std std-ref">sand and mud routing effects</span></a>).</p>
+</div>
 <div class="section" id="reference-volume">
-<span id="id3"></span><h3>Reference Volume<a class="headerlink" href="#reference-volume" title="Permalink to this headline">¶</a></h3>
+<span id="id6"></span><h3>Reference Volume<a class="headerlink" href="#reference-volume" title="Permalink to this headline">¶</a></h3>
 <p>The reference volume (<img class="math" src="../_images/math/3b91308a0751f9601ef49963a6a62565abff8ac7.png" alt="V_0"/>) impacts model stability. This volume characterizes the volume on one inlet-channel cell, from the channel bed to the water surface:</p>
 <div class="math">
 <p><img src="../_images/math/b4e91286a8f51d0b71ddf02c45157553294bd73f.png" alt="V_0 = h_0 {\delta_c}^2"/></p>
@@ -86,7 +156,7 @@ In this documentation, we focus on the details of <em>model implementation</em>,
 <div class="section" id="references">
 <h4>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h4>
 <dl class="footnote brackets">
-<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dt class="label" id="id7"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id4">2</a>)</span></dt>
 <dd><p>A reduced-complexity model for river delta formation – Part 1: Modeling
 deltas with channel dynamics, M. Liang, V. R. Voller, and C. Paola, Earth
 Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.org/10.5194/esurf-3-67-2015">https://doi.org/10.5194/esurf-3-67-2015</a></p>
@@ -107,9 +177,13 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
   <h3><a href="../index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Morphodynamics</a><ul>
-<li><a class="reference internal" href="#sediment-transport">Sediment Transport</a></li>
+<li><a class="reference internal" href="#sediment-transport">Sediment Transport</a><ul>
+<li><a class="reference internal" href="#sediment-routing-weighting">Sediment routing weighting</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#changes-in-the-bed-elevation">Changes in the bed elevation</a></li>
 <li><a class="reference internal" href="#model-stability">Model Stability</a><ul>
+<li><a class="reference internal" href="#topographic-diffusion">Topographic diffusion</a></li>
 <li><a class="reference internal" href="#reference-volume">Reference Volume</a><ul>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -159,7 +233,7 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
         <li class="right" >
           <a href="hydrodynamics.html" title="Hydrodynamics"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Model Information</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Morphodynamics</a></li> 
       </ul>
