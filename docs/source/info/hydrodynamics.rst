@@ -11,14 +11,52 @@ In this documentation, we focus on the details of *model implementation*, rather
 Routing individual water parcels
 ================================
 
-.. note::
+Probabilities for water parcel routing *to all neighbors and to self* for *each cell* are computed *once* at the beginning of the water routing routine (:obj:`~water_tools.get_water_weight_array` called from :obj:`~water_tools.run_water_iteration`).
 
-   Incomplete.
+Water routing probability for a given cell :math:`j` to neighbor cell :math:`i` is computed according to:
 
+.. math::
+
+    w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},
+
+where :math:`\mathbf{F}` is the local routing direction and :math:`\mathbf{d_i}` is a unit vector pointing to neighbor :math:`i` from cell :math:`j`, and :math:`\Delta_i` is the cellular distance to neighbor :math:`i` (:math:`1` for cells in main compass directions and :math:`\sqrt{2}` for corner cells.
+:math:`R_i` is a flow resistance estimated as an inverse function of local water depth (:math:`h_i`):
+
+.. math::
+
+    R_i = \frac{1}{{h_i}^\theta}
+
+The exponent :math:`\theta` takes a value of unity by default for water routing (:attr:`~pyDeltaRCM.DeltaModel.theta_water`, :doc:`/reference/model/yaml_defaults`), leading to routing weight for neighbor cell :math:`i`:
+
+.. math::
+
+    w_i = \frac{h_i \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},
+
+These weights above are calculated only for wet neighbor cells; all dry neighbor cells take a weight value of 0 (:obj:`~water_tools._get_weight_at_cell_water`).
+Finally, probability for routing from cell :math:`j` to cell :math:`i` is calculated as:
+
+.. math::
+
+    p_i = \frac{w_i}{\sum^8_{nb=1} w_{nb}}, i=1, 2, \ldots, 8
+
+Weights are accumulated for 8 neighbors and a probability of 0 is assigned to moving from cell :math:`j` to cell :math:`j` (i.e., no movement).
+These 9 probabilities are organized into an array ``self.water_weights`` with shape (:obj:`L`, :obj:`W`, 9)`. 
 
 The following figure shows several examples of locations within the model domain, and the corresponding water routing weights determined for that location.
 
 .. plot:: water_tools/water_weights_examples.py
+
+Because probabilities are computed for all locations once at the beginning of water iteration, all water parcels can be routed *in parallel* step-by-step in :obj:`~water_tools.run_water_iteration`.
+During iteration, the direction of the random walk is chosen for each parcel via :obj:`_choose_next_directions`, which internally uses :func:`~pyDeltaRCM.shared_tools.random_pick` for randomness.
+For example, see the random walks of several parcels below:
+
+.. plot::  water_tools/run_water_iteration.py
+
+
+.. todo:: add sentence or two above about check_for_loops.
+
+Water routing completes when all water parcels have either 1) reached the model domain boundary, 2) taken a number of steps exceeding :attr:`~pyDeltaRCM.model.DeltaModel.stepmax`, or 3) been removed from further routing via the :obj:`_check_for_loops` function.
+
 
 
 Combining parcels into free surface
@@ -45,16 +83,18 @@ The updated water surface is combined with the previous timestep's water surface
 
 With a new free surface computed, a few final operations prepare the surface for boundary condition updates and eventually being passed to the sediment routing operations.
 A non-linear smoothing operation is applied to the free surface, whereby wet cells are iteratively averaged with neighboring wet cells to yield an overall smoother surface.
-The smoothing is handled by :func:`_smooth_free_surface` and depends on the number of iterations (:attr:`~pyDeltaRCM.DeltaModel.Nsmooth`) and a weighting coefficient (:attr:`~pyDeltaRCM.DeltaModel.Csmooth`).
+The smoothing is handled by :func:`_smooth_free_surface` and depends on the number of iterations (:attr:`~pyDeltaRCM.model.DeltaModel.Nsmooth`) and a weighting coefficient (:attr:`~pyDeltaRCM.model.DeltaModel.Csmooth`).
 
 .. plot:: water_tools/_smooth_free_surface.py
 
 
-.. todo:: add component describing the smoothing.
+Finally, a :meth:`~water_tools.flooding_correction` is applied to the domain.
+In this correction, all "dry" cells (a cell where the flow depth is less than the `dry_depth`) are checked for any neighboring cells where the water surface elevation (`stage`) is higher than the bed elevation of the dry cell.
+If this condition is met for a given dry cell, the dry cell is flooded: the stage of the dry cell is set to the maximum stage of neighboring cells.
 
-.. todo:: add component describing the flooding correction.
+.. plot:: water_tools/flooding_correction.py
 
-
+Similar to :func:`~_smooth_free_surface` described above, :meth:`~water_tools.flooding_correction` acts to remove roughness in the water surface and contributes to :ref:`model stability <model-stability>`.
 
 
 Finalizing and boundary conditions to sediment routing

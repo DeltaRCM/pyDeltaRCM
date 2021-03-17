@@ -14,11 +14,57 @@ warnings.filterwarnings("ignore", category=UserWarning)
 n = 10
 cm = matplotlib.cm.get_cmap('tab10')
 
+
+class SedimentWeightingCalculator(pyDeltaRCM.DeltaModel):
+
+    def __init__(self, input_file=None, **kwargs):
+
+        # inherit from base model
+        super().__init__(input_file, **kwargs)
+
+    def get_sediment_weight_array(self):
+        sand_weights = np.zeros((self.L, self.W, 9))
+        mud_weights = np.zeros((self.L, self.W, 9))
+
+        for i in range(self.L):
+            for j in range(self.W):
+                stage_nbrs = self.pad_stage[i:i + 3, j:j + 3]
+                depth_nbrs = self.pad_depth[i:i + 3, j:j + 3]
+                ct_nbrs = self.pad_cell_type[i:i + 3, j:j + 3]
+
+                _, weight_int = pyDeltaRCM.shared_tools.get_weight_sfc_int(
+                    self.stage[i, j], stage_nbrs.ravel(),
+                    self.qx[i, j], self.qy[i, j], self.ivec_flat,
+                    self.jvec_flat, self.distances_flat)
+
+                try:
+                    sand_weights[i, j] = pyDeltaRCM.sed_tools._get_weight_at_cell_sediment(
+                        (i, j), weight_int, depth_nbrs.ravel(), ct_nbrs.ravel(),
+                        self.dry_depth, self.theta_sand, self.distances_flat)
+
+                    mud_weights[i, j] = pyDeltaRCM.sed_tools._get_weight_at_cell_sediment(
+                        (i, j), weight_int, depth_nbrs.ravel(), ct_nbrs.ravel(),
+                        self.dry_depth, self.theta_mud, self.distances_flat)
+                except Exception:
+                    sand_weights[i, j] = np.nan
+                    mud_weights[i, j] = np.nan
+
+        self.sand_weights = sand_weights
+        self.mud_weights = mud_weights
+
+
 # init delta model
 with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
-    delta = pyDeltaRCM.DeltaModel(
+    delta = SedimentWeightingCalculator(
         out_dir=output_dir,
         resume_checkpoint='../../_resources/checkpoint')
+
+delta.init_water_iteration()
+delta.run_water_iteration()
+delta.compute_free_surface()
+delta.finalize_free_surface()
+
+delta.get_sediment_weight_array()
 
 _shp = delta.eta.shape
 
@@ -80,20 +126,20 @@ def plot_pxpy_weights(pxpy, i):
         i, 1, _dpth_data, cmap='Blues', vmin=0, vmax=5)
     __ax_list.append(_dpth_ax)
 
-    _stge_data = delta.stage[px-1:px+2, py-1:py+2]
-    _stge_ax = _make_single_axis(
-        i, 2, _stge_data, cmap='viridis', vmin=0, vmax=5)
-    __ax_list.append(_stge_ax)
-
     _vel_data = delta.uw[px-1:px+2, py-1:py+2]
     _vel_ax = _make_single_axis(
-        i, 3, _vel_data, cmap='plasma', vmin=0, vmax=1.5)
+        i, 2, _vel_data, cmap='plasma', vmin=0, vmax=1.5)
     __ax_list.append(_vel_ax)
 
-    _wght_data = delta.water_weights[px, py, :].reshape((3, 3))
-    _wght_ax = _make_single_axis(
-        i, 4, _wght_data, cmap='YlGn', vmin=0, vmax=1)
-    __ax_list.append(_wght_ax)
+    _sandwght_data = delta.sand_weights[px, py, :].reshape((3, 3))
+    _sandwght_ax = _make_single_axis(
+        i, 3, _sandwght_data, cmap='YlGn', vmin=0, vmax=1)
+    __ax_list.append(_sandwght_ax)
+
+    _mudwght_data = delta.mud_weights[px, py, :].reshape((3, 3))
+    _mudwght_ax = _make_single_axis(
+        i, 4, _mudwght_data, cmap='YlGn', vmin=0, vmax=1)
+    __ax_list.append(_mudwght_ax)
 
     return __ax_list
 
@@ -109,13 +155,14 @@ ax2 = plot_pxpy_weights(_ex_set[2], hdr+2)
 ax3 = plot_pxpy_weights(_ex_set[3], hdr+3)
 ax4 = plot_pxpy_weights(_ex_set[4], hdr+4)
 
+
 # labels
 for a, axx in enumerate([ax0, ax1, ax2, ax3, ax4]):
     axx[0].set_ylabel(str(a), rotation=0, labelpad=10,
                       ha='center', va='center')
 
 albls = ['bed elevation\n(eta)', 'depth',
-         'stage', 'velocity\n(uw)', 'water weights']
+         'velocity\n(uw)', 'sand weights', 'mud weights']
 for a, (axx, albl) in enumerate(zip(ax4, albls)):
     axx.set_xlabel(albl)
 
