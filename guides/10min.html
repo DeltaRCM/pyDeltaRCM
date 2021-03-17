@@ -46,10 +46,14 @@
 <h1>10-minute tutorial<a class="headerlink" href="#minute-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>Use pyDeltaRCM in ten minutes!
 This simple guide will show you the absolute basics of getting a <cite>pyDeltaRCM</cite> model running, and give you some direction on where to go from there.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If you haven’t already, be sure to follow the <a class="reference internal" href="../meta/installing.html"><span class="doc">installation guide</span></a> to get <em>pyDeltaRCM</em> set up properly on your computer.</p>
+</div>
 <div class="section" id="a-default-model">
 <h2>A default model<a class="headerlink" href="#a-default-model" title="Permalink to this headline">¶</a></h2>
-<p>You can get a model running with three simple lines of code.
-First, we instantiate the main <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyDeltaRCM</span></code> model object.</p>
+<p>You can get a model running with five simple lines of code.
+First, we instantiate the main <code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel</span></code> model object.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyDeltaRCM</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">default_delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">()</span>
@@ -57,30 +61,15 @@ First, we instantiate the main <code class="xref py py-obj docutils literal notr
 </div>
 <p>Instantiating the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel" title="pyDeltaRCM.model.DeltaModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel()</span></code></a> without any arguments will use a set of <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">default parameters</span></a> to configure the model run.
 The default options are a reasonable set for exploring some controls of the model, and would work perfectly well for a simple demonstration here.</p>
-</div>
-<div class="section" id="the-model-with-set-parameters">
-<h2>The model with set parameters<a class="headerlink" href="#the-model-with-set-parameters" title="Permalink to this headline">¶</a></h2>
-<p>To run a simulation with a non-default set of parameters, we can use a configuration file written in the YAML markup language named <cite>10min_tutorial.yaml</cite>.
-For example, we can specify where we would like the output file to be placed with the <cite>out_dir</cite> parameter, ensure that our simulation is easily reproducible by setting the random <cite>seed</cite> parameter, and examine what is the effect of a high fraction of bedload:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;10min_tutorial&#39;</span>
-<span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">451220118313</span>
-<span class="nt">f_bedload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.9</span>
-</pre></div>
-</div>
-<p>Now, we can create a second instance of the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel" title="pyDeltaRCM.model.DeltaModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel()</span></code></a>, this time using the input yaml file.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="s1">&#39;10min_tutorial.yaml&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Next, since this is just a simple demo, we will run for a few short timesteps.
-The delta model is run forward with a call to the <code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code> method of the delta model.
-So we loop the <cite>update</cite> function, and then finalize the model:</p>
+<p>The delta model is run forward with a call to the <code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code> method.
+So, we simply create a <cite>for</cite> loop, and call the <cite>update</cite> function, and then wrap everything up with a call to <code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code> the model:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">delta</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>That’s it! You ran the pyDeltaRCM model for five timesteps.</p>
+<p>That’s it! You ran the pyDeltaRCM model for five timesteps, with just five lines of code.</p>
 <p>We can visualize the delta bed elevation, though it’s not very exciting after only five timesteps…</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
@@ -89,9 +78,30 @@ So we loop the <cite>update</cite> function, and then finalize the model:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>(<a class="reference external" href="../pyplots/10min/model_run_visual.png">png</a>, <a class="reference external" href="../pyplots/10min/model_run_visual.hires.png">hires.png</a>)</p>
+<p>(<a class="reference external" href="../pyplots/guides/10min_demo.png">png</a>, <a class="reference external" href="../pyplots/guides/10min_demo.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/model_run_visual.png" src="../_images/model_run_visual.png" />
+<img alt="../_images/10min_demo.png" src="../_images/10min_demo.png" />
+</div>
+</div>
+<div class="section" id="the-model-with-set-parameters">
+<h2>The model with set parameters<a class="headerlink" href="#the-model-with-set-parameters" title="Permalink to this headline">¶</a></h2>
+<p>To run a simulation with a non-default set of parameters, we use a configuration file written in the YAML markup language named <cite>10min_tutorial.yaml</cite>.
+For example, we can specify where we would like the output file to be placed with the <cite>out_dir</cite> parameter, ensure that our simulation is easily reproducible by setting the random <cite>seed</cite> parameter, and examine what is the effect of a high fraction of bedload:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;10min_tutorial&#39;</span>
+<span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">451220118313</span>
+<span class="nt">f_bedload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.9</span>
+</pre></div>
+</div>
+<p>Now, we can create a second instance of the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel" title="pyDeltaRCM.model.DeltaModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel()</span></code></a>, this time using the input yaml file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">second_delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="s1">&#39;10min_tutorial.yaml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and repeat the same <cite>for</cite> loop operation as above:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">second_delta</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">second_delta</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="resources">
