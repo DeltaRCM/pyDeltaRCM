@@ -101,3 +101,6 @@ target/
 
 # temp folder
 temp/
+
+# joss paper resources
+docs/source/_resources/joss
