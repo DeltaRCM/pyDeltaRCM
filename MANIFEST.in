@@ -1,2 +1,7 @@
 recursive-include pyDeltaRCM *.yml
 exclude *.yml
+recursive-include tests/ *.py *.png
+recursive-include docs/source/ *
+recursive-exclude docs/source/_autosummary *
+recursive-exclude docs/source/_resources/joss *
+global-exclude *.nc *.log
