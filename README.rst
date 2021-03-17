@@ -34,7 +34,7 @@ Documentation includes an `installation guide <https://deltarcm.org/pyDeltaRCM/m
 Installation
 ############
 
-See our complete `installation guide <https://deltarcm.org/pyDeltaRCM/meta/installing.html>`_, especially if you are a developer planning to modify or contribute code (`developer installation guide <dev-install>`_, or if you are new to managing Python `venv` or `conda` environments.
+See our complete `installation guide <https://deltarcm.org/pyDeltaRCM/meta/installing.html>`_, especially if you are a developer planning to modify or contribute code (`developer installation guide <https://deltarcm.org/pyDeltaRCM/meta/installing.html#developer-installation>`_), or if you are new to managing Python `venv` or `conda` environments.
 
 For a quick installation into an existing Python 3.x environment:
 
