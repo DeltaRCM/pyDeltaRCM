@@ -26,7 +26,7 @@ where :math:`\mathbf{F}` is the local routing direction and :math:`\mathbf{d_i}`
 
     R_i = \frac{1}{{h_i}^\theta}
 
-The exponent :math:`\theta` takes a value of unity by default for water routing (:obj:`~pyDeltaRCM.DeltaModel.theta_water`, :doc:`/reference/model/yaml_defaults`), leading to routing weight for neighbor cell :math:`i`:
+The exponent :math:`\theta` takes a value of unity by default for water routing (:attr:`~pyDeltaRCM.DeltaModel.theta_water`, :doc:`/reference/model/yaml_defaults`), leading to routing weight for neighbor cell :math:`i`:
 
 .. math::
 
@@ -47,7 +47,7 @@ The following figure shows several examples of locations within the model domain
 .. plot:: water_tools/water_weights_examples.py
 
 Because probabilities are computed for all locations once at the beginning of water iteration, all water parcels can be routed *in parallel* step-by-step in :obj:`~water_tools.run_water_iteration`.
-During iteration, the direction of the random walk is chosen for each parcel via :obj:`_choose_next_directions`, which internally uses :func:`~pyDeltaRCM.shared_tools.random_pick(weight)` for randomness.
+During iteration, the direction of the random walk is chosen for each parcel via :obj:`_choose_next_directions`, which internally uses :func:`~pyDeltaRCM.shared_tools.random_pick` for randomness.
 For example, see the random walks of several parcels below:
 
 .. plot::  water_tools/run_water_iteration.py
@@ -55,7 +55,7 @@ For example, see the random walks of several parcels below:
 
 .. todo:: add sentence or two above about check_for_loops.
 
-Water routing completes when all water parcels have either 1) reached the model domain boundary, 2) taken a number of steps exceeding :obj:`~pyDeltaRCM.DeltaModel.stepmax`, or 3) been removed from further routing via the :obj:`_check_for_loops` function.
+Water routing completes when all water parcels have either 1) reached the model domain boundary, 2) taken a number of steps exceeding :attr:`~pyDeltaRCM.model.DeltaModel.stepmax`, or 3) been removed from further routing via the :obj:`_check_for_loops` function.
 
 
 
@@ -88,11 +88,13 @@ The smoothing is handled by :func:`_smooth_free_surface` and depends on the numb
 .. plot:: water_tools/_smooth_free_surface.py
 
 
-.. todo:: add component describing the smoothing.
+Finally, a :meth:`~water_tools.flooding_correction` is applied to the domain.
+In this correction, all "dry" cells (a cell where the flow depth is less than the `dry_depth`) are checked for any neighboring cells where the water surface elevation (`stage`) is higher than the bed elevation of the dry cell.
+If this condition is met for a given dry cell, the dry cell is flooded: the stage of the dry cell is set to the maximum stage of neighboring cells.
 
-.. todo:: add component describing the flooding correction.
+.. plot:: water_tools/flooding_correction.py
 
-
+Similar to :func:`~_smooth_free_surface` described above, :meth:`~water_tools.flooding_correction` acts to remove roughness in the water surface and contributes to :ref:`model stability <model-stability>`.
 
 
 Finalizing and boundary conditions to sediment routing

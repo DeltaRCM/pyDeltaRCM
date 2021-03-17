@@ -84,6 +84,7 @@ The impact of routing *all* sand and mud parcels on bed elevation is shown in th
     | .. plot:: sed_tools/_initial_bed_state.py | .. plot:: sed_tools/route_all_sand_parcels.py | .. plot:: sed_tools/route_all_mud_parcels.py |
     +-------------------------------------------+-----------------------------------------------+----------------------------------------------+
 
+.. _model-stability:
 
 ===============
 Model Stability
