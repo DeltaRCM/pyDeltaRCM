@@ -204,45 +204,44 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        if self._save_sandfrac_grids or self._save_sandfrac_figs:
-            _msg = 'Computing bed sand fraction'
-            self.log_info(_msg, verbosity=2)
+        _msg = 'Computing bed sand fraction'
+        self.log_info(_msg, verbosity=2)
 
-            # layer attributes at time t
-            actlyr_thick = self._active_layer_thickness
-            actlyr_top = np.copy(self.eta0)
-            actlyr_bot = actlyr_top - actlyr_thick
+        # layer attributes at time t
+        actlyr_thick = self._active_layer_thickness
+        actlyr_top = np.copy(self.eta0)
+        actlyr_bot = actlyr_top - actlyr_thick
 
-            deta = self.eta - self.eta0
+        deta = self.eta - self.eta0
 
-            # everywhere the bed has degraded this timestep
-            whr_deg = (deta < 0)
-            if np.any(whr_deg):
-                # find where the erosion exceeded the active layer
-                whr_unkwn = self.eta < actlyr_bot
+        # everywhere the bed has degraded this timestep
+        whr_deg = (deta < 0)
+        if np.any(whr_deg):
+            # find where the erosion exceeded the active layer
+            whr_unkwn = self.eta < actlyr_bot
 
-                # update sand_frac in unknown to the boundary condition, -1
-                self.sand_frac[whr_unkwn] = -1  # boundary condition (unknown)
+            # update sand_frac in unknown to the boundary condition, -1
+            self.sand_frac[whr_unkwn] = -1  # boundary condition (unknown)
 
-                # find where erosion was into active layer
-                whr_actero = np.logical_and(whr_deg, self.eta >= actlyr_bot)
+            # find where erosion was into active layer
+            whr_actero = np.logical_and(whr_deg, self.eta >= actlyr_bot)
 
-                # update sand_frac to active_layer value
-                self.sand_frac[whr_actero] = self.active_layer[whr_actero]
+            # update sand_frac to active_layer value
+            self.sand_frac[whr_actero] = self.active_layer[whr_actero]
 
-            # handle aggradation/deposition
-            whr_agg = (deta > 0)
-            whr_agg = np.logical_or(
-                (self.Vp_dep_sand > 0), (self.Vp_dep_mud > 0.000001))
-            if np.any(whr_agg):
-                # sand_frac and active_layer becomes the mixture of the deposit
-                mixture = (self.Vp_dep_sand[whr_agg] /
-                           (self.Vp_dep_mud[whr_agg] +
-                            self.Vp_dep_sand[whr_agg]))
+        # handle aggradation/deposition
+        whr_agg = (deta > 0)
+        whr_agg = np.logical_or(
+            (self.Vp_dep_sand > 0), (self.Vp_dep_mud > 0.000001))
+        if np.any(whr_agg):
+            # sand_frac and active_layer becomes the mixture of the deposit
+            mixture = (self.Vp_dep_sand[whr_agg] /
+                       (self.Vp_dep_mud[whr_agg] +
+                        self.Vp_dep_sand[whr_agg]))
 
-                # update sand_frac in act layer to this value
-                self.sand_frac[whr_agg] = mixture
-                self.active_layer[whr_agg] = mixture
+            # update sand_frac in act layer to this value
+            self.sand_frac[whr_agg] = mixture
+            self.active_layer[whr_agg] = mixture
 
     def save_grids_and_figs(self):
         """Save grids and figures.
