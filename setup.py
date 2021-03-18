@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-from setuptools import setup, find_packages
+from setuptools import setup
 
 from pyDeltaRCM import shared_tools
 
@@ -9,12 +9,13 @@ setup(name='pyDeltaRCM',
       license='MIT',
       description="Python version of original Matlab DeltaRCM",
       long_description=open('README.rst').read(),
-      packages=find_packages(exclude=['*.tests']),
+      packages=['pyDeltaRCM'],
       include_package_data=True,
       url='https://github.com/DeltaRCM/pyDeltaRCM',
       install_requires=['matplotlib', 'netCDF4', 'scipy', 'numpy', 'pyyaml',
                         'numba'],
       entry_points={
-                  'console_scripts': ['pyDeltaRCM=pyDeltaRCM.preprocessor:preprocessor_wrapper'],
+            'console_scripts': [
+                  'pyDeltaRCM=pyDeltaRCM.preprocessor:preprocessor_wrapper'],
       }
       )

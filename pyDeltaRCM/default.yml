@@ -134,7 +134,7 @@ save_checkpoint:
   type: 'bool'
   default: False
 resume_checkpoint:
-  type: 'bool'
+  type: ['bool', 'str']
   default: False
 omega_sfc:
   type: ['float', 'int']

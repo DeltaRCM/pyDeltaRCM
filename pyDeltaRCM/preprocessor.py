@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import abc
 import time
@@ -248,6 +249,14 @@ class BasePreprocessor(abc.ABC):
         if not isinstance(_ensemble, int):
             raise TypeError('Invalid ensemble type, must be an integer.')
 
+        if _ensemble == 1:
+            # there's nothing to do here
+            warnings.warn(UserWarning(
+                    'Ensemble was set to 1. '
+                    'Remove this key from configuration.'))
+            self._has_ensemble = False
+            return
+
         # if matrix does not exist, then it must be created
         if 'matrix' not in self.config_dict.keys():
             _matrix = {}
@@ -375,9 +384,9 @@ class BasePreprocessor(abc.ABC):
                 'You cannot specify "out_dir" as a matrix expansion key.')
         for k in _matrix.keys():  # check validity of keys, depth == 1
             if len(_matrix[k]) == 1:
-                raise ValueError(
+                warnings.warn(UserWarning(
                     'Length of matrix key "%s" was 1, '
-                    'relocate to fixed configuration.' % str(k))
+                    'remove this key from matrix configuration.' % str(k)))
             for v in _matrix[k]:
                 if isinstance(v, list):
                     raise ValueError(
@@ -864,7 +873,7 @@ class PreprocessorCLI(BasePreprocessor):
 
         You probably do not need to interact with this class directly.
         Instead, you can use the command line API as it is described in the
-        :doc:`User Guide <../guides/userguide>` or the python API
+        :doc:`User Guide </guides/user_guide>` or the python API
         :class:`~pyDeltaRCM.preprocessor.Preprocessor`.
 
         When the class is called from the command line the instantiated
@@ -971,9 +980,13 @@ class PreprocessorCLI(BasePreprocessor):
         else:
             args_dict.pop('time_years')
 
-        # set defaults as needed
-        args_dict['parallel'] = args_dict['parallel'] or False
-        args_dict['If'] = args_dict['If'] or 1.0
+        # set (or remove) defaults as needed
+        if (args_dict['parallel'] is None):
+            # if not given remove the key from cli spec
+            args_dict.pop('parallel')
+        if (args_dict['If'] is None):
+            # if not given remove the key from cli spec
+            args_dict.pop('If')
 
         return args_dict
 
@@ -983,7 +996,7 @@ class Preprocessor(BasePreprocessor):
 
     This is the python high-level API class that is callable from a python
     script. For complete documentation on the API configurations, see the
-    :doc:`User Guide <../guides/userguide>`.
+    :doc:`User Guide </guides/user_guide>`.
 
     The class gives a way to configure and run multiple jobs from a python
     script.
@@ -1049,15 +1062,20 @@ class Preprocessor(BasePreprocessor):
 
 
 def preprocessor_wrapper():
-    """Wrapper for CLI interface.
+    """Wrapper for command line interface.
 
-    The entry_points setup of a command line interface requires a function, so
-    we use this simple wrapper to instantiate and run the jobs.
+    The `entry_points` setup of a command line interface requires a function,
+    so we use this simple wrapper to instantiate and run the jobs.
 
-    Works by creating an instance of the
+    This function creates an instance of the
     :obj:`~pyDeltaRCM.preprocessor.PreprocessorCLI` and calls the
     :meth:`~pyDeltaRCM.preprocessor.PreprocessorCLI.run_jobs` to execute all
-    jobs.
+    jobs configured in the preprocessor. In code:
+
+    .. code:: python
+
+        pp = PreprocessorCLI()
+        pp.run_jobs()
     """
     pp = PreprocessorCLI()
     pp.run_jobs()

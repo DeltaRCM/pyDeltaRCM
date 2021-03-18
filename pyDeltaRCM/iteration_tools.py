@@ -44,14 +44,28 @@ class iteration_tools(abc.ABC):
         _msg = 'Beginning water iteration'
         self.log_info(_msg, verbosity=2)
         for iteration in range(self._itermax):
+
+            # initialize the relevant fields and parcel trackers
+            self.hook_init_water_iteration()
             self.init_water_iteration()
+
+            # run the actual iteration of the parcels
+            self.hook_run_water_iteration()
             self.run_water_iteration()
+
+            # accumulate the routed water parcels into free surface
+            self.hook_compute_free_surface()
             self.compute_free_surface()
+
+            # clean up the water surface and apply boundary conditions
+            self.hook_finalize_water_iteration(iteration)
             self.finalize_water_iteration(iteration)
 
         #  sediment iteration
         _msg = 'Beginning sediment iteration'
         self.log_info(_msg, verbosity=2)
+
+        self.hook_sed_route()
         self.sed_route()
 
     def apply_subsidence(self):
@@ -352,10 +366,12 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        _msg = 'Saving data to output file'
-        self.log_info(_msg, verbosity=1)
-
         save_idx = self.save_iter
+
+        _msg = ' '.join((
+            'Saving data to output file:',
+            str(save_idx).zfill(5)))
+        self.log_info(_msg, verbosity=1)
 
         if (self._save_metadata or self._save_any_grids):
             self.output_netcdf.variables['time'][save_idx] = self._time

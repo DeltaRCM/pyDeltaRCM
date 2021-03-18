@@ -11,6 +11,8 @@ from . import shared_tools
 class water_tools(abc.ABC):
 
     def init_water_iteration(self):
+        """Init the water iteration routine.
+        """
         _msg = 'Initializing water iteration'
         self.log_info(_msg, verbosity=2)
 
@@ -35,6 +37,12 @@ class water_tools(abc.ABC):
 
         All parcels are processed in parallel, taking one step for each loop
         of the ``while`` loop.
+
+        Example
+        -------
+        On the initial delta surface, see how ten selected parcels are routed through the domain:
+
+        .. plot:: water_tools/run_water_iteration.py
         """
         _msg = 'Beginning stepping of water parcels'
         self.log_info(_msg, verbosity=2)
@@ -142,9 +150,48 @@ class water_tools(abc.ABC):
         during the routing of the water parcels (in
         :obj:`run_water_iteration`) to determine the free surface. The
         operations of the free surface computation are placed in a jitted
-        function :obj:`accumulate_free_surface_walks`. Following this
+        function :obj:`_accumulate_free_surface_walks`. Following this
         computation, the free surface is smoothed by steps in
         :obj:`finalize_free_surface`.
+
+        See [1]_ and [2]_ for a complete description of hydrodynamic
+        assumptions in the DeltaRCM model.
+
+        Examples
+        --------
+
+        The sequence of `compute_free_surface` is depicted in the figures
+        below. The first image depicts the "input" to `compute_free_surface`,
+        which is the current bed elevation, and the path of each water parcel
+        (cyan lines in right image).
+
+        .. plot:: water_tools/compute_free_surface_inputs.py
+
+        The `compute_free_surface` method then calls the
+        :obj:`_accumulate_free_surface_walks` function to determine 1) the
+        number of times each cell has been visited by a water parcel
+        (``sfc_visit``), and 2) the *total sum of expected elevations* of the
+        water surface at each cell (``sfc_sum``).
+
+        The output from :obj:`_accumulate_free_surface_walks` is then used to
+        calculate a new stage surface (``H_new``) based only on the water
+        parcel paths and expected water surface elevations, approximately as
+        ``H_new = sfc_sum / sfc_visit``. Finally, the updated water surface is
+        combined with the previous timestep's water surface and an
+        underrelaxation coefficient :obj:`_omega_sfc`.
+
+        .. plot:: water_tools/compute_free_surface_outputs.py
+
+        .. [1] A reduced-complexity model for river delta formation – Part 1:
+               Modeling deltas with channel dynamics, M. Liang, V. R. Voller,
+               and C. Paola, Earth Surf. Dynam., 3, 67–86, 2015.
+               https://doi.org/10.5194/esurf-3-67-2015
+
+        .. [2] A reduced-complexity model for river delta formation – Part 2:
+               Assessment of the flow routing scheme, M. Liang, N. Geleynse,
+               D. A. Edmonds, and P. Passalacqua, Earth Surf. Dynam., 3,
+               87–104, 2015. https://doi.org/10.5194/esurf-3-87-2015
+
         """
         _msg = 'Computing free surface from water parcels'
         self.log_info(_msg, verbosity=2)
@@ -199,6 +246,26 @@ class water_tools(abc.ABC):
 
         This method is called once, before parcels are stepped, because the
         weights do not change during the stepping of parcels.
+
+        See :doc:`/info/hydrodynamics` for a description of the model design
+        and equations/algorithms for how water weights are determined.
+
+        .. note::
+
+            No computation actually occurs in this method. Internally, the
+            method calls the jitted :obj:`_get_water_weight_array`, which in
+            turn loops through all of the cells in the model domain and
+            determines the water weight for that cell with
+            :obj:`get_weight_sfc_int` and :obj:`_get_weight_at_cell_water`.
+
+        Examples
+        --------
+
+        The following figure shows several examples of locations within the
+        model domain, and the corresponding water routing weights determined
+        for that location.
+
+        .. plot:: water_tools/water_weights_examples.py
         """
         _msg = 'Computing water weight array'
         self.log_info(_msg, verbosity=2)
@@ -529,6 +596,20 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
 def _get_water_weight_array(depth, stage, cell_type, qx, qy,
                             ivec_flat, jvec_flat, distances_flat,
                             dry_depth, gamma, theta_water):
+    """Worker for :obj:`_get_water_weight_array`.
+
+    This is a jitted function which handles the actual computation of looping
+    through locations of the model domain and determining the water
+    weighting.
+
+    See :meth:`get_water_weight_array` for more information.
+
+    .. note::
+
+        If you are trying to change water weighting behavior, consider
+        reimplementing this method, which calls a custom version of
+        :func:`_get_weight_at_cell_water`.
+    """
     L, W = depth.shape
     pad_stage = shared_tools.custom_pad(stage)
     pad_depth = shared_tools.custom_pad(depth)
@@ -666,7 +747,7 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
 
     new_inds
         Array recording the new index for each water parcel, if the step is
-        taken. Shape is `(:obj:`Np_water`, 1)`, with each element recording
+        taken. Shape is `(Np_water, 1)`, with each element recording
         the *flat* index into the domain shape.
 
     _step
@@ -693,6 +774,16 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
         A binary integer array indicating whether a parcel was determined to
         have been looped, and should be disqualified from the free surface
         computation.
+
+    Examples
+    --------
+
+    The following shows an example of how water parcels that looped along
+    their paths would be relocated. Note than in this example, the parcels are
+    artificially forced to loop, just for the sake of demonstration.
+
+    .. plot:: water_tools/_check_for_loops.py
+
     """
     nparcels = free_surf_walk_inds.shape[0]
     domain_shape = stage_above_SL.shape
@@ -785,18 +876,27 @@ def _accumulate_free_surface_walks(free_surf_walk_inds, free_surf_flag,
         1. loop through every parcel's directed random walk in series.
 
         2. for a parcel's walk, unravel the indices and determine whether the
-        parcel should contribute to the free surface. Parcels are considered
-        contributors if they have reached the ocean and if they are not looped
-        pathways.
+           parcel should contribute to the free surface. Parcels are
+           considered contributors if they have reached the ocean and if they
+           are not looped pathways.
 
         3. then, we begin at the downstream end of the parcel's walk and
-        iterate up-walk until, determining the `Hnew` for each location.
-        Downstream of the shoreline-ocean boundary, the water surface
-        elevation is set to the sea level. Upstream of the shoreline-ocean
-        boundary, the water surface is determined according to the land-slope
-        (:obj:`S0`) and the parcel pathway.
+           iterate up-walk until, determining the `Hnew` for each location.
+           Downstream of the shoreline-ocean boundary, the water surface
+           elevation is set to the sea level. Upstream of the shoreline-ocean
+           boundary, the water surface is determined according to the
+           land-slope (:obj:`S0`) and the parcel pathway.
 
         4. repeat from 2, for each parcel.
+
+
+    Examples
+    --------
+
+    The following shows an example of the walk of a few water parcels, along
+    with the resultant computed water surface.
+
+    .. plot:: water_tools/_accumulate_free_surface_walks.py
 
     """
     _shape = uw.shape
@@ -875,6 +975,12 @@ def _smooth_free_surface(Hin, cell_type, Nsmooth, Csmooth):
 
     Csmooth
         Underrelaxation coefficient for smoothing iterations.
+
+    Examples
+    --------
+    The following shows an example of the water surface smoothing process.
+
+    .. plot:: water_tools/_smooth_free_surface.py
     """
     # grab relevant shape information
     L, W = Hin.shape

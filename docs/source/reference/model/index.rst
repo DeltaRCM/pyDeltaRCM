@@ -8,6 +8,7 @@ This is the main model code.
 
 This class is defined in ``pyDeltaRCM.model``. 
 
+
 The DeltaModel class and all attributes and methods
 ---------------------------------------------------
 
@@ -20,6 +21,7 @@ The DeltaModel class and all attributes and methods
 
 
 
+
 Model configuration reference
 -----------------------------
 
@@ -27,3 +29,4 @@ Model configuration reference
     :maxdepth: 1
 
     yaml_defaults
+    model_hooks

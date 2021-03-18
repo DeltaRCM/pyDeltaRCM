@@ -651,7 +651,7 @@ class init_tools(abc.ABC):
             If you are customing the model and intend to use checkpointing and
             the :obj:`Preprocessor` parallel infrastructure, be sure that
             parameter :obj:`defer_output` is `True` until the
-            :obj:`load_checkpoint: method can be called from the thread the
+            :obj:`load_checkpoint` method can be called from the thread the
             model will execute on. Failure to do so may result in unexpected
             behavior with indexing in the output netCDF4 file.
 
@@ -667,7 +667,7 @@ class init_tools(abc.ABC):
 
         _msg = 'Locating checkpoint file'
         self.log_info(_msg, verbosity=2)
-        ckp_file = os.path.join(self.prefix, 'checkpoint.npz')
+        ckp_file = os.path.join(self._checkpoint_folder, 'checkpoint.npz')
         checkpoint = np.load(ckp_file, allow_pickle=True)
 
         # write saved variables back to the model
@@ -739,9 +739,6 @@ class init_tools(abc.ABC):
                 if self.save_strata:
                     self.strata_counter = int(0)
                 self.init_output_file()
-
-                # note we do not output data and a new checkpoint here!
-
             else:
                 # rename the old netCDF4 file
                 _msg = 'Renaming old NetCDF4 output file'
