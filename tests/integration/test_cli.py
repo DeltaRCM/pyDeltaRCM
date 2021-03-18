@@ -29,6 +29,7 @@ class TestCommandLineInterfaceDirectly:
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
         utilities.write_parameter_to_file(f, 'save_dt', 300)
         utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+        utilities.write_parameter_to_file(f, 'save_eta_grids', True)
         f.close()
         subprocess.check_output(['pyDeltaRCM',
                                  '--config', str(p)])
@@ -57,6 +58,7 @@ class TestCommandLineInterfaceDirectly:
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
         utilities.write_parameter_to_file(f, 'save_dt', 300)
         utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+        utilities.write_parameter_to_file(f, 'save_eta_grids', True)
         f.close()
         subprocess.check_output(['python', '-m', 'pyDeltaRCM',
                                  '--config', str(p)])
@@ -105,6 +107,7 @@ class TestCommandLineInterfaceDirectly:
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
         utilities.write_parameter_to_file(f, 'save_dt', 300)
         utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+        utilities.write_parameter_to_file(f, 'save_eta_grids', True)
         f.close()
         subprocess.check_output(['python', '-m', 'pyDeltaRCM',
                                  '--config', str(p),
@@ -140,6 +143,7 @@ class TestCommandLineInterfaceDirectly:
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
         utilities.write_parameter_to_file(f, 'save_dt', 300)
         utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+        utilities.write_parameter_to_file(f, 'save_eta_grids', True)
         f.close()
         subprocess.check_output(['pyDeltaRCM',
                                  '--config', str(p), '--timesteps', '2'])
@@ -167,6 +171,7 @@ class TestCommandLineInterfaceDirectly:
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
         utilities.write_parameter_to_file(f, 'save_dt', 300)
         utilities.write_parameter_to_file(f, 'save_eta_figs', True)
+        utilities.write_parameter_to_file(f, 'save_eta_grids', True)
         f.close()
         subprocess.check_output(['pyDeltaRCM',
                                  '--config', str(p), '--time', '1000'])

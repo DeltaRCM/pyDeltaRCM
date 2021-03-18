@@ -447,23 +447,6 @@ class init_tools(abc.ABC):
                                         self._beta, self.stepmax,
                                         self.theta_sand)
 
-    def init_stratigraphy(self):
-        """Creates sparse array to store stratigraphy data."""
-        _msg = 'Initializing stratigraphy storage'
-        self.log_info(_msg, verbosity=1)
-        if self.save_strata:
-
-            self.strata_counter = 0
-
-            self.n_steps = int(max(1, 5 * int(self._save_dt / self.dt)))
-
-            self.strata_sand_frac = lil_matrix((self.L * self.W, self.n_steps),
-                                               dtype=np.float32)
-
-            self.init_eta = self.eta.copy()
-            self.strata_eta = lil_matrix((self.L * self.W, self.n_steps),
-                                         dtype=np.float32)
-
     def init_output_file(self):
         """Creates a netCDF file to store output grids.
 
@@ -476,8 +459,7 @@ class init_tools(abc.ABC):
         self.log_info(_msg, verbosity=1)
 
         if (self._save_metadata or
-                self._save_any_grids or
-                self.save_strata):
+                self._save_any_grids):
 
             directory = self.prefix
             filename = 'pyDeltaRCM_output.nc'
@@ -630,11 +612,10 @@ class init_tools(abc.ABC):
 
         Uses the file at the path determined by `self.prefix` and a file named
         `checkpoint.npz`. There are a few pathways for loading, which depend
-        on 1) the status of the :obj:`save_strata` option, 2) the status of
-        additional grid-saving options, 3) the presence of a netCDF output
-        file at the expected output location, and 4) the status of the
-        :obj:`defer_output` parameter passed to this method as an optional
-        argument.
+        on 1) the status of additional grid-saving options, 2) the presence of
+        a netCDF output file at the expected output location, and 3) the status
+        of the :obj:`defer_output` parameter passed to this method as an
+        optional argument.
 
         As a standard user, you should not need to worry about any of these
         pathways or options. However, if you are developing pyDeltaRCM or
@@ -691,27 +672,8 @@ class init_tools(abc.ABC):
         self.qw = checkpoint['qw']
         self.qx = checkpoint['qx']
         self.qy = checkpoint['qy']
-
-        if self.save_strata:
-            # load the stratigraphy info from the file
-            _msg = 'Loading stratigraphy arrays'
-            self.log_info(_msg, verbosity=2)
-
-            self.n_steps = checkpoint['n_steps']
-            self.init_eta = checkpoint['init_eta']
-            self.strata_counter = checkpoint['strata_counter']
-
-            # reconstruct the strata arrays
-            strata_eta_csr = csr_matrix((checkpoint['eta_data'],
-                                         checkpoint['eta_indices'],
-                                         checkpoint['eta_indptr']),
-                                        shape=checkpoint['eta_shape'])
-            self.strata_eta = strata_eta_csr.tolil()
-            strata_sand_csr = csr_matrix((checkpoint['sand_data'],
-                                          checkpoint['sand_indices'],
-                                          checkpoint['sand_indptr']),
-                                         shape=checkpoint['sand_shape'])
-            self.strata_sand_frac = strata_sand_csr.tolil()
+        self.sand_frac = checkpoint['sand_frac']
+        self.active_layer = checkpoint['active_layer']
 
         # load and set random state to continue as if run hadn't stopped
         _msg = 'Loading random state'
@@ -720,7 +682,7 @@ class init_tools(abc.ABC):
         shared_tools.set_random_state(rng_state)
 
         # handle the case with a netcdf file
-        if ((self._save_any_grids or self._save_metadata or self._save_strata)
+        if ((self._save_any_grids or self._save_metadata)
                 and not defer_output):
 
             # check if the file exists already
@@ -735,9 +697,6 @@ class init_tools(abc.ABC):
                 # create a new file
                 # reset output file counters
                 self._save_iter = int(0)
-                # reset strata fields just loaded from checkpoint
-                if self.save_strata:
-                    self.strata_counter = int(0)
                 self.init_output_file()
             else:
                 # rename the old netCDF4 file
@@ -748,13 +707,8 @@ class init_tools(abc.ABC):
                 os.rename(file_path, _tmp_name)
 
                 # write dims / attributes / variables to new netCDF file
-                # except the things defined by output_strata()
                 _msg = 'Creating NetCDF4 output file'
                 self.log_info(_msg, verbosity=2)
-
-                # list of things to not copy over
-                dimtoignore = ['total_strata_age']
-                vartoignore = ['strata_age', 'strata_sand_frac', 'strata_depth']
 
                 # copy data from old netCDF4 into new one
                 with Dataset(_tmp_name) as src, Dataset(file_path, 'w',
@@ -764,11 +718,10 @@ class init_tools(abc.ABC):
                         dst.setncattr(name, src.getncattr(name))
                     # copy dimensions
                     for name, dimension in src.dimensions.items():
-                        if name not in dimtoignore:
-                            if dimension.isunlimited():
-                                dst.createDimension(name, None)
-                            else:
-                                dst.createDimension(name, len(dimension))
+                        if dimension.isunlimited():
+                            dst.createDimension(name, None)
+                        else:
+                            dst.createDimension(name, len(dimension))
                     # copy groups (meta)
                     for name in src.groups.keys():
                         dst.createGroup(name)
@@ -780,10 +733,9 @@ class init_tools(abc.ABC):
                                 src.groups[name].variables[vname][:]
                     # copy variables except ones to exclude
                     for name, variable in src.variables.items():
-                        if name not in vartoignore:
-                            dst.createVariable(name, variable.datatype,
-                                               variable.dimensions)
-                            dst.variables[name][:] = src.variables[name][:]
+                        dst.createVariable(name, variable.datatype,
+                                           variable.dimensions)
+                        dst.variables[name][:] = src.variables[name][:]
 
                 # set object attribute for model
                 self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4')

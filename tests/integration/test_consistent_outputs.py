@@ -41,7 +41,6 @@ class TestConsistentOutputsBetweenMerges:
         utilities.write_parameter_to_file(f, 'save_discharge_grids', False)
         utilities.write_parameter_to_file(f, 'save_velocity_grids', False)
         utilities.write_parameter_to_file(f, 'save_dt', 500)
-        utilities.write_parameter_to_file(f, 'save_strata', True)
         f.close()
         _delta = DeltaModel(input_file=p)
 
@@ -85,7 +84,6 @@ class TestConsistentOutputsBetweenMerges:
         utilities.write_parameter_to_file(f, 'save_discharge_grids', False)
         utilities.write_parameter_to_file(f, 'save_velocity_grids', False)
         utilities.write_parameter_to_file(f, 'save_dt', 500)
-        utilities.write_parameter_to_file(f, 'save_strata', True)
         f.close()
         _delta = DeltaModel(input_file=p)
 
@@ -132,10 +130,10 @@ class TestModelIsReprodicible:
         """Test consistency of two models initialized from same yaml."""
         p1 = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                       {'out_dir': tmp_path / 'out_dir_1',
-                                       'seed': 10})
+                                       'seed': 10, 'save_sandfrac_grids': True})
         p2 = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                       {'out_dir': tmp_path / 'out_dir_2',
-                                       'seed': 10})
+                                       'seed': 10, 'save_sandfrac_grids': True})
 
         # create and update first model
         ModelA = DeltaModel(input_file=p1)
@@ -158,7 +156,3 @@ class TestModelIsReprodicible:
         assert np.all(ModelA.stage == ModelB.stage)
         assert np.all(ModelA.sand_frac == ModelB.sand_frac)
         assert np.all(ModelA.active_layer == ModelB.active_layer)
-        assert np.all(ModelA.strata_eta.todense() ==
-                      ModelB.strata_eta.todense())
-        assert np.all(ModelA.strata_sand_frac.todense() ==
-                      ModelB.strata_sand_frac.todense())

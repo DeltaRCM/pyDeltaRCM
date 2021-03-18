@@ -127,9 +127,6 @@ save_dt:
 checkpoint_dt:
   type: ['int', 'None']
   default: null
-save_strata:
-  type: 'bool'
-  default: True
 save_checkpoint:
   type: 'bool'
   default: False

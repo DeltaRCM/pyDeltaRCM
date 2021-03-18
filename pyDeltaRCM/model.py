@@ -110,10 +110,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         # set up the subsidence fields
         self.init_subsidence()
 
-        # initialize the stratigraphy infrastructure
-        self.hook_init_stratigraphy()
-        self.init_stratigraphy()
-
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
             # load values from the checkpoint and don't init final features
@@ -212,9 +208,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if self._is_finalized:
             raise RuntimeError('Cannot finalize model, '
                                'model already finalized!')
-
-        self.hook_record_final_stratigraphy()
-        self.record_final_stratigraphy()
 
         try:
             self.output_netcdf.close()
@@ -846,17 +839,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if checkpoint_dt is None:
             checkpoint_dt = self._save_dt
         self._checkpoint_dt = checkpoint_dt
-
-    @property
-    def save_strata(self):
-        """
-        save_strata controls whether or not stratigraphy information is saved.
-        """
-        return self._save_strata
-
-    @save_strata.setter
-    def save_strata(self, save_strata):
-        self._save_strata = save_strata
 
     @property
     def save_checkpoint(self):

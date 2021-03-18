@@ -342,15 +342,13 @@ class TestFinalize:
         _delta.log_info = mock.MagicMock()
         _delta.output_data = mock.MagicMock()
         _delta.output_checkpoint = mock.MagicMock()
-        _delta.record_final_stratigraphy = mock.MagicMock()
 
         # run finalize
         _delta.finalize()
 
         # assert calls
         #  should hit all options since no saves
-        assert _delta.log_info.call_count == 2
-        assert _delta.record_final_stratigraphy.call_count == 1
+        assert _delta.log_info.call_count == 1
 
         # these were originally included in `finalize`, but no longer.
         #   the checks for no call are here to ensure we don't revert

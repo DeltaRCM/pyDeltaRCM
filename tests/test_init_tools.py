@@ -174,57 +174,12 @@ class TestInitSubsidence:
 class TestLoadCheckpoint:
 
     @mock.patch('pyDeltaRCM.shared_tools.set_random_state')
-    def test_load_standard_strata(self, patched, tmp_path):
-        """Test that a run can be resumed when there are outputs.
-        """
-        # create one delta, just to have a checkpoint file
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_checkpoint': True})
-        _delta = DeltaModel(input_file=p)
-
-        # make mocks
-        _delta.log_info = mock.MagicMock()
-        _delta.logger = mock.MagicMock()
-        _delta.init_output_file = mock.MagicMock()
-
-        # close the file so can be safely opened in load
-        _delta.output_netcdf.close()
-
-        # check checkpoint exists
-        assert os.path.isfile(os.path.join(
-            _delta.prefix, 'checkpoint.npz'))
-        assert os.path.isfile(os.path.join(
-            _delta.prefix, 'pyDeltaRCM_output.nc'))
-        assert hasattr(_delta, 'strata_counter')
-
-        # now mess up a field
-        _eta0 = np.copy(_delta.eta)
-        _rand_field = np.random.uniform(0, 1, size=_delta.eta.shape)
-        _delta.eta = _rand_field
-        assert np.all(_delta.eta == _rand_field)
-
-        # now resume from the checkpoint to restore the field
-        _delta.load_checkpoint()
-
-        # check that fields match
-        assert np.all(_delta.eta == _eta0)
-        assert hasattr(_delta, 'strata_counter')
-
-        # assertions on function calls
-        _strat_call = [mock.call('Loading stratigraphy arrays', verbosity=2)]
-        _delta.log_info.assert_has_calls(_strat_call, any_order=True)
-        _delta.logger.assert_not_called()
-        _delta.init_output_file.assert_not_called()
-        patched.assert_called()
-
-    @mock.patch('pyDeltaRCM.shared_tools.set_random_state')
     def test_load_standard_grid_nostrata(self, patched, tmp_path):
         """Test that a run can be resumed when there are outputs.
         """
         # create one delta, just to have a checkpoint file
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_checkpoint': True,
-                                      'save_strata': False,
                                       'save_eta_grids': True})
         _delta = DeltaModel(input_file=p)
 
@@ -254,7 +209,6 @@ class TestLoadCheckpoint:
 
         # check that fields match
         assert np.all(_delta.eta == _eta0)
-        assert not hasattr(_delta, 'strata_counter')
 
         # assertions on function calls
         _call = [mock.call('Renaming old NetCDF4 output file', verbosity=2)]
@@ -271,8 +225,7 @@ class TestLoadCheckpoint:
         """
         # create one delta, just to have a checkpoint file
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_checkpoint': True,
-                                      'save_strata': False})
+                                     {'save_checkpoint': True})
         _delta = DeltaModel(input_file=p)
 
         # make mocks
@@ -315,7 +268,6 @@ class TestLoadCheckpoint:
         # define a yaml with NO outputs, but checkpoint
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_checkpoint': True,
-                                      'save_strata': False,
                                       'save_eta_grids': True})
         _delta = DeltaModel(input_file=p)
 
