@@ -266,6 +266,12 @@ class Test__init__:
         with pytest.raises(ValueError):
             _ = DeltaModel(input_file=p)
 
+    def test_negative_active_layer_thickness(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'active_layer_thickness': -2.2})
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
 
 class TestUpdate:
 

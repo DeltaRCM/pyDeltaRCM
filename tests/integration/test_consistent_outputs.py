@@ -156,6 +156,8 @@ class TestModelIsReprodicible:
         assert np.all(ModelA.uy == ModelB.uy)
         assert np.all(ModelA.depth == ModelB.depth)
         assert np.all(ModelA.stage == ModelB.stage)
+        assert np.all(ModelA.sand_frac == ModelB.sand_frac)
+        assert np.all(ModelA.active_layer == ModelB.active_layer)
         assert np.all(ModelA.strata_eta.todense() ==
                       ModelB.strata_eta.todense())
         assert np.all(ModelA.strata_sand_frac.todense() ==
