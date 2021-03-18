@@ -158,15 +158,6 @@ class init_tools(abc.ABC):
         for k, v in list(self._input_file_vars.items()):
             setattr(self, k, v)
 
-        # if checkpoint_dt is the default value (None), then set it to save_dt
-        if self.checkpoint_dt is None:
-            self.checkpoint_dt = self._save_dt
-
-        # if active_layer is default (None), then set it to half the inlet
-        # channel width, h0
-        if self.active_layer_thickness < 0:
-            self.active_layer_thickness = self._h0 / 2
-
         # write the input file values to the log
         if not self._resume_checkpoint:
             for k, v in list(self._input_file_vars.items()):
@@ -364,10 +355,8 @@ class init_tools(abc.ABC):
         self.uy = np.zeros((self.L, self.W), dtype=np.float32)
         self.uw = np.zeros((self.L, self.W), dtype=np.float32)
         self.qs = np.zeros((self.L, self.W), dtype=np.float32)
-        # self.sand_frac = np.zeros((self.L, self.W), dtype=np.float32)
-        self.sand_frac = np.zeros((self.L, self.W), dtype=np.float32) - 1.
-        # self.active_layer = np.zeros((self.L, self.W), dtype=np.float32)
-        self.active_layer = np.zeros((self.L, self.W), dtype=np.float32) - 1.
+        self.sand_frac = -1*np.ones((self.L, self.W), dtype=np.float32)
+        self.active_layer = -1*np.ones((self.L, self.W), dtype=np.float32)
         self.Vp_dep_sand = np.zeros((self.L, self.W), dtype=np.float32)
         self.Vp_dep_mud = np.zeros((self.L, self.W), dtype=np.float32)
 
@@ -438,7 +427,8 @@ class init_tools(abc.ABC):
 
         # initialize the MudRouter object
         self._mr = sed_tools.MudRouter(self._dt, self._dx, self.Vp_sed,
-                                       self.u_max, self.U_dep_mud, self.U_ero_mud,
+                                       self.u_max, self.U_dep_mud,
+                                       self.U_ero_mud,
                                        self.ivec_flat, self.jvec_flat,
                                        self.iwalk_flat, self.jwalk_flat,
                                        self.distances_flat, self.dry_depth,
@@ -446,7 +436,8 @@ class init_tools(abc.ABC):
                                        self.theta_mud)
         # initialize the SandRouter object
         self._sr = sed_tools.SandRouter(self._dt, self._dx, self.Vp_sed,
-                                        self.u_max, self.qs0, self._u0, self.U_ero_sand,
+                                        self.u_max, self.qs0, self._u0,
+                                        self.U_ero_sand,
                                         self._f_bedload,
                                         self.ivec_flat, self.jvec_flat,
                                         self.iwalk_flat, self.jwalk_flat,
@@ -753,7 +744,8 @@ class init_tools(abc.ABC):
                 # rename the old netCDF4 file
                 _msg = 'Renaming old NetCDF4 output file'
                 self.log_info(_msg, verbosity=2)
-                _tmp_name = os.path.join(self.prefix, 'old_pyDeltaRCM_output.nc')
+                _tmp_name = os.path.join(self.prefix,
+                                         'old_pyDeltaRCM_output.nc')
                 os.rename(file_path, _tmp_name)
 
                 # write dims / attributes / variables to new netCDF file

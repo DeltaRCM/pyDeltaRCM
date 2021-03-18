@@ -502,7 +502,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @active_layer_thickness.setter
     def active_layer_thickness(self, active_layer_thickness):
-        if active_layer_thickness < 0:
+        if active_layer_thickness is None:
+            active_layer_thickness = self._h0 / 2
+        elif active_layer_thickness < 0:
             raise ValueError('active_layer thickness must be greater than'
                              ' or equal to 0, cannot be negative.')
         self._active_layer_thickness = active_layer_thickness
@@ -811,6 +813,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @checkpoint_dt.setter
     def checkpoint_dt(self, checkpoint_dt):
+        if checkpoint_dt is None:
+            checkpoint_dt = self._save_dt
         self._checkpoint_dt = checkpoint_dt
 
     @property

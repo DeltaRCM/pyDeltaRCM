@@ -230,31 +230,14 @@ class iteration_tools(abc.ABC):
                 # find where the erosion exceeded the active layer
                 whr_unkwn = self.eta < actlyr_bot
 
-                # update sand_frac in unknown to the basin value
-                self.sand_frac[whr_unkwn] = 0  # boundary condition
+                # update sand_frac in unknown to the boundary condition, -1
+                self.sand_frac[whr_unkwn] = -1  # boundary condition (unknown)
 
                 # find where erosion was into active layer
                 whr_actero = np.logical_and(whr_deg, self.eta >= actlyr_bot)
 
                 # update sand_frac to active_layer value
                 self.sand_frac[whr_actero] = self.active_layer[whr_actero]
-
-            # separate mud/sand handling with min. mud value matches the
-            # old method used to record deposition in strata_sand_frac exactly
-            # whr_mud = (self.Vp_dep_mud > 0.000001)
-            # if np.any(whr_mud):
-            #     # special case for just mud deposition
-            #     self.sand_frac[whr_mud] = 0.000001
-            #     self.active_layer[whr_mud] = 0.000001
-            #
-            # whr_sand = (self.Vp_dep_sand > 0)
-            # if np.any(whr_sand):
-            #     mixture = (self.Vp_dep_sand[whr_sand] /
-            #                (self.Vp_dep_mud[whr_sand] +
-            #                self.Vp_dep_sand[whr_sand]))
-            #
-            #     self.sand_frac[whr_sand] = mixture
-            #     self.active_layer[whr_sand] = mixture
 
             # handle aggradation/deposition
             whr_agg = (deta > 0)
