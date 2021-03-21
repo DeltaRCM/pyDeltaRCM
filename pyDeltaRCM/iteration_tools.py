@@ -221,8 +221,8 @@ class iteration_tools(abc.ABC):
             # find where the erosion exceeded the active layer
             whr_unkwn = self.eta < actlyr_bot
 
-            # update sand_frac in unknown to the boundary condition, -1
-            self.sand_frac[whr_unkwn] = -1  # boundary condition (unknown)
+            # update sand_frac in unknown to the boundary condition
+            self.sand_frac[whr_unkwn] = self._sand_frac_bc
 
             # find where erosion was into active layer
             whr_actero = np.logical_and(whr_deg, self.eta >= actlyr_bot)

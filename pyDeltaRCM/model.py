@@ -1251,3 +1251,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def bed_elevation(self):
         """Get bed elevation."""
         return self.eta
+
+    @property
+    def sand_frac_bc(self):
+        """Sand fraction boundary condition."""
+        return self._sand_frac_bc
+
+    @sand_frac_bc.setter
+    def sand_frac_bc(self, sand_frac_bc):
+        self._sand_frac_bc = sand_frac_bc

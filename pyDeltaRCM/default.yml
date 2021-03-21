@@ -172,3 +172,6 @@ alpha:
 stepmax:
   type: ['float', 'int', 'None']
   default: null
+sand_frac_bc:
+  type: ['float', 'int']
+  default: 0

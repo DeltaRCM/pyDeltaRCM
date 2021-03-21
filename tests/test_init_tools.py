@@ -592,6 +592,12 @@ class TestSettingParametersFromYAMLFile:
         assert np.any(_delta.sigma > 0)
         assert np.all(_delta.sigma <= (1e-9 * _delta.dt))
 
+    def test_sand_frac_bc(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'sand_frac_bc': -1})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.sand_frac_bc == -1
+
 
 class TestSettingOtherParametersFromYAMLSettings:
 

@@ -357,8 +357,10 @@ class init_tools(abc.ABC):
         self.uy = np.zeros((self.L, self.W), dtype=np.float32)
         self.uw = np.zeros((self.L, self.W), dtype=np.float32)
         self.qs = np.zeros((self.L, self.W), dtype=np.float32)
-        self.sand_frac = -1*np.ones((self.L, self.W), dtype=np.float32)
-        self.active_layer = -1*np.ones((self.L, self.W), dtype=np.float32)
+        self.sand_frac = np.zeros((self.L, self.W), dtype=np.float32) + \
+            self.sand_frac_bc
+        self.active_layer = np.zeros((self.L, self.W), dtype=np.float32) + \
+            self.sand_frac_bc
         self.Vp_dep_sand = np.zeros((self.L, self.W), dtype=np.float32)
         self.Vp_dep_mud = np.zeros((self.L, self.W), dtype=np.float32)
 
