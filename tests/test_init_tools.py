@@ -174,7 +174,7 @@ class TestInitSubsidence:
 class TestLoadCheckpoint:
 
     @mock.patch('pyDeltaRCM.shared_tools.set_random_state')
-    def test_load_standard_grid_nostrata(self, patched, tmp_path):
+    def test_load_standard_grid(self, patched, tmp_path):
         """Test that a run can be resumed when there are outputs.
         """
         # create one delta, just to have a checkpoint file
@@ -196,7 +196,6 @@ class TestLoadCheckpoint:
             _delta.prefix, 'checkpoint.npz'))
         assert os.path.isfile(os.path.join(
             _delta.prefix, 'pyDeltaRCM_output.nc'))
-        assert not hasattr(_delta, 'strata_counter')
 
         # now mess up a field
         _eta0 = np.copy(_delta.eta)
@@ -237,7 +236,6 @@ class TestLoadCheckpoint:
             _delta.prefix, 'checkpoint.npz'))
         assert not os.path.isfile(os.path.join(
             _delta.prefix, 'pyDeltaRCM_output.nc'))
-        assert not hasattr(_delta, 'strata_counter')
 
         # now mess up a field
         _eta0 = np.copy(_delta.eta)
@@ -250,7 +248,6 @@ class TestLoadCheckpoint:
 
         # check that fields match
         assert np.all(_delta.eta == _eta0)
-        assert not hasattr(_delta, 'strata_counter')
 
         # assertions on function calls
         _delta.log_info.assert_called()
@@ -299,7 +296,6 @@ class TestLoadCheckpoint:
 
         # check that fields match
         assert np.all(_delta.eta == _eta0)
-        assert not hasattr(_delta, 'strata_counter')
         assert _delta._save_iter == 0
 
         # assertions on function calls

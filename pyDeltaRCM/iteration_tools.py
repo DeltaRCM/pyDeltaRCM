@@ -121,6 +121,7 @@ class iteration_tools(abc.ABC):
         self.eta[0, self.inlet] = self.stage[0, self.inlet] - self._h0
         self.depth[0, self.inlet] = self._h0
 
+        self.hook_compute_sand_frac()
         self.compute_sand_frac()
 
         self.H_SL = self._H_SL + self._SLR * self._dt

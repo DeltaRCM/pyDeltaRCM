@@ -20,3 +20,4 @@ A complete list of hooks in the model follows:
     , :obj:`~hook_tools.hook_route_all_sand_parcels`
     , :obj:`~hook_tools.hook_topo_diffusion`
     , :obj:`~hook_tools.hook_route_all_mud_parcels`
+    , :obj:`~hook_tools.hook_compute_sand_frac`

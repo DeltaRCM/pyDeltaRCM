@@ -151,3 +151,11 @@ class hook_tools(abc.ABC):
         :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels`.
         """
         pass
+
+    def hook_compute_sand_frac(self):
+        """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac`.
+
+        Called immediately before
+        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac`.
+        """
+        pass
