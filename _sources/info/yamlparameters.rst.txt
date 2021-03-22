@@ -52,6 +52,8 @@ Model Domain Parameters
 
 :attr:`pyDeltaRCM.model.DeltaModel.f_bedload`
 
+:attr:`pyDeltaRCM.model.DeltaModel.active_layer_thickness`
+
 :attr:`pyDeltaRCM.model.DeltaModel.C0_percent`
 
 :attr:`pyDeltaRCM.model.DeltaModel.Csmooth`
@@ -76,6 +78,10 @@ Output Settings
 
 :attr:`pyDeltaRCM.model.DeltaModel.save_velocity_figs`
 
+:attr:`pyDeltaRCM.model.DeltaModel.save_sedflux_figs`
+
+:attr:`pyDeltaRCM.model.DeltaModel.save_sandfrac_figs`
+
 :attr:`pyDeltaRCM.model.DeltaModel.save_figs_sequential`
 
 :attr:`pyDeltaRCM.model.DeltaModel.save_eta_grids`
@@ -88,6 +94,10 @@ Output Settings
 
 :attr:`pyDeltaRCM.model.DeltaModel.save_velocity_grids`
 
+:attr:`pyDeltaRCM.model.DeltaModel.save_sedflux_grids`
+
+:attr:`pyDeltaRCM.model.DeltaModel.save_sandfrac_grids`
+
 :attr:`pyDeltaRCM.model.DeltaModel.save_discharge_components`
 
 :attr:`pyDeltaRCM.model.DeltaModel.save_velocity_components`
@@ -95,8 +105,6 @@ Output Settings
 :attr:`pyDeltaRCM.model.DeltaModel.save_dt`
 
 :attr:`pyDeltaRCM.model.DeltaModel.checkpoint_dt`
-
-:attr:`pyDeltaRCM.model.DeltaModel.save_strata`
 
 :attr:`pyDeltaRCM.model.DeltaModel.save_checkpoint`
 

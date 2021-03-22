@@ -85,9 +85,9 @@ is incremented, such that subsidence will begin on the step
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyDeltaRCM.iteration_tools.iteration_tools.expand_stratigraphy">
-<code class="sig-name descname"><span class="pre">expand_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.expand_stratigraphy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Expand stratigraphy array sizes.</p>
+<dt id="pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac">
+<code class="sig-name descname"><span class="pre">compute_sand_frac</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the sand fraction as a continous updating data field.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -155,14 +155,6 @@ resumed from this time.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy">
-<code class="sig-name descname"><span class="pre">record_final_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save the stratigraphy as sparse matrix to file.</p>
-<p>Saves the stratigraphy (sand fraction) sparse matrices into output
-netcdf file.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep">
 <code class="sig-name descname"><span class="pre">run_one_timestep</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the timestep once.</p>
@@ -219,24 +211,6 @@ the relevant flags in the YAML configuration file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyDeltaRCM.iteration_tools.iteration_tools.save_stratigraphy">
-<code class="sig-name descname"><span class="pre">save_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_stratigraphy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save stratigraphy to an attribute of the delta.</p>
-<p>Saves the sand fraction of deposited sediment into a sparse array
-created by <code class="xref py py-obj docutils literal notranslate"><span class="pre">init_stratigraphy()</span></code>. Note
-that the actual record in the netcdf file is not made until
-<cite>finalize()</cite>.</p>
-<p>Only runs if <code class="xref py py-obj docutils literal notranslate"><span class="pre">save_strata</span></code> is True.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This routine needs a complete description of the algorithm,
-additionally, it should be ported to a routine in DeltaMetrics,
-probably the new and preferred method of computing and storing
-straitgraphy cubes.</p>
-</div>
-</dd></dl>
-
-<dl class="py method">
 <dt id="pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint">
 <code class="sig-name descname"><span class="pre">save_the_checkpoint</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save checkpoint files.</p>
@@ -250,9 +224,9 @@ are the following:</p>
 <li><p>Water depth</p></li>
 <li><p>Water stage</p></li>
 <li><p>Topography</p></li>
+<li><p>Surface sand fraction</p></li>
+<li><p>Active layer values</p></li>
 <li><p>Current random seed state</p></li>
-<li><p>Stratigraphic ‘topography’ in ‘strata_eta’</p></li>
-<li><p>Stratigraphic sand fraction in ‘strata_sand_frac’</p></li>
 </ul>
 <p>If <cite>save_checkpoint</cite> is turned on, checkpoints are re-written
 with either a frequency of <cite>checkpoint_dt</cite> or <cite>save_dt</cite> if
@@ -325,7 +299,7 @@ with either a frequency of <cite>checkpoint_dt</cite> or <cite>save_dt</cite> if
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.3.
     </div>
   </body>
 </html>

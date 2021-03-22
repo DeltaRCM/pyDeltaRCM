@@ -213,7 +213,16 @@
 <span class="normal">165</span>
 <span class="normal">166</span>
 <span class="normal">167</span>
-<span class="normal">168</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span>
   <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;str&#39;</span>
   <span class="nt">default</span><span class="p">:</span> <span class="s">&#39;deltaRCM_Output&#39;</span>
 <span class="nt">verbose</span><span class="p">:</span>
@@ -264,6 +273,9 @@
 <span class="nt">f_bedload</span><span class="p">:</span>
   <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
   <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<span class="nt">active_layer_thickness</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;None&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
 <span class="nt">C0_percent</span><span class="p">:</span>
   <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
   <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
@@ -297,6 +309,9 @@
 <span class="nt">save_sedflux_figs</span><span class="p">:</span>
   <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
   <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_sandfrac_figs</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
 <span class="nt">save_figs_sequential</span><span class="p">:</span>
   <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
   <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
@@ -321,6 +336,9 @@
 <span class="nt">save_sedflux_grids</span><span class="p">:</span>
   <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
   <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">save_sandfrac_grids</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
 <span class="nt">save_discharge_components</span><span class="p">:</span>
   <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
   <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
@@ -333,9 +351,6 @@
 <span class="nt">checkpoint_dt</span><span class="p">:</span>
   <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;int&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;None&#39;</span><span class="p p-Indicator">]</span>
   <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
-<span class="nt">save_strata</span><span class="p">:</span>
-  <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
-  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
 <span class="nt">save_checkpoint</span><span class="p">:</span>
   <span class="nt">type</span><span class="p">:</span> <span class="s">&#39;bool&#39;</span>
   <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
@@ -381,6 +396,9 @@
 <span class="nt">stepmax</span><span class="p">:</span>
   <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;None&#39;</span><span class="p p-Indicator">]</span>
   <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="nt">sand_frac_bc</span><span class="p">:</span>
+  <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;float&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;int&#39;</span><span class="p p-Indicator">]</span>
+  <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
 </pre></div>
 </td></tr></table></div>
 </div>
@@ -439,7 +457,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.3.
     </div>
   </body>
 </html>

@@ -38,6 +38,9 @@ saved as metadata are the following:
 - Bedload fraction: `f_bedload`
 - Sediment concentration: `C0_percent`
 - Characteristic Velocity: `u0`
+- If subsidence is enabled:
+   - Subsidence start time: `start_subsidence`
+   - Subsidence rate: `sigma`
 
 Working with Model Outputs
 --------------------------

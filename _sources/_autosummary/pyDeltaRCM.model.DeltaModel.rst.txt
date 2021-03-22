@@ -19,10 +19,10 @@
       ~DeltaModel.check_for_boundary
       ~DeltaModel.check_size_of_indices_matrix
       ~DeltaModel.compute_free_surface
+      ~DeltaModel.compute_sand_frac
       ~DeltaModel.create_domain
       ~DeltaModel.create_other_variables
       ~DeltaModel.determine_random_seed
-      ~DeltaModel.expand_stratigraphy
       ~DeltaModel.finalize
       ~DeltaModel.finalize_free_surface
       ~DeltaModel.finalize_timestep
@@ -32,18 +32,17 @@
       ~DeltaModel.get_wet_mask_nh
       ~DeltaModel.hook_apply_subsidence
       ~DeltaModel.hook_compute_free_surface
+      ~DeltaModel.hook_compute_sand_frac
       ~DeltaModel.hook_create_domain
       ~DeltaModel.hook_create_other_variables
       ~DeltaModel.hook_finalize_timestep
       ~DeltaModel.hook_finalize_water_iteration
       ~DeltaModel.hook_import_files
-      ~DeltaModel.hook_init_stratigraphy
       ~DeltaModel.hook_init_water_iteration
       ~DeltaModel.hook_load_checkpoint
       ~DeltaModel.hook_output_checkpoint
       ~DeltaModel.hook_output_data
       ~DeltaModel.hook_process_input_to_model
-      ~DeltaModel.hook_record_final_stratigraphy
       ~DeltaModel.hook_route_all_mud_parcels
       ~DeltaModel.hook_route_all_sand_parcels
       ~DeltaModel.hook_run_one_timestep
@@ -55,7 +54,6 @@
       ~DeltaModel.init_output_file
       ~DeltaModel.init_output_infrastructure
       ~DeltaModel.init_sediment_routers
-      ~DeltaModel.init_stratigraphy
       ~DeltaModel.init_subsidence
       ~DeltaModel.init_water_iteration
       ~DeltaModel.load_checkpoint
@@ -65,7 +63,6 @@
       ~DeltaModel.output_checkpoint
       ~DeltaModel.output_data
       ~DeltaModel.process_input_to_model
-      ~DeltaModel.record_final_stratigraphy
       ~DeltaModel.route_all_mud_parcels
       ~DeltaModel.route_all_sand_parcels
       ~DeltaModel.run_one_timestep
@@ -73,7 +70,6 @@
       ~DeltaModel.save_figure
       ~DeltaModel.save_grids
       ~DeltaModel.save_grids_and_figs
-      ~DeltaModel.save_stratigraphy
       ~DeltaModel.save_the_checkpoint
       ~DeltaModel.sed_route
       ~DeltaModel.set_constants
@@ -107,6 +103,7 @@
       ~DeltaModel.S0
       ~DeltaModel.SLR
       ~DeltaModel.Width
+      ~DeltaModel.active_layer_thickness
       ~DeltaModel.alpha
       ~DeltaModel.bed_elevation
       ~DeltaModel.bedload_fraction
@@ -130,6 +127,7 @@
       ~DeltaModel.omega_sfc
       ~DeltaModel.out_dir
       ~DeltaModel.resume_checkpoint
+      ~DeltaModel.sand_frac_bc
       ~DeltaModel.save_checkpoint
       ~DeltaModel.save_depth_figs
       ~DeltaModel.save_depth_grids
@@ -142,11 +140,12 @@
       ~DeltaModel.save_figs_sequential
       ~DeltaModel.save_iter
       ~DeltaModel.save_metadata
+      ~DeltaModel.save_sandfrac_figs
+      ~DeltaModel.save_sandfrac_grids
       ~DeltaModel.save_sedflux_figs
       ~DeltaModel.save_sedflux_grids
       ~DeltaModel.save_stage_figs
       ~DeltaModel.save_stage_grids
-      ~DeltaModel.save_strata
       ~DeltaModel.save_time_since_checkpoint
       ~DeltaModel.save_time_since_data
       ~DeltaModel.save_velocity_components

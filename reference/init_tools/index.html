@@ -144,12 +144,6 @@ expensive, so we avoid boxing up the constants on each iteration.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyDeltaRCM.init_tools.init_tools.init_stratigraphy">
-<code class="sig-name descname"><span class="pre">init_stratigraphy</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools.init_stratigraphy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates sparse array to store stratigraphy data.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="pyDeltaRCM.init_tools.init_tools.init_subsidence">
 <code class="sig-name descname"><span class="pre">init_subsidence</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools.init_subsidence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize subsidence pattern.</p>
@@ -168,11 +162,10 @@ DeltaModel class.</p>
 <dd><p>Load the checkpoint from the .npz file.</p>
 <p>Uses the file at the path determined by <cite>self.prefix</cite> and a file named
 <cite>checkpoint.npz</cite>. There are a few pathways for loading, which depend
-on 1) the status of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">save_strata</span></code> option, 2) the status of
-additional grid-saving options, 3) the presence of a netCDF output
-file at the expected output location, and 4) the status of the
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">defer_output</span></code> parameter passed to this method as an optional
-argument.</p>
+on 1) the status of additional grid-saving options, 2) the presence of
+a netCDF output file at the expected output location, and 3) the status
+of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">defer_output</span></code> parameter passed to this method as an
+optional argument.</p>
 <p>As a standard user, you should not need to worry about any of these
 pathways or options. However, if you are developing pyDeltaRCM or
 customizing the model in any way that involves loadind from
@@ -279,7 +272,7 @@ values specified into the log file.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.3.
     </div>
   </body>
 </html>
