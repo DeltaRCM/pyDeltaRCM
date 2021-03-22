@@ -38,6 +38,8 @@ class iteration_tools(abc.ABC):
         -------
         """
         # start the model operations
+        self.eta0 = np.copy(self.eta)  # copy
+
         #   water iterations
         _msg = 'Beginning water iteration'
         self.log_info(_msg, verbosity=2)
@@ -119,6 +121,9 @@ class iteration_tools(abc.ABC):
         self.eta[0, self.inlet] = self.stage[0, self.inlet] - self._h0
         self.depth[0, self.inlet] = self._h0
 
+        self.hook_compute_sand_frac()
+        self.compute_sand_frac()
+
         self.H_SL = self._H_SL + self._SLR * self._dt
 
     def log_info(self, message, verbosity=0):
@@ -154,7 +159,6 @@ class iteration_tools(abc.ABC):
         """
         if self._save_time_since_data >= self.save_dt:
 
-            self.save_stratigraphy()
             self.save_grids_and_figs()
 
             self._save_iter += int(1)
@@ -191,8 +195,8 @@ class iteration_tools(abc.ABC):
 
                 self._save_time_since_checkpoint = 0
 
-    def expand_stratigraphy(self):
-        """Expand stratigraphy array sizes.
+    def compute_sand_frac(self):
+        """Compute the sand fraction as a continous updating data field.
 
         Parameters
         ----------
@@ -201,94 +205,44 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        _msg = 'Expanding stratigraphy arrays'
-        self.log_info(_msg, verbosity=1)
+        _msg = 'Computing bed sand fraction'
+        self.log_info(_msg, verbosity=2)
 
-        lil_blank = lil_matrix((self.L * self.W, self.n_steps),
-                               dtype=np.float32)
+        # layer attributes at time t
+        actlyr_thick = self._active_layer_thickness
+        actlyr_top = np.copy(self.eta0)
+        actlyr_bot = actlyr_top - actlyr_thick
 
-        self.strata_eta = hstack([self.strata_eta, lil_blank], format='lil')
-        self.strata_sand_frac = hstack([self.strata_sand_frac, lil_blank],
-                                       format='lil')
+        deta = self.eta - self.eta0
 
-    def save_stratigraphy(self):
-        """Save stratigraphy to an attribute of the delta.
+        # everywhere the bed has degraded this timestep
+        whr_deg = (deta < 0)
+        if np.any(whr_deg):
+            # find where the erosion exceeded the active layer
+            whr_unkwn = self.eta < actlyr_bot
 
-        Saves the sand fraction of deposited sediment into a sparse array
-        created by :obj:`~pyDeltaRCM.DeltaModel.init_stratigraphy()`. Note
-        that the actual record in the netcdf file is not made until
-        `finalize()`.
+            # update sand_frac in unknown to the boundary condition
+            self.sand_frac[whr_unkwn] = self._sand_frac_bc
 
-        Only runs if :obj:`~pyDeltaRCM.DeltaModel.save_strata` is True.
+            # find where erosion was into active layer
+            whr_actero = np.logical_and(whr_deg, self.eta >= actlyr_bot)
 
-        .. note::
+            # update sand_frac to active_layer value
+            self.sand_frac[whr_actero] = self.active_layer[whr_actero]
 
-            This routine needs a complete description of the algorithm,
-            additionally, it should be ported to a routine in DeltaMetrics,
-            probably the new and preferred method of computing and storing
-            straitgraphy cubes.
+        # handle aggradation/deposition
+        whr_agg = (deta > 0)
+        whr_agg = np.logical_or(
+            (self.Vp_dep_sand > 0), (self.Vp_dep_mud > 0.000001))
+        if np.any(whr_agg):
+            # sand_frac and active_layer becomes the mixture of the deposit
+            mixture = (self.Vp_dep_sand[whr_agg] /
+                       (self.Vp_dep_mud[whr_agg] +
+                        self.Vp_dep_sand[whr_agg]))
 
-        Parameters
-        ----------
-
-        Returns
-        -------
-
-        """
-        if self.save_strata:
-
-            if self.strata_counter >= self.strata_eta.shape[1]:
-                self.expand_stratigraphy()
-
-            _msg = 'Storing stratigraphy data'
-            self.log_info(_msg, verbosity=2)
-
-            # ------------------ sand frac ------------------
-            # -1 for cells with deposition volumes < vol_limit
-            # vol_limit for any mud (to diff from no deposition in sparse
-            #   array)
-            # (overwritten if any sand deposited)
-
-            sand_frac = -1 * np.ones((self.L, self.W))
-
-            vol_limit = 0.000001  # threshold deposition volume
-            sand_frac[self.Vp_dep_mud > vol_limit] = vol_limit
-
-            sand_loc = self.Vp_dep_sand > 0
-            sand_frac[sand_loc] = (self.Vp_dep_sand[sand_loc]
-                                   / (self.Vp_dep_mud[sand_loc]
-                                      + self.Vp_dep_sand[sand_loc])
-                                   )
-            # store indices and sand_frac into a sparse array
-            row_s = np.where(sand_frac.flatten() >= 0)[0]
-            col_s = np.zeros((len(row_s),))
-            data_s = sand_frac[sand_frac >= 0]
-
-            sand_sparse = csc_matrix((data_s, (row_s, col_s)),
-                                     shape=(self.L * self.W, 1))
-            # store sand_sparse into strata_sand_frac
-            self.strata_sand_frac[:, self.strata_counter] = sand_sparse
-
-            # ------------------ eta ------------------
-            diff_eta = self.eta - self.init_eta
-
-            row_s = np.where(diff_eta.flatten() != 0)[0]
-            col_s = np.zeros((len(row_s),))
-            data_s = self.eta[diff_eta != 0]
-
-            eta_sparse = csc_matrix((data_s, (row_s, col_s)),
-                                    shape=(self.L * self.W, 1))
-
-            self.strata_eta[:, self.strata_counter] = eta_sparse
-
-            if self._toggle_subsidence and (self._time >= self._start_subsidence):
-
-                sigma_change = (self.strata_eta[:, :self.strata_counter]
-                                - self.sigma.flatten()[:, np.newaxis])
-                self.strata_eta[:, :self.strata_counter] = lil_matrix(
-                    sigma_change)
-
-            self.strata_counter += 1
+            # update sand_frac in act layer to this value
+            self.sand_frac[whr_agg] = mixture
+            self.active_layer[whr_agg] = mixture
 
     def save_grids_and_figs(self):
         """Save grids and figures.
@@ -361,6 +315,12 @@ class iteration_tools(abc.ABC):
                                  filename_root='sedflux_',
                                  timestep=self.save_iter)
 
+            if self._save_sandfrac_figs:
+                _ff = self.make_figure('sand_frac', self._time)
+                self.save_figure(_ff, directory=self.prefix,
+                                 filename_root='sandfrac_',
+                                 timestep=self.save_iter)
+
         # ------------------ grids ------------------
         if self._save_any_grids:
 
@@ -385,6 +345,9 @@ class iteration_tools(abc.ABC):
             if self._save_sedflux_grids:
                 self.save_grids('sedflux', self.qs, save_idx)
 
+            if self._save_sandfrac_grids:
+                self.save_grids('sandfrac', self.sand_frac, save_idx)
+
             if self._save_discharge_components:
                 self.save_grids('discharge_x', self.qx, save_idx)
                 self.save_grids('discharge_y', self.qy, save_idx)
@@ -401,7 +364,8 @@ class iteration_tools(abc.ABC):
 
             self.output_netcdf['meta']['H_SL'][save_idx] = self._H_SL
             self.output_netcdf['meta']['f_bedload'][save_idx] = self._f_bedload
-            self.output_netcdf['meta']['C0_percent'][save_idx] = self._C0_percent
+            self.output_netcdf['meta']['C0_percent'][save_idx] = \
+                self._C0_percent
             self.output_netcdf['meta']['u0'][save_idx] = self._u0
 
         # -------------------- sync --------------------
@@ -411,77 +375,6 @@ class iteration_tools(abc.ABC):
             self.log_info(_msg, verbosity=2)
 
             self.output_netcdf.sync()
-
-    def record_final_stratigraphy(self):
-        """Save the stratigraphy as sparse matrix to file.
-
-        Saves the stratigraphy (sand fraction) sparse matrices into output
-        netcdf file.
-
-        .. note:
-
-            This method is called only once, within the
-            :obj:`pyDeltaRCM.DeltaModel.finalize()` step of model execution.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-
-        """
-        if self._save_strata:
-
-            _msg = 'Saving final stratigraphy to netCDF file'
-            self.log_info(_msg, verbosity=0)
-
-            if not self.strata_counter > 0:
-                _msg = 'Model has no computed stratigraphy. This is likely ' \
-                    'because `delta.time < delta.save_dt`, and the model ' \
-                    'has not computed stratigraphy.'
-                self.logger.error(_msg)
-                raise RuntimeError(_msg)
-
-            self.strata_eta = self.strata_eta[:, :self.strata_counter]
-
-            shape = self.strata_eta.shape
-
-            self.output_netcdf.createDimension(
-                'total_strata_age',
-                shape[1])
-
-            strata_age = self.output_netcdf.createVariable('strata_age',
-                                                           np.int32,
-                                                           ('total_strata_age'))
-            strata_age.units = 'second'
-            self.output_netcdf.variables['strata_age'][
-                :] = list(range(shape[1] - 1, -1, -1))
-
-            sand_frac = self.output_netcdf.createVariable('strata_sand_frac',
-                                                          np.float32,
-                                                          ('total_strata_age', 'length', 'width'))
-            sand_frac.units = 'fraction'
-
-            strata_elev = self.output_netcdf.createVariable('strata_depth',
-                                                            np.float32,
-                                                            ('total_strata_age', 'length', 'width'))
-            strata_elev.units = 'meters'
-
-            for i in range(shape[1]):
-
-                sf = self.strata_sand_frac[:, i].toarray()
-                sf = sf.reshape(self.eta.shape)
-                sf[sf == 0] = -1
-
-                self.output_netcdf.variables['strata_sand_frac'][i, :, :] = sf
-
-                sz = self.strata_eta[:, i].toarray().reshape(self.eta.shape)
-                sz[sz == 0] = self.init_eta[sz == 0]
-
-                self.output_netcdf.variables['strata_depth'][i, :, :] = sz
-
-            _msg = 'Stratigraphy data saved.'
-            self.log_info(_msg, verbosity=0)
 
     def make_figure(self, var, timestep):
         """Create a figure.
@@ -593,37 +486,15 @@ class iteration_tools(abc.ABC):
         - Water depth
         - Water stage
         - Topography
+        - Surface sand fraction
+        - Active layer values
         - Current random seed state
-        - Stratigraphic 'topography' in 'strata_eta'
-        - Stratigraphic sand fraction in 'strata_sand_frac'
 
         If `save_checkpoint` is turned on, checkpoints are re-written
         with either a frequency of `checkpoint_dt` or `save_dt` if
         `checkpoint_dt` has not been explicitly defined.
         """
         ckp_file = os.path.join(self.prefix, 'checkpoint.npz')
-
-        # handle checkpoint which needs stratigraphy info
-        strata_dict = {}
-        if self.save_strata:
-            # convert sparse arrays to csr type so they are easier to save
-            csr_strata_eta = self.strata_eta.tocsr()
-            csr_strata_sand_frac = self.strata_sand_frac.tocsr()
-
-            strata_dict.update(
-                {'eta_data': csr_strata_eta.data,
-                 'eta_indices': csr_strata_eta.indices,
-                 'eta_indptr': csr_strata_eta.indptr,
-                 'eta_shape': csr_strata_eta.shape,
-                 'sand_data': csr_strata_sand_frac.data,
-                 'sand_indices': csr_strata_sand_frac.indices,
-                 'sand_indptr': csr_strata_sand_frac.indptr,
-                 'sand_shape': csr_strata_sand_frac.shape,
-                 'n_steps': self.n_steps,
-                 'init_eta': self.init_eta,
-                 'strata_counter': self.strata_counter
-                 }
-                )
 
         # get rng state
         rng_state_list = shared_tools.get_random_state()
@@ -647,9 +518,9 @@ class iteration_tools(abc.ABC):
             qw=self.qw,
             qx=self.qx,
             qy=self.qy,
+            sand_frac=self.sand_frac,
+            active_layer=self.active_layer,
             # boundary condition / state variables
             H_SL=self._H_SL,
             rng_state=rng_state,
-            # stratigraphy related variables
-            **strata_dict
             )

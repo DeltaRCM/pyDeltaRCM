@@ -49,6 +49,9 @@ Np_sed:
 f_bedload:
   type: ['float', 'int']
   default: 0.5
+active_layer_thickness:
+  type: ['float', 'int', 'None']
+  default: null
 C0_percent:
   type: ['float', 'int']
   default: 0.1
@@ -82,6 +85,9 @@ save_velocity_figs:
 save_sedflux_figs:
   type: 'bool'
   default: False
+save_sandfrac_figs:
+  type: 'bool'
+  default: False
 save_figs_sequential:
   type: 'bool'
   default: True
@@ -106,6 +112,9 @@ save_velocity_grids:
 save_sedflux_grids:
   type: 'bool'
   default: False
+save_sandfrac_grids:
+  type: 'bool'
+  default: False
 save_discharge_components:
   type: 'bool'
   default: False
@@ -118,9 +127,6 @@ save_dt:
 checkpoint_dt:
   type: ['int', 'None']
   default: null
-save_strata:
-  type: 'bool'
-  default: True
 save_checkpoint:
   type: 'bool'
   default: False
@@ -166,3 +172,6 @@ alpha:
 stepmax:
   type: ['float', 'int', 'None']
   default: null
+sand_frac_bc:
+  type: ['float', 'int']
+  default: 0

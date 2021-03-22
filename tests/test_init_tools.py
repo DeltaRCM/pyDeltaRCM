@@ -174,57 +174,12 @@ class TestInitSubsidence:
 class TestLoadCheckpoint:
 
     @mock.patch('pyDeltaRCM.shared_tools.set_random_state')
-    def test_load_standard_strata(self, patched, tmp_path):
-        """Test that a run can be resumed when there are outputs.
-        """
-        # create one delta, just to have a checkpoint file
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_checkpoint': True})
-        _delta = DeltaModel(input_file=p)
-
-        # make mocks
-        _delta.log_info = mock.MagicMock()
-        _delta.logger = mock.MagicMock()
-        _delta.init_output_file = mock.MagicMock()
-
-        # close the file so can be safely opened in load
-        _delta.output_netcdf.close()
-
-        # check checkpoint exists
-        assert os.path.isfile(os.path.join(
-            _delta.prefix, 'checkpoint.npz'))
-        assert os.path.isfile(os.path.join(
-            _delta.prefix, 'pyDeltaRCM_output.nc'))
-        assert hasattr(_delta, 'strata_counter')
-
-        # now mess up a field
-        _eta0 = np.copy(_delta.eta)
-        _rand_field = np.random.uniform(0, 1, size=_delta.eta.shape)
-        _delta.eta = _rand_field
-        assert np.all(_delta.eta == _rand_field)
-
-        # now resume from the checkpoint to restore the field
-        _delta.load_checkpoint()
-
-        # check that fields match
-        assert np.all(_delta.eta == _eta0)
-        assert hasattr(_delta, 'strata_counter')
-
-        # assertions on function calls
-        _strat_call = [mock.call('Loading stratigraphy arrays', verbosity=2)]
-        _delta.log_info.assert_has_calls(_strat_call, any_order=True)
-        _delta.logger.assert_not_called()
-        _delta.init_output_file.assert_not_called()
-        patched.assert_called()
-
-    @mock.patch('pyDeltaRCM.shared_tools.set_random_state')
-    def test_load_standard_grid_nostrata(self, patched, tmp_path):
+    def test_load_standard_grid(self, patched, tmp_path):
         """Test that a run can be resumed when there are outputs.
         """
         # create one delta, just to have a checkpoint file
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_checkpoint': True,
-                                      'save_strata': False,
                                       'save_eta_grids': True})
         _delta = DeltaModel(input_file=p)
 
@@ -241,7 +196,6 @@ class TestLoadCheckpoint:
             _delta.prefix, 'checkpoint.npz'))
         assert os.path.isfile(os.path.join(
             _delta.prefix, 'pyDeltaRCM_output.nc'))
-        assert not hasattr(_delta, 'strata_counter')
 
         # now mess up a field
         _eta0 = np.copy(_delta.eta)
@@ -254,7 +208,6 @@ class TestLoadCheckpoint:
 
         # check that fields match
         assert np.all(_delta.eta == _eta0)
-        assert not hasattr(_delta, 'strata_counter')
 
         # assertions on function calls
         _call = [mock.call('Renaming old NetCDF4 output file', verbosity=2)]
@@ -271,8 +224,7 @@ class TestLoadCheckpoint:
         """
         # create one delta, just to have a checkpoint file
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_checkpoint': True,
-                                      'save_strata': False})
+                                     {'save_checkpoint': True})
         _delta = DeltaModel(input_file=p)
 
         # make mocks
@@ -284,7 +236,6 @@ class TestLoadCheckpoint:
             _delta.prefix, 'checkpoint.npz'))
         assert not os.path.isfile(os.path.join(
             _delta.prefix, 'pyDeltaRCM_output.nc'))
-        assert not hasattr(_delta, 'strata_counter')
 
         # now mess up a field
         _eta0 = np.copy(_delta.eta)
@@ -297,7 +248,6 @@ class TestLoadCheckpoint:
 
         # check that fields match
         assert np.all(_delta.eta == _eta0)
-        assert not hasattr(_delta, 'strata_counter')
 
         # assertions on function calls
         _delta.log_info.assert_called()
@@ -315,7 +265,6 @@ class TestLoadCheckpoint:
         # define a yaml with NO outputs, but checkpoint
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_checkpoint': True,
-                                      'save_strata': False,
                                       'save_eta_grids': True})
         _delta = DeltaModel(input_file=p)
 
@@ -347,7 +296,6 @@ class TestLoadCheckpoint:
 
         # check that fields match
         assert np.all(_delta.eta == _eta0)
-        assert not hasattr(_delta, 'strata_counter')
         assert _delta._save_iter == 0
 
         # assertions on function calls
@@ -536,6 +484,20 @@ class TestSettingParametersFromYAMLFile:
         assert _delta._save_any_grids is True
         assert _delta._save_any_figs is False
 
+    def test_save_sedflux_grids(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_sedflux_grids': True})
+        _delta = DeltaModel(input_file=p)
+        assert _delta._save_any_grids is True
+        assert _delta._save_any_figs is False
+
+    def test_save_sandfrac_grids(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_sandfrac_grids': True})
+        _delta = DeltaModel(input_file=p)
+        assert _delta._save_any_grids is True
+        assert _delta._save_any_figs is False
+
     def test_save_discharge_components(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_discharge_components': True})
@@ -587,6 +549,20 @@ class TestSettingParametersFromYAMLFile:
         assert _delta._save_any_figs is True
         assert _delta._save_any_grids is False
 
+    def test_save_sedflux_figs(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_sedflux_figs': True})
+        _delta = DeltaModel(input_file=p)
+        assert _delta._save_any_figs is True
+        assert _delta._save_any_grids is False
+
+    def test_save_sandfrac_figs(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_sandfrac_figs': True})
+        _delta = DeltaModel(input_file=p)
+        assert _delta._save_any_figs is True
+        assert _delta._save_any_grids is False
+
     def test_save_figs_sequential(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_figs_sequential': False})
@@ -615,6 +591,12 @@ class TestSettingParametersFromYAMLFile:
         assert _delta.subsidence_rate == 1e-9
         assert np.any(_delta.sigma > 0)
         assert np.all(_delta.sigma <= (1e-9 * _delta.dt))
+
+    def test_sand_frac_bc(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'sand_frac_bc': -1})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.sand_frac_bc == -1
 
 
 class TestSettingOtherParametersFromYAMLSettings:
@@ -714,6 +696,15 @@ class TestSettingOtherParametersFromYAMLSettings:
                                       'dx': 10})
         _delta = DeltaModel(input_file=p)
         assert _delta.CTR == 299  # 300th index
+
+    def test_CTR_small(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'Length': 40,
+                                      'Width': 40,
+                                      'dx': 10})
+        _delta = DeltaModel(input_file=p)
+        # small case, instead of 4/2-1=1 it is 4/2=2
+        assert _delta.CTR == 2
 
     def test_gamma(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -860,3 +851,20 @@ class TestSettingOtherParametersFromYAMLSettings:
         assert _delta.dt == 625
         assert _delta.N_crossdiff == int(round(50000 / 50))
         assert _delta.diffusion_multiplier == (625 / 1000 * 0.3 * 0.5 / 5**2)
+
+    def test_active_layer_thickness_float(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'active_layer_thickness': 2.7})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.active_layer_thickness == 2.7
+
+    def test_active_layer_thickness_int(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'active_layer_thickness': 2})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.active_layer_thickness == 2
+
+    def test_active_layer_thickness_default(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+        assert _delta.active_layer_thickness == _delta.h0 / 2

@@ -57,7 +57,7 @@ class TestShowAttributeDomain:
         with pytest.raises(TypeError):
             _delta.show_attribute('dx')
         with pytest.raises(TypeError):
-            _delta.show_attribute('strata_sand_frac')
+            _delta.show_attribute('CTR')
 
     @pytest.mark.mpl_image_compare(remove_text=True)
     def test_plot_domain_cell_type_no_grid(self, tmp_path):

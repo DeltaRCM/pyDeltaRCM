@@ -266,6 +266,12 @@ class Test__init__:
         with pytest.raises(ValueError):
             _ = DeltaModel(input_file=p)
 
+    def test_negative_active_layer_thickness(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'active_layer_thickness': -2.2})
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
 
 class TestUpdate:
 
@@ -336,15 +342,13 @@ class TestFinalize:
         _delta.log_info = mock.MagicMock()
         _delta.output_data = mock.MagicMock()
         _delta.output_checkpoint = mock.MagicMock()
-        _delta.record_final_stratigraphy = mock.MagicMock()
 
         # run finalize
         _delta.finalize()
 
         # assert calls
         #  should hit all options since no saves
-        assert _delta.log_info.call_count == 2
-        assert _delta.record_final_stratigraphy.call_count == 1
+        assert _delta.log_info.call_count == 1
 
         # these were originally included in `finalize`, but no longer.
         #   the checks for no call are here to ensure we don't revert

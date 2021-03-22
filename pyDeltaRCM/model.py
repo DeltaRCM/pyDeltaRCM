@@ -110,10 +110,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         # set up the subsidence fields
         self.init_subsidence()
 
-        # initialize the stratigraphy infrastructure
-        self.hook_init_stratigraphy()
-        self.init_stratigraphy()
-
         # if resume flag set to True, load checkpoint, open netCDF4
         if self.resume_checkpoint:
             # load values from the checkpoint and don't init final features
@@ -212,9 +208,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if self._is_finalized:
             raise RuntimeError('Cannot finalize model, '
                                'model already finalized!')
-
-        self.hook_record_final_stratigraphy()
-        self.record_final_stratigraphy()
 
         try:
             self.output_netcdf.close()
@@ -517,6 +510,29 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._f_bedload = f_bedload
 
     @property
+    def active_layer_thickness(self):
+        """
+        Active layer thickness for sand fraction.
+
+        The active layer thickness is the depth to which the sand fraction
+        values are maintained in the event of erosion from one timestep to the
+        next. When erosion exceeds the depth of the active layer, the boundary
+        condition is to fill that cell with a value of 0 (maybe this should be
+        -1 so that it is clear which cells are not truly mud but unknown
+        sediment content based on the active layer thickness?)
+        """
+        return self._active_layer_thickness
+
+    @active_layer_thickness.setter
+    def active_layer_thickness(self, active_layer_thickness):
+        if active_layer_thickness is None:
+            active_layer_thickness = self._h0 / 2
+        elif active_layer_thickness < 0:
+            raise ValueError('active_layer thickness must be greater than'
+                             ' or equal to 0, cannot be negative.')
+        self._active_layer_thickness = active_layer_thickness
+
+    @property
     def C0_percent(self):
         """
         C0_percent is the sediment concentration in the input water supply.
@@ -649,6 +665,18 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_sedflux_figs = save_sedflux_figs
 
     @property
+    def save_sandfrac_figs(self):
+        """
+        save_sandfrac_figs controls whether or not figures of the sediment
+        surface (i.e., the bed) sand fraction are saved.
+        """
+        return self._save_sandfrac_figs
+
+    @save_sandfrac_figs.setter
+    def save_sandfrac_figs(self, save_sandfrac_figs):
+        self._save_sandfrac_figs = save_sandfrac_figs
+
+    @property
     def save_figs_sequential(self):
         """
         save_figs_sequential sets how figures are to be saved.
@@ -755,6 +783,18 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_sedflux_grids = save_sedflux_grids
 
     @property
+    def save_sandfrac_grids(self):
+        """
+        save_sandfrac_grids controls whether or not the sediment
+        surface (i.e., the bed) sand fraction is saved.
+        """
+        return self._save_sandfrac_grids
+
+    @save_sandfrac_grids.setter
+    def save_sandfrac_grids(self, save_sandfrac_grids):
+        self._save_sandfrac_grids = save_sandfrac_grids
+
+    @property
     def save_discharge_components(self):
         """
         save_discharge_components controls saving of x-y discharge components.
@@ -796,18 +836,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @checkpoint_dt.setter
     def checkpoint_dt(self, checkpoint_dt):
+        if checkpoint_dt is None:
+            checkpoint_dt = self._save_dt
         self._checkpoint_dt = checkpoint_dt
-
-    @property
-    def save_strata(self):
-        """
-        save_strata controls whether or not stratigraphy information is saved.
-        """
-        return self._save_strata
-
-    @save_strata.setter
-    def save_strata(self, save_strata):
-        self._save_strata = save_strata
 
     @property
     def save_checkpoint(self):
@@ -1220,3 +1251,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     def bed_elevation(self):
         """Get bed elevation."""
         return self.eta
+
+    @property
+    def sand_frac_bc(self):
+        """Sand fraction boundary condition."""
+        return self._sand_frac_bc
+
+    @sand_frac_bc.setter
+    def sand_frac_bc(self, sand_frac_bc):
+        self._sand_frac_bc = sand_frac_bc

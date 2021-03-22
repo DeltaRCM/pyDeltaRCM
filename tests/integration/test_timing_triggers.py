@@ -9,44 +9,6 @@ from pyDeltaRCM.model import DeltaModel
 from .. import utilities
 
 
-class TestTimingStratigraphy:
-
-    def test_expand_stratigraphy(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'toggle_subsidence': True,
-                                      'start_subsidence': 20000,
-                                      'sigma_max': 1e-8,
-                                      'save_dt': 50000})
-        _delta = DeltaModel(input_file=p)
-
-        # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
-
-        assert _delta.dt == 25000
-        assert _delta.n_steps == 10
-        assert _delta.strata_counter == 1
-        assert _delta.strata_eta[:, _delta.strata_counter].getnnz() == 0
-        for _t in range(19):
-            # assert _delta.strata_eta[:, _delta.strata_counter].getnnz() == 0
-            _delta.update()
-            assert _delta.time == _delta.dt * (_t + 1)
-            assert _delta.strata_eta.shape[1] == 10
-        assert _delta.time == 19 * 25000
-        assert _delta.strata_counter == 10  # stored 10, invalid next store
-        assert _delta.strata_eta.shape[1] == 10
-        # expansion occurs when model tries to save strata after next update
-        _delta.update()
-        assert _delta.time == 20 * 25000
-        assert _delta.strata_counter == 11
-        assert _delta.strata_eta.shape[1] == 20
-        # run to bring to even 100 steps, check status again
-        for _t in range(80):
-            _delta.update()
-        assert _delta.time == 100 * 25000
-        assert _delta.strata_counter == 51
-        assert _delta.strata_eta.shape[1] == 60
-
-
 class TestTimingOutputData:
 
     def test_update_make_record(self, tmp_path):
@@ -143,10 +105,8 @@ class TestTimingOutputData:
         # DO NOT mock output_data
 
         # mock the calls inside output_data
-        _delta.save_stratigraphy = mock.MagicMock()
         _delta.save_grids_and_figs = mock.MagicMock()
 
-        assert _delta.strata_counter == 1  # once during init
         _delta.update()  # no new saves, after init
 
         assert _delta.time_iter == int(1)
@@ -197,14 +157,12 @@ class TestTimingOutputData:
         # DO NOT mock output_data
 
         # mock the calls inside output_data
-        _delta.save_stratigraphy = mock.MagicMock()
         _delta.save_grids_and_figs = mock.MagicMock()
 
         _delta.update()  # save on first iteration
 
         assert _delta.time_iter == int(1)
         assert _delta.time == _delta.dt
-        assert _delta.save_stratigraphy.call_count == 1
         assert _delta.save_grids_and_figs.call_count == 1
 
         _delta.update()  # save again
@@ -212,14 +170,12 @@ class TestTimingOutputData:
         assert _delta.save_time_since_data == 0
         assert _delta.time_iter == int(2)
         assert _delta.time == 2 * _delta.dt
-        assert _delta.save_stratigraphy.call_count == 2
         assert _delta.save_grids_and_figs.call_count == 2
 
         _delta.update()  # save again
 
         assert _delta.save_time_since_data == 0
         assert _delta.time_iter == int(3)
-        assert _delta.save_stratigraphy.call_count == 3
         assert _delta.save_grids_and_figs.call_count == 3
 
         assert _delta.save_iter == 4  # once during init
@@ -245,21 +201,18 @@ class TestTimingOutputData:
         # DO NOT mock output_data
 
         # mock the calls inside output_data
-        _delta.save_stratigraphy = mock.MagicMock()
         _delta.save_grids_and_figs = mock.MagicMock()
 
         _delta.update()
 
         assert _delta.time_iter == int(1)
         assert _delta.time == _delta.dt
-        assert _delta.save_stratigraphy.call_count == 0
         assert _delta.save_grids_and_figs.call_count == 0
 
         _delta.update()
 
         assert _delta.time_iter == int(2)
         assert _delta.time == 2 * _delta.dt
-        assert _delta.save_stratigraphy.call_count == 1
         assert _delta.save_grids_and_figs.call_count == 1
 
         for _ in range(10):
@@ -267,7 +220,6 @@ class TestTimingOutputData:
 
         assert _delta.time_iter == int(12)
         assert _delta.time == 3600
-        assert _delta.save_stratigraphy.call_count == 6
         assert _delta.save_grids_and_figs.call_count == 6
 
     def test_update_saving_intervals_offset_long_over_double(self, tmp_path):
@@ -290,7 +242,6 @@ class TestTimingOutputData:
         # DO NOT mock output_data
 
         # mock the calls inside output_data
-        _delta.save_stratigraphy = mock.MagicMock()
         _delta.save_grids_and_figs = mock.MagicMock()
 
         _delta.update()
@@ -302,33 +253,28 @@ class TestTimingOutputData:
 
         assert _delta.time_iter == int(2)
         assert _delta.time == 2 * _delta.dt
-        assert _delta.save_stratigraphy.call_count == 0
         assert _delta.save_grids_and_figs.call_count == 0
 
         _delta.update()
 
         assert _delta.time_iter == int(3)
         assert _delta.time == 3 * _delta.dt
-        assert _delta.save_stratigraphy.call_count == 0
         assert _delta.save_grids_and_figs.call_count == 0
 
         _delta.update()
 
         assert _delta.time == 4 * _delta.dt
-        assert _delta.save_stratigraphy.call_count == 1
         assert _delta.save_grids_and_figs.call_count == 1
 
         _delta.update()
 
         assert _delta.time == 5 * _delta.dt
-        assert _delta.save_stratigraphy.call_count == 1
         assert _delta.save_grids_and_figs.call_count == 1
 
         for _ in range(33):
             _delta.update()
 
         assert _delta.time == 38 * _delta.dt
-        assert _delta.save_stratigraphy.call_count == 9
         assert _delta.save_grids_and_figs.call_count == 9
         assert _delta._is_finalized is False
 
@@ -340,7 +286,6 @@ class TestTimingOutputData:
         _delta.log_info = mock.MagicMock()
         _delta.output_data = mock.MagicMock()
         _delta.output_checkpoint = mock.MagicMock()
-        _delta.record_final_stratigraphy = mock.MagicMock()
 
         # modify the save interval
         _t = 5
@@ -358,10 +303,9 @@ class TestTimingOutputData:
 
         # assert calls
         #   should only hit top-levels
-        assert _delta.log_info.call_count == 2
+        assert _delta.log_info.call_count == 1
         assert _delta.output_data.call_count == 0
         assert _delta.output_checkpoint.call_count == 0
-        assert _delta.record_final_stratigraphy.call_count == 1
 
         assert _delta._is_finalized is True
 
@@ -433,11 +377,11 @@ class TestTimingOutputData:
         assert _delta.time_iter == 2.0
         assert nc_size_middle > nc_size_before
 
-        # now finalize, and file size should increase over middle again
+        # now finalize, and file size should stay the same
         _delta.finalize()
         nc_size_after = os.path.getsize(exp_path_nc)
         assert _delta.time_iter == 2.0
-        assert nc_size_after > nc_size_middle
+        assert nc_size_after == nc_size_middle
         assert nc_size_after > nc_size_before
 
     def test_save_metadata_no_grids(self, tmp_path):

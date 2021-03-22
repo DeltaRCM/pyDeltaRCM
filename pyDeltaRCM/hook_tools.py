@@ -48,14 +48,6 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_init_stratigraphy(self):
-        """Hook :obj:`~pyDeltaRCM.init_tools.init_tools.init_stratigraphy`.
-
-        Called immediately before
-        :obj:`~pyDeltaRCM.init_tools.init_tools.init_stratigraphy`.
-        """
-        pass
-
     def hook_run_one_timestep(self):
         """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep`.
 
@@ -160,10 +152,10 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_record_final_stratigraphy(self):
-        """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy`.
+    def hook_compute_sand_frac(self):
+        """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac`.
 
         Called immediately before
-        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.record_final_stratigraphy`.
+        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac`.
         """
         pass

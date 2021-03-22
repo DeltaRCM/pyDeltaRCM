@@ -103,6 +103,7 @@ class TestApplyingSubsidence:
                                      {'toggle_subsidence': True,
                                       'subsidence_rate': 1e-8,
                                       'start_subsidence': 0,
+                                      'save_eta_grids': True,
                                       'seed': 0})
         _delta = DeltaModel(input_file=p)
 
@@ -127,6 +128,7 @@ class TestApplyingSubsidence:
                                      {'toggle_subsidence': True,
                                       'subsidence_rate': 1e-8,
                                       'start_subsidence': 25000,
+                                      'save_eta_grids': True,
                                       'seed': 0})
         _delta = DeltaModel(input_file=p)
 
@@ -157,6 +159,7 @@ class TestApplyingSubsidence:
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'toggle_subsidence': True,
+                                      'save_eta_grids': True,
                                       'subsidence_rate': 1e-8})
         _delta = DeltaModel(input_file=p)
 
@@ -230,116 +233,11 @@ class TestOutputCheckpoint:
         assert (_delta.logger.warning.call_count == 1)
 
 
-class TestExpandingStratigraphy:
-
-    def test_expand_stratigraphy(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
-        _delta = DeltaModel(input_file=p)
-
-        # mock the log_info
-        _delta.log_info = mock.MagicMock()
-
-        # check initials
-        assert _delta.dt == 25000
-        assert _delta.n_steps == 15
-        assert _delta.strata_counter == 1  # init output
-        assert _delta.strata_eta.getnnz() == 0
-
-        # check size before
-        assert _delta.strata_eta.shape[1] == _delta.n_steps
-        assert _delta.strata_sand_frac.shape[1] == _delta.n_steps
-
-        # run the method
-        _delta.expand_stratigraphy()
-
-        # check that the size of the arry has increased
-        assert _delta.strata_eta.shape[1] == _delta.n_steps * 2
-        assert _delta.strata_sand_frac.shape[1] == _delta.n_steps * 2
-
-        assert (_delta.log_info.call_count == 1)
-
-
-class TestSaveStratigraphy:
-
-    def test_save_stratigraphy_false(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_strata': False})
-        _delta = DeltaModel(input_file=p)
-
-        # mock the log_info and expanding
-        _delta.log_info = mock.MagicMock()
-        _delta.expand_stratigraphy = mock.MagicMock()
-
-        assert not hasattr(_delta, 'strata_counter')
-        assert not hasattr(_delta, 'strata_eta')
-
-        # should do nothing, because save_strata False
-        _delta.save_stratigraphy()
-
-        # assertions
-        assert (_delta.log_info.called is False)
-        assert (_delta.expand_stratigraphy.called is False)
-
-    def test_save_stratigraphy(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
-        _delta = DeltaModel(input_file=p)
-
-        # mock the log_info and expanding
-        _delta.log_info = mock.MagicMock()
-        _delta.expand_stratigraphy = mock.MagicMock()
-
-        assert _delta.dt == 25000
-        assert _delta.n_steps == 15
-        assert _delta.strata_counter == 1  # exported once at init
-        assert _delta.strata_sand_frac.getnnz() == 0
-
-        # update the sand frac field so something is filled
-        _rand = np.random.uniform(0, 1, size=_delta.eta.shape)
-        _delta.Vp_dep_sand += _rand
-
-        # should save
-        _delta.save_stratigraphy()
-
-        assert _delta.strata_counter == 2
-        assert _delta.strata_sand_frac.getnnz() > 0  # filled
-
-        assert _delta.log_info.call_count == 1
-        assert _delta.expand_stratigraphy.call_count == 0
-
-    def test_save_stratigraphy_calls_expand(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
-        _delta = DeltaModel(input_file=p)
-
-        # mock the log_info
-        _delta.log_info = mock.MagicMock()
-
-        # mock expanding, and error on expanding.
-        #   just want to see that method is called, the actual method is
-        #   tested elsewhere
-        _delta.expand_stratigraphy = mock.MagicMock(
-            side_effect=NotImplementedError)
-
-        assert _delta.n_steps == 15
-        assert _delta.strata_counter == 1  # exported once at init
-        assert _delta.strata_eta.shape[1] == 15
-
-        # change counter to trigger expanding
-        _delta.strata_counter = (_delta.n_steps)
-
-        # should save
-        with pytest.raises(NotImplementedError):
-            _delta.save_stratigraphy()
-
-        # should call expanding
-        assert _delta.expand_stratigraphy.call_count == 1
-
-
 class TestSaveGridsAndFigs:
 
     def test_save_no_figs_no_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_dt': 1,
-                                      'save_strata': False})
+                                     {'save_dt': 1})
         _delta = DeltaModel(input_file=p)
 
         # mock the log_info
@@ -369,7 +267,6 @@ class TestSaveGridsAndFigs:
     def test_save_one_fig_no_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
-                                      'save_strata': False,
                                       'save_eta_figs': True})
         _delta = DeltaModel(input_file=p)
 
@@ -435,7 +332,6 @@ class TestSaveGridsAndFigs:
     def test_save_all_figures_no_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
-                                      'save_strata': False,
                                       'save_eta_figs': True,
                                       'save_discharge_figs': True,
                                       'save_velocity_figs': True,
@@ -584,7 +480,6 @@ class TestSaveFigure:
     def test_save_figure(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
-                                      'save_strata': False,
                                       'save_eta_figs': True})
         _delta = DeltaModel(input_file=p)
 
@@ -610,7 +505,6 @@ class TestSaveFigure:
     def test_save_figure_sequential(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
-                                      'save_strata': False,
                                       'save_eta_figs': True,
                                       'save_figs_sequential': False})
         _delta = DeltaModel(input_file=p)
