@@ -319,13 +319,6 @@ class init_tools(abc.ABC):
                                 self._save_sandfrac_grids or
                                 self._save_discharge_components or
                                 self._save_velocity_components)
-        self._save_any_figs = (self._save_eta_figs or
-                               self._save_depth_figs or
-                               self._save_stage_figs or
-                               self._save_discharge_figs or
-                               self._save_velocity_figs or
-                               self._save_sedflux_figs or
-                               self._save_sandfrac_figs)
         if self._save_any_grids:  # always save metadata if saving grids
             self._save_metadata = True
         self._is_finalized = False

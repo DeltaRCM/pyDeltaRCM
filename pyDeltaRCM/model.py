@@ -76,6 +76,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_time_since_data = float("inf")  # force save on t==0
         self._save_iter = int(0)
         self._save_time_since_checkpoint = float("inf")  # force save on t==0
+        self._save_fig_list = []  # establish list of figure variables to save
 
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
@@ -607,6 +608,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_eta_figs.setter
     def save_eta_figs(self, save_eta_figs):
+        if (save_eta_figs is True) and ('eta' not in self._save_fig_list):
+            self._save_fig_list.append('eta')
+        elif (save_eta_figs is False) and ('eta' in self._save_fig_list):
+            self._save_fig_list.remove('eta')
         self._save_eta_figs = save_eta_figs
 
     @property
@@ -618,6 +623,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_stage_figs.setter
     def save_stage_figs(self, save_stage_figs):
+        if (save_stage_figs is True) and ('stage' not in self._save_fig_list):
+            self._save_fig_list.append('stage')
+        elif (save_stage_figs is False) and ('stage' in self._save_fig_list):
+            self._save_fig_list.remove('stage')
         self._save_stage_figs = save_stage_figs
 
     @property
@@ -629,6 +638,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_depth_figs.setter
     def save_depth_figs(self, save_depth_figs):
+        if (save_depth_figs is True) and ('depth' not in self._save_fig_list):
+            self._save_fig_list.append('depth')
+        elif (save_depth_figs is False) and ('depth' in self._save_fig_list):
+            self._save_fig_list.remove('depth')
         self._save_depth_figs = save_depth_figs
 
     @property
@@ -640,6 +653,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_discharge_figs.setter
     def save_discharge_figs(self, save_discharge_figs):
+        if (save_discharge_figs is True) and ('qw' not in self._save_fig_list):
+            self._save_fig_list.append('qw')
+        elif (save_discharge_figs is False) and ('qw' in self._save_fig_list):
+            self._save_fig_list.remove('qw')
         self._save_discharge_figs = save_discharge_figs
 
     @property
@@ -651,6 +668,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_velocity_figs.setter
     def save_velocity_figs(self, save_velocity_figs):
+        if (save_velocity_figs is True) and ('uw' not in self._save_fig_list):
+            self._save_fig_list.append('uw')
+        elif (save_velocity_figs is False) and ('uw' in self._save_fig_list):
+            self._save_fig_list.remove('uw')
         self._save_velocity_figs = save_velocity_figs
 
     @property
@@ -662,6 +683,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_sedflux_figs.setter
     def save_sedflux_figs(self, save_sedflux_figs):
+        if (save_sedflux_figs is True) and ('qs' not in self._save_fig_list):
+            self._save_fig_list.append('qs')
+        elif (save_sedflux_figs is False) and ('qs' in self._save_fig_list):
+            self._save_fig_list.remove('qs')
         self._save_sedflux_figs = save_sedflux_figs
 
     @property
@@ -674,6 +699,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_sandfrac_figs.setter
     def save_sandfrac_figs(self, save_sandfrac_figs):
+        if (save_sandfrac_figs is True) and \
+          ('sand_frac' not in self._save_fig_list):
+            self._save_fig_list.append('sand_frac')
+        elif (save_sandfrac_figs is False) and \
+          ('sand_frac' in self._save_fig_list):
+            self._save_fig_list.remove('sand_frac')
         self._save_sandfrac_figs = save_sandfrac_figs
 
     @property

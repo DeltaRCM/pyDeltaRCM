@@ -274,52 +274,36 @@ class iteration_tools(abc.ABC):
             self.output_netcdf.variables['time'][save_idx] = self._time
 
         # ------------------ Figures ------------------
-        if self._save_any_figs:
+        if len(self._save_fig_list) > 0:
 
             _msg = 'Saving figures'
             self.log_info(_msg, verbosity=2)
 
-            if self._save_eta_figs:
-                _fe = self.make_figure('eta', self._time)
-                self.save_figure(_fe, directory=self.prefix,
-                                 filename_root='eta_',
-                                 timestep=self.save_iter)
-
-            if self._save_stage_figs:
-                _fs = self.make_figure('stage', self._time)
-                self.save_figure(_fs, directory=self.prefix,
-                                 filename_root='stage_',
-                                 timestep=self.save_iter)
-
-            if self._save_depth_figs:
-                _fh = self.make_figure('depth', self._time)
-                self.save_figure(_fh, directory=self.prefix,
-                                 filename_root='depth_',
-                                 timestep=self.save_iter)
-
-            if self._save_discharge_figs:
-                _fq = self.make_figure('qw', self._time)
-                self.save_figure(_fq, directory=self.prefix,
-                                 filename_root='discharge_',
-                                 timestep=self.save_iter)
-
-            if self._save_velocity_figs:
-                _fu = self.make_figure('uw', self._time)
-                self.save_figure(_fu, directory=self.prefix,
-                                 filename_root='velocity_',
-                                 timestep=self.save_iter)
-
-            if self._save_sedflux_figs:
-                _fu = self.make_figure('qs', self._time)
-                self.save_figure(_fu, directory=self.prefix,
-                                 filename_root='sedflux_',
-                                 timestep=self.save_iter)
-
-            if self._save_sandfrac_figs:
-                _ff = self.make_figure('sand_frac', self._time)
-                self.save_figure(_ff, directory=self.prefix,
-                                 filename_root='sandfrac_',
-                                 timestep=self.save_iter)
+            for f in self._save_fig_list:
+                _attr = getattr(self, f)
+                if isinstance(_attr, np.ndarray):
+                    if _attr.shape == (self.L, self.W):
+                        _fig = self.make_figure(f, self._time)
+                        self.save_figure(_fig, directory=self.prefix,
+                                         filename_root=f+'_',
+                                         timestep=self.save_iter)
+                    else:
+                        raise AttributeError('Attribute "{_k}" is not of the '
+                                             'right shape to be saved as a '
+                                             'figure using the built-in '
+                                             'methods. Expected a shape of '
+                                             '"{_expshp}", but it has a shape '
+                                             'of "{_wasshp}". Consider making '
+                                             'a custom plotting utility to '
+                                             'visualize this attribute.'
+                                             .format(_k=f,
+                                                     _expshp=(self.L, self.W),
+                                                     _wasshp=_attr.shape))
+                else:
+                    raise AttributeError('Only plotting of np.ndarray-type '
+                                         'attributes is natively supported. '
+                                         'Input "{_k}" was of type "{_wt}".'
+                                         .format(_k=f, _wt=type(_attr)))
 
         # ------------------ grids ------------------
         if self._save_any_grids:

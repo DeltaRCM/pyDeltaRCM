@@ -283,7 +283,7 @@ class TestSaveGridsAndFigs:
         _delta.save_figure.call_count == 0
         _delta.save_grids.call_count == 0
 
-        assert (_delta._save_any_figs is True)
+        assert (len(_delta._save_fig_list) > 0)
         assert (_delta._save_eta_figs is True)
 
         # update the delta a few times
