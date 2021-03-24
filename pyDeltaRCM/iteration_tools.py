@@ -311,6 +311,8 @@ class iteration_tools(abc.ABC):
             _msg = 'Saving grids'
             self.log_info(_msg, verbosity=2)
 
+            self.hook_save_grids(save_idx)  # hook to let you save custom grids
+
             if self._save_eta_grids:
                 self.save_grids('eta', self.eta, save_idx)
 
@@ -345,6 +347,8 @@ class iteration_tools(abc.ABC):
 
             _msg = 'Saving metadata'
             self.log_info(_msg, verbosity=2)
+
+            self.hook_save_metadata(save_idx)  # hook to save custom metadata
 
             self.output_netcdf['meta']['H_SL'][save_idx] = self._H_SL
             self.output_netcdf['meta']['f_bedload'][save_idx] = self._f_bedload

@@ -496,6 +496,9 @@ class init_tools(abc.ABC):
             x[:] = self.x
             y[:] = self.y
 
+            # hook to set up additional variables as output grids
+            self.hook_init_grids()
+
             # set up variables for output data grids
             if self.save_eta_grids:
                 eta = self.output_netcdf.createVariable(
@@ -549,6 +552,8 @@ class init_tools(abc.ABC):
                 _v[:] = varvalue
 
             self.output_netcdf.createGroup('meta')
+            # hook to add custom metadata
+            self.hook_init_metadata()
             # fixed metadata
             _create_meta_variable('L0', self.L0, 'cells', vartype='i8')
             _create_meta_variable('N0', self.N0, 'cells', vartype='i8')

@@ -159,3 +159,47 @@ class hook_tools(abc.ABC):
         :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac`.
         """
         pass
+
+    def hook_init_grids(self):
+        """
+        Hook within :obj:`~pyDeltaRCM.init_tools.init_tools.init_output_file`.
+
+        Called within :obj:`~pyDeltaRCM.init_tools.init_tools.init_output_file`
+        after establishment of the output netCDF4 file and its dimensions.
+        But before creation of standard grids in the netCDF file. Look at the
+        function :obj:`~pyDeltaRCM.init_tools.init_tools.init_output_file` for
+        guidance on how to write this hook to set up additional netCDF grids.
+        """
+        pass
+
+    def hook_init_metadata(self):
+        """
+        Hook within :obj:`~pyDeltaRCM.init_tools.init_tools.init_output_file`.
+
+        Called within :obj:`~pyDeltaRCM.init_tools.init_tools.init_output_file`
+        after creation of the netCDF4 metadata group, 'meta'.
+        But before assignment of standard metadata variables. Look at the
+        function :obj:`~pyDeltaRCM.init_tools.init_tools.init_output_file` for
+        guidance on how to write this hook to set up additional metadata.
+        """
+        pass
+
+    def hook_save_grids(self, save_idx):
+        """
+        Hook within :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs`.
+
+        Called within
+        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs`
+        before standard grids are saved to the netCDF file.
+        """
+        pass
+
+    def hook_save_metadata(self, save_idx):
+        """
+        Hook within :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs`.
+
+        Called within
+        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs`
+        before the standard time-varying metadata is saved to the group.
+        """
+        pass
