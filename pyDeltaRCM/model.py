@@ -76,7 +76,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_time_since_data = float("inf")  # force save on t==0
         self._save_iter = int(0)
         self._save_time_since_checkpoint = float("inf")  # force save on t==0
-        self._save_fig_list = []  # establish list of figure variables to save
 
         self.input_file = input_file
         _src_dir = os.path.realpath(os.path.dirname(__file__))
@@ -120,6 +119,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         else:
             # initialize the output file
             if not defer_output:
+                self.hook_init_output_file()
                 self.init_output_file()
 
                 # record initial conditions
@@ -756,6 +756,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_eta_grids.setter
     def save_eta_grids(self, save_eta_grids):
+        if (save_eta_grids is True) and \
+          ('eta' not in self._save_var_list.keys()):
+            self._save_var_list['eta'] = ['eta', 'meters', 'f4',
+                                          ('total_time', 'length', 'width')]
+        elif (save_eta_grids is False) and \
+          ('eta' in self._save_var_list.keys()):
+            del self._save_var_list['eta']
         self._save_eta_grids = save_eta_grids
 
     @property
@@ -767,6 +774,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_stage_grids.setter
     def save_stage_grids(self, save_stage_grids):
+        if (save_stage_grids is True) and \
+          ('stage' not in self._save_var_list.keys()):
+            self._save_var_list['stage'] = ['stage', 'meters', 'f4',
+                                            ('total_time', 'length', 'width')]
+        elif (save_stage_grids is False) and \
+          ('stage' in self._save_var_list.keys()):
+            del self._save_var_list['stage']
         self._save_stage_grids = save_stage_grids
 
     @property
@@ -778,6 +792,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_depth_grids.setter
     def save_depth_grids(self, save_depth_grids):
+        if (save_depth_grids is True) and \
+          ('depth' not in self._save_var_list.keys()):
+            self._save_var_list['depth'] = ['depth', 'meters', 'f4',
+                                            ('total_time', 'length', 'width')]
+        elif (save_depth_grids is False) and \
+          ('depth' in self._save_var_list.keys()):
+            del self._save_var_list['depth']
         self._save_depth_grids = save_depth_grids
 
     @property
@@ -789,6 +810,16 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_discharge_grids.setter
     def save_discharge_grids(self, save_discharge_grids):
+        if (save_discharge_grids is True) and \
+          ('discharge' not in self._save_var_list.keys()):
+            self._save_var_list['discharge'] = ['qw',
+                                                'cubic meters per second',
+                                                'f4',
+                                                ('total_time', 'length',
+                                                 'width')]
+        elif (save_discharge_grids is False) and \
+          ('discharge' in self._save_var_list.keys()):
+            del self._save_var_list['discharge']
         self._save_discharge_grids = save_discharge_grids
 
     @property
@@ -800,6 +831,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_velocity_grids.setter
     def save_velocity_grids(self, save_velocity_grids):
+        if (save_velocity_grids is True) and \
+          ('velocity' not in self._save_var_list.keys()):
+            self._save_var_list['velocity'] = ['uw', 'meters per second', 'f4',
+                                               ('total_time', 'length',
+                                                'width')]
+        elif (save_velocity_grids is False) and \
+          ('velocity' in self._save_var_list.keys()):
+            del self._save_var_list['velocity']
         self._save_velocity_grids = save_velocity_grids
 
     @property
@@ -811,6 +850,15 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_sedflux_grids.setter
     def save_sedflux_grids(self, save_sedflux_grids):
+        if (save_sedflux_grids is True) and \
+          ('sedflux' not in self._save_var_list.keys()):
+            self._save_var_list['sedflux'] = ['qs', 'cubic meters per second',
+                                              'f4',
+                                              ('total_time', 'length',
+                                               'width')]
+        elif (save_sedflux_grids is False) and \
+          ('sedflux' in self._save_var_list.keys()):
+            del self._save_var_list['sedflux']
         self._save_sedflux_grids = save_sedflux_grids
 
     @property
@@ -823,6 +871,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_sandfrac_grids.setter
     def save_sandfrac_grids(self, save_sandfrac_grids):
+        if (save_sandfrac_grids is True) and \
+          ('sandfrac' not in self._save_var_list.keys()):
+            self._save_var_list['sandfrac'] = ['sand_frac', 'fraction', 'f4',
+                                               ('total_time', 'length',
+                                                'width')]
+        elif (save_sandfrac_grids is False) and \
+          ('sandfrac' in self._save_var_list.keys()):
+            del self._save_var_list['sandfrac']
         self._save_sandfrac_grids = save_sandfrac_grids
 
     @property
@@ -834,6 +890,20 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_discharge_components.setter
     def save_discharge_components(self, save_discharge_components):
+        if (save_discharge_components is True):
+            if ('discharge_x' not in self._save_var_list.keys()):
+                self._save_var_list['discharge_x'] = [
+                    'qx', 'cubic meters per second', 'f4',
+                    ('total_time', 'length', 'width')]
+            if ('discharge_y' not in self._save_var_list.keys()):
+                self._save_var_list['discharge_y'] = [
+                    'qy', 'cubic meters per second', 'f4',
+                    ('total_time', 'length', 'width')]
+        elif (save_discharge_components is False):
+            if ('discharge_x' in self._save_var_list.keys()):
+                del self._save_var_list['discharge_x']
+            if ('discharge_y' in self._save_var_list.keys()):
+                del self._save_var_list['discharge_y']
         self._save_discharge_components = save_discharge_components
 
     @property
@@ -845,6 +915,20 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_velocity_components.setter
     def save_velocity_components(self, save_velocity_components):
+        if (save_velocity_components is True):
+            if ('velocity_x' not in self._save_var_list.keys()):
+                self._save_var_list['velocity_x'] = [
+                    'ux', 'meters per second', 'f4',
+                    ('total_time', 'length', 'width')]
+            if ('velocity_y' not in self._save_var_list.keys()):
+                self._save_var_list['velocity_y'] = [
+                    'uy', 'meters per second', 'f4',
+                    ('total_time', 'length', 'width')]
+        elif (save_velocity_components is False):
+            if ('velocity_x' in self._save_var_list.keys()):
+                del self._save_var_list['velocity_x']
+            if ('velocity_y' in self._save_var_list.keys()):
+                del self._save_var_list['velocity_y']
         self._save_velocity_components = save_velocity_components
 
     @property

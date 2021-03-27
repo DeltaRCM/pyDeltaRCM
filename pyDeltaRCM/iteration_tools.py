@@ -311,36 +311,12 @@ class iteration_tools(abc.ABC):
             _msg = 'Saving grids'
             self.log_info(_msg, verbosity=2)
 
-            self.hook_save_grids(save_idx)  # hook to let you save custom grids
-
-            if self._save_eta_grids:
-                self.save_grids('eta', self.eta, save_idx)
-
-            if self._save_depth_grids:
-                self.save_grids('depth', self.depth, save_idx)
-
-            if self._save_stage_grids:
-                self.save_grids('stage', self.stage, save_idx)
-
-            if self._save_discharge_grids:
-                self.save_grids('discharge', self.qw, save_idx)
-
-            if self._save_velocity_grids:
-                self.save_grids('velocity', self.uw, save_idx)
-
-            if self._save_sedflux_grids:
-                self.save_grids('sedflux', self.qs, save_idx)
-
-            if self._save_sandfrac_grids:
-                self.save_grids('sandfrac', self.sand_frac, save_idx)
-
-            if self._save_discharge_components:
-                self.save_grids('discharge_x', self.qx, save_idx)
-                self.save_grids('discharge_y', self.qy, save_idx)
-
-            if self._save_velocity_components:
-                self.save_grids('velocity_x', self.ux, save_idx)
-                self.save_grids('velocity_y', self.uy, save_idx)
+            _var_list = list(self._save_var_list.keys())
+            _var_list.remove('meta')
+            for _val in _var_list:
+                self.save_grids(_val, getattr(self,
+                                              self._save_var_list[_val][0]),
+                                save_idx)
 
         # ------------------ metadata ------------------
         if self._save_metadata:
@@ -348,13 +324,11 @@ class iteration_tools(abc.ABC):
             _msg = 'Saving metadata'
             self.log_info(_msg, verbosity=2)
 
-            self.hook_save_metadata(save_idx)  # hook to save custom metadata
-
-            self.output_netcdf['meta']['H_SL'][save_idx] = self._H_SL
-            self.output_netcdf['meta']['f_bedload'][save_idx] = self._f_bedload
-            self.output_netcdf['meta']['C0_percent'][save_idx] = \
-                self._C0_percent
-            self.output_netcdf['meta']['u0'][save_idx] = self._u0
+            for _val in self._save_var_list['meta'].keys():
+                # use knowledge of time-varying values to save them
+                if (self._save_var_list['meta'][_val][0] is None):
+                    self.output_netcdf['meta'][_val][save_idx] = \
+                        getattr(self, _val)
 
         # -------------------- sync --------------------
         if (self._save_metadata or self._save_any_grids):
