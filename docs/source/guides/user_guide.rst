@@ -39,7 +39,7 @@ The "low-level" API consists of creating a model instance from a YAML configurat
 
 
 
-.. _high_level_api: 
+.. _high_level_api:
 
 High-level model API
 ====================
@@ -107,11 +107,11 @@ The former case is straightforward, insofar that the model determines the timest
 To specify the number of timesteps to run the model, use the argument ``--timesteps`` at the command line (or ``timesteps:`` in the configuration YAML file, or ``timesteps=`` with the Python :obj:`~pyDeltaRCM.Preprocessor`).
 
 .. code:: bash
-    
+
     pyDeltaRCM --config model_configuration.yml --timesteps 5000
 
 The second case is more complicated, because the time specification is converted to model time according to a set of additional parameters.
-In this case, the model run end condition is that the elapsed model time is *equal to or greater than* the specified input time. 
+In this case, the model run end condition is that the elapsed model time is *equal to or greater than* the specified input time.
 Importantly, this means that the duration of the model run is unlikely to exactly match the input condition, because the model timestep is unlikely to be a factor of the specified time.
 Again, refer to the complete description of model time :doc:`../info/modeltime` for more information.
 
@@ -119,7 +119,7 @@ To specify the duration of time to run the model in *seconds*, simply use the ar
 It is also possible to specify the input run duration in units of years with the similarly named argument ``--time_years`` (``time_years:``, ``time_years=``).
 
 .. code:: bash
-    
+
     pyDeltaRCM --config model_configuration.yml --time 31557600
     pyDeltaRCM --config model_configuration.yml --time_years 1
 
@@ -138,14 +138,14 @@ See :doc:`../info/modeltime` for complete information on the scaling between mod
 Running simulations in parallel
 -------------------------------
 
-The high-level API provides the ability to run simulations in parallel on Linux environments. 
+The high-level API provides the ability to run simulations in parallel on Linux environments.
 This option is only useful in the case where you are running multiple jobs with the :ref:`matrix expansion <matrix_expansion_tag>`, :ref:`ensemble expansion <ensemble_expansion_tag>`, or :ref:`set expansion <set_expansion_tag>` tools.
 
 To run jobs in parallel simply specify the `--parallel` flag to the command line interface.
 Optionally, you can specify the number of simulations to run at once by following the flag with a number.
 
 .. code:: bash
-    
+
     pyDeltaRCM --config model_configuration.yml --timesteps 5000 --parallel
     pyDeltaRCM --config model_configuration.yml --timesteps 5000 --parallel 6
 
@@ -166,7 +166,7 @@ The simplest case to use the low-level API is to do
     >>> delta.finalize()
 
 However, you can also inspect/modify the :obj:`~pyDeltaRCM.DeltaModel.update` method, and change the order of operations, or add operations, as desired.
-If you are working with the low-level API, you can optionally pass any valid key in the YAML configuration file as a keyword argument during model instantiation. 
+If you are working with the low-level API, you can optionally pass any valid key in the YAML configuration file as a keyword argument during model instantiation.
 For example:
 
 .. code::
@@ -206,3 +206,4 @@ Examples:
 
     * :doc:`/examples/slight_slope`
     * :doc:`/examples/subsidence_region`
+    * :doc:`/examples/custom_saving`
