@@ -63,7 +63,19 @@ This subclass has added the active layer as a figure and a grid to be saved, as 
 For simplicity we will just check that the appropriate parameters were added to the save figure and save variable lists, however please feel free to give this example a try on your local machine and examine the output figures and netCDF file.
 
 .. doctest::
+    :context:
 
+    >>> 'active_layer' in mdl._save_fig_list
+    True
+
+    >>> print(mdl._save_fig_list)
+    ['active_layer']
+
+    >>> print(mdl._save_var_list)
+    {'meta': {'water_parcels': ['Np_water', 'parcels', 'i8', ()]}, 'ACT_lay': ['active_layer', 'fraction', 'f4', ('total_time', 'length', 'width')]}
+
+.. code::
+    
     >>> 'active_layer' in mdl._save_fig_list
     True
 
