@@ -36,7 +36,7 @@ class init_tools(abc.ABC):
             os.makedirs(self.prefix_abspath)
             assert os.path.isdir(self.prefix_abspath)  # validate dir created
 
-        self._save_fig_list = []  # list of figure variables to save
+        self._save_fig_list = dict()  # dict of figure variables to save
         self._save_var_list = dict()  # dict of variables to save
         self._save_var_list['meta'] = dict()  # set up meta dict
 

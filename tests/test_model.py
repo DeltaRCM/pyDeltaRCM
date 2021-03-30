@@ -276,7 +276,7 @@ class Test__init__:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _model = DeltaModel(input_file=p, defer_output=True)
         # add request to plot invalid attribute
-        _model._save_fig_list.append('beta')
+        _model._save_fig_list['beta'] = ['beta']
         # try to finish init
         _model.init_output_file()
         with pytest.raises(AttributeError):
@@ -286,7 +286,7 @@ class Test__init__:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _model = DeltaModel(input_file=p, defer_output=True)
         # add request to plot attribute w/ invalid shape
-        _model._save_fig_list.append('inlet')
+        _model._save_fig_list['inlet'] = ['inlet']
         # try to finish init
         _model.init_output_file()
         with pytest.raises(AttributeError):

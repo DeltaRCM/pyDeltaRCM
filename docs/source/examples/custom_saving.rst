@@ -6,17 +6,27 @@ Fortunately, the use of subclasses and hooks itself enables flexible setting of 
 
 To customize the figures and variables that are saved, the hook ``hook_init_output_file`` should be used to subclass the pyDeltaRCM model.
 
-When adding a model attribute to the list of grids to save as figures, be sure to append the actual *attribute name* to the list of figures to save.
-For example, ``self._save_fig_list.append('active_layer')`` will properly indicate that figures of the active layer should be saved, however ``self._save_fig_list.append('activelayer')`` will not work because the name of the model attribute is ``active_layer`` not ``activelayer``.
+When adding a model attribute to the key-value pairs of grids to save as figures, the key indicates the name of the figure file that will be saved, and the value-pair can be a string representing the model attribute to be plotted, or a combination of model attributes, such as ``self.eta * self.depth``.
+For example, ``self._save_fig_list['active_layer'] = ['active_layer']`` will properly indicate that figures of the active layer should be saved.
+
+.. important::
+
+    The built-in, on-the-fly, figure saving as the model runs is only supported for gridded variables with the shape ``L x W`` matching the model domain.
+    Trying to set up figures to save that are not variables of that shape will result in an error.
 
 When adding variables or metadata to be initialized and subsequently saved in the output netCDF, the key-value pair relationship is as follows.
 The key added to ``self._save_var_list`` is the name of the variable as it will be recorded in the netCDF file, this *does not* have to correspond to the name of an attribute in the model.
 To add a variable to the metadata, a key must be added to ``self._save_var_list['meta']``.
 The expected value for a given key is a list containing strings indicating the model attribute to be saved, its units, the variable type, and lastly the variable dimensions (e.g., ``['active_layer', 'fraction', 'f4', ('total_time', 'length', 'width')]`` for the active layer).
 
+.. important::
+
+    The dimensions of the custom variable being specified must match *exactly* with one of the three standard dimensions: length, width, total_time.
+    Use of an invalid dimension will result in an error.
+
 An example of using the hook and creating a model subclass to customize the figures, gridded variables, and metadata being saved is provided below.
 
-.. plot::
+.. doctest::
     :context: reset
     :include-source:
 
@@ -35,7 +45,7 @@ An example of using the hook and creating a model subclass to customize the figu
         def hook_init_output_file(self):
             """Add non-standard grids, figures and metadata to be saved."""
             # save a figure of the active layer each save_dt
-            self._save_fig_list.append('active_layer')
+            self._save_fig_list['active_layer'] = ['active_layer']
 
             # save the active layer grid each save_dt w/ a short name
             self._save_var_list['actlay'] = ['active_layer', 'fraction', 'f4',
@@ -52,7 +62,7 @@ Next, we instantiate the model class.
     mdl = CustomSaveModel()
 
 
-.. plot::
+.. doctest::
     :context:
 
     with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
@@ -75,7 +85,7 @@ For simplicity we will just check that the appropriate parameters were added to 
     {'meta': {'water_parcels': ['Np_water', 'parcels', 'i8', ()]}, 'ACT_lay': ['active_layer', 'fraction', 'f4', ('total_time', 'length', 'width')]}
 
 .. code::
-    
+
     >>> 'active_layer' in mdl._save_fig_list
     True
 

@@ -279,11 +279,12 @@ class iteration_tools(abc.ABC):
             _msg = 'Saving figures'
             self.log_info(_msg, verbosity=2)
 
-            for f in self._save_fig_list:
-                _attr = getattr(self, f)
+            for f in self._save_fig_list.keys():
+                _attr = getattr(self, self._save_fig_list[f][0])
                 if isinstance(_attr, np.ndarray):
                     if _attr.shape == (self.L, self.W):
-                        _fig = self.make_figure(f, self._time)
+                        _fig = self.make_figure(self._save_fig_list[f][0],
+                                                self._time)
                         self.save_figure(_fig, directory=self.prefix,
                                          filename_root=f+'_',
                                          timestep=self.save_iter)
@@ -352,7 +353,6 @@ class iteration_tools(abc.ABC):
         fig : :obj:`matplotlib.figure`
             The created figure object.
         """
-
         _data = getattr(self, var)
 
         fig, ax = plt.subplots()
@@ -366,7 +366,7 @@ class iteration_tools(abc.ABC):
         cb.ax.tick_params(labelsize=7)
         ax.use_sticky_edges = False
         ax.margins(y=0.2)
-        ax.set_title(var+'\ntime: '+str(timestep), fontsize=10)
+        ax.set_title(str(var)+'\ntime: '+str(timestep), fontsize=10)
 
         return fig
 
