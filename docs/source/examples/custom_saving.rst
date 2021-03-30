@@ -79,7 +79,7 @@ For simplicity we will just check that the appropriate parameters were added to 
     True
 
     >>> print(mdl._save_fig_list)
-    ['active_layer']
+    {'active_layer': ['active_layer']}
 
     >>> print(mdl._save_var_list)
     {'meta': {'water_parcels': ['Np_water', 'parcels', 'i8', ()]}, 'ACT_lay': ['active_layer', 'fraction', 'f4', ('total_time', 'length', 'width')]}
@@ -90,7 +90,7 @@ For simplicity we will just check that the appropriate parameters were added to 
     True
 
     >>> print(mdl._save_fig_list)
-    ['active_layer']
+    {'active_layer': ['active_layer']}
 
     >>> print(mdl._save_var_list)
     {'meta': {'water_parcels': ['Np_water', 'parcels', 'i8', ()]}, 'ACT_lay': ['active_layer', 'fraction', 'f4', ('total_time', 'length', 'width')]}
