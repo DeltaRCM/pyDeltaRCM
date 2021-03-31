@@ -35,8 +35,8 @@ Python code and scripts are the preferred and most common model use case.
 Let's do the exact same thing (run a model for 10 timesteps), but do so with Python code.
 
 Python is an object-oriented programming language, which means that the `pyDeltaRCM` model is set up to be manipulated *as an object*.
-In technical jargon, the `pyDeltaRCM` model is a `class`, specifically, it is a class called `DeltaModel`; stated explicitly, **the actual model is created by instantiating** (making an instance of a class) **the `DeltaModel`.**
-We can instantiate a Python object by calling from a python script (or at the Python console):
+In technical jargon, the `pyDeltaRCM` model is built out as a Python `class`, specifically, it is a class named ``DeltaModel``; so, **the actual model is created by instantiating** (making an instance of a class) **the** :obj:`DeltaModel`.
+Python objects are instantiated by calling the `class` name, followed by parentheses (and potentially any input arguments), from a python script (or at the Python console):
 
 .. code:: python
 
@@ -48,7 +48,7 @@ We can instantiate a Python object by calling from a python script (or at the Py
     >>> with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
     ...     mdl = pyDeltaRCM.DeltaModel(out_dir=output_dir)
 
-Here, `mdl` is an instance of the `DeltaModel` class; `mdl` is *an actual model that we can run*.
+Here, ``mdl`` is an instance of the :obj:`DeltaModel` class; ``mdl`` is *an actual model that we can run*.
 Based on the :doc:`default parameters </reference/model/yaml_defaults>`, the model domain is configured as an open basin, with an inlet centered along one wall.
 Default parameters are set to sensible values, and generally follow those described in [1]_.
 
@@ -59,21 +59,32 @@ Default parameters are set to sensible values, and generally follow those descri
     >>> ax.imshow(mdl.bed_elevation, vmax=-3)
     >>> plt.show()
 
-To run the model, we use the :obj:`update` method of the `DeltaModel` instance (i.e., call `update()` on `mdl`):
+To run the model, we use the :meth:`~pyDeltaRCM.model.DeltaModel.update` method of the :obj:`~pyDeltaRCM.model.DeltaModel` instance (i.e., call :meth:`~pyDeltaRCM.model.DeltaModel.update` on ``mdl``):
 
 .. code:: python
 
     >>> for _ in range(0, 5):
     ...     mdl.update()
 
+The :meth:`~pyDeltaRCM.model.DeltaModel.update` method manages a single timestep of the model run.
+Check out the docstring of the method for a description of the routine, and additional steps that are called from :obj:`update`.
+Additionally, it may be helpful to read through the :doc:`model informational guides </info/index>`.
+
+.. note::
+
+    The model timestep (:attr:`~pyDeltaRCM.model.DeltaModel.dt`) is determined by model stability criteria; see :doc:`the model stability guide </info/morphodynamics>` for more information.
+
 Finally, we need to tie up some loose ends when we are done running the model.
-We use the :obj:`finalize` method of the `DeltaModel` instance (i.e., call `finalize()` on `mdl`):
+We use the :obj:`~pyDeltaRCM.model.DeltaModel.finalize` method of the :obj:`DeltaModel` instance (i.e., call :meth:`~pyDeltaRCM.model.DeltaModel.finalize` on ``mdl``):
 
 .. code:: python
 
     >>> mdl.finalize()
 
-And putting the above t all together as a complete minimum working example script:
+Specifically, calling :meth:`~pyDeltaRCM.model.DeltaModel.finalize` will ensure that any data output during the model run to the :doc:`output NetCDF4 file </info/outputfile>` is correctly saved to the disk and does not become corrupted while the script is exiting.
+Note that the output file is periodically saved during the model run, so things might be okay if you forget to :meth:`finalize` at the end of your simulation, but it is considered a best practice to explicitly close the output file with :meth:`finalize`.
+
+Putting the above snippets together gives a complete **minimum working example script**:
 
 .. code-block:: python
 
@@ -84,8 +95,7 @@ And putting the above t all together as a complete minimum working example scrip
 
     >>> mdl.finalize()
 
-Now, we probably don't want to just run the model with default parameters, so the remainder of the guide will cover other use cases; first up is changing model parameter values via a ``YAML`` configuration file.
-
+Now, we probably don't want to just run the model with default parameters, so the remainder of the guide will cover other use cases with increasing complexity; first up is changing model parameter values via a ``YAML`` configuration file.
 
 
 ==============================
