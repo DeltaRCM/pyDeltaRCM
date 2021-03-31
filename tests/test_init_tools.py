@@ -454,56 +454,56 @@ class TestSettingParametersFromYAMLFile:
                                      {'save_eta_grids': True})
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
-        assert _delta._save_any_figs is False
+        assert len(_delta._save_fig_list) == 0
 
     def test_save_depth_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_depth_grids': True})
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
-        assert _delta._save_any_figs is False
+        assert len(_delta._save_fig_list) == 0
 
     def test_save_stage_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_stage_grids': True})
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
-        assert _delta._save_any_figs is False
+        assert len(_delta._save_fig_list) == 0
 
     def test_save_discharge_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_discharge_grids': True})
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
-        assert _delta._save_any_figs is False
+        assert len(_delta._save_fig_list) == 0
 
     def test_save_velocity_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_velocity_grids': True})
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
-        assert _delta._save_any_figs is False
+        assert len(_delta._save_fig_list) == 0
 
     def test_save_sedflux_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_sedflux_grids': True})
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
-        assert _delta._save_any_figs is False
+        assert len(_delta._save_fig_list) == 0
 
     def test_save_sandfrac_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_sandfrac_grids': True})
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
-        assert _delta._save_any_figs is False
+        assert len(_delta._save_fig_list) == 0
 
     def test_save_discharge_components(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_discharge_components': True})
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
-        assert _delta._save_any_figs is False
+        assert len(_delta._save_fig_list) == 0
         assert _delta._save_discharge_components is True
 
     def test_save_velocity_components(self, tmp_path):
@@ -511,63 +511,63 @@ class TestSettingParametersFromYAMLFile:
                                      {'save_velocity_components': True})
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
-        assert _delta._save_any_figs is False
+        assert len(_delta._save_fig_list) == 0
         assert _delta._save_velocity_components is True
 
     def test_save_eta_figs(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_eta_figs': True})
         _delta = DeltaModel(input_file=p)
-        assert _delta._save_any_figs is True
+        assert len(_delta._save_fig_list) > 0
         assert _delta._save_any_grids is False
 
     def test_save_depth_figs(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_depth_figs': True})
         _delta = DeltaModel(input_file=p)
-        assert _delta._save_any_figs is True
+        assert len(_delta._save_fig_list) > 0
         assert _delta._save_any_grids is False
 
     def test_save_stage_figs(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_stage_figs': True})
         _delta = DeltaModel(input_file=p)
-        assert _delta._save_any_figs is True
+        assert len(_delta._save_fig_list) > 0
         assert _delta._save_any_grids is False
 
     def test_save_discharge_figs(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_discharge_figs': True})
         _delta = DeltaModel(input_file=p)
-        assert _delta._save_any_figs is True
+        assert len(_delta._save_fig_list) > 0
         assert _delta._save_any_grids is False
 
     def test_save_velocity_figs(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_velocity_figs': True})
         _delta = DeltaModel(input_file=p)
-        assert _delta._save_any_figs is True
+        assert len(_delta._save_fig_list) > 0
         assert _delta._save_any_grids is False
 
     def test_save_sedflux_figs(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_sedflux_figs': True})
         _delta = DeltaModel(input_file=p)
-        assert _delta._save_any_figs is True
+        assert len(_delta._save_fig_list) > 0
         assert _delta._save_any_grids is False
 
     def test_save_sandfrac_figs(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_sandfrac_figs': True})
         _delta = DeltaModel(input_file=p)
-        assert _delta._save_any_figs is True
+        assert len(_delta._save_fig_list) > 0
         assert _delta._save_any_grids is False
 
     def test_save_figs_sequential(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_figs_sequential': False})
         _delta = DeltaModel(input_file=p)
-        assert _delta._save_any_figs is False
+        assert len(_delta._save_fig_list) == 0
         assert _delta._save_any_grids is False
         assert _delta._save_figs_sequential is False
 

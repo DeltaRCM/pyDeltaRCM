@@ -272,6 +272,26 @@ class Test__init__:
         with pytest.raises(ValueError):
             _ = DeltaModel(input_file=p)
 
+    def test_badtype_figure_saving(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _model = DeltaModel(input_file=p, defer_output=True)
+        # add request to plot invalid attribute
+        _model._save_fig_list['beta'] = ['beta']
+        # try to finish init
+        _model.init_output_file()
+        with pytest.raises(AttributeError):
+            _model.output_data()
+
+    def test_badshape_figure_saving(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _model = DeltaModel(input_file=p, defer_output=True)
+        # add request to plot attribute w/ invalid shape
+        _model._save_fig_list['inlet'] = ['inlet']
+        # try to finish init
+        _model.init_output_file()
+        with pytest.raises(AttributeError):
+            _model.output_data()
+
 
 class TestUpdate:
 

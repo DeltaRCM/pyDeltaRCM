@@ -22,7 +22,7 @@ from . import sed_tools
 class init_tools(abc.ABC):
 
     def init_output_infrastructure(self):
-        """Initialize the output infrastructure (i.e., folder).
+        """Initialize the output infrastructure (folder and save lists).
 
         This method is the first called in the initialization of the
         `DeltaModel`, after the configuration variables have been imported.
@@ -35,6 +35,10 @@ class init_tools(abc.ABC):
         if not os.path.exists(self.prefix_abspath):
             os.makedirs(self.prefix_abspath)
             assert os.path.isdir(self.prefix_abspath)  # validate dir created
+
+        self._save_fig_list = dict()  # dict of figure variables to save
+        self._save_var_list = dict()  # dict of variables to save
+        self._save_var_list['meta'] = dict()  # set up meta dict
 
     def init_logger(self):
         """Initialize a logger.
@@ -319,13 +323,6 @@ class init_tools(abc.ABC):
                                 self._save_sandfrac_grids or
                                 self._save_discharge_components or
                                 self._save_velocity_components)
-        self._save_any_figs = (self._save_eta_figs or
-                               self._save_depth_figs or
-                               self._save_stage_figs or
-                               self._save_discharge_figs or
-                               self._save_velocity_figs or
-                               self._save_sedflux_figs or
-                               self._save_sandfrac_figs)
         if self._save_any_grids:  # always save metadata if saving grids
             self._save_metadata = True
         self._is_finalized = False
@@ -460,6 +457,36 @@ class init_tools(abc.ABC):
         _msg = 'Initializing output NetCDF4 file'
         self.log_info(_msg, verbosity=1)
 
+        # set standard/default metadata values in the dict structure
+        if self._save_metadata:
+            # fixed metadata
+            self._save_var_list['meta']['L0'] = ['L0', 'cells', 'i8', ()]
+            self._save_var_list['meta']['N0'] = ['N0', 'cells', 'i8', ()]
+            self._save_var_list['meta']['CTR'] = ['CTR', 'cells', 'i8', ()]
+            self._save_var_list['meta']['dx'] = ['dx', 'meters', 'f4', ()]
+            self._save_var_list['meta']['h0'] = ['h0', 'meters', 'f4', ()]
+            self._save_var_list['meta']['cell_type'] = ['cell_type',
+                                                        'type', 'i8',
+                                                        ('length', 'width')]
+            # subsidence metadata
+            if self._toggle_subsidence:
+                self._save_var_list['meta']['start_subsidence'] = [
+                    'start_subsidence', 'seconds', 'i8', ()
+                ]
+                self._save_var_list['meta']['sigma'] = [
+                    'sigma', 'meters per timestep', 'f4',
+                    ('length', 'width')
+                ]
+            # time-varying metadata
+            self._save_var_list['meta']['H_SL'] = [None, 'meters', 'f4',
+                                                   ('total_time')]
+            self._save_var_list['meta']['f_bedload'] = [None, 'fraction',
+                                                        'f4', ('total_time')]
+            self._save_var_list['meta']['C0_percent'] = [None, 'percent',
+                                                         'f4', ('total_time')]
+            self._save_var_list['meta']['u0'] = [None, 'meters per second',
+                                                 'f4', ('total_time')]
+
         if (self._save_metadata or
                 self._save_any_grids):
 
@@ -504,48 +531,18 @@ class init_tools(abc.ABC):
             y[:] = self.y
 
             # set up variables for output data grids
-            if self.save_eta_grids:
-                eta = self.output_netcdf.createVariable(
-                    'eta', 'f4', ('total_time', 'length', 'width'))
-                eta.units = 'meters'
-            if self.save_stage_grids:
-                stage = self.output_netcdf.createVariable(
-                    'stage', 'f4', ('total_time', 'length', 'width'))
-                stage.units = 'meters'
-            if self.save_depth_grids:
-                depth = self.output_netcdf.createVariable(
-                    'depth', 'f4', ('total_time', 'length', 'width'))
-                depth.units = 'meters'
-            if self.save_discharge_grids:
-                discharge = self.output_netcdf.createVariable(
-                    'discharge', 'f4', ('total_time', 'length', 'width'))
-                discharge.units = 'cubic meters per second'
-            if self.save_velocity_grids:
-                velocity = self.output_netcdf.createVariable(
-                    'velocity', 'f4', ('total_time', 'length', 'width'))
-                velocity.units = 'meters per second'
-            if self.save_sedflux_grids:
-                sedflux = self.output_netcdf.createVariable(
-                    'sedflux', 'f4', ('total_time', 'length', 'width'))
-                sedflux.units = 'cubic meters per second'
-            if self.save_sandfrac_grids:
-                sandfrac = self.output_netcdf.createVariable(
-                    'sandfrac', 'f4', ('total_time', 'length', 'width'))
-                sandfrac.units = 'fraction'
-            if self.save_discharge_components:
-                discharge_x = self.output_netcdf.createVariable(
-                    'discharge_x', 'f4', ('total_time', 'length', 'width'))
-                discharge_x.units = 'cubic meters per second'
-                discharge_y = self.output_netcdf.createVariable(
-                    'discharge_y', 'f4', ('total_time', 'length', 'width'))
-                discharge_y.units = 'cubic meters per second'
-            if self.save_velocity_components:
-                velocity_x = self.output_netcdf.createVariable(
-                    'velocity_x', 'f4', ('total_time', 'length', 'width'))
-                velocity_x.units = 'meters per second'
-                velocity_y = self.output_netcdf.createVariable(
-                    'velocity_y', 'f4', ('total_time', 'length', 'width'))
-                velocity_y.units = 'meters per second'
+            def _create_grid_variable(varname, varunits,
+                                      vartype='f4', vardims=()):
+                _v = self.output_netcdf.createVariable(
+                    varname, vartype, vardims)
+                _v.units = varunits
+
+            _var_list = list(self._save_var_list.keys())
+            _var_list.remove('meta')
+            for _val in _var_list:
+                _create_grid_variable(_val, self._save_var_list[_val][1],
+                                      self._save_var_list[_val][2],
+                                      self._save_var_list[_val][3])
 
             # set up metadata group and populate variables
             def _create_meta_variable(varname, varvalue, varunits,
@@ -556,32 +553,21 @@ class init_tools(abc.ABC):
                 _v[:] = varvalue
 
             self.output_netcdf.createGroup('meta')
-            # fixed metadata
-            _create_meta_variable('L0', self.L0, 'cells', vartype='i8')
-            _create_meta_variable('N0', self.N0, 'cells', vartype='i8')
-            _create_meta_variable('CTR', self.CTR, 'cells', vartype='i8')
-            _create_meta_variable('dx', self.dx, 'meters')
-            _create_meta_variable('h0', self.h0, 'meters')
-            _create_meta_variable('cell_type', self.cell_type, 'type',
-                                  vartype='i8', vardims=('length', 'width'))
-            # subsidence metadata
-            if self._toggle_subsidence:
-                _create_meta_variable('start_subsidence',
-                                      self.start_subsidence, 'seconds',
-                                      vartype='i8')
-                _create_meta_variable('sigma', self.sigma,
-                                      'meters per timestep',
-                                      vardims=('length', 'width'))
-
-            # time-varying metadata
-            _create_meta_variable('H_SL', None, 'meters',
-                                  vardims=('total_time'))
-            _create_meta_variable('f_bedload', None, 'fraction',
-                                  vardims=('total_time'))
-            _create_meta_variable('C0_percent', None, 'percent',
-                                  vardims=('total_time'))
-            _create_meta_variable('u0', None, 'meters per second',
-                                  vardims=('total_time'))
+            for _val in self._save_var_list['meta'].keys():
+                # time-varying initialize w/ None value, fixed use attribute
+                if (self._save_var_list['meta'][_val][0] is None):
+                    _create_meta_variable(
+                        _val, self._save_var_list['meta'][_val][0],
+                        self._save_var_list['meta'][_val][1],
+                        self._save_var_list['meta'][_val][2],
+                        self._save_var_list['meta'][_val][3])
+                else:
+                    _create_meta_variable(
+                        _val, getattr(self,
+                                      self._save_var_list['meta'][_val][0]),
+                        self._save_var_list['meta'][_val][1],
+                        self._save_var_list['meta'][_val][2],
+                        self._save_var_list['meta'][_val][3])
 
             _msg = 'Output netCDF file created'
             self.log_info(_msg, verbosity=2)
