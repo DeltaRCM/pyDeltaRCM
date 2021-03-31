@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saving custom fields to the output file &#8212; pyDeltaRCM 1.3.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developer Guide" href="../guides/developer_guide.html" />
+    <link rel="prev" title="Constraining subsidence to part of the domain" href="subsidence_region.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../guides/developer_guide.html" title="Developer Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="subsidence_region.html" title="Constraining subsidence to part of the domain"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Examples of using and working with pyDeltaRCM</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Saving custom fields to the output file</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="saving-custom-fields-to-the-output-file">
+<h1>Saving custom fields to the output file<a class="headerlink" href="#saving-custom-fields-to-the-output-file" title="Permalink to this headline">¶</a></h1>
+<p>Given the flexibility of the pyDeltaRCM model to modifications via hooks and subclassing, it is necessary that the variables saved to the output netCDF file are similarly customizable.
+Fortunately, the use of subclasses and hooks itself enables flexible setting of gridded variables to be saved as figures, as well as customization of the fields saved to the netCDF file as both variables, and as metadata.</p>
+<p>To customize the figures and variables that are saved, the hook <code class="docutils literal notranslate"><span class="pre">hook_init_output_file</span></code> should be used to subclass the pyDeltaRCM model.</p>
+<p>When adding a model attribute to the key-value pairs of grids to save as figures, the key indicates the name of the figure file that will be saved, and the value-pair can be a string representing the model attribute to be plotted, or a combination of model attributes, such as <code class="docutils literal notranslate"><span class="pre">self.eta</span> <span class="pre">*</span> <span class="pre">self.depth</span></code>.
+For example, <code class="docutils literal notranslate"><span class="pre">self._save_fig_list['active_layer']</span> <span class="pre">=</span> <span class="pre">['active_layer']</span></code> will properly indicate that figures of the active layer should be saved.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The built-in, on-the-fly, figure saving as the model runs is only supported for gridded variables with the shape <code class="docutils literal notranslate"><span class="pre">L</span> <span class="pre">x</span> <span class="pre">W</span></code> matching the model domain.
+Trying to set up figures to save that are not variables of that shape will result in an error.</p>
+</div>
+<p>When adding variables or metadata to be initialized and subsequently saved in the output netCDF, the key-value pair relationship is as follows.
+The key added to <code class="docutils literal notranslate"><span class="pre">self._save_var_list</span></code> is the name of the variable as it will be recorded in the netCDF file, this <em>does not</em> have to correspond to the name of an attribute in the model.
+To add a variable to the metadata, a key must be added to <code class="docutils literal notranslate"><span class="pre">self._save_var_list['meta']</span></code>.
+The expected value for a given key is a list containing strings indicating the model attribute to be saved, its units, the variable type, and lastly the variable dimensions (e.g., <code class="docutils literal notranslate"><span class="pre">['active_layer',</span> <span class="pre">'fraction',</span> <span class="pre">'f4',</span> <span class="pre">('total_time',</span> <span class="pre">'length',</span> <span class="pre">'width')]</span></code> for the active layer).</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The dimensions of the custom variable being specified must match <em>exactly</em> with one of the three standard dimensions: length, width, total_time.
+Use of an invalid dimension will result in an error.</p>
+</div>
+<p>An example of using the hook and creating a model subclass to customize the figures, gridded variables, and metadata being saved is provided below.</p>
+<p>Next, we instantiate the model class.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mdl</span> <span class="o">=</span> <span class="n">CustomSaveModel</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This subclass has added the active layer as a figure and a grid to be saved, as well as the number of water parcels as metadata to be saved.
+For simplicity we will just check that the appropriate parameters were added to the save figure and save variable lists, however please feel free to give this example a try on your local machine and examine the output figures and netCDF file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;active_layer&#39;</span> <span class="ow">in</span> <span class="n">mdl</span><span class="o">.</span><span class="n">_save_fig_list</span>
+<span class="go">True</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mdl</span><span class="o">.</span><span class="n">_save_fig_list</span><span class="p">)</span>
+<span class="go">{&#39;active_layer&#39;: [&#39;active_layer&#39;]}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mdl</span><span class="o">.</span><span class="n">_save_var_list</span><span class="p">)</span>
+<span class="go">{&#39;meta&#39;: {&#39;water_parcels&#39;: [&#39;Np_water&#39;, &#39;parcels&#39;, &#39;i8&#39;, ()]}, &#39;ACT_lay&#39;: [&#39;active_layer&#39;, &#39;fraction&#39;, &#39;f4&#39;, (&#39;total_time&#39;, &#39;length&#39;, &#39;width&#39;)]}</span>
+</pre></div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="subsidence_region.html"
+                        title="previous chapter">Constraining subsidence to part of the domain</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../guides/developer_guide.html"
+                        title="next chapter">Developer Guide</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/examples/custom_saving.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../guides/developer_guide.html" title="Developer Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="subsidence_region.html" title="Constraining subsidence to part of the domain"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Examples of using and working with pyDeltaRCM</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Saving custom fields to the output file</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, The DeltaRCM Team.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.3.
+    </div>
+  </body>
+</html>

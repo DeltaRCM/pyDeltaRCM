@@ -38,6 +38,7 @@
       ~DeltaModel.hook_finalize_timestep
       ~DeltaModel.hook_finalize_water_iteration
       ~DeltaModel.hook_import_files
+      ~DeltaModel.hook_init_output_file
       ~DeltaModel.hook_init_water_iteration
       ~DeltaModel.hook_load_checkpoint
       ~DeltaModel.hook_output_checkpoint

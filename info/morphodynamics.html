@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -71,7 +72,7 @@ In this documentation, we focus on the details of <em>model implementation</em>,
 </div><p>Here, <img class="math" src="../_images/math/8a87f04e7d7cca18343c084cceca5237fae62491.png" alt="\theta"/> takes the value of <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_theta_sand" title="pyDeltaRCM.model.DeltaModel.coeff_theta_sand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_theta_sand</span></code></a> for sand routing probabilities, and <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_theta_mud" title="pyDeltaRCM.model.DeltaModel.coeff_theta_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_theta_mud</span></code></a> for mud routing.</p>
 <p>(<a class="reference external" href="../pyplots/sed_tools/sediment_weights_examples.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/sediment_weights_examples.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/sediment_weights_examples.png" src="../_images/sediment_weights_examples.png" />
+<img alt="../_images/sediment_weights_examples.png" class="plot-directive" src="../_images/sediment_weights_examples.png" />
 </div>
 </div>
 </div>
@@ -106,17 +107,17 @@ The impact of routing <em>all</em> sand and mud parcels on bed elevation is show
 <tbody>
 <tr class="row-even"><td><p>(<a class="reference external" href="../pyplots/sed_tools/_initial_bed_state.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/_initial_bed_state.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/_initial_bed_state.png" src="../_images/_initial_bed_state.png" />
+<img alt="../_images/_initial_bed_state.png" class="plot-directive" src="../_images/_initial_bed_state.png" />
 </div>
 </td>
 <td><p>(<a class="reference external" href="../pyplots/sed_tools/route_all_sand_parcels.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/route_all_sand_parcels.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/route_all_sand_parcels.png" src="../_images/route_all_sand_parcels.png" />
+<img alt="../_images/route_all_sand_parcels.png" class="plot-directive" src="../_images/route_all_sand_parcels.png" />
 </div>
 </td>
 <td><p>(<a class="reference external" href="../pyplots/sed_tools/route_all_mud_parcels.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/route_all_mud_parcels.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/route_all_mud_parcels.png" src="../_images/route_all_mud_parcels.png" />
+<img alt="../_images/route_all_mud_parcels.png" class="plot-directive" src="../_images/route_all_mud_parcels.png" />
 </div>
 </td>
 </tr>
@@ -143,7 +144,7 @@ The diffusion is repeated over the entire model domain <code class="xref py py-o
 In the following example, <code class="xref py py-obj docutils literal notranslate"><span class="pre">N_crossdiff</span></code> takes the <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">default value</span></a>.</p>
 <p>(<a class="reference external" href="../pyplots/sed_tools/topo_diffusion.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/topo_diffusion.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/topo_diffusion.png" src="../_images/topo_diffusion.png" />
+<img alt="../_images/topo_diffusion.png" class="plot-directive" src="../_images/topo_diffusion.png" />
 </div>
 <p>The impact of topographic diffusion is minor compared to the bed elevation change driven by parcel erosion or deposition (<a class="reference internal" href="#sand-mud-route-comparison"><span class="std std-ref">sand and mud routing effects</span></a>).</p>
 </div>

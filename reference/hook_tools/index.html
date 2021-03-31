@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -129,6 +130,30 @@
 <dd><p>Hook <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.import_files" title="pyDeltaRCM.init_tools.init_tools.import_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_files</span></code></a>.</p>
 <p>Called immediately before
 <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.import_files" title="pyDeltaRCM.init_tools.init_tools.import_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_files</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyDeltaRCM.hook_tools.hook_tools.hook_init_output_file">
+<code class="sig-name descname"><span class="pre">hook_init_output_file</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_init_output_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_output_file" title="pyDeltaRCM.init_tools.init_tools.init_output_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_output_file</span></code></a>.</p>
+<p>Called immediately before
+<a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_output_file" title="pyDeltaRCM.init_tools.init_tools.init_output_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_output_file</span></code></a>.</p>
+<p>Expected format for entries to the <cite>meta</cite> dictionary nested within the
+<cite>self._save_var_list</cite> dictionary:</p>
+<p><a href="#id2"><span class="problematic" id="id3">``</span></a>`
+self._save_var_list[‘meta’][‘new_meta_name’] = [‘varname’, ‘units’,</p>
+<blockquote>
+<div><p>‘type’, (dimensions)]</p>
+</div></blockquote>
+<p><a href="#id4"><span class="problematic" id="id5">``</span></a><a href="#id6"><span class="problematic" id="id7">`</span></a></p>
+<p>Expected format for time varying grid entries as keys within the
+<cite>self._save_var_list</cite> dictionary:</p>
+<p><a href="#id8"><span class="problematic" id="id9">``</span></a>`
+self._save_var_list[‘new_grid_name’] = [‘varname’, ‘units’, ‘type’,</p>
+<blockquote>
+<div><p>(dimensions)]</p>
+</div></blockquote>
+<p><a href="#id10"><span class="problematic" id="id11">``</span></a><a href="#id12"><span class="problematic" id="id13">`</span></a></p>
 </dd></dl>
 
 <dl class="py method">

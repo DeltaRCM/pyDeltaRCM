@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -69,14 +70,14 @@ These 9 probabilities are organized into an array <code class="docutils literal 
 <p>The following figure shows several examples of locations within the model domain, and the corresponding water routing weights determined for that location.</p>
 <p>(<a class="reference external" href="../pyplots/water_tools/water_weights_examples.png">png</a>, <a class="reference external" href="../pyplots/water_tools/water_weights_examples.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/water_weights_examples.png" src="../_images/water_weights_examples.png" />
+<img alt="../_images/water_weights_examples.png" class="plot-directive" src="../_images/water_weights_examples.png" />
 </div>
 <p>Because probabilities are computed for all locations once at the beginning of water iteration, all water parcels can be routed <em>in parallel</em> step-by-step in <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="pyDeltaRCM.water_tools.water_tools.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>.
 During iteration, the direction of the random walk is chosen for each parcel via <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools._choose_next_directions" title="pyDeltaRCM.water_tools._choose_next_directions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_choose_next_directions</span></code></a>, which internally uses <a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.random_pick" title="pyDeltaRCM.shared_tools.random_pick"><code class="xref py py-func docutils literal notranslate"><span class="pre">random_pick()</span></code></a> for randomness.
 For example, see the random walks of several parcels below:</p>
 <p>(<a class="reference external" href="../pyplots/water_tools/run_water_iteration.png">png</a>, <a class="reference external" href="../pyplots/water_tools/run_water_iteration.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/run_water_iteration.png" src="../_images/run_water_iteration.png" />
+<img alt="../_images/run_water_iteration.png" class="plot-directive" src="../_images/run_water_iteration.png" />
 </div>
 <div class="admonition-todo admonition" id="id3">
 <p class="admonition-title">Todo</p>
@@ -90,7 +91,7 @@ For example, see the random walks of several parcels below:</p>
 First, the <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="pyDeltaRCM.water_tools.water_tools.compute_free_surface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_free_surface()</span></code></a> is called, which takes as input the current bed elevation, and the path of each water parcel (top row in figure below).</p>
 <p>(<a class="reference external" href="../pyplots/water_tools/compute_free_surface_inputs.png">png</a>, <a class="reference external" href="../pyplots/water_tools/compute_free_surface_inputs.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/compute_free_surface_inputs.png" src="../_images/compute_free_surface_inputs.png" />
+<img alt="../_images/compute_free_surface_inputs.png" class="plot-directive" src="../_images/compute_free_surface_inputs.png" />
 </div>
 <p>The <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="pyDeltaRCM.water_tools.water_tools.compute_free_surface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_free_surface()</span></code></a> method internally calls the <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools._accumulate_free_surface_walks" title="pyDeltaRCM.water_tools._accumulate_free_surface_walks"><code class="xref py py-func docutils literal notranslate"><span class="pre">_accumulate_free_surface_walks()</span></code></a> function to determine 1) the number of times each cell has been visited by a water parcel
 (<code class="docutils literal notranslate"><span class="pre">sfc_visit</span></code>), and 2) the <em>total sum of expected elevations</em> of the water surface at each cell (<code class="docutils literal notranslate"><span class="pre">sfc_sum</span></code>).
@@ -98,28 +99,28 @@ First, the <a class="reference internal" href="../reference/water_tools/index.ht
 While downstream of the land-ocean boundary (determined by a depth-or-velocity threshold), the water surface elevation is assumed to be <code class="docutils literal notranslate"><span class="pre">0</span></code>, whereas upstream of this boundary, the predicted elevation of the water surface is determined by the distance from the previously identified water surface elevation and the background land slope (<code class="xref py py-attr docutils literal notranslate"><span class="pre">S0</span></code>), such the the water surface maintains an approximately constant slope for each parcel pathway.</p>
 <p>(<a class="reference external" href="../pyplots/water_tools/_accumulate_free_surface_walks.png">png</a>, <a class="reference external" href="../pyplots/water_tools/_accumulate_free_surface_walks.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/_accumulate_free_surface_walks.png" src="../_images/_accumulate_free_surface_walks.png" />
+<img alt="../_images/_accumulate_free_surface_walks.png" class="plot-directive" src="../_images/_accumulate_free_surface_walks.png" />
 </div>
 <p>The algorithm tracks the number of times each cell has been visited by a water parcel (<code class="docutils literal notranslate"><span class="pre">sfc_visit</span></code>), and the <em>total sum of expected elevations</em> of the water surface at each cell (<code class="docutils literal notranslate"><span class="pre">sfc_sum</span></code>), by adding the predicted surface elevation of each parcel step while iterating through each step of each parcel.</p>
 <p>Next, the output from <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools._accumulate_free_surface_walks" title="pyDeltaRCM.water_tools._accumulate_free_surface_walks"><code class="xref py py-func docutils literal notranslate"><span class="pre">_accumulate_free_surface_walks()</span></code></a> is used to calculate a new stage surface (<code class="docutils literal notranslate"><span class="pre">H_new</span></code>) based only on the water parcel paths and expected water surface elevations, approximately as <code class="docutils literal notranslate"><span class="pre">H_new</span> <span class="pre">=</span> <span class="pre">sfc_sum</span> <span class="pre">/</span> <span class="pre">sfc_visit</span></code>.
 The updated water surface is combined with the previous timestep’s water surface and an under-relaxation coefficient (<code class="xref py py-attr docutils literal notranslate"><span class="pre">omega_sfc</span></code>).</p>
 <p>(<a class="reference external" href="../pyplots/water_tools/compute_free_surface_outputs.png">png</a>, <a class="reference external" href="../pyplots/water_tools/compute_free_surface_outputs.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/compute_free_surface_outputs.png" src="../_images/compute_free_surface_outputs.png" />
+<img alt="../_images/compute_free_surface_outputs.png" class="plot-directive" src="../_images/compute_free_surface_outputs.png" />
 </div>
 <p>With a new free surface computed, a few final operations prepare the surface for boundary condition updates and eventually being passed to the sediment routing operations.
 A non-linear smoothing operation is applied to the free surface, whereby wet cells are iteratively averaged with neighboring wet cells to yield an overall smoother surface.
 The smoothing is handled by <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools._smooth_free_surface" title="pyDeltaRCM.water_tools._smooth_free_surface"><code class="xref py py-func docutils literal notranslate"><span class="pre">_smooth_free_surface()</span></code></a> and depends on the number of iterations (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.Nsmooth" title="pyDeltaRCM.model.DeltaModel.Nsmooth"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Nsmooth</span></code></a>) and a weighting coefficient (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.Csmooth" title="pyDeltaRCM.model.DeltaModel.Csmooth"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Csmooth</span></code></a>).</p>
 <p>(<a class="reference external" href="../pyplots/water_tools/_smooth_free_surface.png">png</a>, <a class="reference external" href="../pyplots/water_tools/_smooth_free_surface.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/_smooth_free_surface.png" src="../_images/_smooth_free_surface.png" />
+<img alt="../_images/_smooth_free_surface.png" class="plot-directive" src="../_images/_smooth_free_surface.png" />
 </div>
 <p>Finally, a <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.flooding_correction" title="pyDeltaRCM.water_tools.water_tools.flooding_correction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">flooding_correction()</span></code></a> is applied to the domain.
 In this correction, all “dry” cells (a cell where the flow depth is less than the <cite>dry_depth</cite>) are checked for any neighboring cells where the water surface elevation (<cite>stage</cite>) is higher than the bed elevation of the dry cell.
 If this condition is met for a given dry cell, the dry cell is flooded: the stage of the dry cell is set to the maximum stage of neighboring cells.</p>
 <p>(<a class="reference external" href="../pyplots/water_tools/flooding_correction.png">png</a>, <a class="reference external" href="../pyplots/water_tools/flooding_correction.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/flooding_correction.png" src="../_images/flooding_correction.png" />
+<img alt="../_images/flooding_correction.png" class="plot-directive" src="../_images/flooding_correction.png" />
 </div>
 <p>Similar to <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools._smooth_free_surface" title="pyDeltaRCM.water_tools._smooth_free_surface"><code class="xref py py-func docutils literal notranslate"><span class="pre">_smooth_free_surface()</span></code></a> described above, <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.flooding_correction" title="pyDeltaRCM.water_tools.water_tools.flooding_correction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">flooding_correction()</span></code></a> acts to remove roughness in the water surface and contributes to <a class="reference internal" href="morphodynamics.html#model-stability"><span class="std std-ref">model stability</span></a>.</p>
 </div>

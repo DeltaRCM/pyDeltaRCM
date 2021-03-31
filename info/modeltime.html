@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -60,7 +61,7 @@ So while flooding only occurs for a small fraction of total time, most of the ti
 For 25 days of the flood event, the discharge is high enough to exceed the bankfull discharge (“flooding duration”).</p>
 <p>(<a class="reference external" href="../pyplots/modeltime/one_year_plot.png">png</a>, <a class="reference external" href="../pyplots/modeltime/one_year_plot.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/one_year_plot.png" src="../_images/one_year_plot.png" />
+<img alt="../_images/one_year_plot.png" class="plot-directive" src="../_images/one_year_plot.png" />
 </div>
 <p>A numerical model could simulate every day of this hydrograph, but this would require substantial computing power.
 To accelerate the computation time of models, we assume that the only important period of time is when the river is at-or-above bankfull discharge, and we collapse the hydrograph to a single value: the bankfull discharge.
@@ -82,7 +83,7 @@ For example, for a model run that has elapsed <img class="math" src="../_images/
 A simulation of every day in the simulation duration would require 1460 days of simulated time (<img class="math" src="../_images/math/cabb77baaacc77b37f3d89c80d3163825517c5a4.png" alt="1.26 \times 10^8"/> seconds).</p>
 <p>(<a class="reference external" href="../pyplots/modeltime/four_year_plot.png">png</a>, <a class="reference external" href="../pyplots/modeltime/four_year_plot.hires.png">hires.png</a>)</p>
 <div class="figure align-default">
-<img alt="../_images/four_year_plot.png" src="../_images/four_year_plot.png" />
+<img alt="../_images/four_year_plot.png" class="plot-directive" src="../_images/four_year_plot.png" />
 </div>
 <p>In contrast, by condensing the simulated time down to a bankfull discharge only, the intermittency assumption allows us to simulate the same “four year” period in just under 59 days of simulated time (<img class="math" src="../_images/math/87ae2712a99293393aa40bbce6755bae8987d7cf.png" alt="5.08 \times 10^6"/> seconds).</p>
 <div class="section" id="see-also">
