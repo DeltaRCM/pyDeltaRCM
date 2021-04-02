@@ -896,7 +896,7 @@ class PreprocessorCLI(BasePreprocessor):
         cli_dict = self.process_arguments()
 
         # process the input file to a dictionary (or empty if none)
-        if 'config' in cli_dict.keys():
+        if cli_dict['config'] is not None:
             input_file = cli_dict['config']
             yaml_dict = self.open_input_file_to_dict(input_file)
             self._input_file = input_file  # fill field
