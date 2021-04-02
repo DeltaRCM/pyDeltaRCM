@@ -187,7 +187,7 @@ class init_tools(abc.ABC):
         self.log_info(_msg, verbosity=0)
 
     def set_constants(self):
-
+        """Set the model constants."""
         _msg = 'Setting model constants'
         self.log_info(_msg, verbosity=1)
 
