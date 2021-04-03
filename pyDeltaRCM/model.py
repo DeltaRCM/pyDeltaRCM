@@ -141,14 +141,23 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         model time-tracking attributes. This method calls, in sequence:
 
             * the routine to run one timestep (i.e., water surface estimation
-              and sediment routing, :meth:`run_one_timestep`)
-            * the basin subsidence update pattern (:meth:`apply_subsidence`)
-            * the timestep finalization routine (:meth:`finalize_timestep`)
-            * straigraphy updating routine (:meth:`record_stratigraphy`)
+              and sediment routing;
+              :meth:`~pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep`)
+            * the basin subsidence update;
+              (:meth:`~pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence`)
+            * the timestep finalization routine (applying boundary conditions);
+              (:meth:`~pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep`)
+            * the internal time-tracking attributes of the model are updated
+            * the routine to output data to the NetCDF file;
+              (:meth:`~pyDeltaRCM.iteration_tools.iteration_tools.output_data`)
+            * the routine to output a checkpoint file;
+              (:meth:`~pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint`)
 
         If you attempt to override the ``update`` routine, you must implement
         these operations at a minimum. More likely, you can implement what you
-        need to by just overriding one of the methods called by `update`.
+        need to by utilizing a model `hook`, or overriding one of the methods
+        called by `update`. For more information on customizing the model, see
+        the :ref:`complete guide <customize_the_model>`.
 
         Parameters
         ----------
