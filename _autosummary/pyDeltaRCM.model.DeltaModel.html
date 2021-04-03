@@ -1186,15 +1186,24 @@ model time-tracking attributes. This method calls, in sequence:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>the routine to run one timestep (i.e., water surface estimation
-and sediment routing, <code class="xref py py-meth docutils literal notranslate"><span class="pre">run_one_timestep()</span></code>)</p></li>
-<li><p>the basin subsidence update pattern (<code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_subsidence()</span></code>)</p></li>
-<li><p>the timestep finalization routine (<code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize_timestep()</span></code>)</p></li>
-<li><p>straigraphy updating routine (<code class="xref py py-meth docutils literal notranslate"><span class="pre">record_stratigraphy()</span></code>)</p></li>
+and sediment routing;
+<a class="reference internal" href="../reference/iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run_one_timestep()</span></code></a>)</p></li>
+<li><p>the basin subsidence update;
+(<a class="reference internal" href="../reference/iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_subsidence()</span></code></a>)</p></li>
+<li><p>the timestep finalization routine (applying boundary conditions);
+(<a class="reference internal" href="../reference/iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize_timestep()</span></code></a>)</p></li>
+<li><p>the internal time-tracking attributes of the model are updated</p></li>
+<li><p>the routine to output data to the NetCDF file;
+(<a class="reference internal" href="../reference/iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.output_data" title="pyDeltaRCM.iteration_tools.iteration_tools.output_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">output_data()</span></code></a>)</p></li>
+<li><p>the routine to output a checkpoint file;
+(<a class="reference internal" href="../reference/iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint" title="pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint"><code class="xref py py-meth docutils literal notranslate"><span class="pre">output_checkpoint()</span></code></a>)</p></li>
 </ul>
 </div></blockquote>
 <p>If you attempt to override the <code class="docutils literal notranslate"><span class="pre">update</span></code> routine, you must implement
 these operations at a minimum. More likely, you can implement what you
-need to by just overriding one of the methods called by <cite>update</cite>.</p>
+need to by utilizing a model <cite>hook</cite>, or overriding one of the methods
+called by <cite>update</cite>. For more information on customizing the model, see
+the <a class="reference internal" href="../guides/user_guide.html#customize-the-model"><span class="std std-ref">complete guide</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><strong>RuntimeError</strong> – If model has already been finalized via <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.finalize" title="pyDeltaRCM.model.DeltaModel.finalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code></a>.</p>
