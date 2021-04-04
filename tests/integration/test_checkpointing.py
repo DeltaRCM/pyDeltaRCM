@@ -619,8 +619,14 @@ class TestCheckpointingCreatingLoading:
             # basemodel
             assert output['time'].shape[0] <= (bmsi // 2)
 
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason='OS differences regarding netCDF permissions.')
     def test_load_checkpoint_with_open_netcdf(self, tmp_path):
         """Test what happens if output netCDF file is actually open.
+
+        This is not the same as when the netCDF file is open in another
+        process. That situation raises an error for all OS.
         """
         # define a yaml with outputs (defaults will output strata)
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -679,3 +685,51 @@ class TestCheckpointingCreatingLoading:
         # random field should be saved in the new netCDF file
         # some rounding/truncation happens in the netCDF so we use approx
         assert pytest.approx(_rand_field == _new['eta'][1, :, :].data)
+
+    @pytest.mark.skipif(
+        platform.system() != 'Windows',
+        reason='OS differences regarding netCDF permissions.')
+    def test_load_checkpoint_with_open_netcdf_win(self, tmp_path):
+        """Test what happens if output netCDF file is actually open.
+
+        This is not the same as when the netCDF file is open in another
+        process. That situation raises an error for all OS.
+        """
+        # define a yaml with outputs (defaults will output strata)
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_checkpoint': True,
+                                      'save_eta_grids': True})
+        _delta = DeltaModel(input_file=p)
+
+        # replace eta with a random field for checkpointing success check
+        _rand_field = np.random.uniform(0, 1, size=_delta.eta.shape)
+        _delta.eta = _rand_field
+
+        _delta._save_time_since_checkpoint = float("inf")
+        _delta.output_checkpoint()  # force another checkpoint
+        _delta.finalize()
+
+        # paths exists
+        assert os.path.isfile(os.path.join(
+            _delta.prefix, 'pyDeltaRCM_output.nc'))
+        assert os.path.isfile(os.path.join(
+            _delta.prefix, 'checkpoint.npz'))
+        _prefix = _delta.prefix
+        _delta = []  # clear
+
+        # open the netCDF file
+        _opened = Dataset(os.path.join(_prefix, 'pyDeltaRCM_output.nc'),
+                          'r+', format='NETCDF4')
+        assert type(_opened) == Dataset
+        assert 'eta' in _opened.variables.keys()
+        # saved grid is the initial one, before random field was assigned
+        assert np.all(_opened.variables['eta'][:].data != _rand_field)
+
+        # can be resumed
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_checkpoint': True,
+                                      'resume_checkpoint': True,
+                                      'save_eta_grids': True})
+        # raises a permissions error on Windows
+        with pytest.raises(PermissionError):
+            _ = DeltaModel(input_file=p)
