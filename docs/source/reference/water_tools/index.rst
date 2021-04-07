@@ -13,7 +13,7 @@ During each of these iterations of the water routing, the following methods are 
 
 .. autosummary::
 
-    water_tools.init_water_iteration
+  water_tools.init_water_iteration
 	water_tools.run_water_iteration
 	water_tools.compute_free_surface
 	water_tools.finalize_water_iteration
@@ -22,7 +22,7 @@ During each of these iterations of the water routing, the following methods are 
 Public API methods attached to model
 ------------------------------------
 
-The following methods are defined in the ``water_tools`` class, of the ``pyDeltaRCM.water_tools`` module. 
+The following methods are defined in the ``water_tools`` class, of the ``pyDeltaRCM.water_tools`` module.
 
 .. autosummary::
 

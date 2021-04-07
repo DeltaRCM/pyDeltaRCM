@@ -27,53 +27,54 @@ The expected value for a given key is a list containing strings indicating the m
 An example of using the hook and creating a model subclass to customize the figures, gridded variables, and metadata being saved is provided below.
 
 .. doctest::
-    :context: reset
-    :include-source:
 
-    class CustomSaveModel(pyDeltaRCM.DeltaModel):
-        """A subclass of DeltaModel to save custom figures and variables.
+    >>> import pyDeltaRCM
 
-        This subclass modifies the list of variables and figures used to
-        initialize the netCDF file and save figures and grids before the
-        output file is setup and initial conditions are plotted.
-        """
-        def __init__(self, input_file=None, **kwargs):
-
-             # inherit base DeltaModel methods
-            super().__init__(input_file, **kwargs)
-
-        def hook_init_output_file(self):
-            """Add non-standard grids, figures and metadata to be saved."""
-            # save a figure of the active layer each save_dt
-            self._save_fig_list['active_layer'] = ['active_layer']
-
-            # save the active layer grid each save_dt w/ a short name
-            self._save_var_list['actlay'] = ['active_layer', 'fraction', 'f4',
-                                             ('total_time', 'length', 'width')]
-            # save number of water parcels w/ a long name
-            self._save_var_list['meta']['water_parcels'] = ['Np_water',
-                                                            'parcels',
-                                                            'i8', ()]
+    >>> class CustomSaveModel(pyDeltaRCM.DeltaModel):
+    ...     """A subclass of DeltaModel to save custom figures and variables.
+    ...
+    ...     This subclass modifies the list of variables and figures used to
+    ...     initialize the netCDF file and save figures and grids before the
+    ...     output file is setup and initial conditions are plotted.
+    ...     """
+    ...     def __init__(self, input_file=None, **kwargs):
+    ...
+    ...         # inherit base DeltaModel methods
+    ...         super().__init__(input_file, **kwargs)
+    ...
+    ...     def hook_init_output_file(self):
+    ...         """Add non-standard grids, figures and metadata to be saved."""
+    ...         # save a figure of the active layer each save_dt
+    ...         self._save_fig_list['active_layer'] = ['active_layer']
+    ...
+    ...         # save the active layer grid each save_dt w/ a short name
+    ...         self._save_var_list['actlay'] = ['active_layer', 'fraction',
+    ...                                          'f4', ('total_time',
+    ...                                                 'length', 'width')]
+    ...
+    ...         # save number of water parcels w/ a long name
+    ...         self._save_var_list['meta']['water_parcels'] = ['Np_water',
+    ...                                                         'parcels',
+    ...                                                         'i8', ()]
 
 Next, we instantiate the model class.
 
 .. code::
 
-    mdl = CustomSaveModel()
+    >>> mdl = CustomSaveModel()
 
 
 .. doctest::
-    :context:
+    :hide:
 
-    with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
-        mdl = CustomSaveModel(out_dir=output_dir)
+    >>> with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
+    ...     mdl = CustomSaveModel(out_dir=output_dir)
 
 
 This subclass has added the active layer as a figure and a grid to be saved, as well as the number of water parcels as metadata to be saved.
 For simplicity we will just check that the appropriate parameters were added to the save figure and save variable lists, however please feel free to give this example a try on your local machine and examine the output figures and netCDF file.
 
 .. doctest::
-    :context:
 
     >>> 'active_layer' in mdl._save_fig_list
     True
@@ -82,15 +83,4 @@ For simplicity we will just check that the appropriate parameters were added to 
     {'active_layer': ['active_layer']}
 
     >>> print(mdl._save_var_list)
-    {'meta': {'water_parcels': ['Np_water', 'parcels', 'i8', ()]}, 'ACT_lay': ['active_layer', 'fraction', 'f4', ('total_time', 'length', 'width')]}
-
-.. code::
-
-    >>> 'active_layer' in mdl._save_fig_list
-    True
-
-    >>> print(mdl._save_fig_list)
-    {'active_layer': ['active_layer']}
-
-    >>> print(mdl._save_var_list)
-    {'meta': {'water_parcels': ['Np_water', 'parcels', 'i8', ()]}, 'ACT_lay': ['active_layer', 'fraction', 'f4', ('total_time', 'length', 'width')]}
+    {'meta': {'water_parcels': ['Np_water', 'parcels', 'i8', ()]}, 'actlay': ['active_layer', 'fraction', 'f4', ('total_time', 'length', 'width')]}

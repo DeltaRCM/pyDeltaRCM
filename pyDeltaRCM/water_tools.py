@@ -509,7 +509,10 @@ class water_tools(abc.ABC):
 @njit
 def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
                               dry_depth, gamma, theta):
+    """Compute water weights for a given cell.
 
+    This is a jitted function called by :func:`_get_water_weight_array`.
+    """
     # create a fixed set of bools
     dry = (depth_nbrs < dry_depth)
     wall = (ct_nbrs == -2)

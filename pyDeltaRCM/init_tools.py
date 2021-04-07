@@ -187,7 +187,7 @@ class init_tools(abc.ABC):
         self.log_info(_msg, verbosity=0)
 
     def set_constants(self):
-
+        """Set the model constants."""
         _msg = 'Setting model constants'
         self.log_info(_msg, verbosity=1)
 
@@ -687,6 +687,17 @@ class init_tools(abc.ABC):
                 self._save_iter = int(0)
                 self.init_output_file()
             else:
+                # check if file is open in another process, if so throw error
+                try:
+                    _dataset = Dataset(file_path, 'r+', format='NETCDF')
+                    _dataset.close()  # if this worked then close it
+                except OSError:
+                    raise RuntimeError(
+                        'Could not open the NetCDF file for checkpointing. '
+                        'This could be because the file is corrupt, or open '
+                        'in another interpreter. Be sure to close any '
+                        'connections to the file before proceeding.')
+                # if not open elsewhere, then proceed
                 # rename the old netCDF4 file
                 _msg = 'Renaming old NetCDF4 output file'
                 self.log_info(_msg, verbosity=2)
