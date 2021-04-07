@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Constraining subsidence to part of the domain &#8212; pyDeltaRCM 1.3.0 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
@@ -43,11 +44,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="constraining-subsidence-to-part-of-the-domain">
+  <section id="constraining-subsidence-to-part-of-the-domain">
 <h1>Constraining subsidence to part of the domain<a class="headerlink" href="#constraining-subsidence-to-part-of-the-domain" title="Permalink to this headline">¶</a></h1>
 <p>One case that has been explored in the literature with the DeltaRCM model is the case of subsidence limited to one region of the model domain <a class="footnote-reference brackets" href="#id3" id="id1">1</a>.
 This model configuration can be readily achieved with model subclassing.</p>
-<div class="section" id="setting-up-the-custom-subclass">
+<section id="setting-up-the-custom-subclass">
 <h2>Setting up the custom subclass<a class="headerlink" href="#setting-up-the-custom-subclass" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ConstrainedSubsidenceModel</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A simple subclass of DeltaModel with subsidence region constrained.</span>
@@ -107,11 +108,11 @@ Note that the colorscale depicts the magnitude of subsidence in the model <em>pe
 </pre></div>
 </div>
 <p>(<a class="reference external" href="../examples/subsidence_region-3.png">png</a>, <a class="reference external" href="../examples/subsidence_region-3.hires.png">hires.png</a>)</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="../_images/subsidence_region-3.png" class="plot-directive" src="../_images/subsidence_region-3.png" />
-</div>
-</div>
-<div class="section" id="using-the-custom-subclass-with-the-preprocessor">
+</figure>
+</section>
+<section id="using-the-custom-subclass-with-the-preprocessor">
 <h2>Using the custom subclass with the preprocessor<a class="headerlink" href="#using-the-custom-subclass-with-the-preprocessor" title="Permalink to this headline">¶</a></h2>
 <p>We can configure a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code> to handle a set of custom runs in conjunction with out custom <cite>pyDeltaRCM</cite> model subclass.
 For example, in <a class="footnote-reference brackets" href="#id3" id="id2">1</a>, the authors explore the impact of subsidence at various rates: 3 mm/yr, 6 mm/yr, 10 mm/yr, 25 mm/yr, 50 mm/yr, and 100 mm/yr.
@@ -168,17 +169,17 @@ For example, in a Python script, following the definition of the subclass above,
 </pre></div>
 </div>
 <p>(<a class="reference external" href="../examples/subsidence_region-7.png">png</a>, <a class="reference external" href="../examples/subsidence_region-7.hires.png">hires.png</a>)</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="../_images/subsidence_region-7.png" class="plot-directive" src="../_images/subsidence_region-7.png" />
-</div>
+</figure>
 <dl class="footnote brackets">
 <dt class="label" id="id3"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>)</span></dt>
 <dd><p>Liang, M., Kim, W., and Passalacqua, P. (2016), How much subsidence is
 enough to change the morphology of river deltas?, Geophysical Research Letters, 43, 10,266–10,276, doi:10.1002/2016GL070519.</p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>

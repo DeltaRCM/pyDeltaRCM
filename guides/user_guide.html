@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>User Guide &#8212; pyDeltaRCM 1.3.0 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
@@ -42,7 +43,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="user-guide">
+  <section id="user-guide">
 <h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">Preface</p>
 <p>All of the documentation in this page, and elsewhere assumes you have imported the <cite>pyDeltaRCM</cite> package as <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM</span></code>:</p>
@@ -55,7 +56,7 @@ We may not always explicitly import these packages throughout the documentation;
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 </pre></div>
 </div>
-<div class="section" id="running-the-model">
+<section id="running-the-model">
 <h2>Running the model<a class="headerlink" href="#running-the-model" title="Permalink to this headline">¶</a></h2>
 <p>Running a <cite>pyDeltaRCM</cite> model is usually accomplished via a combination of configuration files and scripts.
 In the simplest case, actually, none of these are required; the following command (executed at a console) runs a <cite>pyDeltaRCM</cite> model with the default set of model parameters for 10 timesteps:</p>
@@ -75,9 +76,9 @@ Python objects are instantiated by calling the <cite>class</cite> name, followed
 Based on the <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">default parameters</span></a>, the model domain is configured as an open basin, with an inlet centered along one wall.
 Default parameters are set to sensible values, and generally follow those described in <a class="footnote-reference brackets" href="#id2" id="id1">1</a>.</p>
 <p>(<a class="reference external" href="../guides/user_guide-2.png">png</a>, <a class="reference external" href="../guides/user_guide-2.hires.png">hires.png</a>)</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="../_images/user_guide-2.png" class="plot-directive" src="../_images/user_guide-2.png" />
-</div>
+</figure>
 <p>To run the model, we use the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.update" title="pyDeltaRCM.model.DeltaModel.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code></a> method of the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel" title="pyDeltaRCM.model.DeltaModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel</span></code></a> instance (i.e., call <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.update" title="pyDeltaRCM.model.DeltaModel.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code></a> on <code class="docutils literal notranslate"><span class="pre">mdl</span></code>):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">mdl</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
@@ -107,8 +108,8 @@ Note that the output file is periodically saved during the model run, so things 
 </pre></div>
 </div>
 <p>Now, we probably don’t want to just run the model with default parameters, so the remainder of the guide will cover other use cases with increasing complexity; first up is changing model parameter values via a <code class="docutils literal notranslate"><span class="pre">YAML</span></code> configuration file.</p>
-</div>
-<div class="section" id="configuring-an-input-yaml-file">
+</section>
+<section id="configuring-an-input-yaml-file">
 <h2>Configuring an input YAML file<a class="headerlink" href="#configuring-an-input-yaml-file" title="Permalink to this headline">¶</a></h2>
 <p>The configuration for a pyDeltaRCM run is set up by a parameter set, usually described in the <code class="docutils literal notranslate"><span class="pre">YAML</span></code> markup format.
 To configure a run, you should create a file called, for example, <code class="docutils literal notranslate"><span class="pre">run_parameters.yml</span></code>.
@@ -121,13 +122,13 @@ Inside this file you can specify parameters for your run, with each parameter on
 Multiple parameters can be specified line by line.</p>
 <p>Default values are substituted for any parameter not explicitly given in the <code class="docutils literal notranslate"><span class="pre">input_file</span></code> <code class="docutils literal notranslate"><span class="pre">.yml</span></code> file.
 Default values of the YAML configuration are listed in the <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">Default Model Variable Values</span></a>.</p>
-</div>
-<div class="section" id="starting-model-runs">
+</section>
+<section id="starting-model-runs">
 <h2>Starting model runs<a class="headerlink" href="#starting-model-runs" title="Permalink to this headline">¶</a></h2>
 <p>There are two API levels at which you can interact with the pyDeltaRCM model.
 There is a “high-level” model API, which takes as argument a YAML configuration file, and will compose a list of jobs as indicated in the YAML file; the setup can be configured to automatically execute the job list, as well.
 The “low-level” API consists of creating a model instance from a YAML configuration file and manually handling the timestepping, or optionally, augmenting operations of the model to implement new features.</p>
-<div class="section" id="high-level-model-api">
+<section id="high-level-model-api">
 <span id="high-level-api"></span><h3>High-level model API<a class="headerlink" href="#high-level-model-api" title="Permalink to this headline">¶</a></h3>
 <p>The high-level API is accessed via either a shell prompt or python script, and handles setting up the model configuration and running the model a specified duration.</p>
 <p>For the following high-level API demonstrations, consider a YAML input file named <code class="docutils literal notranslate"><span class="pre">model_configuration.yml</span></code> which looks like:</p>
@@ -136,7 +137,7 @@ The “low-level” API consists of creating a model instance from a YAML config
 <span class="nt">timesteps</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">500</span>
 </pre></div>
 </div>
-<div class="section" id="command-line-api">
+<section id="command-line-api">
 <h4>Command line API<a class="headerlink" href="#command-line-api" title="Permalink to this headline">¶</a></h4>
 <p>To invoke a model run from the command line using the YAML file <code class="docutils literal notranslate"><span class="pre">model_configuration.yml</span></code> defined above,
 we would simply call:</p>
@@ -149,8 +150,8 @@ we would simply call:</p>
 </div>
 <p>These invocations will run the pyDeltaRCM <a class="reference internal" href="../_autosummary/pyDeltaRCM.preprocessor.PreprocessorCLI.html#pyDeltaRCM.preprocessor.PreprocessorCLI" title="pyDeltaRCM.preprocessor.PreprocessorCLI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preprocessor</span></code></a> with the parameters specified in the <code class="docutils literal notranslate"><span class="pre">model_configuration.yml</span></code> file.
 If the YAML configuration indicates multiple jobs (<a class="reference internal" href="#configuring-multiple-jobs"><span class="std std-ref">via matrix expansion or ensemble specification</span></a>), the jobs will each be run automatically by calling <code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code> on the model 500 times.</p>
-</div>
-<div class="section" id="python-api">
+</section>
+<section id="python-api">
 <h4>Python API<a class="headerlink" href="#python-api" title="Permalink to this headline">¶</a></h4>
 <p>The Python high-level API is accessed via the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code> object.
 First, the <cite>Preprocessor</cite> is instantiated with a YAML configuration file (e.g., <code class="docutils literal notranslate"><span class="pre">model_configuration.yml</span></code>):</p>
@@ -162,8 +163,8 @@ Jobs are then run with:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pp</span><span class="o">.</span><span class="n">run_jobs</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="model-simulation-duration-in-the-high-level-api">
+</section>
+<section id="model-simulation-duration-in-the-high-level-api">
 <h4>Model simulation duration in the high-level API<a class="headerlink" href="#model-simulation-duration-in-the-high-level-api" title="Permalink to this headline">¶</a></h4>
 <p>The duration of a model run configured with the high-level API can be set up with a number of different configuration parameters.</p>
 <div class="admonition note">
@@ -196,8 +197,8 @@ In the case of multiple argument specification, precedence is given in the order
 This argument will scale the specified time-to-model-time, such that the <em>scaled time</em> is equal to the input argument time.
 Specifying the <img class="math" src="../_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>  value is essential when using the model duration run specifications.
 See <a class="reference internal" href="../info/modeltime.html"><span class="doc">Time in pyDeltaRCM</span></a> for complete information on the scaling between model time and elapsed simulation time.</p>
-</div>
-<div class="section" id="running-simulations-in-parallel">
+</section>
+<section id="running-simulations-in-parallel">
 <h4>Running simulations in parallel<a class="headerlink" href="#running-simulations-in-parallel" title="Permalink to this headline">¶</a></h4>
 <p>The high-level API provides the ability to run simulations in parallel on Linux environments.
 This option is only useful in the case where you are running multiple jobs with the <a class="reference internal" href="#matrix-expansion-tag"><span class="std std-ref">matrix expansion</span></a>, <a class="reference internal" href="#ensemble-expansion-tag"><span class="std std-ref">ensemble expansion</span></a>, or <a class="reference internal" href="#set-expansion-tag"><span class="std std-ref">set expansion</span></a> tools.</p>
@@ -207,9 +208,9 @@ Optionally, you can specify the number of simulations to run at once by followin
 $ pyDeltaRCM --config model_configuration.yml --timesteps <span class="m">5000</span> --parallel <span class="m">6</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="low-level-model-api">
+</section>
+</section>
+<section id="low-level-model-api">
 <h3>Low-level model API<a class="headerlink" href="#low-level-model-api" title="Permalink to this headline">¶</a></h3>
 <p>The low-level API is the same as that described at the beginning of this guide.
 Interact with the model by creating your own script, and manipulating model outputs at the desired level.
@@ -231,14 +232,14 @@ For example:</p>
 </div>
 <p>Keyword arguments supplied at this point will supersede values specified in the YAML configuration.
 See <a class="reference internal" href="#customize-the-model"><span class="std std-ref">our guide for model customization</span></a> for a complete explanation and demonstration for how to modify model behavior.</p>
-</div>
-</div>
-<div class="section" id="advanced-model-configurations">
+</section>
+</section>
+<section id="advanced-model-configurations">
 <h2>Advanced model configurations<a class="headerlink" href="#advanced-model-configurations" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="configuring-multiple-model-runs-from-a-single-yaml-file">
+<section id="configuring-multiple-model-runs-from-a-single-yaml-file">
 <span id="configuring-multiple-jobs"></span><h3>Configuring multiple model runs from a single YAML file<a class="headerlink" href="#configuring-multiple-model-runs-from-a-single-yaml-file" title="Permalink to this headline">¶</a></h3>
 <p>Multiple model runs (referred to as “jobs”) can be configured by a single <cite>.yml</cite> configuration file, by using the <cite>matrix</cite> and <cite>ensemble</cite> configuration keys.</p>
-<div class="section" id="matrix-expansion">
+<section id="matrix-expansion">
 <span id="matrix-expansion-tag"></span><h4>Matrix expansion<a class="headerlink" href="#matrix-expansion" title="Permalink to this headline">¶</a></h4>
 <p>To use matrix expansion to configure multiple model runs, the dimensions of the matrix (i.e., the variables you want to run) should be listed below the <cite>matrix</cite> key. For example, the following configuration is a one-dimensional matrix with the variable <cite>f_bedload</cite>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;out_dir&#39;</span>
@@ -278,8 +279,8 @@ Each folder will contain a copy of the configuration file used for that job; for
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="ensemble-expansion">
+</section>
+<section id="ensemble-expansion">
 <span id="ensemble-expansion-tag"></span><h4>Ensemble expansion<a class="headerlink" href="#ensemble-expansion" title="Permalink to this headline">¶</a></h4>
 <p>Ensemble expansion creates replicates of specified model configurations with different random seed values.
 Like the matrix expansion, the <cite>out_dir</cite> key must be specified in the input configuration file.
@@ -304,8 +305,8 @@ The ensemble expansion can be applied to configuration files that include a matr
 </pre></div>
 </div>
 <p>The above configuration file would produce 6 model runs, 3 with a basin depth (<cite>h0</cite>) of 1.0, and 3 with a basin depth of 2.0.</p>
-</div>
-<div class="section" id="set-expansion">
+</section>
+<section id="set-expansion">
 <span id="set-expansion-tag"></span><h4>Set expansion<a class="headerlink" href="#set-expansion" title="Permalink to this headline">¶</a></h4>
 <p>Set expansion enables user-configured parameter sets to take advantage of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code> infrastructure (such as the job output preparation and ability to run jobs in parallel), while also enabling flexible configurations for parameter sets than cannot be configured via <cite>matrix</cite> expansion.
 For example, to vary <cite>Qw0</cite> while holding <cite>Qs0</cite> fixed requires modifying both <cite>C0_percent</cite> and some water-discharge-controlling parameter <em>simultaneously</em>; i.e., this cannot be achieved with <cite>matrix</cite> expansion.</p>
@@ -318,9 +319,9 @@ For example, to configure two model runs, the first with parameters <code class=
 </div>
 <p>All jobs in the <cite>set</cite> specification must have the exact same set of keys.
 Moreover, additional <cite>ensemble</cite> or <cite>matrix</cite> specifications are not supported with the <cite>set</cite> specification.</p>
-</div>
-</div>
-<div class="section" id="customizing-model-operations-with-subclasses-and-hooks">
+</section>
+</section>
+<section id="customizing-model-operations-with-subclasses-and-hooks">
 <h3>Customizing model operations with subclasses and hooks<a class="headerlink" href="#customizing-model-operations-with-subclasses-and-hooks" title="Permalink to this headline">¶</a></h3>
 <p id="customize-the-model">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel</span></code> is designed for flexibility and extension by users, and to support arbitrary and imaginative changes to the model routine.
 For example, one could easily extend the model to include additional delta controls (such as vegetation or permafrost development), or modify the model domain boundary conditions (such as imposing a sloped receiving basin).
@@ -405,24 +406,24 @@ For example, to change the behavior of the subsidence field to vary randomly in 
 <p>There may be cases where hooks are insufficient for the modifications you need to make to the model.
 In this case, you should subclass the model, as depicted above, and re-implement entire methods, as necessary, by copying code from the package to your own subclass.
 However, for stability and forwards-compatibility, you should try to minimize copied code as much as possible.</p>
-<div class="section" id="subclassing-examples">
+<section id="subclassing-examples">
 <h4>Subclassing examples<a class="headerlink" href="#subclassing-examples" title="Permalink to this headline">¶</a></h4>
 <p>We maintain a number of <a class="reference internal" href="../examples/index.html"><span class="doc">examples of pyDeltaRCM use</span></a>, which show  DeltaModel subclasses implementing various hooks, and reimplementing existing methods, to achieve complex behavior.</p>
-</div>
-</div>
-</div>
-<div class="section" id="working-with-subsidence">
+</section>
+</section>
+</section>
+<section id="working-with-subsidence">
 <h2>Working with subsidence<a class="headerlink" href="#working-with-subsidence" title="Permalink to this headline">¶</a></h2>
 <p>What is subsidence anyway? Subsidence is basically the downward vertical
 movement of the ground. There are many direct and indirect causes of subsidence,
 check out the <a class="reference external" href="https://en.wikipedia.org/wiki/Subsidence">Wikipedia page</a>
 to get an overview.</p>
-<div class="section" id="turning-on-subsidence-in-pydeltarcm">
+<section id="turning-on-subsidence-in-pydeltarcm">
 <h3>Turning on Subsidence in pyDeltaRCM<a class="headerlink" href="#turning-on-subsidence-in-pydeltarcm" title="Permalink to this headline">¶</a></h3>
 <p>To configure a pyDeltaRCM model with subsidence, the yaml parameter,
 <code class="docutils literal notranslate"><span class="pre">toggle_subsidence</span></code> must be set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
-</div>
-<div class="section" id="controlling-subsidence-behavior">
+</section>
+<section id="controlling-subsidence-behavior">
 <h3>Controlling Subsidence Behavior<a class="headerlink" href="#controlling-subsidence-behavior" title="Permalink to this headline">¶</a></h3>
 <p>Two yaml parameters are provided to give users some basic control over
 subsidence behavior. The first is <code class="docutils literal notranslate"><span class="pre">start_subsidence</span></code>, which defines <em>when</em>
@@ -441,14 +442,14 @@ parameters:</p>
 <span class="nt">subsidence_rate</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2e-10</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="advanced-subsidence-configurations">
+</section>
+<section id="advanced-subsidence-configurations">
 <h3>Advanced Subsidence Configurations<a class="headerlink" href="#advanced-subsidence-configurations" title="Permalink to this headline">¶</a></h3>
 <p>Subsidence behavior can be easily modified by <a class="reference internal" href="#customize-the-model"><span class="std std-ref">creating a subclass</span></a> and overwriting the <a class="reference internal" href="../reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_subsidence" title="pyDeltaRCM.init_tools.init_tools.init_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_subsidence</span></code></a> or <a class="reference internal" href="../reference/iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_subsidence</span></code></a> methods, or even more simply the relevant model hooks.</p>
 <p>An example of using subclassing to create a model setup with subsidence confined to only part of the model domain is included in the documentation:</p>
 <p><a class="reference internal" href="../examples/subsidence_region.html"><span class="doc">Constraining subsidence to part of the domain</span></a></p>
-</div>
-<div class="section" id="supporting-documentation-and-files">
+</section>
+<section id="supporting-documentation-and-files">
 <h3>Supporting documentation and files<a class="headerlink" href="#supporting-documentation-and-files" title="Permalink to this headline">¶</a></h3>
 <p>Model reference:</p>
 <blockquote>
@@ -465,8 +466,8 @@ parameters:</p>
 <li><p><a class="reference internal" href="../examples/custom_saving.html"><span class="doc">Saving custom fields to the output file</span></a></p></li>
 </ul>
 </div></blockquote>
-</div>
-<div class="section" id="references">
+</section>
+<section id="references">
 <h3>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
 <dl class="footnote brackets">
 <dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
@@ -475,9 +476,9 @@ deltas with channel dynamics, M. Liang, V. R. Voller, and C. Paola, Earth
 Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.org/10.5194/esurf-3-67-2015">https://doi.org/10.5194/esurf-3-67-2015</a></p>
 </dd>
 </dl>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>

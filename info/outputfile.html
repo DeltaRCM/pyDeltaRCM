@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Output File Format &#8212; pyDeltaRCM 1.3.0 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
@@ -43,10 +44,10 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="output-file-format">
+  <section id="output-file-format">
 <h1>Output File Format<a class="headerlink" href="#output-file-format" title="Permalink to this headline">¶</a></h1>
 <p>Model outputs are saved using the <a class="reference external" href="http://unidata.github.io/netcdf4-python/">netCDF4</a> file format.</p>
-<div class="section" id="gridded-variables">
+<section id="gridded-variables">
 <h2>Gridded Variables<a class="headerlink" href="#gridded-variables" title="Permalink to this headline">¶</a></h2>
 <p>In any given run, the saving parameters “save_&lt;var&gt;_grids” control whether or
 not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file.
@@ -54,8 +55,8 @@ In the netCDF4 file, a 3-D array with the dimensions
 <em>time</em> x <em>length</em> x <em>width</em> is created for each 2-D grid variable that is set
 to be saved. The appropriate units for these variables are stored as well,
 such as “meters per second” for the <em>velocity</em> grid.</p>
-</div>
-<div class="section" id="grid-coordinates">
+</section>
+<section id="grid-coordinates">
 <h2>Grid Coordinates<a class="headerlink" href="#grid-coordinates" title="Permalink to this headline">¶</a></h2>
 <p>To save the model information associated with the domain itself, variables
 associated with the grid are saved as well. These are the meshed 2-D grids
@@ -64,8 +65,8 @@ dimension of the domain, <em>x</em> in meters. As well as the distance away from
 boundary of each cell in the “Length” dimension, as <em>y</em> in meters. Similarly, a
 <em>time</em> variable is stored which is a 1-D array (vector) holding the model time
 values in seconds, associated with each set of saved output data.</p>
-</div>
-<div class="section" id="model-metadata">
+</section>
+<section id="model-metadata">
 <h2>Model Metadata<a class="headerlink" href="#model-metadata" title="Permalink to this headline">¶</a></h2>
 <p>In addition to the grid coordinates, model metadata is saved as a group of
 1-D arrays (vectors) and 0-D arrays (floats and integers). The values that are
@@ -89,8 +90,8 @@ saved as metadata are the following:</p>
 </dl>
 </li>
 </ul>
-</div>
-<div class="section" id="working-with-model-outputs">
+</section>
+<section id="working-with-model-outputs">
 <h2>Working with Model Outputs<a class="headerlink" href="#working-with-model-outputs" title="Permalink to this headline">¶</a></h2>
 <p>The resulting netCDF4 output file can be read using any netCDF4-compatible
 library. These libraries range from the
@@ -100,8 +101,8 @@ to higher-level libraries such as
 <em>pyDeltaRCM</em>, there is also a package under development called
 <a class="reference external" href="https://github.com/DeltaRCM/DeltaMetrics">DeltaMetrics</a>,
 that is being designed to help post-process and analyze <em>pyDeltaRCM</em> outputs.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
