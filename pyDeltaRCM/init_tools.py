@@ -685,6 +685,7 @@ class init_tools(abc.ABC):
                 # create a new file
                 # reset output file counters
                 self._save_iter = int(0)
+                self.hook_init_output_file()
                 self.init_output_file()
             else:
                 # rename the old netCDF4 file
