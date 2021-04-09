@@ -451,7 +451,8 @@ class init_tools(abc.ABC):
 
         Fills with default variables.
 
-        .. warning:: Overwrites an existing netcdf file with the same name.
+        .. warning:: Overwrites an existing netcdf file with the same name if
+        :attr:`pyDeltaRCM.model.DeltaModel.clobber_netcdf` is True
 
         """
         _msg = 'Initializing output NetCDF4 file'
@@ -498,7 +499,12 @@ class init_tools(abc.ABC):
                 file=file_path)
             self.log_info(_msg, verbosity=2)
 
-            if os.path.exists(file_path):
+            if (os.path.exists(file_path)) and \
+                    (self._clobber_netcdf is False):
+                raise FileExistsError(
+                    'Existing NetCDF4 output file in target output location.')
+            elif (os.path.exists(file_path)) and \
+                    (self._clobber_netcdf is True):
                 _msg = 'Replacing existing netCDF file'
                 self.logger.warning(_msg)
                 warnings.warn(UserWarning(_msg))
