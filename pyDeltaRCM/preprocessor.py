@@ -270,12 +270,10 @@ class BasePreprocessor(abc.ABC):
 
             # here we augment each set by duplicating and add seed
             new_set = []  # new set list
-            for i in range(len(old_set)):
-                # extract the ith set
-                ith_old_set = old_set[i]
+            for ith_old_set in old_set:
 
                 # loop through the number of ensembles
-                for j in range(n_ensembles):
+                for _ in range(n_ensembles):
                     # make a copy of the ith
                     jth_new_set = ith_old_set.copy()
 
