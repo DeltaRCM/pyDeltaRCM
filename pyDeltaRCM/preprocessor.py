@@ -163,11 +163,10 @@ class BasePreprocessor(abc.ABC):
         if 'set' in self.config_dict.keys():
             # set found
             self._has_set = True
-            # can't specify anything else in present implementation
-            if ('ensemble' in self.config_dict.keys() or
-                    'matrix' in self.config_dict.keys()):
+            # can't specify matrix with set
+            if ('matrix' in self.config_dict.keys()):
                 raise ValueError(
-                    'Cannot spec other expansions with "set" option.')
+                    'Cannot use "matrix" and "set" expansion together.')
 
         if 'ensemble' in self.config_dict.keys():
             # ensemble found
@@ -233,14 +232,20 @@ class BasePreprocessor(abc.ABC):
     def _expand_ensemble(self):
         """Create ensemble random seeds and put into matrix.
 
-        Ensemble expansion is implemented as a special class of matrix
-        expansion where the matrix key is set for the `seed` field of the
-        model. This setting ensures that the runs will have different
-        outcomes, while allowing all other parameters to remain fixed, and
-        supporting additional keys in the matrix.
+        Ensemble expansion is implemented as a special class of matrix/set
+        expansion where:
 
-        In implementation, if the matrix does not yet exist (e.g., only
-        ensemble specified), then the matrix is created.
+            * if set specification is used, each set is duplicated the
+              specified number of times, and a seed is added to each set
+            * otherwise, the matrix key is set for the `seed` field of the
+              model
+
+        This approach ensures that the runs will have different
+        outcomes, while allowing all other parameters to remain fixed, and
+        supporting additional keys in the matrix/set.
+
+        In the non-set expansion implementation, if the matrix does not yet
+        exist (e.g., only ensemble specified), then the matrix is created.
         """
         # extract the ensemble key
         _ensemble = self.config_dict.pop('ensemble')
@@ -257,38 +262,68 @@ class BasePreprocessor(abc.ABC):
             self._has_ensemble = False
             return
 
-        # if matrix does not exist, then it must be created
-        if 'matrix' not in self.config_dict.keys():
-            _matrix = {}
+        if self._has_set:
+
+            # pop the set to work with it, then replace at end
+            old_set = self.config_dict.pop('set')
+            n_ensembles = _ensemble  # from parsing above
+
+            # here we augment each set by duplicating and add seed
+            new_set = []  # new set list
+            for i in range(len(old_set)):
+                # extract the ith set
+                ith_old_set = old_set[i]
+
+                # loop through the number of ensembles
+                for j in range(n_ensembles):
+                    # make a copy of the ith
+                    jth_new_set = ith_old_set.copy()
+
+                    # make a new seed for jth set
+                    jth_seed = np.random.randint((2**32) - 1, dtype='u8')
+
+                    # fill seed spec
+                    jth_new_set['seed'] = jth_seed
+
+                    # append to the new set list
+                    new_set.append(jth_new_set)
+
+            self.config_dict['set'] = new_set
+
         else:
-            # self.config_dict['matrix'] = _matrix
-            _matrix = self.config_dict.pop('matrix')
+            # if matrix does not exist, then it must be created
+            if 'matrix' not in self.config_dict.keys():
+                _matrix = {}
+            else:
+                _matrix = self.config_dict.pop('matrix')
 
-        # check type of matrix
-        #   is this needed here? Do earlier? Let it error naturally?
-        if not isinstance(_matrix, dict):
-            raise ValueError(
-                'Invalid matrix specification, was not evaluated to "dict".')
+            # check type of matrix
+            #   is this needed here? Do earlier? Let it error naturally?
+            if not isinstance(_matrix, dict):
+                raise ValueError(
+                    'Invalid matrix specification, '
+                    'was not evaluated to "dict".')
 
-        # check for invalid specs
-        if 'seed' in _matrix.keys():
-            raise ValueError('Random seeds cannot be specified in the matrix, '
-                             'if an "ensemble" number is specified as well.')
+            # check for invalid specs
+            if 'seed' in _matrix.keys():
+                raise ValueError(
+                    'Random seeds cannot be specified in the matrix, '
+                    'if an "ensemble" number is specified as well.')
 
-        # generate list of random seeds
-        seed_list = []
-        n_ensembles = _ensemble
-        for i in range(n_ensembles):
-            seed_list.append(np.random.randint((2**32) - 1, dtype='u8'))
+            # generate list of random seeds
+            seed_list = []
+            n_ensembles = _ensemble
+            for i in range(n_ensembles):
+                seed_list.append(np.random.randint((2**32) - 1, dtype='u8'))
 
-        # add list of random seeds to the matrix
-        _matrix['seed'] = seed_list
+            # add list of random seeds to the matrix
+            _matrix['seed'] = seed_list
 
-        # write it back to the total configuration
-        self.config_dict['matrix'] = _matrix
+            # write it back to the total configuration
+            self.config_dict['matrix'] = _matrix
 
-        # change the variable to expand matrix on future step
-        self._has_matrix = True
+            # change the variable to expand matrix on future step
+            self._has_matrix = True
 
     def _expand_set(self):
 
