@@ -972,8 +972,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @checkpoint_dt.setter
     def checkpoint_dt(self, checkpoint_dt):
-        if checkpoint_dt is None:
-            checkpoint_dt = self._save_dt
         self._checkpoint_dt = checkpoint_dt
 
     @property
@@ -985,6 +983,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_checkpoint.setter
     def save_checkpoint(self, save_checkpoint):
+        if (save_checkpoint is True) and (self.checkpoint_dt is None):
+            self.checkpoint_dt = self._save_dt
+        elif (save_checkpoint is False) and (self.checkpoint_dt is not None):
+            save_checkpoint = True
         self._save_checkpoint = save_checkpoint
 
     @property
