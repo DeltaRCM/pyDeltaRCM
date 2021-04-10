@@ -151,7 +151,8 @@ class TestModelDomainSetup:
 class TestCheckpointSavinganddt:
 
     def test_nodt_savingon(self, tmp_path):
-        """Test checkpoint_dt = None but save_checkpoint = True."""
+        """Test checkpoint_dt = None but save_checkpoint = True.
+        Will set checkpoint_dt = save_dt but let the user know with a warning."""
 
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
@@ -161,7 +162,8 @@ class TestCheckpointSavinganddt:
         utilities.write_parameter_to_file(f, 'save_checkpoint', True)
         f.close()
 
-        delta = DeltaModel(input_file=p)
+        with pytest.warns(UserWarning):
+            delta = DeltaModel(input_file=p)
         # assert save checkpoint is indeed on
         assert delta.save_checkpoint is True
         # check that checkpoint_dt became save_dt
@@ -169,7 +171,7 @@ class TestCheckpointSavinganddt:
 
     def test_checkpointdt_savingoff(self, tmp_path):
         """Test checkpoint_dt = value but save_checkpoint = False.
-        Want checkpoint_dt to superceded save_checkpoint and turn it on."""
+        Does not save checkpoints but spits out a warning."""
 
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
@@ -179,11 +181,12 @@ class TestCheckpointSavinganddt:
         utilities.write_parameter_to_file(f, 'checkpoint_dt', 100)
         f.close()
 
-        delta = DeltaModel(input_file=p)
+        with pytest.warns(UserWarning):
+            delta = DeltaModel(input_file=p)
         # check that checkpoint_dt is expected value
         assert delta.checkpoint_dt == 100
         # assert save checkpoint was flipped on
-        assert delta.save_checkpoint is True
+        assert delta.save_checkpoint is False
 
 
 class TestInitSubsidence:

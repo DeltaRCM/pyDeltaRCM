@@ -984,9 +984,16 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @save_checkpoint.setter
     def save_checkpoint(self, save_checkpoint):
         if (save_checkpoint is True) and (self.checkpoint_dt is None):
+            _msg = ('Save checkpoint is turned on but a checkpoint_dt has not '
+                    'been specified. Setting checkpoint_dt to save_dt.')
+            self.logger.warning(_msg)
+            warnings.warn(UserWarning(_msg))
             self.checkpoint_dt = self._save_dt
         elif (save_checkpoint is False) and (self.checkpoint_dt is not None):
-            save_checkpoint = True
+            _msg = ('A checkpoint_dt has been specified but checkpointing is '
+                    'turned on.')
+            self.logger.warning(_msg)
+            warnings.warn(UserWarning(_msg))
         self._save_checkpoint = save_checkpoint
 
     @property
