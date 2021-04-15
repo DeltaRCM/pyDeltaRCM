@@ -95,8 +95,8 @@ The above configuration file would produce 6 model runs, 3 with a basin depth (`
 Set expansion
 -------------
 
-Set expansion enables user-configured parameter sets to take advantage of the :obj:`~pyDeltaRCM.Preprocessor` infrastructure (such as the job output preparation and ability to run jobs in parallel), while also enabling flexible configurations for parameter sets than cannot be configured via `matrix` expansion.
-For example, to vary `Qw0` while holding `Qs0` fixed requires modifying both `C0_percent` and some water-discharge-controlling parameter *simultaneously*; i.e., this cannot be achieved with `matrix` expansion. 
+Set expansion enables user-configured parameter sets to take advantage of the :obj:`~pyDeltaRCM.Preprocessor` infrastructure (such as the job output preparation and ability to run jobs in parallel), while also enabling flexible configurations for parameter sets that cannot be configured via `matrix` expansion.
+For example, to vary `Qw0` while holding `Qs0` fixed requires modifying both `C0_percent` and some water-discharge-controlling parameter *simultaneously*; this cannot be achieved with `matrix` expansion. 
 
 To use set expansion, add the `set` key to a configuration file, and define a *list* of *dictionaries* which set the parameters of each run to be completed.
 For example, to configure two model runs, the first with parameters ``u0: 1.0`` and ``h0: 1.0``, and the second with parameters ``u0: 1.2`` and ``h0: 1.2``:
@@ -109,7 +109,11 @@ For example, to configure two model runs, the first with parameters ``u0: 1.0`` 
 
 
 All jobs in the `set` specification must have the exact same set of keys.
-Moreover, additional `ensemble` or `matrix` specifications are not supported with the `set` specification. 
+
+.. note::
+    
+    Set expansion works with `ensemble` expansion, whereby each item in the `set` list is replicated `ensemble` number of times (with varied seed).
+    Note that, `matrix` specification is not supported with the `set` specification. 
 
 
 Customizing model operations with subclasses and hooks

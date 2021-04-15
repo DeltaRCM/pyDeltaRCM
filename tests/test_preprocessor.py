@@ -528,6 +528,47 @@ class TestPreprocessorMatrixAndEnsembleJobsSetups:
             _ = preprocessor.Preprocessor(input_file=p, timesteps=3)
 
 
+class TestPreprocessorSetAndEnsembleJobsSetups:
+
+    def test_1_set_ensemble_3(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'ensemble', 3)
+        utilities.write_set_to_file(f, [{'f_bedload': 0.77, 'u0': 1}])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+        assert pp._has_set is True
+        assert pp._has_matrix is False
+        assert pp._has_ensemble is True
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 3
+        assert pp._is_completed is False
+
+        f_bedload_list = pp._matrix_table[:, 1]
+
+        assert sum([j == 0.77 for j in f_bedload_list]) == 3
+        assert pp.config_dict['timesteps'] == 3
+
+
+class TestPreprocessorSetAndMatrixJobsSetups:
+
+    def test_not_possible(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_set_to_file(f, [{'f_bedload': 0.77, 'h0': 1}])
+        utilities.write_matrix_to_file(f,
+                                       ['u0'],
+                                       [[0.2, 0.5, 0.6]])
+        f.close()
+
+        with pytest.raises(ValueError,
+                           match=r'Cannot use "matrix" and "set" .*'):
+            _ = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+
 class TestPreprocessorParallelJobsSetups:
     """
     Note that parallel job setup will work on any operating system. This is
