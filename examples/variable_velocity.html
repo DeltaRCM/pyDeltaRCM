@@ -4,8 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Time-varying inlet velocity &#8212; pyDeltaRCM 1.3.0 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
@@ -44,12 +43,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="time-varying-inlet-velocity">
+  <div class="section" id="time-varying-inlet-velocity">
 <h1>Time-varying inlet velocity<a class="headerlink" href="#time-varying-inlet-velocity" title="Permalink to this headline">¶</a></h1>
 <p>It is straightforward to create models with time-varying boundary conditions.
 In this example, we set up an array of values to use for the inlet flow velocity, depending on the time of the model (i.e., a timeseries).</p>
 <p>In implementation, because we don’t know the timestep of the model before creating it, we interpolate the actual inlet flow velocity from the boundary condition timeseries.</p>
-<section id="define-the-boundary-condition">
+<div class="section" id="define-the-boundary-condition">
 <h2>Define the boundary condition<a class="headerlink" href="#define-the-boundary-condition" title="Permalink to this headline">¶</a></h2>
 <p>First, let’s set up the boundary condition array we want to use.
 We’ll set this up in a function, so that it can be called from the model subclass, as well as here for plotting.</p>
@@ -80,11 +79,11 @@ We can inspect the result of this function, as it will be called in the model su
 </pre></div>
 </div>
 <p>(<a class="reference external" href="../examples/variable_velocity-2.png">png</a>, <a class="reference external" href="../examples/variable_velocity-2.hires.png">hires.png</a>)</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="../_images/variable_velocity-2.png" class="plot-directive" src="../_images/variable_velocity-2.png" />
-</figure>
-</section>
-<section id="define-the-model-subclass">
+</div>
+</div>
+<div class="section" id="define-the-model-subclass">
 <h2>Define the model subclass<a class="headerlink" href="#define-the-model-subclass" title="Permalink to this headline">¶</a></h2>
 <p>We define a model subclass to handle the changing boundary condition:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ChangingVelocityModel</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
@@ -123,8 +122,8 @@ We can inspect the result of this function, as it will be called in the model su
     <span class="n">mdl</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
             <div class="clearer"></div>
@@ -188,7 +187,7 @@ We can inspect the result of this function, as it will be called in the model su
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
     </div>
   </body>
 </html>
