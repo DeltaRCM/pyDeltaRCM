@@ -307,8 +307,8 @@ The ensemble expansion can be applied to configuration files that include a matr
 </div>
 <div class="section" id="set-expansion">
 <span id="set-expansion-tag"></span><h4>Set expansion<a class="headerlink" href="#set-expansion" title="Permalink to this headline">¶</a></h4>
-<p>Set expansion enables user-configured parameter sets to take advantage of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code> infrastructure (such as the job output preparation and ability to run jobs in parallel), while also enabling flexible configurations for parameter sets than cannot be configured via <cite>matrix</cite> expansion.
-For example, to vary <cite>Qw0</cite> while holding <cite>Qs0</cite> fixed requires modifying both <cite>C0_percent</cite> and some water-discharge-controlling parameter <em>simultaneously</em>; i.e., this cannot be achieved with <cite>matrix</cite> expansion.</p>
+<p>Set expansion enables user-configured parameter sets to take advantage of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code> infrastructure (such as the job output preparation and ability to run jobs in parallel), while also enabling flexible configurations for parameter sets that cannot be configured via <cite>matrix</cite> expansion.
+For example, to vary <cite>Qw0</cite> while holding <cite>Qs0</cite> fixed requires modifying both <cite>C0_percent</cite> and some water-discharge-controlling parameter <em>simultaneously</em>; this cannot be achieved with <cite>matrix</cite> expansion.</p>
 <p>To use set expansion, add the <cite>set</cite> key to a configuration file, and define a <em>list</em> of <em>dictionaries</em> which set the parameters of each run to be completed.
 For example, to configure two model runs, the first with parameters <code class="docutils literal notranslate"><span class="pre">u0:</span> <span class="pre">1.0</span></code> and <code class="docutils literal notranslate"><span class="pre">h0:</span> <span class="pre">1.0</span></code>, and the second with parameters <code class="docutils literal notranslate"><span class="pre">u0:</span> <span class="pre">1.2</span></code> and <code class="docutils literal notranslate"><span class="pre">h0:</span> <span class="pre">1.2</span></code>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">set</span><span class="p">:</span>
@@ -316,8 +316,12 @@ For example, to configure two model runs, the first with parameters <code class=
   <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nt">u0</span><span class="p">:</span> <span class="nv">1.2</span><span class="p p-Indicator">,</span><span class="nt"> h0</span><span class="p">:</span> <span class="nv">1.2</span><span class="p p-Indicator">}</span>
 </pre></div>
 </div>
-<p>All jobs in the <cite>set</cite> specification must have the exact same set of keys.
-Moreover, additional <cite>ensemble</cite> or <cite>matrix</cite> specifications are not supported with the <cite>set</cite> specification.</p>
+<p>All jobs in the <cite>set</cite> specification must have the exact same set of keys.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Set expansion works with <cite>ensemble</cite> expansion, whereby each item in the <cite>set</cite> list is replicated <cite>ensemble</cite> number of times (with varied seed).
+Note that, <cite>matrix</cite> specification is not supported with the <cite>set</cite> specification.</p>
+</div>
 </div>
 </div>
 <div class="section" id="customizing-model-operations-with-subclasses-and-hooks">

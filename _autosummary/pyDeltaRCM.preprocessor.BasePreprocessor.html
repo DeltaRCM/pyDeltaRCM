@@ -108,13 +108,21 @@ out the Python API.</p>
 <dt id="pyDeltaRCM.preprocessor.BasePreprocessor._expand_ensemble">
 <code class="sig-name descname"><span class="pre">_expand_ensemble</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._expand_ensemble" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create ensemble random seeds and put into matrix.</p>
-<p>Ensemble expansion is implemented as a special class of matrix
-expansion where the matrix key is set for the <cite>seed</cite> field of the
-model. This setting ensures that the runs will have different
+<p>Ensemble expansion is implemented as a special class of matrix/set
+expansion where:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>if set specification is used, each set is duplicated the
+specified number of times, and a seed is added to each set</p></li>
+<li><p>otherwise, the matrix key is set for the <cite>seed</cite> field of the
+model</p></li>
+</ul>
+</div></blockquote>
+<p>This approach ensures that the runs will have different
 outcomes, while allowing all other parameters to remain fixed, and
-supporting additional keys in the matrix.</p>
-<p>In implementation, if the matrix does not yet exist (e.g., only
-ensemble specified), then the matrix is created.</p>
+supporting additional keys in the matrix/set.</p>
+<p>In the non-set expansion implementation, if the matrix does not yet
+exist (e.g., only ensemble specified), then the matrix is created.</p>
 </dd></dl>
 
 <dl class="py method">
