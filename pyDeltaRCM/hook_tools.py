@@ -169,17 +169,18 @@ class hook_tools(abc.ABC):
         Expected format for entries to the `meta` dictionary nested within the
         `self._save_var_list` dictionary:
 
-        ```
-        self._save_var_list['meta']['new_meta_name'] = ['varname', 'units',
-                                                        'type', (dimensions)]
-        ```
+        .. code::
+
+            self._save_var_list['meta']['new_meta_name'] = ['varname', 'units',
+                                                            'type', (dimensions)]  # noqa: E501
 
         Expected format for time varying grid entries as keys within the
         `self._save_var_list` dictionary:
 
-        ```
-        self._save_var_list['new_grid_name'] = ['varname', 'units', 'type',
-                                                (dimensions)]
-        ```
+        .. code::
+
+            self._save_var_list['new_grid_name'] = ['varname', 'units',
+                                                    'type', (dimensions)]
+
         """
         pass
