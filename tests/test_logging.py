@@ -1,4 +1,5 @@
 import os
+import sys
 import glob
 
 import unittest.mock as mock
@@ -128,6 +129,16 @@ class TestLoggerIntegratedDuringInitialization:
             assert 'Creating model domain' in _lines
             assert 'Initializing output NetCDF4 file' in _lines
             assert 'Model initialization complete' in _lines
+
+            if sys.platform == 'linux':
+                assert r'Platform: Linux-.*' in _lines
+            elif sys.platform == 'darwin':
+                assert r'Platform: OSx-.*' in _lines
+            elif sys.platform == 'windows':
+                assert r'Platform: Windows-.*' in _lines
+            else:
+                raise RuntimeError(
+                    'Platform type not recognized.')
         assert not os.path.isfile(os.path.join(
             tmp_path, 'out_dir', 'discharge_0.0.png'))
         assert not os.path.isfile(os.path.join(
