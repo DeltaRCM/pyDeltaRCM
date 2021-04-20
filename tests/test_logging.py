@@ -133,7 +133,9 @@ class TestLoggerIntegratedDuringInitialization:
             if sys.platform.startswith('linux'):
                 assert 'Platform: Linux-' in _lines
             elif sys.platform == 'darwin':
-                assert 'Platform: Darwin-' in _lines
+                guess1 = 'Platform: Darwin-' in _lines
+                guess2 = 'Platform: macOS-' in _lines
+                assert (guess1 | guess2)
             elif sys.platform.startswith('win'):
                 assert 'Platform: Windows-' in _lines
             else:
