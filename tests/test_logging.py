@@ -131,11 +131,11 @@ class TestLoggerIntegratedDuringInitialization:
             assert 'Model initialization complete' in _lines
 
             if sys.platform == 'linux':
-                assert r'Platform: Linux-.*' in _lines
+                assert 'Platform: Linux-' in _lines
             elif sys.platform == 'darwin':
-                assert r'Platform: OSx-.*' in _lines
+                assert 'Platform: OSx-' in _lines
             elif sys.platform == 'windows':
-                assert r'Platform: Windows-.*' in _lines
+                assert 'Platform: Windows-' in _lines
             else:
                 raise RuntimeError(
                     'Platform type not recognized.')
