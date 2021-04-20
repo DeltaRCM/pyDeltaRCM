@@ -2,6 +2,8 @@
 import os
 import logging
 import warnings
+import platform
+import sys
 
 from math import floor
 import numpy as np
@@ -61,8 +63,16 @@ class init_tools(abc.ABC):
         # add handler to logger object
         self.logger.addHandler(fh)
 
-        _msg = 'Output log file initialized.'
+        _msg = 'Output log file initialized'
         self.log_info(_msg, verbosity=0)
+
+        # log attributes of the model and environment
+        self.log_info('pyDeltaRCM version {}'.format(self.__pyDeltaRCM_version__))  # log the pyDeltaRCM version
+        self.log_info('Python version {}'.format(sys.version),
+                      verbosity=0)  # log the python version
+        self.log_info('Platform: {}'.format(platform.platform()),
+                      verbosity=0)  # log the os
+
 
     def import_files(self, kwargs_dict={}):
         """Import the input files.
@@ -156,6 +166,9 @@ class init_tools(abc.ABC):
             *not* written to the log.
         """
         _msg = 'Setting up model configuration'
+        self.log_info(_msg, verbosity=0)
+
+        _msg = f'Model type is: {self.__class__.__name__}'
         self.log_info(_msg, verbosity=0)
 
         # process the input file to attributes of the model
