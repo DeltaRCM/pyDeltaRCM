@@ -10,6 +10,7 @@ from .water_tools import water_tools
 from .init_tools import init_tools
 from .hook_tools import hook_tools
 from .debug_tools import debug_tools
+from .shared_tools import _get_version
 
 
 class DeltaModel(iteration_tools, sed_tools, water_tools,
@@ -71,6 +72,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         :doc:`/guides/user_guide`.
 
         """
+        self.__pyDeltaRCM_version__ = _get_version()
+
         self._time = 0.
         self._time_iter = int(0)
         self._save_time_since_data = float("inf")  # force save on t==0
