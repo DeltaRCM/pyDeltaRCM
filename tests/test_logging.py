@@ -130,11 +130,11 @@ class TestLoggerIntegratedDuringInitialization:
             assert 'Initializing output NetCDF4 file' in _lines
             assert 'Model initialization complete' in _lines
 
-            if sys.platform == 'linux':
+            if sys.platform.startswith('linux'):
                 assert 'Platform: Linux-' in _lines
             elif sys.platform == 'darwin':
-                assert 'Platform: OSx-' in _lines
-            elif sys.platform == 'windows':
+                assert 'Platform: Darwin-' in _lines
+            elif sys.platform.startswith('win'):
                 assert 'Platform: Windows-' in _lines
             else:
                 raise RuntimeError(
