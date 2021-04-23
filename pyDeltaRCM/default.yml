@@ -37,6 +37,9 @@ N0_meters:
 h0:
   type: ['float', 'int']
   default: 5.0
+hb:
+  type: ['float', 'int', 'None']
+  default: null
 H_SL:
   type: ['float', 'int']
   default: 0.0

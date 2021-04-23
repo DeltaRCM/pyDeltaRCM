@@ -73,7 +73,6 @@ class init_tools(abc.ABC):
         self.log_info('Platform: {}'.format(platform.platform()),
                       verbosity=0)  # log the os
 
-
     def import_files(self, kwargs_dict={}):
         """Import the input files.
 
@@ -306,6 +305,9 @@ class init_tools(abc.ABC):
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
         self.Vp_sed = self.dVs / self._Np_sed  # volume of each sediment parcel
 
+        # determine the value for the basin depth
+        self._hb = self.hb or self.h0
+
         # max number of jumps for parcel
         if self.stepmax is None:
             self.stepmax = 2 * (self.L + self.W)
@@ -397,7 +399,7 @@ class init_tools(abc.ABC):
                          self._dx * self._S0)
         self.stage[self.cell_type == cell_ocean] = 0.
 
-        self.depth[self.cell_type == cell_ocean] = self.h0
+        self.depth[self.cell_type == cell_ocean] = self.hb
         self.depth[self.cell_type == cell_channel] = self.h0
 
         self.qx[self.cell_type == cell_channel] = self.qw0
