@@ -169,7 +169,6 @@ class TestCheckpointingIntegrations:
         assert 'sandfrac' in out_vars
 
         # check attributes of variables
-        import pdb; pdb.set_trace()
         assert output['time'][0].tolist() == 0.0
         assert output['time'][-1] == resumeModel.time
         assert output['time'][-1].tolist() == resumeModel._dt * \
