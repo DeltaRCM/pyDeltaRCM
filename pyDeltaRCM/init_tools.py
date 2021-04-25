@@ -472,33 +472,7 @@ class init_tools(abc.ABC):
 
         # set standard/default metadata values in the dict structure
         if self._save_metadata:
-            # fixed metadata
-            self._save_var_list['meta']['L0'] = ['L0', 'cells', 'i8', ()]
-            self._save_var_list['meta']['N0'] = ['N0', 'cells', 'i8', ()]
-            self._save_var_list['meta']['CTR'] = ['CTR', 'cells', 'i8', ()]
-            self._save_var_list['meta']['dx'] = ['dx', 'meters', 'f4', ()]
-            self._save_var_list['meta']['h0'] = ['h0', 'meters', 'f4', ()]
-            self._save_var_list['meta']['cell_type'] = ['cell_type',
-                                                        'type', 'i8',
-                                                        ('length', 'width')]
-            # subsidence metadata
-            if self._toggle_subsidence:
-                self._save_var_list['meta']['start_subsidence'] = [
-                    'start_subsidence', 'seconds', 'i8', ()
-                ]
-                self._save_var_list['meta']['sigma'] = [
-                    'sigma', 'meters per timestep', 'f4',
-                    ('length', 'width')
-                ]
-            # time-varying metadata
-            self._save_var_list['meta']['H_SL'] = [None, 'meters', 'f4',
-                                                   ('total_time')]
-            self._save_var_list['meta']['f_bedload'] = [None, 'fraction',
-                                                        'f4', ('total_time')]
-            self._save_var_list['meta']['C0_percent'] = [None, 'percent',
-                                                         'f4', ('total_time')]
-            self._save_var_list['meta']['u0'] = [None, 'meters per second',
-                                                 'f4', ('total_time')]
+            self.init_metadata_list()
 
         if (self._save_metadata or
                 self._save_any_grids):
@@ -607,6 +581,39 @@ class init_tools(abc.ABC):
             self.subsidence_mask[:self.L0, :] = False
 
             self.sigma = self.subsidence_mask * self._subsidence_rate * self.dt
+
+    def init_metadata_list(self):
+        """Populate the list of metadata information.
+
+        Sets up the dictionary object for the standard metadata.
+        """
+        # fixed metadata
+        self._save_var_list['meta']['L0'] = ['L0', 'cells', 'i8', ()]
+        self._save_var_list['meta']['N0'] = ['N0', 'cells', 'i8', ()]
+        self._save_var_list['meta']['CTR'] = ['CTR', 'cells', 'i8', ()]
+        self._save_var_list['meta']['dx'] = ['dx', 'meters', 'f4', ()]
+        self._save_var_list['meta']['h0'] = ['h0', 'meters', 'f4', ()]
+        self._save_var_list['meta']['cell_type'] = ['cell_type',
+                                                    'type', 'i8',
+                                                    ('length', 'width')]
+        # subsidence metadata
+        if self._toggle_subsidence:
+            self._save_var_list['meta']['start_subsidence'] = [
+                'start_subsidence', 'seconds', 'i8', ()
+            ]
+            self._save_var_list['meta']['sigma'] = [
+                'sigma', 'meters per timestep', 'f4',
+                ('length', 'width')
+            ]
+        # time-varying metadata
+        self._save_var_list['meta']['H_SL'] = [None, 'meters', 'f4',
+                                               ('total_time')]
+        self._save_var_list['meta']['f_bedload'] = [None, 'fraction',
+                                                    'f4', ('total_time')]
+        self._save_var_list['meta']['C0_percent'] = [None, 'percent',
+                                                     'f4', ('total_time')]
+        self._save_var_list['meta']['u0'] = [None, 'meters per second',
+                                             'f4', ('total_time')]
 
     def load_checkpoint(self, defer_output=False):
         """Load the checkpoint from the .npz file.
@@ -722,6 +729,10 @@ class init_tools(abc.ABC):
                 # write dims / attributes / variables to new netCDF file
                 _msg = 'Creating NetCDF4 output file'
                 self.log_info(_msg, verbosity=2)
+
+                # populate default metadata list
+                if self._save_metadata:
+                    self.init_metadata_list()
 
                 # copy data from old netCDF4 into new one
                 with Dataset(_tmp_name) as src, Dataset(file_path, 'w',

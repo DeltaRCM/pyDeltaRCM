@@ -187,7 +187,8 @@ class TestCheckpointingIntegrations:
         assert np.all(output['meta']['cell_type'][:] == resumeModel.cell_type)
         assert output['meta']['H_SL'][-1].data == resumeModel.H_SL
         assert output['meta']['f_bedload'][-1].data == resumeModel.f_bedload
-        assert output['meta']['C0_percent'][-1].data == resumeModel.C0_percent
+        assert pytest.approx(float(output['meta']['C0_percent'][-1].data) ==
+                             resumeModel.C0_percent)
         assert output['meta']['u0'][-1].data == resumeModel.u0
 
         # checkpoint interval aligns w/ timestep dt so these should match
