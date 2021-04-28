@@ -52,6 +52,7 @@
       ~DeltaModel.hook_topo_diffusion
       ~DeltaModel.import_files
       ~DeltaModel.init_logger
+      ~DeltaModel.init_metadata_list
       ~DeltaModel.init_output_file
       ~DeltaModel.init_output_infrastructure
       ~DeltaModel.init_sediment_routers
