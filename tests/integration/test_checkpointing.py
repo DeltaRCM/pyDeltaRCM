@@ -178,6 +178,18 @@ class TestCheckpointingIntegrations:
         assert output['depth'][-1].shape == resumeModel.eta.shape
         assert output['discharge'][-1].shape == resumeModel.eta.shape
         assert output['sandfrac'][-1].shape == resumeModel.eta.shape
+        # check the metadata
+        assert output['meta']['L0'][:] == resumeModel.L0
+        assert output['meta']['N0'][:] == resumeModel.N0
+        assert output['meta']['CTR'][:] == resumeModel.CTR
+        assert output['meta']['dx'][:] == resumeModel.dx
+        assert output['meta']['h0'][:] == resumeModel.h0
+        assert np.all(output['meta']['cell_type'][:] == resumeModel.cell_type)
+        assert output['meta']['H_SL'][-1].data == resumeModel.H_SL
+        assert output['meta']['f_bedload'][-1].data == resumeModel.f_bedload
+        assert pytest.approx(float(output['meta']['C0_percent'][-1].data) ==
+                             resumeModel.C0_percent)
+        assert output['meta']['u0'][-1].data == resumeModel.u0
 
         # checkpoint interval aligns w/ timestep dt so these should match
         assert output['time'][-1].tolist() == resumeModel.time
