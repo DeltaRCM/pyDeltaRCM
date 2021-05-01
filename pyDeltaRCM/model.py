@@ -441,6 +441,22 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._h0 = h0
 
     @property
+    def hb(self):
+        """
+        hb is the basin depth in meters.
+
+        hb is the basin depth in meters. This parameter must be an *integer*
+        or *float*, or *None*. If no value is supplied for this parameter,
+        then the value of h0 is used to determine the basin depth (i.e., they
+        are the same).
+        """
+        return self._hb
+
+    @hb.setter
+    def hb(self, hb):
+        self._hb = hb
+
+    @property
     def H_SL(self):
         """
         H_SL sets the sea level elevation in meters.
