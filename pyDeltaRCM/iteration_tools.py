@@ -157,7 +157,7 @@ class iteration_tools(abc.ABC):
         """Output grids and figures if needed.
 
         """
-        if self._save_time_since_data >= self.save_dt:
+        if self._save_time_since_data >= self._save_dt:
 
             self.save_grids_and_figs()
 
@@ -177,9 +177,9 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        if self._save_time_since_checkpoint >= self.checkpoint_dt:
+        if self._save_checkpoint:
 
-            if self._save_checkpoint:
+            if self._save_time_since_checkpoint >= self._checkpoint_dt:
 
                 _msg = 'Saving checkpoint'
                 self.log_info(_msg, verbosity=1)

@@ -45,7 +45,7 @@ def yaml_from_dict(tmp_path, file_name, _dict=None):
     p, f = create_temporary_file(tmp_path, file_name)
     if (_dict is None):
         _dict = {'out_dir': tmp_path / 'out_dir'}
-    else:
+    elif ('out_dir' not in _dict.keys()):
         _dict['out_dir'] = tmp_path / 'out_dir'
 
     for k in _dict.keys():

@@ -975,8 +975,6 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @checkpoint_dt.setter
     def checkpoint_dt(self, checkpoint_dt):
-        if checkpoint_dt is None:
-            checkpoint_dt = self._save_dt
         self._checkpoint_dt = checkpoint_dt
 
     @property
@@ -988,6 +986,17 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
     @save_checkpoint.setter
     def save_checkpoint(self, save_checkpoint):
+        if (save_checkpoint is True) and (self.checkpoint_dt is None):
+            _msg = ('Save checkpoint is turned on but a checkpoint_dt has not '
+                    'been specified. Setting checkpoint_dt to save_dt.')
+            self.logger.warning(_msg)
+            warnings.warn(UserWarning(_msg))
+            self.checkpoint_dt = self._save_dt
+        elif (save_checkpoint is False) and (self.checkpoint_dt is not None):
+            _msg = ('A checkpoint_dt has been specified but checkpointing is '
+                    'turned on.')
+            self.logger.warning(_msg)
+            warnings.warn(UserWarning(_msg))
         self._save_checkpoint = save_checkpoint
 
     @property
@@ -1218,6 +1227,23 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @stepmax.setter
     def stepmax(self, stepmax):
         self._stepmax = stepmax
+
+    @property
+    def clobber_netcdf(self):
+        """
+        Allows overwriting (clobbering) of an existing netCDF output file.
+
+        Default behavior, clobber_netcdf: False, is for the model to raise an
+        error during initialization if a netCDF output file is found in the
+        location specified by :attr:`out_dir`. If the clobber_netcdf parameter
+        is instead set to True, then if there is an existing netCDF output file
+        in the target folder, it will be "clobbered" or overwritten.
+        """
+        return self._clobber_netcdf
+
+    @clobber_netcdf.setter
+    def clobber_netcdf(self, clobber_netcdf):
+        self._clobber_netcdf = clobber_netcdf
 
     @property
     def time(self):
