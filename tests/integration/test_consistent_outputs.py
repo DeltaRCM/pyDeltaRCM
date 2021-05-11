@@ -124,14 +124,14 @@ class TestConsistentOutputsBetweenMerges:
         delta.finalize()
 
 
-class TestModelIsReprodicible:
+class TestModelIsReproducible:
 
     def test_same_result_two_models(self, tmp_path):
         """Test consistency of two models initialized from same yaml."""
-        p1 = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+        p1 = utilities.yaml_from_dict(tmp_path, 'input_1.yaml',
                                       {'out_dir': tmp_path / 'out_dir_1',
                                        'seed': 10, 'save_sandfrac_grids': True})
-        p2 = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+        p2 = utilities.yaml_from_dict(tmp_path, 'input_2.yaml',
                                       {'out_dir': tmp_path / 'out_dir_2',
                                        'seed': 10, 'save_sandfrac_grids': True})
 

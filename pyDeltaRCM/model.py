@@ -1220,6 +1220,23 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._stepmax = stepmax
 
     @property
+    def clobber_netcdf(self):
+        """
+        Allows overwriting (clobbering) of an existing netCDF output file.
+
+        Default behavior, clobber_netcdf: False, is for the model to raise an
+        error during initialization if a netCDF output file is found in the
+        location specified by :attr:`out_dir`. If the clobber_netcdf parameter
+        is instead set to True, then if there is an existing netCDF output file
+        in the target folder, it will be "clobbered" or overwritten.
+        """
+        return self._clobber_netcdf
+
+    @clobber_netcdf.setter
+    def clobber_netcdf(self, clobber_netcdf):
+        self._clobber_netcdf = clobber_netcdf
+
+    @property
     def time(self):
         """Elapsed model time in seconds.
         """

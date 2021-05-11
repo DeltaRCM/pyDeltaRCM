@@ -292,6 +292,38 @@ class Test__init__:
         with pytest.raises(AttributeError):
             _model.output_data()
 
+    def test_clobber_netcdf(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'clobber_netcdf': True})
+        _model = DeltaModel(input_file=p)
+        # assert that model could have clobbered a netcdf
+        assert _model._clobber_netcdf is True
+
+    def test_clobbering(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'clobber_netcdf': True,
+                                      'save_eta_grids': True})
+        _model_1 = DeltaModel(input_file=p)
+        _model_1.output_netcdf.close()
+        # assert that model could have clobbered a netcdf
+        assert _model_1._clobber_netcdf is True
+        # make a second model which clobbers, raising eyebrows (and warning)
+        with pytest.warns(UserWarning):
+            _model_2 = DeltaModel(input_file=p)
+        _model_2.output_netcdf.close()
+        assert _model_2._clobber_netcdf is True
+
+    def test_no_clobber_error(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_eta_grids': True})
+        _model_1 = DeltaModel(input_file=p)
+        _model_1.output_netcdf.close()
+        # assert that model could not have clobbered a netcdf
+        assert _model_1._clobber_netcdf is False
+        # make a second model which raises error
+        with pytest.raises(FileExistsError):
+            _ = DeltaModel(input_file=p)
+
 
 class TestUpdate:
 
