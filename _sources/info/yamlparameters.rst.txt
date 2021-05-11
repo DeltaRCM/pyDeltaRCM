@@ -110,6 +110,8 @@ Output Settings
 
 :attr:`pyDeltaRCM.model.DeltaModel.resume_checkpoint`
 
+:attr:`pyDeltaRCM.model.DeltaModel.clobber_netcdf`
+
 
 Reduced-Complexity Routing Parameters
 =====================================

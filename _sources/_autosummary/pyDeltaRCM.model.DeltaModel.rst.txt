@@ -114,6 +114,7 @@
       ~DeltaModel.channel_flow_velocity
       ~DeltaModel.channel_width
       ~DeltaModel.checkpoint_dt
+      ~DeltaModel.clobber_netcdf
       ~DeltaModel.coeff_U_dep_mud
       ~DeltaModel.coeff_U_ero_mud
       ~DeltaModel.coeff_U_ero_sand

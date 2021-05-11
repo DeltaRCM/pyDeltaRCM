@@ -4,14 +4,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>10-minute tutorial &#8212; pyDeltaRCM 1.3.0 documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -43,7 +44,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="minute-tutorial">
+  <section id="minute-tutorial">
 <h1>10-minute tutorial<a class="headerlink" href="#minute-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>Use pyDeltaRCM in ten minutes!
 This simple guide will show you the absolute basics of getting a <cite>pyDeltaRCM</cite> model running, and give you some direction on where to go from there.</p>
@@ -51,7 +52,7 @@ This simple guide will show you the absolute basics of getting a <cite>pyDeltaRC
 <p class="admonition-title">Important</p>
 <p>If you haven’t already, be sure to follow the <a class="reference internal" href="../meta/installing.html"><span class="doc">installation guide</span></a> to get <em>pyDeltaRCM</em> set up properly on your computer.</p>
 </div>
-<div class="section" id="a-default-model">
+<section id="a-default-model">
 <h2>A default model<a class="headerlink" href="#a-default-model" title="Permalink to this headline">¶</a></h2>
 <p>You can get a model running with five simple lines of code.
 First, we instantiate the main <code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel</span></code> model object.</p>
@@ -80,11 +81,11 @@ So, we simply create a <cite>for</cite> loop, and call the <cite>update</cite> f
 </pre></div>
 </div>
 <p>(<a class="reference external" href="../pyplots/guides/10min_demo.png">png</a>, <a class="reference external" href="../pyplots/guides/10min_demo.hires.png">hires.png</a>)</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="../_images/10min_demo.png" class="plot-directive" src="../_images/10min_demo.png" />
-</div>
-</div>
-<div class="section" id="the-model-with-set-parameters">
+</figure>
+</section>
+<section id="the-model-with-set-parameters">
 <h2>The model with set parameters<a class="headerlink" href="#the-model-with-set-parameters" title="Permalink to this headline">¶</a></h2>
 <p>To run a simulation with a non-default set of parameters, we use a configuration file written in the YAML markup language named <cite>10min_tutorial.yaml</cite>.
 For example, we can specify where we would like the output file to be placed with the <cite>out_dir</cite> parameter, ensure that our simulation is easily reproducible by setting the random <cite>seed</cite> parameter, and examine what is the effect of a high fraction of bedload:</p>
@@ -104,16 +105,16 @@ For example, we can specify where we would like the output file to be placed wit
 <span class="gp">&gt;&gt;&gt; </span><span class="n">second_delta</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="resources">
+</section>
+<section id="resources">
 <h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
 <p>Consider reading through the <a class="reference internal" href="user_guide.html"><span class="doc">User Guide</span></a> as a first action, and determine how to set up the model to complete your experiment, including tutorials and examples for customizing the model to achieve any arbitrary behavior you need!</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="user_guide.html"><span class="doc">User Guide</span></a></p></li>
 <li><p><a class="reference internal" href="../reference/model/index.html"><span class="doc">model</span></a></p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -178,7 +179,7 @@ For example, we can specify where we would like the output file to be placed wit
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

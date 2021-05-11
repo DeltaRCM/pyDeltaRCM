@@ -4,14 +4,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Time in pyDeltaRCM &#8212; pyDeltaRCM 1.3.0 documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -43,7 +44,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="time-in-pydeltarcm">
+  <section id="time-in-pydeltarcm">
 <h1>Time in pyDeltaRCM<a class="headerlink" href="#time-in-pydeltarcm" title="Permalink to this headline">¶</a></h1>
 <p>Time in the pyDeltaRCM model is simulated in units of seconds.
 The duration of a timestep is determined during model initialization to maintain numerical stability; the calculation is based on model domain and configuration parameters.
@@ -60,9 +61,9 @@ So while flooding only occurs for a small fraction of total time, most of the ti
 <p>For example, in the contrived river-delta hydrograph shown below, the discharge fluctuates around a base-flow condition for most of the year, with the exception of a 50 day period when a flood event occurs (from “start event” to “end event”).
 For 25 days of the flood event, the discharge is high enough to exceed the bankfull discharge (“flooding duration”).</p>
 <p>(<a class="reference external" href="../pyplots/modeltime/one_year_plot.png">png</a>, <a class="reference external" href="../pyplots/modeltime/one_year_plot.hires.png">hires.png</a>)</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="../_images/one_year_plot.png" class="plot-directive" src="../_images/one_year_plot.png" />
-</div>
+</figure>
 <p>A numerical model could simulate every day of this hydrograph, but this would require substantial computing power.
 To accelerate the computation time of models, we assume that the only important period of time is when the river is at-or-above bankfull discharge, and we collapse the hydrograph to a single value: the bankfull discharge.
 The choice of bankfull discharge for the single-value discharge assumption is a matter of convenience, in that this is readily estimated from field data or measurements.</p>
@@ -82,26 +83,26 @@ For example, for a model run that has elapsed <img class="math" src="../_images/
 <p>Applying the intermittency assumption to a four year model simulation reveals the computational advantage of this approach.
 A simulation of every day in the simulation duration would require 1460 days of simulated time (<img class="math" src="../_images/math/cabb77baaacc77b37f3d89c80d3163825517c5a4.png" alt="1.26 \times 10^8"/> seconds).</p>
 <p>(<a class="reference external" href="../pyplots/modeltime/four_year_plot.png">png</a>, <a class="reference external" href="../pyplots/modeltime/four_year_plot.hires.png">hires.png</a>)</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="../_images/four_year_plot.png" class="plot-directive" src="../_images/four_year_plot.png" />
-</div>
+</figure>
 <p>In contrast, by condensing the simulated time down to a bankfull discharge only, the intermittency assumption allows us to simulate the same “four year” period in just under 59 days of simulated time (<img class="math" src="../_images/math/87ae2712a99293393aa40bbce6755bae8987d7cf.png" alt="5.08 \times 10^6"/> seconds).</p>
-<div class="section" id="see-also">
+<section id="see-also">
 <h2>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="../reference/preprocessor/index.html#pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate" title="pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_relative_sea_level_rise_rate</span></code></a></p></li>
 <li><p><a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.scale_model_time" title="pyDeltaRCM.shared_tools.scale_model_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_model_time</span></code></a></p></li>
 </ul>
-</div>
-<div class="section" id="references">
+</section>
+<section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <dl class="citation">
 <dt class="label" id="wm60"><span class="brackets"><a class="fn-backref" href="#id1">WM60</a></span></dt>
 <dd><p>Wolman, M. G., &amp; Miller, J. P. (1960). Magnitude and frequency of forces in geomorphic processes. The Journal of Geology, 68(1), 54–74. <a class="reference external" href="https://doi.org/10.1086/626637">https://doi.org/10.1086/626637</a></p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -165,7 +166,7 @@ A simulation of every day in the simulation duration would require 1460 days of 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>
