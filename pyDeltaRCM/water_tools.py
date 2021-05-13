@@ -10,6 +10,39 @@ from . import shared_tools
 
 class water_tools(abc.ABC):
 
+    def route_water(self):
+        """Water routing main method.
+
+        This is the main method for water routing in the model. It is
+        called once per `update()` call.
+
+        Internally, this method calls:
+            * :obj:`init_water_iteration`
+            * :obj:`run_water_iteration`
+            * :obj:`compute_free_surface`
+            * :obj:`finalize_water_iteration`
+        """
+        _msg = 'Beginning water iteration'
+        self.log_info(_msg, verbosity=2)
+
+        for iteration in range(self._itermax):
+
+            # initialize the relevant fields and parcel trackers
+            self.hook_init_water_iteration()
+            self.init_water_iteration()
+
+            # run the actual iteration of the parcels
+            self.hook_run_water_iteration()
+            self.run_water_iteration()
+
+            # accumulate the routed water parcels into free surface
+            self.hook_compute_free_surface()
+            self.compute_free_surface()
+
+            # clean up the water surface and apply boundary conditions
+            self.hook_finalize_water_iteration(iteration)
+            self.finalize_water_iteration(iteration)
+
     def init_water_iteration(self):
         """Init the water iteration routine.
         """

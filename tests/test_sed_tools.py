@@ -16,11 +16,6 @@ class TestSedimentRoute:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
-        # alter field for initial values going into function
-        _delta.qs += np.random.uniform(0, 1, size=_delta.eta.shape)
-        _delta.Vp_dep_sand += np.random.uniform(0, 1, size=_delta.eta.shape)
-        _delta.Vp_dep_mud += np.random.uniform(0, 1, size=_delta.eta.shape)
-
         # mock top-level methods
         _delta.log_info = mock.MagicMock()
         _delta.init_sediment_iteration = mock.MagicMock()
@@ -42,6 +37,11 @@ class TestSedimentRoute:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
+
+        # alter field for initial values going into function
+        _delta.qs += np.random.uniform(0, 1, size=_delta.eta.shape)
+        _delta.Vp_dep_sand += np.random.uniform(0, 1, size=_delta.eta.shape)
+        _delta.Vp_dep_mud += np.random.uniform(0, 1, size=_delta.eta.shape)
 
         # mock top-level methods
         _delta.log_info = mock.MagicMock()

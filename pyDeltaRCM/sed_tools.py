@@ -26,6 +26,9 @@ class sed_tools(abc.ABC):
             * :obj:`topo_diffusion`
             * :obj:`route_all_mud_parcels`
         """
+        _msg = 'Beginning sediment iteration'
+        self.log_info(_msg, verbosity=2)
+
         # initialize the relevant fields and parcel trackers
         self.hook_init_sediment_iteration()
         self.init_sediment_iteration()

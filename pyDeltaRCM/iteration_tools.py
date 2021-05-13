@@ -40,31 +40,11 @@ class iteration_tools(abc.ABC):
         # start the model operations
         self.eta0 = np.copy(self.eta)  # copy
 
-        #   water iterations
-        _msg = 'Beginning water iteration'
-        self.log_info(_msg, verbosity=2)
-        for iteration in range(self._itermax):
+        # water iterations
+        self.hook_route_water()
+        self.route_water()
 
-            # initialize the relevant fields and parcel trackers
-            self.hook_init_water_iteration()
-            self.init_water_iteration()
-
-            # run the actual iteration of the parcels
-            self.hook_run_water_iteration()
-            self.run_water_iteration()
-
-            # accumulate the routed water parcels into free surface
-            self.hook_compute_free_surface()
-            self.compute_free_surface()
-
-            # clean up the water surface and apply boundary conditions
-            self.hook_finalize_water_iteration(iteration)
-            self.finalize_water_iteration(iteration)
-
-        #  sediment iteration
-        _msg = 'Beginning sediment iteration'
-        self.log_info(_msg, verbosity=2)
-
+        # sediment iteration
         self.hook_route_sediment()
         self.route_sediment()
 

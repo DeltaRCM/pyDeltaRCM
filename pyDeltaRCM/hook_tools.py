@@ -106,6 +106,14 @@ class hook_tools(abc.ABC):
         """
         pass
 
+    def hook_route_water(self):
+        """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.route_water`.
+
+        Called immediately before
+        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.route_water`.
+        """
+        pass
+
     def hook_init_water_iteration(self):
         """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.init_water_iteration`.
 
