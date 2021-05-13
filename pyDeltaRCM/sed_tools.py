@@ -20,12 +20,15 @@ class sed_tools(abc.ABC):
 
         This is the main method for sediment routing in the model. It is
         called once per `update()` call.
-        """
-        self.pad_depth = np.pad(self.depth, 1, 'edge')
 
-        self.qs[:] = 0
-        self.Vp_dep_sand[:] = 0
-        self.Vp_dep_mud[:] = 0
+        Internally, this method calls:
+            * :obj:`route_all_sand_parcels`
+            * :obj:`topo_diffusion`
+            * :obj:`route_all_mud_parcels`
+        """
+        # initialize the relevant fields and parcel trackers
+        self.hook_init_sediment_iteration()
+        self.init_sediment_iteration()
 
         _msg = 'Beginning sand parcel routing'
         self.log_info(_msg, verbosity=2)
@@ -43,12 +46,29 @@ class sed_tools(abc.ABC):
         self.route_all_mud_parcels()
 
     def sed_route(self):
+        """Deprecated, since v1.3.1. Use :obj:`route_sediment`."""
         warnings.warn(UserWarning(
             '`sed_route` and `hook_sed_route` are deprecated and '
             'have been replaced with `route_sediment`. '
             'Running `route_sediment` now, but '
             'this will be removed in future release.'))
         self.route_sediment()
+
+    def init_sediment_iteration(self):
+        """Init the water iteration routine.
+
+        Clear and pad fields in preparation for iterating parcels.
+        """
+        _msg = 'Initializing water iteration'
+        self.log_info(_msg, verbosity=2)
+
+        # pad with edge on depth
+        self.pad_depth = np.pad(self.depth, 1, 'edge')
+
+        # clear sediment flux field and deposit volumes
+        self.qs[:] = 0
+        self.Vp_dep_sand[:] = 0
+        self.Vp_dep_mud[:] = 0
 
     def route_all_sand_parcels(self):
         """Route sand parcels; topo diffusion.

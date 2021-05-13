@@ -26,7 +26,7 @@ class TestRunOneTimestep:
         delta.run_water_iteration = mock.MagicMock()
         delta.compute_free_surface = mock.MagicMock()
         delta.finalize_water_iteration = mock.MagicMock()
-        delta.sed_route = mock.MagicMock()
+        delta.route_sediment = mock.MagicMock()
 
         # run the timestep
         delta.run_one_timestep()
@@ -40,7 +40,7 @@ class TestRunOneTimestep:
         delta.finalize_water_iteration.assert_has_calls(
             _calls, any_order=False)
         assert delta.finalize_water_iteration.call_count == 3
-        assert (delta.sed_route.called is True)
+        assert (delta.route_sediment.called is True)
         assert (delta._is_finalized is False)
 
     def test_run_one_timestep_itermax_10(self, tmp_path):
@@ -55,7 +55,7 @@ class TestRunOneTimestep:
         delta.run_water_iteration = mock.MagicMock()
         delta.compute_free_surface = mock.MagicMock()
         delta.finalize_water_iteration = mock.MagicMock()
-        delta.sed_route = mock.MagicMock()
+        delta.route_sediment = mock.MagicMock()
 
         # run the timestep
         delta.run_one_timestep()
@@ -69,7 +69,7 @@ class TestRunOneTimestep:
         delta.finalize_water_iteration.assert_has_calls(
             _calls, any_order=False)
         assert delta.finalize_water_iteration.call_count == 10
-        assert (delta.sed_route.called is True)
+        assert (delta.route_sediment.called is True)
         assert (delta._is_finalized is False)
 
 

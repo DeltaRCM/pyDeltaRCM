@@ -146,6 +146,14 @@ class hook_tools(abc.ABC):
         """
         pass
 
+    def hook_init_sediment_iteration(self):
+        """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.init_sediment_iteration`.
+
+        Called immediately before
+        :obj:`~pyDeltaRCM.sed_tools.sed_tools.init_sediment_iteration`.
+        """
+        pass
+
     def hook_route_all_sand_parcels(self):
         """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels`.
 
