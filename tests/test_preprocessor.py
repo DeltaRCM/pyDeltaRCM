@@ -21,6 +21,31 @@ class TestPreprocessorSingleJobSetups:
         with pytest.raises(ValueError):
             _ = preprocessor.Preprocessor()
 
+    def test_py_hlvl_runjobs_simple_param(self, tmp_path):
+        # a single parameter
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'h0': 7.5})
+        pp = preprocessor.Preprocessor(p)
+
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        # a parameter that takes null as the default
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'hb': 7.5})
+        pp = preprocessor.Preprocessor(p)
+
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        # a parameter that takes null with null
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'hb': None})
+        pp = preprocessor.Preprocessor(p)
+
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
     def test_py_hlvl_tsteps_yml_runjobs_sngle(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'timesteps': 50})
@@ -185,6 +210,28 @@ class TestPreprocessorMatrixJobsSetups:
         assert sum([j == 0.2 for j in f_bedload_list]) == 1
         assert sum([j == 0.6 for j in f_bedload_list]) == 1
         assert pp.config_dict['timesteps'] == 3
+
+    def test_py_hlvl_mtrx_smthng_null(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_parameter_to_file(f, 'timesteps', 3)
+        utilities.write_matrix_to_file(f,
+                                       ['hb'],
+                                       [[None, 2, 7]])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p)
+
+        assert pp._has_matrix is True
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 3
+        assert pp._is_completed is False
+
+        hb_list = pp._matrix_table[:, 1]
+
+        assert sum([j == 'None' for j in hb_list]) == 1
+        assert sum([j == 2 for j in hb_list]) == 1
+        assert sum([j == 7 for j in hb_list]) == 1
 
     def test_py_hlvl_mtrx_2list(self, tmp_path):
         file_name = 'user_parameters.yaml'
@@ -1107,6 +1154,94 @@ class TestParallelJob:
         pj.deltamodel.logger.error.assert_has_calls(
             [mock.call('error!')])
         pj.deltamodel.logger.exception.assert_called_once()
+
+
+class TestWriteYamlConfigToFile:
+
+    def test_write_single_int(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable': 1}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+
+        assert _returned == 'variable: 1\n'
+
+    def test_write_single_float(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable': 1.5}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+
+        assert _returned == 'variable: 1.5\n'
+
+    def test_write_single_string(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable': 'a string'}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+
+        assert _returned == 'variable: a string\n'
+
+    def test_write_single_bool(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable': False}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+
+        assert _returned == 'variable: False\n'
+
+    def test_write_single_null(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable': None}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+
+        assert _returned == 'variable: null\n'
+
+    def test_write_multiple_one_each(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable1': 1,
+                     'variable2': 2.2,
+                     'variable3': 'a string',
+                     'variable4': False,
+                     'variable5': None}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+        print(_returned)
+
+        assert _returned == ('variable1: 1\n variable2: 2.2\n '
+                             'variable3: a string\n variable4: False\n '
+                             'variable5: null\n')
 
 
 class TestPreprocessorImported:

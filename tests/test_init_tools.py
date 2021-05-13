@@ -403,6 +403,37 @@ class TestSettingParametersFromYAMLFile:
         _delta = DeltaModel(input_file=p)
         assert _delta.itermax == 6
 
+    def test_h0(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'h0': 7.5})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.h0 == 7.5
+
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'h0': int(7)})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.h0 == 7
+
+    def test_hb(self, tmp_path):
+        # take default from h0 if not given:
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'h0': 7.5})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.h0 == 7.5
+        assert _delta.hb == 7.5
+
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'hb': 7.5})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.h0 == 5
+        assert _delta.hb == 7.5
+
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'hb': int(7)})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.h0 == 5
+        assert _delta.hb == 7
+
     def test_Nsmooth(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml', {'Nsmooth': 6})
         _delta = DeltaModel(input_file=p)

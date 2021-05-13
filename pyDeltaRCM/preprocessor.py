@@ -1127,7 +1127,10 @@ def _write_yaml_config_to_file(_config, _path):
     """
     def _write_parameter_to_file(f, varname, varvalue):
         """Write each line, formatted."""
-        f.write(varname + ': ' + str(varvalue) + '\n')
+        if varvalue is None:
+            f.write(varname + ': ' + 'null' + '\n')
+        else:
+            f.write(varname + ': ' + str(varvalue) + '\n')
 
     f = open(_path, "a")
     for k in _config.keys():
