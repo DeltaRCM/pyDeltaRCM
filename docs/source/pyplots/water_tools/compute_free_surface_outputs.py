@@ -28,22 +28,22 @@ delta.run_water_iteration()
 delta.compute_free_surface()
 
 
-pidx = 60
+# pidx = 60
 
-sfc_visit, sfc_sum = pyDeltaRCM.water_tools._accumulate_free_surface_walks(
-    delta.free_surf_walk_inds, delta.free_surf_flag, delta.cell_type,
-    delta.uw, delta.ux, delta.uy, delta.depth,
-    delta._dx, delta._u0, delta.h0, delta._H_SL, delta._S0)
-
-
-Hnew = np.full_like(sfc_visit, np.nan)
-Hnew[sfc_visit > 0] = (sfc_sum[sfc_visit > 0] /
-                       sfc_visit[sfc_visit > 0])
+# sfc_visit, sfc_sum = pyDeltaRCM.water_tools._accumulate_free_surface_walks(
+#     delta.free_surf_walk_inds, delta.free_surf_flag, delta.cell_type,
+#     delta.uw, delta.ux, delta.uy, delta.depth,
+#     delta._dx, delta._u0, delta.h0, delta._H_SL, delta._S0)
 
 
-stage_new = delta.eta + delta.depth
-stage_new[sfc_visit > 0] = (sfc_sum[sfc_visit > 0] /
-                            sfc_visit[sfc_visit > 0])
+Hnew = np.full_like(delta.sfc_visit, np.nan)
+Hnew[delta.sfc_visit > 0] = (delta.sfc_sum[delta.sfc_visit > 0] /
+                             delta.sfc_visit[delta.sfc_visit > 0])
+
+
+# stage_new = delta.eta + delta.depth
+# stage_new[delta.sfc_visit > 0] = (delta.sfc_sum[delta.sfc_visit > 0] /
+#                             delta.sfc_visit[delta.sfc_visit > 0])
 
 
 fig, ax = plt.subplots(2, 2, sharex=True, sharey=True, figsize=(9, 4))
@@ -57,9 +57,9 @@ pyDeltaRCM.debug_tools.plot_domain(
 
 pyDeltaRCM.debug_tools.plot_domain(
     Hnew, ax=ax[1, 0], grid=False,
-    label='H_new (m)')
+    label='computed Hnew (m)')
 pyDeltaRCM.debug_tools.plot_domain(
-    stage_new, ax=ax[1, 1], grid=False,
+    delta.Hnew, ax=ax[1, 1], grid=False,
     label='stage (m)')
 
 fig.show()

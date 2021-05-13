@@ -14,7 +14,7 @@ from pyDeltaRCM import water_tools
 
 class TestWaterRoute:
 
-    def test_route_sediment(self, tmp_path):
+    def test_route_water(self, tmp_path):
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)

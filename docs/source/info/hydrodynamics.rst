@@ -81,12 +81,11 @@ The updated water surface is combined with the previous timestep's water surface
 
 .. plot:: water_tools/compute_free_surface_outputs.py
 
-With a new free surface computed, a few final operations prepare the surface for boundary condition updates and eventually being passed to the sediment routing operations.
+With a new free surface computed, a few final operations prepare the surface for boundary condition updates and eventually being passed to the sediment routing operations (inside :meth:`~water_tools.finalize_free_surface`).
 A non-linear smoothing operation is applied to the free surface, whereby wet cells are iteratively averaged with neighboring wet cells to yield an overall smoother surface.
 The smoothing is handled by :func:`_smooth_free_surface` and depends on the number of iterations (:attr:`~pyDeltaRCM.model.DeltaModel.Nsmooth`) and a weighting coefficient (:attr:`~pyDeltaRCM.model.DeltaModel.Csmooth`).
 
 .. plot:: water_tools/_smooth_free_surface.py
-
 
 Finally, a :meth:`~water_tools.flooding_correction` is applied to the domain.
 In this correction, all "dry" cells (a cell where the flow depth is less than the `dry_depth`) are checked for any neighboring cells where the water surface elevation (`stage`) is higher than the bed elevation of the dry cell.
