@@ -853,7 +853,7 @@ class TestSerialJob:
         sj.deltamodel._checkpoint_dt = 2 * sj.deltamodel._dt
 
         # mock top-level methods, verify call was made to each
-        sj.deltamodel.run_one_timestep = mock.MagicMock()
+        sj.deltamodel.solve_water_and_sediment_timestep = mock.MagicMock()
         sj.deltamodel.apply_subsidence = mock.MagicMock()
         sj.deltamodel.finalize_timestep = mock.MagicMock()
         sj.deltamodel.log_model_time = mock.MagicMock()
@@ -868,7 +868,7 @@ class TestSerialJob:
         # assertions
         assert sj.deltamodel._time_iter == 10
         assert sj.deltamodel.output_data.call_count == 10
-        assert sj.deltamodel.run_one_timestep.call_count == 10
+        assert sj.deltamodel.solve_water_and_sediment_timestep.call_count == 10
         assert sj.deltamodel.apply_subsidence.call_count == 10
         assert sj.deltamodel.finalize_timestep.call_count == 10
         assert sj.deltamodel.log_model_time.call_count == 10
@@ -892,7 +892,7 @@ class TestSerialJob:
         sj.deltamodel._checkpoint_dt = 2 * sj.deltamodel._dt
 
         # mock top-level methods, verify call was made to each
-        sj.deltamodel.run_one_timestep = mock.MagicMock()
+        sj.deltamodel.solve_water_and_sediment_timestep = mock.MagicMock()
         sj.deltamodel.apply_subsidence = mock.MagicMock()
         sj.deltamodel.finalize_timestep = mock.MagicMock()
         sj.deltamodel.log_model_time = mock.MagicMock()
@@ -907,7 +907,7 @@ class TestSerialJob:
 
         # assertions
         assert sj.deltamodel._time_iter == 1
-        assert sj.deltamodel.run_one_timestep.call_count == 1
+        assert sj.deltamodel.solve_water_and_sediment_timestep.call_count == 1
         assert sj.deltamodel.apply_subsidence.call_count == 1
         assert sj.deltamodel.finalize_timestep.call_count == 1
         assert sj.deltamodel.log_model_time.call_count == 1
@@ -934,7 +934,7 @@ class TestSerialJob:
         sj.deltamodel._checkpoint_dt = 2 * sj.deltamodel._dt
 
         # mock top-level methods, verify call was made to each
-        sj.deltamodel.run_one_timestep = mock.MagicMock()
+        sj.deltamodel.solve_water_and_sediment_timestep = mock.MagicMock()
         sj.deltamodel.apply_subsidence = mock.MagicMock()
         sj.deltamodel.finalize_timestep = mock.MagicMock()
         sj.deltamodel.log_model_time = mock.MagicMock()
@@ -949,7 +949,7 @@ class TestSerialJob:
 
         # assertions
         assert sj.deltamodel._time_iter == 10
-        assert sj.deltamodel.run_one_timestep.call_count == 10
+        assert sj.deltamodel.solve_water_and_sediment_timestep.call_count == 10
         assert sj.deltamodel.apply_subsidence.call_count == 10
         assert sj.deltamodel.finalize_timestep.call_count == 10
         assert sj.deltamodel.log_model_time.call_count == 10
@@ -982,7 +982,7 @@ class TestParallelJob:
         pj.deltamodel._checkpoint_dt = 2 * pj.deltamodel._dt
 
         # mock top-level methods, verify call was made to each
-        pj.deltamodel.run_one_timestep = mock.MagicMock()
+        pj.deltamodel.solve_water_and_sediment_timestep = mock.MagicMock()
         pj.deltamodel.apply_subsidence = mock.MagicMock()
         pj.deltamodel.finalize_timestep = mock.MagicMock()
         pj.deltamodel.log_model_time = mock.MagicMock()
@@ -996,7 +996,7 @@ class TestParallelJob:
 
         # assertions
         assert pj.deltamodel._time_iter == 10
-        assert pj.deltamodel.run_one_timestep.call_count == 10
+        assert pj.deltamodel.solve_water_and_sediment_timestep.call_count == 10
         assert pj.deltamodel.apply_subsidence.call_count == 10
         assert pj.deltamodel.finalize_timestep.call_count == 10
         assert pj.deltamodel.log_model_time.call_count == 10
@@ -1025,7 +1025,7 @@ class TestParallelJob:
         pj.deltamodel._checkpoint_dt = 2 * pj.deltamodel._dt
 
         # mock top-level methods, verify call was made to each
-        pj.deltamodel.run_one_timestep = mock.MagicMock()
+        pj.deltamodel.solve_water_and_sediment_timestep = mock.MagicMock()
         pj.deltamodel.apply_subsidence = mock.MagicMock()
         pj.deltamodel.finalize_timestep = mock.MagicMock()
         pj.deltamodel.log_model_time = mock.MagicMock(
@@ -1040,7 +1040,7 @@ class TestParallelJob:
 
         # assertions
         assert pj.deltamodel._time_iter == 1
-        assert pj.deltamodel.run_one_timestep.call_count == 1
+        assert pj.deltamodel.solve_water_and_sediment_timestep.call_count == 1
         assert pj.deltamodel.apply_subsidence.call_count == 1
         assert pj.deltamodel.finalize_timestep.call_count == 1
         assert pj.deltamodel.log_model_time.call_count == 1
@@ -1074,7 +1074,7 @@ class TestParallelJob:
         pj.deltamodel._checkpoint_dt = 2 * pj.deltamodel._dt
 
         # mock top-level methods, verify call was made to each
-        pj.deltamodel.run_one_timestep = mock.MagicMock()
+        pj.deltamodel.solve_water_and_sediment_timestep = mock.MagicMock()
         pj.deltamodel.apply_subsidence = mock.MagicMock()
         pj.deltamodel.finalize_timestep = mock.MagicMock()
         pj.deltamodel.log_model_time = mock.MagicMock()
@@ -1089,7 +1089,7 @@ class TestParallelJob:
 
         # assertions
         assert pj.deltamodel._time_iter == 10
-        assert pj.deltamodel.run_one_timestep.call_count == 10
+        assert pj.deltamodel.solve_water_and_sediment_timestep.call_count == 10
         assert pj.deltamodel.apply_subsidence.call_count == 10
         assert pj.deltamodel.finalize_timestep.call_count == 10
         assert pj.deltamodel.log_model_time.call_count == 10

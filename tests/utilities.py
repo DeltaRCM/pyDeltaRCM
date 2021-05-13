@@ -100,11 +100,11 @@ class FastIteratingDeltaModel:
     This class is useful in patching the DeltaModel for timing tests. The
     patched DeltaModel uses the random number generation internally, so it
     will verify functionality in any checkpointing scenarios, and overwriting
-    only the `run_one_timestep` method removes most of the jitting compilation
+    only the `solve_water_and_sediment_timestep` method removes most of the jitting compilation
     time and much of the actual computation time.
     """
 
-    def run_one_timestep(self):
+    def solve_water_and_sediment_timestep(self):
         """PATCH"""
 
         def _get_random_field(shp):

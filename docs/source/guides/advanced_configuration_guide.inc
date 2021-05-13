@@ -157,7 +157,7 @@ We then can initialize our new model type, and see that this model has all of th
 
 Hooks are methods in the model sequence that do nothing by default, but can be augmented to provide arbitrary desired behavior in the model.
 Hooks have been integrated throughout the model initialization and update sequences, to allow the users to achieve complex behavior at various stages of the model sequence.
-For example, ``hook_run_one_timestep`` is a hook which occurs immediately before the  model :obj:`run_one_timestep` method.
+For example, ``hook_solve_water_and_sediment_timestep`` is a hook which occurs immediately before the model :obj:`solve_water_and_sediment_timestep` method.
 
 To utilize the hooks, we simply define a method in our subclass with the name corresponding to the hook we want to augment to achieve the desired behavior.
 For example, to change the behavior of the subsidence field to vary randomly in magnitude on each iteration:

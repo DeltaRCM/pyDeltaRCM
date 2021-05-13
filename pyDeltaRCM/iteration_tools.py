@@ -23,13 +23,11 @@ class iteration_tools(abc.ABC):
     these operations largely occur when saving and updating the model.
     """
 
-    def run_one_timestep(self):
-        """Run the timestep once.
+    def solve_water_and_sediment_timestep(self):
+        """Run water and sediment operations for one timestep.
 
         The first operation called by :meth:`update`, this method iterates the
         water surface calculation and sediment parcel routing routines.
-
-        .. note:: Will print the current time to stdout, if ``verbose > 0``.
 
         Parameters
         ----------
@@ -47,6 +45,17 @@ class iteration_tools(abc.ABC):
         # sediment iteration
         self.hook_route_sediment()
         self.route_sediment()
+
+    def run_one_timestep(self):
+        """Deprecated, since v1.3.1. Use :obj:`solve_water_and_sediment_timestep`."""
+        _msg = ('`run_one_timestep` and `hook_run_one_timestep` are '
+                'deprecated and have been replaced with '
+                '`solve_water_and_sediment_timestep`. '
+                'Running `solve_water_and_sediment_timestep` now, but '
+                'this will be removed in future release.')
+        self.logger.warning(_msg)
+        warnings.warn(UserWarning(_msg))
+        self.solve_water_and_sediment_timestep()
 
     def apply_subsidence(self):
         """Apply subsidence pattern.

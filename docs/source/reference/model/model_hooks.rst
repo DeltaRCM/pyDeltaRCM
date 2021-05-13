@@ -9,7 +9,7 @@ A complete list of hooks in the model follows:
     :header: "Initializing", "Updating"
     :widths: 40, 40
 
-    :obj:`~hook_tools.hook_import_files`, :obj:`~hook_tools.hook_run_one_timestep`
+    :obj:`~hook_tools.hook_import_files`, :obj:`~hook_tools.hook_solve_water_and_sediment_timestep`
     :obj:`~hook_tools.hook_process_input_to_model`, :obj:`~hook_tools.hook_apply_subsidence`
     :obj:`~hook_tools.hook_create_other_variables`, :obj:`~hook_tools.hook_finalize_timestep`
     :obj:`~hook_tools.hook_create_domain`, :obj:`~hook_tools.hook_route_water`
