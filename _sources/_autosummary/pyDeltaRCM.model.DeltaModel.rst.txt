@@ -124,6 +124,7 @@
       ~DeltaModel.dx
       ~DeltaModel.f_bedload
       ~DeltaModel.h0
+      ~DeltaModel.hb
       ~DeltaModel.influx_sediment_concentration
       ~DeltaModel.itermax
       ~DeltaModel.omega_flow
