@@ -84,6 +84,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         _src_dir = os.path.realpath(os.path.dirname(__file__))
         self.default_file = os.path.join(_src_dir, 'default.yml')
 
+        # check for any deprecated hooks
+        self._check_deprecated_hooks()
+
         # import the input file
         self.hook_import_files()  # user hook
         self.import_files(kwargs)

@@ -6,6 +6,8 @@ from numba.experimental import jitclass
 from scipy import ndimage
 import abc
 
+import warnings
+
 from . import shared_tools
 
 # tools for sediment routing algorithms and deposition/erosion
@@ -13,7 +15,7 @@ from . import shared_tools
 
 class sed_tools(abc.ABC):
 
-    def sed_route(self):
+    def route_sediment(self):
         """Sediment routing main method.
 
         This is the main method for sediment routing in the model. It is
@@ -39,6 +41,14 @@ class sed_tools(abc.ABC):
         self.log_info(_msg, verbosity=2)
         self.hook_route_all_mud_parcels()
         self.route_all_mud_parcels()
+
+    def sed_route(self):
+        warnings.warn(UserWarning(
+            '`sed_route` and `hook_sed_route` are deprecated and '
+            'have been replaced with `route_sediment`. '
+            'Running `route_sediment` now, but '
+            'this will be removed in future release.'))
+        self.route_sediment()
 
     def route_all_sand_parcels(self):
         """Route sand parcels; topo diffusion.

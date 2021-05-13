@@ -325,6 +325,27 @@ class Test__init__:
             _ = DeltaModel(input_file=p)
 
 
+class TestDeprecatedHooks:
+
+    class HookDeltaModel(DeltaModel):
+        """Dummy class to add old hook."""
+
+        def hook_sed_route(self):
+            """Old hook"""
+            pass
+
+    def test_if_hook_raise_error(self, tmp_path):
+        """Deprecated hooks cannot be implemented and will raise an error."""
+
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        with pytest.raises(AttributeError):
+            _ = self.HookDeltaModel(input_file=p)
+
+        # check that regular model still works though
+        _ = DeltaModel(input_file=p)
+
+
 class TestUpdate:
 
     def test_update(self, tmp_path):

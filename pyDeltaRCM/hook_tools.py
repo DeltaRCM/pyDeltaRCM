@@ -8,6 +8,24 @@ class hook_tools(abc.ABC):
     </guides/user_guide>`.
     """
 
+    def _check_deprecated_hooks(self):
+        """Check for any old hooks that are defined.
+
+        Sometimes hook names need to be deprecated, due to changing underlying
+        model mechanics or anything else. This may mean that an old hook is
+        *no longer called*, but there is no way to warn the user about this.
+        Therefore, we enforce that no old hooks may be used as method names of
+        subclassing models.
+
+        This helper method is early in the `DeltaModel` `__init__` routine.
+        """
+        _deprecated_list = {'hook_sed_route': 'hook_route_sediment'}
+        for old_hook, new_hook in _deprecated_list.items():
+            if hasattr(self, old_hook):
+                raise AttributeError(
+                    f'`{old_hook}` is deprecated, '
+                    f'and has been replaced with `{new_hook}`.')
+
     def hook_import_files(self):
         """Hook :obj:`~pyDeltaRCM.init_tools.init_tools.import_files`.
 
@@ -120,11 +138,11 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_sed_route(self):
-        """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.sed_route`.
+    def hook_route_sediment(self):
+        """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`.
 
         Called immediately before
-        :obj:`~pyDeltaRCM.sed_tools.sed_tools.sed_route`.
+        :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`.
         """
         pass
 

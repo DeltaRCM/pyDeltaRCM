@@ -65,8 +65,8 @@ class iteration_tools(abc.ABC):
         _msg = 'Beginning sediment iteration'
         self.log_info(_msg, verbosity=2)
 
-        self.hook_sed_route()
-        self.sed_route()
+        self.hook_route_sediment()
+        self.route_sediment()
 
     def apply_subsidence(self):
         """Apply subsidence pattern.

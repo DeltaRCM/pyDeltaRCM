@@ -2,15 +2,16 @@
 
 import numpy as np
 
+import pytest
 import unittest.mock as mock
 
 from pyDeltaRCM.model import DeltaModel
 from . import utilities
 
 
-class TestSedRoute:
+class TestSedimentRoute:
 
-    def test_sed_route(self, tmp_path):
+    def test_route_sediment(self, tmp_path):
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
@@ -27,7 +28,7 @@ class TestSedRoute:
         _delta.route_all_mud_parcels = mock.MagicMock()
 
         # run the method
-        _delta.sed_route()
+        _delta.route_sediment()
 
         # assertions
         assert np.all(_delta.pad_depth[1:-1, 1:-1] == _delta.depth)
@@ -40,6 +41,18 @@ class TestSedRoute:
         assert (_delta.route_all_sand_parcels.called is True)
         assert (_delta.topo_diffusion.called is True)
         assert (_delta.route_all_mud_parcels.called is True)
+
+    def test_sed_route_deprecated(self, tmp_path):
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # mock top-level methods
+        _delta.log_info = mock.MagicMock()
+        _delta.route_sediment = mock.MagicMock()
+
+        with pytest.warns(UserWarning):
+            _delta.sed_route()
 
 
 class TestRouteAllSandParcels:
