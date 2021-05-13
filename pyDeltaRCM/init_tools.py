@@ -601,6 +601,7 @@ class init_tools(abc.ABC):
         self._save_var_list['meta']['CTR'] = ['CTR', 'cells', 'i8', ()]
         self._save_var_list['meta']['dx'] = ['dx', 'meters', 'f4', ()]
         self._save_var_list['meta']['h0'] = ['h0', 'meters', 'f4', ()]
+        self._save_var_list['meta']['hb'] = ['hb', 'meters', 'f4', ()]
         self._save_var_list['meta']['cell_type'] = ['cell_type',
                                                     'type', 'i8',
                                                     ('length', 'width')]
