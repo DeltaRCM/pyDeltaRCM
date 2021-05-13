@@ -44,6 +44,8 @@ Model Domain Parameters
 
 :attr:`pyDeltaRCM.model.DeltaModel.h0`
 
+:attr:`pyDeltaRCM.model.DeltaModel.hb`
+
 :attr:`pyDeltaRCM.model.DeltaModel.H_SL`
 
 :attr:`pyDeltaRCM.model.DeltaModel.SLR`

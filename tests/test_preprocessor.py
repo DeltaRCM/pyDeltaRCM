@@ -1156,6 +1156,94 @@ class TestParallelJob:
         pj.deltamodel.logger.exception.assert_called_once()
 
 
+class TestWriteYamlConfigToFile:
+
+    def test_write_single_int(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable': 1}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+
+        assert _returned == 'variable: 1\n'
+
+    def test_write_single_float(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable': 1.5}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+
+        assert _returned == 'variable: 1.5\n'
+
+    def test_write_single_string(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable': 'a string'}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+
+        assert _returned == 'variable: a string\n'
+
+    def test_write_single_bool(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable': False}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+
+        assert _returned == 'variable: False\n'
+
+    def test_write_single_null(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable': None}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+
+        assert _returned == 'variable: null\n'
+
+    def test_write_multiple_one_each(self, tmp_path):
+        # set up what to write
+        file_path = tmp_path / 'output.yml'
+        yaml_dict = {'variable1': 1,
+                     'variable2': 2.2,
+                     'variable3': 'a string',
+                     'variable4': False,
+                     'variable5': None}
+
+        # write the file
+        preprocessor._write_yaml_config_to_file(yaml_dict, file_path)
+
+        with open(file_path) as f:
+            _returned = ' '.join(f.readlines())
+        print(_returned)
+
+        assert _returned == ('variable1: 1\n variable2: 2.2\n '
+                             'variable3: a string\n variable4: False\n '
+                             'variable5: null\n')
+
+
 class TestPreprocessorImported:
 
     def test_Preprocessor_toplevelimport(self):
