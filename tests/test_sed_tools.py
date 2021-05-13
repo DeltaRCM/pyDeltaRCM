@@ -27,7 +27,7 @@ class TestSedimentRoute:
         _delta.route_sediment()
 
         # methods called
-        assert (_delta.log_info.call_count == 3)
+        assert (_delta.log_info.call_count == 4)
         assert (_delta.init_sediment_iteration.called is True)
         assert (_delta.route_all_sand_parcels.called is True)
         assert (_delta.topo_diffusion.called is True)
@@ -38,17 +38,16 @@ class TestSedimentRoute:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
-        # alter field for initial values going into function
-        _delta.qs += np.random.uniform(0, 1, size=_delta.eta.shape)
-        _delta.Vp_dep_sand += np.random.uniform(0, 1, size=_delta.eta.shape)
-        _delta.Vp_dep_mud += np.random.uniform(0, 1, size=_delta.eta.shape)
-
         # mock top-level methods
-        _delta.log_info = mock.MagicMock()
+        _delta.logger = mock.MagicMock()
         _delta.route_sediment = mock.MagicMock()
 
+        # check warning raised
         with pytest.warns(UserWarning):
             _delta.sed_route()
+
+        # and logged
+        assert (_delta.logger.warning.called is True)
 
 
 class TestInitSedimentIteration:
@@ -58,12 +57,19 @@ class TestInitSedimentIteration:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
+        # alter field for initial values going into function
+        _delta.qs += np.random.uniform(0, 1, size=_delta.eta.shape)
+        _delta.Vp_dep_sand += np.random.uniform(0, 1, size=_delta.eta.shape)
+        _delta.Vp_dep_mud += np.random.uniform(0, 1, size=_delta.eta.shape)
+
+        assert not np.all(_delta.qs == 0)  # field has info
+
         # call the method
         _delta.init_sediment_iteration()
 
         # assertions
         assert np.all(_delta.pad_depth[1:-1, 1:-1] == _delta.depth)
-        assert np.all(_delta.qs == 0)
+        assert np.all(_delta.qs == 0)      # field is cleared
         assert np.all(_delta.Vp_dep_sand == 0)
         assert np.all(_delta.Vp_dep_mud == 0)
 

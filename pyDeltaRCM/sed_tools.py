@@ -50,11 +50,12 @@ class sed_tools(abc.ABC):
 
     def sed_route(self):
         """Deprecated, since v1.3.1. Use :obj:`route_sediment`."""
-        warnings.warn(UserWarning(
-            '`sed_route` and `hook_sed_route` are deprecated and '
-            'have been replaced with `route_sediment`. '
-            'Running `route_sediment` now, but '
-            'this will be removed in future release.'))
+        _msg = ('`sed_route` and `hook_sed_route` are deprecated and '
+                'have been replaced with `route_sediment`. '
+                'Running `route_sediment` now, but '
+                'this will be removed in future release.')
+        self.logger.warning(_msg)
+        warnings.warn(UserWarning(_msg))
         self.route_sediment()
 
     def init_sediment_iteration(self):
