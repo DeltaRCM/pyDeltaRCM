@@ -17,15 +17,15 @@ from .. import utilities
 
 
 @mock.patch(
-    'pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep',
-    new=utilities.FastIteratingDeltaModel.run_one_timestep)
+    'pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep',
+    new=utilities.FastIteratingDeltaModel.solve_water_and_sediment_timestep)
 class TestCheckpointingIntegrations:
     """
     The above patch implements an augmented DeltaModel from `utilities`. In
-    this modified DeltaModel, the `run_one_timestep` operations (i.e., the
-    time consuming part of the model) is replaced with an updating random
-    field. This guarantees that the random-repeatedness of checkpointing is
-    validated, but it is much faster and easier to isolate
+    this modified DeltaModel, the `solve_water_and_sediment_timestep`
+    operations (i.e., the time consuming part of the model) is replaced with
+    an updating random field. This guarantees that the random-repeatedness of
+    checkpointing is validated, but it is much faster and easier to isolate
     checkpointing-related issues from model issues.
     """
 
@@ -531,8 +531,8 @@ class TestCheckpointingCreatingLoading:
         assert np.all(_delta.eta == _rand_field)
 
     @mock.patch(
-        'pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep',
-        new=utilities.FastIteratingDeltaModel.run_one_timestep)
+        'pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep',
+        new=utilities.FastIteratingDeltaModel.solve_water_and_sediment_timestep)
     @pytest.mark.skipif(
         platform.system() != 'Linux',
         reason='Parallel support only on Linux OS.')

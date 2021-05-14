@@ -12,6 +12,31 @@ from . import utilities
 from pyDeltaRCM import water_tools
 
 
+class TestWaterRoute:
+
+    def test_route_water(self, tmp_path):
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # mock top-level methods
+        _delta.log_info = mock.MagicMock()
+        _delta.init_water_iteration = mock.MagicMock()
+        _delta.run_water_iteration = mock.MagicMock()
+        _delta.compute_free_surface = mock.MagicMock()
+        _delta.finalize_water_iteration = mock.MagicMock()
+
+        # run the method
+        _delta.route_water()
+
+        # methods called
+        assert (_delta.log_info.called is True)
+        assert (_delta.init_water_iteration.call_count == _delta._itermax)
+        assert (_delta.run_water_iteration.call_count == _delta._itermax)
+        assert (_delta.compute_free_surface.call_count == _delta._itermax)
+        assert (_delta.finalize_water_iteration.call_count == _delta._itermax)
+
+
 class TestWaterRoutingWeights:
 
     def test_get_weight_at_cell(self):

@@ -20,7 +20,7 @@ The following codes produce two runs (using `matrix` expansion from the Preproce
             self._changed = False
             self._changed_back = False
 
-        def hook_run_one_timestep(self):
+        def hook_solve_water_and_sediment_timestep(self):
             """Change the state depending on the _time.
             """
             # check if the state has been changed, and time to change it
@@ -85,8 +85,8 @@ Here, we will change the model time value directly, so that we can verify that t
         mdl_sandy._time = _time  # you should never do this
 
         # run the hooked method
-        mdl_muddy.hook_run_one_timestep()
-        mdl_sandy.hook_run_one_timestep()
+        mdl_muddy.hook_solve_water_and_sediment_timestep()
+        mdl_sandy.hook_solve_water_and_sediment_timestep()
 
         # grab the state of the `f_bedload` parameter
         fb_mdl_muddy[i] = mdl_muddy.f_bedload  # get the value

@@ -13,9 +13,9 @@ from pyDeltaRCM.model import DeltaModel
 from . import utilities
 
 
-class TestRunOneTimestep:
+class TestSolveWaterAndSedimentTimestep:
 
-    def test_run_one_timestep_defaults(self, tmp_path):
+    def test_solve_water_and_sediment_timestep_defaults(self, tmp_path):
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         delta = DeltaModel(input_file=p)
@@ -26,10 +26,10 @@ class TestRunOneTimestep:
         delta.run_water_iteration = mock.MagicMock()
         delta.compute_free_surface = mock.MagicMock()
         delta.finalize_water_iteration = mock.MagicMock()
-        delta.sed_route = mock.MagicMock()
+        delta.route_sediment = mock.MagicMock()
 
         # run the timestep
-        delta.run_one_timestep()
+        delta.solve_water_and_sediment_timestep()
 
         # assert that methods are called
         assert delta.init_water_iteration.called is True
@@ -40,10 +40,10 @@ class TestRunOneTimestep:
         delta.finalize_water_iteration.assert_has_calls(
             _calls, any_order=False)
         assert delta.finalize_water_iteration.call_count == 3
-        assert (delta.sed_route.called is True)
+        assert (delta.route_sediment.called is True)
         assert (delta._is_finalized is False)
 
-    def test_run_one_timestep_itermax_10(self, tmp_path):
+    def test_solve_water_and_sediment_timestep_itermax_10(self, tmp_path):
         # create a delta with different itermax
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'itermax': 10})
@@ -55,10 +55,10 @@ class TestRunOneTimestep:
         delta.run_water_iteration = mock.MagicMock()
         delta.compute_free_surface = mock.MagicMock()
         delta.finalize_water_iteration = mock.MagicMock()
-        delta.sed_route = mock.MagicMock()
+        delta.route_sediment = mock.MagicMock()
 
         # run the timestep
-        delta.run_one_timestep()
+        delta.solve_water_and_sediment_timestep()
 
         # assert that methods are called
         assert delta.init_water_iteration.called is True
@@ -69,8 +69,24 @@ class TestRunOneTimestep:
         delta.finalize_water_iteration.assert_has_calls(
             _calls, any_order=False)
         assert delta.finalize_water_iteration.call_count == 10
-        assert (delta.sed_route.called is True)
+        assert (delta.route_sediment.called is True)
         assert (delta._is_finalized is False)
+
+    def test_run_one_timestep_deprecated(self, tmp_path):
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # mock top-level methods
+        _delta.logger = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
+
+        # check warning raised
+        with pytest.warns(UserWarning):
+            _delta.run_one_timestep()
+
+        # and logged
+        assert (_delta.logger.warning.called is True)
 
 
 class TestFinalizeTimestep:
@@ -108,7 +124,7 @@ class TestApplyingSubsidence:
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
 
         assert _delta.dt == 25000
         assert _delta.subsidence_rate == 1e-8
@@ -133,7 +149,7 @@ class TestApplyingSubsidence:
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
 
         assert _delta.dt == 25000
         assert _delta.subsidence_rate == 1e-8
@@ -153,7 +169,7 @@ class TestApplyingSubsidence:
                       pytest.approx(-_delta.h0 - 0.00025))
         _delta.output_netcdf.close()
 
-        _delta.run_one_timestep.call_count == 2
+        _delta.solve_water_and_sediment_timestep.call_count == 2
 
     def test_subsidence_changed_with_timestep(self, tmp_path):
         # create a delta with subsidence parameters

@@ -84,6 +84,9 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         _src_dir = os.path.realpath(os.path.dirname(__file__))
         self.default_file = os.path.join(_src_dir, 'default.yml')
 
+        # check for any deprecated hooks
+        self._check_deprecated_hooks()
+
         # import the input file
         self.hook_import_files()  # user hook
         self.import_files(kwargs)
@@ -137,15 +140,16 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.log_model_time()
 
     def update(self):
-        """Run the model for one full instance.
+        """Run the model for one full timestep.
 
         This method handles the input/output from the model, orchestrating the
-        various morphodynamic and basin-scale processes, and incrementing the
-        model time-tracking attributes. This method calls, in sequence:
+        various morphodynamic and basin-scale processes (from sub-methods),
+        and incrementing the model time-tracking attributes. This method
+        calls, in sequence:
 
             * the routine to run one timestep (i.e., water surface estimation
               and sediment routing;
-              :meth:`~pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep`)
+              :meth:`~pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep`)
             * the basin subsidence update;
               (:meth:`~pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence`)
             * the timestep finalization routine (applying boundary conditions);
@@ -178,8 +182,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             raise RuntimeError('Cannot update model, model already finalized!')
 
         # update the model, i.e., the actual model morphodynamics
-        self.hook_run_one_timestep()
-        self.run_one_timestep()
+        self.hook_solve_water_and_sediment_timestep()
+        self.solve_water_and_sediment_timestep()
 
         self.hook_apply_subsidence()
         self.apply_subsidence()

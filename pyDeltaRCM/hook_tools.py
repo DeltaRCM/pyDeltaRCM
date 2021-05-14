@@ -8,6 +8,25 @@ class hook_tools(abc.ABC):
     </guides/user_guide>`.
     """
 
+    def _check_deprecated_hooks(self):
+        """Check for any old hooks that are defined.
+
+        Sometimes hook names need to be deprecated, due to changing underlying
+        model mechanics or anything else. This may mean that an old hook is
+        *no longer called*, but there is no way to warn the user about this.
+        Therefore, we enforce that no old hooks may be used as method names of
+        subclassing models.
+
+        This helper method is early in the `DeltaModel` `__init__` routine.
+        """
+        _deprecated_list = {'hook_sed_route': 'hook_route_sediment',
+                            'hook_run_one_timestep': 'hook_solve_water_and_sediment_timestep'}
+        for old_hook, new_hook in _deprecated_list.items():
+            if hasattr(self, old_hook):
+                raise AttributeError(
+                    f'`{old_hook}` is deprecated, '
+                    f'and has been replaced with `{new_hook}`.')
+
     def hook_import_files(self):
         """Hook :obj:`~pyDeltaRCM.init_tools.init_tools.import_files`.
 
@@ -48,11 +67,11 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_run_one_timestep(self):
-        """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep`.
+    def hook_solve_water_and_sediment_timestep(self):
+        """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep`.
 
         Called immediately before
-        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep`.
+        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep`.
         """
         pass
 
@@ -88,6 +107,14 @@ class hook_tools(abc.ABC):
         """
         pass
 
+    def hook_route_water(self):
+        """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.route_water`.
+
+        Called immediately before
+        :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.route_water`.
+        """
+        pass
+
     def hook_init_water_iteration(self):
         """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.init_water_iteration`.
 
@@ -120,11 +147,19 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_sed_route(self):
-        """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.sed_route`.
+    def hook_route_sediment(self):
+        """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`.
 
         Called immediately before
-        :obj:`~pyDeltaRCM.sed_tools.sed_tools.sed_route`.
+        :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`.
+        """
+        pass
+
+    def hook_init_sediment_iteration(self):
+        """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.init_sediment_iteration`.
+
+        Called immediately before
+        :obj:`~pyDeltaRCM.sed_tools.sed_tools.init_sediment_iteration`.
         """
         pass
 

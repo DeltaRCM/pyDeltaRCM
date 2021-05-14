@@ -10,6 +10,39 @@ from . import shared_tools
 
 class water_tools(abc.ABC):
 
+    def route_water(self):
+        """Water routing main method.
+
+        This is the main method for water routing in the model. It is
+        called once per `update()` call.
+
+        Internally, this method calls:
+            * :obj:`init_water_iteration`
+            * :obj:`run_water_iteration`
+            * :obj:`compute_free_surface`
+            * :obj:`finalize_water_iteration`
+        """
+        _msg = 'Beginning water iteration'
+        self.log_info(_msg, verbosity=2)
+
+        for iteration in range(self._itermax):
+
+            # initialize the relevant fields and parcel trackers
+            self.hook_init_water_iteration()
+            self.init_water_iteration()
+
+            # run the actual iteration of the parcels
+            self.hook_run_water_iteration()
+            self.run_water_iteration()
+
+            # accumulate the routed water parcels into free surface
+            self.hook_compute_free_surface()
+            self.compute_free_surface()
+
+            # clean up the water surface and apply boundary conditions
+            self.hook_finalize_water_iteration(iteration)
+            self.finalize_water_iteration(iteration)
+
     def init_water_iteration(self):
         """Init the water iteration routine.
         """
@@ -176,9 +209,18 @@ class water_tools(abc.ABC):
         The output from :obj:`_accumulate_free_surface_walks` is then used to
         calculate a new stage surface (``H_new``) based only on the water
         parcel paths and expected water surface elevations, approximately as
-        ``H_new = sfc_sum / sfc_visit``. Finally, the updated water surface is
+        ``Hnew = sfc_sum / sfc_visit`` ("computed Hnew" in figure below)
+
+        Following this step, a correction is applied forcing the new free
+        surface to be below sea level and above or equal to the land surface
+        elevation over the model domain ("stage" in figure below). This
+        surface `Hnew` is used in the following operation
+        :obj:`finalize_free_surface`.
+
+        Finally, the updated water surface is
         combined with the previous timestep's water surface and an
-        underrelaxation coefficient :obj:`_omega_sfc`.
+        underrelaxation coefficient
+        :obj:`~pyDeltaRCM.model.DeltaModel.omega_sfc`.
 
         .. plot:: water_tools/compute_free_surface_outputs.py
 
@@ -201,7 +243,48 @@ class water_tools(abc.ABC):
             self.uw, self.ux, self.uy, self.depth,
             self._dx, self._u0, self.h0, self._H_SL, self._S0)
 
+        # begin from the previous stage
+        Hnew = self.eta + self.depth
+
+        # find average water surface elevation for a cell from accumulation
+        Hnew[self.sfc_visit > 0] = (self.sfc_sum[self.sfc_visit > 0] /
+                                    self.sfc_visit[self.sfc_visit > 0])
+
+        # water surface height not under sea level
+        Hnew[Hnew < self._H_SL] = self._H_SL
+
+        # water surface height not below bed elevation
+        Hnew[Hnew < self.eta] = self.eta[Hnew < self.eta]
+
+        # set to model field
+        self.Hnew = Hnew
+
+        # finalize the free surface (combine and smooth)
         self.finalize_free_surface()
+
+    def finalize_free_surface(self):
+        """Finalize the water free surface.
+
+        This method occurs after the initial computation of the free surface,
+        and creates the new free surface by smoothing the newly computed free
+        surface with a jitted function (:obj:`_smooth_free_surface`), and then
+        combining the old surface and new smoothed surface with
+        underrelaxation. Finally, a :obj:`flooding_correction` is applied.
+        """
+        _msg = 'Smoothing and finalizing free surface'
+        self.log_info(_msg, verbosity=2)
+
+        # smooth newly calculated free surface
+        Hsmth = _smooth_free_surface(
+            self.Hnew, self.cell_type, self._Nsmooth, self._Csmooth)
+
+        # combine new smoothed and previous free surf with underrelaxation
+        if self._time_iter > 0:
+            self.stage = (((1 - self._omega_sfc) * self.stage) +
+                          (self._omega_sfc * Hsmth))
+
+        # apply a flooding correction
+        self.flooding_correction()
 
     def finalize_water_iteration(self, iteration):
         """Finish updating flow fields.
@@ -325,43 +408,6 @@ class water_tools(abc.ABC):
         # inds[self.free_surf_flag == 2] = 0
         boundary = (self.cell_type.flat[inds] == -1)
         return boundary
-
-    def finalize_free_surface(self):
-        """Finalize the water free surface.
-
-        This method occurs after the initial computation of the free surface,
-        by accumulating the directed walks of all water parcels. In this
-        method, thresholding is applied to correct for sea level, and a the
-        free surface is smoothed by a jitted function
-        (:obj:`_smooth_free_surface`).
-        """
-        _msg = 'Smoothing and finalizing free surface'
-        self.log_info(_msg, verbosity=2)
-
-        # begin from the previous stage
-        Hnew = self.eta + self.depth
-
-        # find average water surface elevation for a cell from accumulation
-        Hnew[self.sfc_visit > 0] = (self.sfc_sum[self.sfc_visit > 0] /
-                                    self.sfc_visit[self.sfc_visit > 0])
-
-        # water surface height not under sea level
-        Hnew[Hnew < self._H_SL] = self._H_SL
-
-        # water surface height not below bed elevation
-        Hnew[Hnew < self.eta] = self.eta[Hnew < self.eta]
-
-        # smooth newly calculated free surface
-        Hsmth = _smooth_free_surface(
-            Hnew, self.cell_type, self._Nsmooth, self._Csmooth)
-
-        # combine new smoothed and previous free surf with underrelaxation
-        if self._time_iter > 0:
-            self.stage = (((1 - self._omega_sfc) * self.stage) +
-                          (self._omega_sfc * Hsmth))
-
-        # apply a flooding correction
-        self.flooding_correction()
 
     def update_flow_field(self, iteration):
         """Update water discharge.

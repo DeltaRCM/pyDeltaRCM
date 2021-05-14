@@ -22,7 +22,7 @@ class TestTimingOutputData:
         _delta._checkpoint_dt = 2 * _delta._dt
 
         # mock top-level methods, verify call was made to each
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
         _delta.apply_subsidence = mock.MagicMock()
         _delta.finalize_timestep = mock.MagicMock()
         _delta.log_info = mock.MagicMock()
@@ -39,7 +39,7 @@ class TestTimingOutputData:
         _delta.update()
 
         # assert calls
-        assert _delta.run_one_timestep.call_count == 1
+        assert _delta.solve_water_and_sediment_timestep.call_count == 1
         assert _delta.apply_subsidence.call_count == 1
         assert _delta.finalize_timestep.call_count == 1
         assert _delta.log_model_time.call_count == 1
@@ -56,7 +56,7 @@ class TestTimingOutputData:
         _delta.update()
 
         # assert calls
-        assert _delta.run_one_timestep.call_count == 2
+        assert _delta.solve_water_and_sediment_timestep.call_count == 2
         assert _delta.apply_subsidence.call_count == 2
         assert _delta.finalize_timestep.call_count == 2
         assert _delta.log_model_time.call_count == 2
@@ -73,7 +73,7 @@ class TestTimingOutputData:
         _delta.update()
 
         # assert calls
-        assert _delta.run_one_timestep.call_count == 3
+        assert _delta.solve_water_and_sediment_timestep.call_count == 3
         assert _delta.apply_subsidence.call_count == 3
         assert _delta.finalize_timestep.call_count == 3
         assert _delta.log_model_time.call_count == 3
@@ -97,7 +97,7 @@ class TestTimingOutputData:
         _delta._save_any_grids = True  # override from settings
 
         # mock top-level methods, verify call was made to each
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
         _delta.apply_subsidence = mock.MagicMock()
         _delta.finalize_timestep = mock.MagicMock()
         _delta.log_model_time = mock.MagicMock()
@@ -149,7 +149,7 @@ class TestTimingOutputData:
         _delta._save_any_grids = True  # override from settings
 
         # mock top-level methods, verify call was made to each
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
         _delta.apply_subsidence = mock.MagicMock()
         _delta.finalize_timestep = mock.MagicMock()
         _delta.log_model_time = mock.MagicMock()
@@ -193,7 +193,7 @@ class TestTimingOutputData:
         _delta._save_any_grids = True  # override from settings
 
         # mock top-level methods, verify call was made to each
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
         _delta.apply_subsidence = mock.MagicMock()
         _delta.finalize_timestep = mock.MagicMock()
         _delta.log_model_time = mock.MagicMock()
@@ -234,7 +234,7 @@ class TestTimingOutputData:
         _delta._save_any_grids = True  # override from settings
 
         # mock top-level methods, verify call was made to each
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
         _delta.apply_subsidence = mock.MagicMock()
         _delta.finalize_timestep = mock.MagicMock()
         _delta.log_model_time = mock.MagicMock()
@@ -317,7 +317,7 @@ class TestTimingOutputData:
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
         _delta.apply_subsidence = mock.MagicMock()
         _delta.finalize_timestep = mock.MagicMock()
         _delta.log_model_time = mock.MagicMock()
@@ -334,7 +334,7 @@ class TestTimingOutputData:
             _delta.update()
 
         assert _delta.time_iter == 2.0
-        _delta.run_one_timestep.call_count == 2
+        _delta.solve_water_and_sediment_timestep.call_count == 2
 
         # check for output eta files
         exp_path_nc = os.path.join(
@@ -357,7 +357,7 @@ class TestTimingOutputData:
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
         _delta.apply_subsidence = mock.MagicMock()
         _delta.finalize_timestep = mock.MagicMock()
         _delta.log_model_time = mock.MagicMock()
@@ -391,7 +391,7 @@ class TestTimingOutputData:
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
         _delta.apply_subsidence = mock.MagicMock()
         _delta.finalize_timestep = mock.MagicMock()
         _delta.log_model_time = mock.MagicMock()
@@ -405,7 +405,7 @@ class TestTimingOutputData:
             _delta.update()
 
         assert _delta.time_iter == 2.0
-        _delta.run_one_timestep.call_count == 2
+        _delta.solve_water_and_sediment_timestep.call_count == 2
 
         _delta.finalize()
 
@@ -424,7 +424,7 @@ class TestTimingOutputData:
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
         _delta.apply_subsidence = mock.MagicMock()
         _delta.finalize_timestep = mock.MagicMock()
         _delta.log_model_time = mock.MagicMock()
@@ -438,7 +438,7 @@ class TestTimingOutputData:
             _delta.update()
 
         assert _delta.time_iter == 2.0
-        _delta.run_one_timestep.call_count == 2
+        _delta.solve_water_and_sediment_timestep.call_count == 2
 
         _delta.finalize()
 
@@ -459,7 +459,7 @@ class TestTimingOutputData:
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
-        _delta.run_one_timestep = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
         _delta.apply_subsidence = mock.MagicMock()
         _delta.finalize_timestep = mock.MagicMock()
         _delta.log_model_time = mock.MagicMock()
@@ -473,7 +473,7 @@ class TestTimingOutputData:
             _delta.update()
 
         assert _delta.time_iter == 6.0
-        _delta.run_one_timestep.call_count == 6
+        _delta.solve_water_and_sediment_timestep.call_count == 6
 
         _delta.finalize()
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")

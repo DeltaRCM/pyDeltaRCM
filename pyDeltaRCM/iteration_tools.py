@@ -23,13 +23,11 @@ class iteration_tools(abc.ABC):
     these operations largely occur when saving and updating the model.
     """
 
-    def run_one_timestep(self):
-        """Run the timestep once.
+    def solve_water_and_sediment_timestep(self):
+        """Run water and sediment operations for one timestep.
 
         The first operation called by :meth:`update`, this method iterates the
         water surface calculation and sediment parcel routing routines.
-
-        .. note:: Will print the current time to stdout, if ``verbose > 0``.
 
         Parameters
         ----------
@@ -40,33 +38,24 @@ class iteration_tools(abc.ABC):
         # start the model operations
         self.eta0 = np.copy(self.eta)  # copy
 
-        #   water iterations
-        _msg = 'Beginning water iteration'
-        self.log_info(_msg, verbosity=2)
-        for iteration in range(self._itermax):
+        # water iterations
+        self.hook_route_water()
+        self.route_water()
 
-            # initialize the relevant fields and parcel trackers
-            self.hook_init_water_iteration()
-            self.init_water_iteration()
+        # sediment iteration
+        self.hook_route_sediment()
+        self.route_sediment()
 
-            # run the actual iteration of the parcels
-            self.hook_run_water_iteration()
-            self.run_water_iteration()
-
-            # accumulate the routed water parcels into free surface
-            self.hook_compute_free_surface()
-            self.compute_free_surface()
-
-            # clean up the water surface and apply boundary conditions
-            self.hook_finalize_water_iteration(iteration)
-            self.finalize_water_iteration(iteration)
-
-        #  sediment iteration
-        _msg = 'Beginning sediment iteration'
-        self.log_info(_msg, verbosity=2)
-
-        self.hook_sed_route()
-        self.sed_route()
+    def run_one_timestep(self):
+        """Deprecated, since v1.3.1. Use :obj:`solve_water_and_sediment_timestep`."""
+        _msg = ('`run_one_timestep` and `hook_run_one_timestep` are '
+                'deprecated and have been replaced with '
+                '`solve_water_and_sediment_timestep`. '
+                'Running `solve_water_and_sediment_timestep` now, but '
+                'this will be removed in future release.')
+        self.logger.warning(_msg)
+        warnings.warn(UserWarning(_msg))
+        self.solve_water_and_sediment_timestep()
 
     def apply_subsidence(self):
         """Apply subsidence pattern.
