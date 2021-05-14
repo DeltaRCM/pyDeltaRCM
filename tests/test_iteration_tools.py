@@ -72,6 +72,22 @@ class TestSolveWaterAndSedimentTimestep:
         assert (delta.route_sediment.called is True)
         assert (delta._is_finalized is False)
 
+    def test_run_one_timestep_deprecated(self, tmp_path):
+        # create a delta with default settings
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # mock top-level methods
+        _delta.logger = mock.MagicMock()
+        _delta.solve_water_and_sediment_timestep = mock.MagicMock()
+
+        # check warning raised
+        with pytest.warns(UserWarning):
+            _delta.run_one_timestep()
+
+        # and logged
+        assert (_delta.logger.warning.called is True)
+
 
 class TestFinalizeTimestep:
 
