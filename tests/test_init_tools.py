@@ -5,6 +5,7 @@ import unittest.mock as mock
 
 import numpy as np
 import os
+from netCDF4 import Dataset
 
 from pyDeltaRCM.model import DeltaModel
 
@@ -486,6 +487,7 @@ class TestSettingParametersFromYAMLFile:
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
         assert len(_delta._save_fig_list) == 0
+        assert 'eta' in _delta._save_var_list.keys()
 
     def test_save_depth_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -493,6 +495,7 @@ class TestSettingParametersFromYAMLFile:
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
         assert len(_delta._save_fig_list) == 0
+        assert 'depth' in _delta._save_var_list.keys()
 
     def test_save_stage_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -500,6 +503,7 @@ class TestSettingParametersFromYAMLFile:
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
         assert len(_delta._save_fig_list) == 0
+        assert 'stage' in _delta._save_var_list.keys()
 
     def test_save_discharge_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -507,6 +511,7 @@ class TestSettingParametersFromYAMLFile:
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
         assert len(_delta._save_fig_list) == 0
+        assert 'discharge' in _delta._save_var_list.keys()
 
     def test_save_velocity_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -514,6 +519,7 @@ class TestSettingParametersFromYAMLFile:
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
         assert len(_delta._save_fig_list) == 0
+        assert 'velocity' in _delta._save_var_list.keys()
 
     def test_save_sedflux_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -521,6 +527,7 @@ class TestSettingParametersFromYAMLFile:
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
         assert len(_delta._save_fig_list) == 0
+        assert 'sedflux' in _delta._save_var_list.keys()
 
     def test_save_sandfrac_grids(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -528,6 +535,7 @@ class TestSettingParametersFromYAMLFile:
         _delta = DeltaModel(input_file=p)
         assert _delta._save_any_grids is True
         assert len(_delta._save_fig_list) == 0
+        assert 'sandfrac' in _delta._save_var_list.keys()
 
     def test_save_discharge_components(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -536,6 +544,8 @@ class TestSettingParametersFromYAMLFile:
         assert _delta._save_any_grids is True
         assert len(_delta._save_fig_list) == 0
         assert _delta._save_discharge_components is True
+        assert 'discharge_x' in _delta._save_var_list.keys()
+        assert 'discharge_y' in _delta._save_var_list.keys()
 
     def test_save_velocity_components(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -544,6 +554,8 @@ class TestSettingParametersFromYAMLFile:
         assert _delta._save_any_grids is True
         assert len(_delta._save_fig_list) == 0
         assert _delta._save_velocity_components is True
+        assert 'velocity_x' in _delta._save_var_list.keys()
+        assert 'velocity_y' in _delta._save_var_list.keys()
 
     def test_save_eta_figs(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -899,3 +911,82 @@ class TestSettingOtherParametersFromYAMLSettings:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
         assert _delta.active_layer_thickness == _delta.h0 / 2
+
+
+class TestInitMetadataList:
+
+    def test_save_list_exists(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+        f.close()
+        delta = DeltaModel(input_file=p)
+        # check things about the metadata
+        assert hasattr(delta, '_save_var_list')
+        assert type(delta._save_var_list) == dict
+        assert 'meta' in delta._save_var_list.keys()
+        # save meta not on, so check that it is empty
+        assert delta._save_var_list['meta'] == {}
+
+    def test_default_meta_list(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+        utilities.write_parameter_to_file(f, 'save_metadata', True)
+        f.close()
+        delta = DeltaModel(input_file=p)
+        # check things about the metadata
+        assert hasattr(delta, '_save_var_list')
+        assert type(delta._save_var_list) == dict
+        assert 'meta' in delta._save_var_list.keys()
+        # save meta on, so check that some expected values are there
+        assert 'L0' in delta._save_var_list['meta'].keys()
+        assert delta._save_var_list['meta']['L0'] == ['L0', 'cells', 'i8', ()]
+        assert 'H_SL' in delta._save_var_list['meta'].keys()
+        assert delta._save_var_list['meta']['H_SL'] == \
+            [None, 'meters', 'f4', 'total_time']
+
+    def test_netcdf_vars(self, tmp_path):
+        # test that stuff makes it to the netcdf file as expected
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+        utilities.write_parameter_to_file(f, 'save_eta_grids', True)
+        utilities.write_parameter_to_file(f, 'save_metadata', True)
+        f.close()
+        delta = DeltaModel(input_file=p)
+        # check things about the metadata
+        assert hasattr(delta, '_save_var_list')
+        assert type(delta._save_var_list) == dict
+        assert 'meta' in delta._save_var_list.keys()
+        # save meta on, so check that some expected values are there
+        assert 'L0' in delta._save_var_list['meta'].keys()
+        assert delta._save_var_list['meta']['L0'] == ['L0', 'cells', 'i8', ()]
+        assert 'H_SL' in delta._save_var_list['meta'].keys()
+        assert delta._save_var_list['meta']['H_SL'] == \
+            [None, 'meters', 'f4', 'total_time']
+        # check save var list for eta
+        assert 'eta' in delta._save_var_list.keys()
+        assert delta._save_var_list['eta'] == \
+            ['eta', 'meters', 'f4', ('total_time', 'length', 'width')]
+        # force save to netcdf
+        delta.save_grids_and_figs()
+        # close netcdf
+        delta.output_netcdf.close()
+        # check out the netcdf
+        data = Dataset(os.path.join(delta.prefix, 'pyDeltaRCM_output.nc'),
+                       'r+', format='NETCDF4')
+        # check for meta group
+        assert 'meta' in data.groups
+        # check for L0 a single value metadata
+        assert 'L0' in data['meta'].variables
+        assert data['meta']['L0'][0].data == delta.L0
+        # check H_SL a vector of metadata
+        assert 'H_SL' in data['meta'].variables
+        assert data['meta']['H_SL'].dimensions == ('total_time',)
+        assert data['time'].shape == data['meta']['H_SL'].shape
+        # check on the eta grid
+        assert 'eta' in data.variables
+        assert data['eta'].shape[0] == data['time'].shape[0]
+        assert data['eta'].shape[1] == delta.L
+        assert data['eta'].shape[2] == delta.W
