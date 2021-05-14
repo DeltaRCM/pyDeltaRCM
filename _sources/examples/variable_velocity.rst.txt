@@ -76,7 +76,7 @@ We define a model subclass to handle the changing boundary condition:
             self._time_array, self._velocity_array = create_velocity_array(
                 end_time)  # use default shape parameters for the array
 
-        def hook_run_one_timestep(self):
+        def hook_solve_water_and_sediment_timestep(self):
             """Change the velocity."""
 
             # find the new velocity and set it to the model

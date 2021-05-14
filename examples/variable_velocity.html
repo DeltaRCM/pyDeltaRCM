@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Time-varying inlet velocity &#8212; pyDeltaRCM 1.3.0 documentation</title>
+    <title>Time-varying inlet velocity &#8212; pyDeltaRCM 1.3.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="variable_bedload.html" title="Time-varying bedload"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Examples of using and working with pyDeltaRCM</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Time-varying inlet velocity</a></li> 
       </ul>
@@ -104,7 +104,7 @@ We can inspect the result of this function, as it will be called in the model su
         <span class="bp">self</span><span class="o">.</span><span class="n">_time_array</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocity_array</span> <span class="o">=</span> <span class="n">create_velocity_array</span><span class="p">(</span>
             <span class="n">end_time</span><span class="p">)</span>  <span class="c1"># use default shape parameters for the array</span>
 
-    <span class="k">def</span> <span class="nf">hook_run_one_timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">hook_solve_water_and_sediment_timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Change the velocity.&quot;&quot;&quot;</span>
 
         <span class="c1"># find the new velocity and set it to the model</span>
@@ -181,7 +181,7 @@ We can inspect the result of this function, as it will be called in the model su
         <li class="right" >
           <a href="variable_bedload.html" title="Time-varying bedload"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Examples of using and working with pyDeltaRCM</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Time-varying inlet velocity</a></li> 
       </ul>

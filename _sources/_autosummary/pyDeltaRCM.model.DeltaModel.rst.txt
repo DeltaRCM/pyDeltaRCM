@@ -39,6 +39,7 @@
       ~DeltaModel.hook_finalize_water_iteration
       ~DeltaModel.hook_import_files
       ~DeltaModel.hook_init_output_file
+      ~DeltaModel.hook_init_sediment_iteration
       ~DeltaModel.hook_init_water_iteration
       ~DeltaModel.hook_load_checkpoint
       ~DeltaModel.hook_output_checkpoint
@@ -46,15 +47,17 @@
       ~DeltaModel.hook_process_input_to_model
       ~DeltaModel.hook_route_all_mud_parcels
       ~DeltaModel.hook_route_all_sand_parcels
-      ~DeltaModel.hook_run_one_timestep
+      ~DeltaModel.hook_route_sediment
+      ~DeltaModel.hook_route_water
       ~DeltaModel.hook_run_water_iteration
-      ~DeltaModel.hook_sed_route
+      ~DeltaModel.hook_solve_water_and_sediment_timestep
       ~DeltaModel.hook_topo_diffusion
       ~DeltaModel.import_files
       ~DeltaModel.init_logger
       ~DeltaModel.init_metadata_list
       ~DeltaModel.init_output_file
       ~DeltaModel.init_output_infrastructure
+      ~DeltaModel.init_sediment_iteration
       ~DeltaModel.init_sediment_routers
       ~DeltaModel.init_subsidence
       ~DeltaModel.init_water_iteration
@@ -67,6 +70,8 @@
       ~DeltaModel.process_input_to_model
       ~DeltaModel.route_all_mud_parcels
       ~DeltaModel.route_all_sand_parcels
+      ~DeltaModel.route_sediment
+      ~DeltaModel.route_water
       ~DeltaModel.run_one_timestep
       ~DeltaModel.run_water_iteration
       ~DeltaModel.save_figure
@@ -78,6 +83,7 @@
       ~DeltaModel.show_attribute
       ~DeltaModel.show_ind
       ~DeltaModel.show_line
+      ~DeltaModel.solve_water_and_sediment_timestep
       ~DeltaModel.topo_diffusion
       ~DeltaModel.update
       ~DeltaModel.update_Q

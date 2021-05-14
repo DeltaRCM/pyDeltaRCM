@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Hydrodynamics &#8212; pyDeltaRCM 1.3.0 documentation</title>
+    <title>Hydrodynamics &#8212; pyDeltaRCM 1.3.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="modeltime.html" title="Time in pyDeltaRCM"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Model Information</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Hydrodynamics</a></li> 
       </ul>
@@ -109,7 +109,7 @@ The updated water surface is combined with the previous timestep’s water surfa
 <figure class="align-default">
 <img alt="../_images/compute_free_surface_outputs.png" class="plot-directive" src="../_images/compute_free_surface_outputs.png" />
 </figure>
-<p>With a new free surface computed, a few final operations prepare the surface for boundary condition updates and eventually being passed to the sediment routing operations.
+<p>With a new free surface computed, a few final operations prepare the surface for boundary condition updates and eventually being passed to the sediment routing operations (inside <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.finalize_free_surface" title="pyDeltaRCM.water_tools.water_tools.finalize_free_surface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize_free_surface()</span></code></a>).
 A non-linear smoothing operation is applied to the free surface, whereby wet cells are iteratively averaged with neighboring wet cells to yield an overall smoother surface.
 The smoothing is handled by <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools._smooth_free_surface" title="pyDeltaRCM.water_tools._smooth_free_surface"><code class="xref py py-func docutils literal notranslate"><span class="pre">_smooth_free_surface()</span></code></a> and depends on the number of iterations (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.Nsmooth" title="pyDeltaRCM.model.DeltaModel.Nsmooth"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Nsmooth</span></code></a>) and a weighting coefficient (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.Csmooth" title="pyDeltaRCM.model.DeltaModel.Csmooth"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Csmooth</span></code></a>).</p>
 <p>(<a class="reference external" href="../pyplots/water_tools/_smooth_free_surface.png">png</a>, <a class="reference external" href="../pyplots/water_tools/_smooth_free_surface.hires.png">hires.png</a>)</p>
@@ -207,7 +207,7 @@ D. A. Edmonds, and P. Passalacqua, Earth Surf. Dynam., 3, 87–104, 2015.
         <li class="right" >
           <a href="modeltime.html" title="Time in pyDeltaRCM"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Model Information</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Hydrodynamics</a></li> 
       </ul>

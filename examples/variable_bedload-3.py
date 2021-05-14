@@ -13,8 +13,8 @@ for i, _time in enumerate(_times):
     mdl_sandy._time = _time  # you should never do this
 
     # run the hooked method
-    mdl_muddy.hook_run_one_timestep()
-    mdl_sandy.hook_run_one_timestep()
+    mdl_muddy.hook_solve_water_and_sediment_timestep()
+    mdl_sandy.hook_solve_water_and_sediment_timestep()
 
     # grab the state of the `f_bedload` parameter
     fb_mdl_muddy[i] = mdl_muddy.f_bedload  # get the value

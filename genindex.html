@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; pyDeltaRCM 1.3.0 documentation</title>
+    <title>Index &#8212; pyDeltaRCM 1.3.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -23,7 +23,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="#" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pyDeltaRCM 1.3.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Index</a></li> 
       </ul>
     </div>  
@@ -83,6 +83,8 @@
 </li>
       <li><a href="reference/water_tools/index.html#pyDeltaRCM.water_tools._calculate_new_inds">_calculate_new_inds() (in module pyDeltaRCM.water_tools)</a>
 </li>
+      <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools._check_deprecated_hooks">_check_deprecated_hooks() (pyDeltaRCM.hook_tools.hook_tools method)</a>
+</li>
       <li><a href="reference/water_tools/index.html#pyDeltaRCM.water_tools._check_for_loops">_check_for_loops() (in module pyDeltaRCM.water_tools)</a>
 </li>
       <li><a href="reference/water_tools/index.html#pyDeltaRCM.water_tools._choose_next_directions">_choose_next_directions() (in module pyDeltaRCM.water_tools)</a>
@@ -91,10 +93,10 @@
 </li>
       <li><a href="_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html#pyDeltaRCM.sed_tools.BaseRouter._deposit_or_erode">_deposit_or_erode() (pyDeltaRCM.sed_tools.BaseRouter method)</a>
 </li>
-      <li><a href="reference/shared_tools/index.html#pyDeltaRCM.shared_tools._docs_temp_directory">_docs_temp_directory() (in module pyDeltaRCM.shared_tools)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/shared_tools/index.html#pyDeltaRCM.shared_tools._docs_temp_directory">_docs_temp_directory() (in module pyDeltaRCM.shared_tools)</a>
+</li>
       <li><a href="_autosummary/pyDeltaRCM.preprocessor.BasePreprocessor.html#pyDeltaRCM.preprocessor.BasePreprocessor._expand_ensemble">_expand_ensemble() (pyDeltaRCM.preprocessor.BasePreprocessor method)</a>
 </li>
       <li><a href="_autosummary/pyDeltaRCM.preprocessor.BasePreprocessor.html#pyDeltaRCM.preprocessor.BasePreprocessor._expand_matrix">_expand_matrix() (pyDeltaRCM.preprocessor.BasePreprocessor method)</a>
@@ -305,6 +307,8 @@
 </li>
       <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_init_output_file">hook_init_output_file() (pyDeltaRCM.hook_tools.hook_tools method)</a>
 </li>
+      <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_init_sediment_iteration">hook_init_sediment_iteration() (pyDeltaRCM.hook_tools.hook_tools method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_init_water_iteration">hook_init_water_iteration() (pyDeltaRCM.hook_tools.hook_tools method)</a>
@@ -321,11 +325,13 @@
 </li>
       <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_route_all_sand_parcels">hook_route_all_sand_parcels() (pyDeltaRCM.hook_tools.hook_tools method)</a>
 </li>
-      <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_run_one_timestep">hook_run_one_timestep() (pyDeltaRCM.hook_tools.hook_tools method)</a>
+      <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_route_sediment">hook_route_sediment() (pyDeltaRCM.hook_tools.hook_tools method)</a>
+</li>
+      <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_route_water">hook_route_water() (pyDeltaRCM.hook_tools.hook_tools method)</a>
 </li>
       <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_run_water_iteration">hook_run_water_iteration() (pyDeltaRCM.hook_tools.hook_tools method)</a>
 </li>
-      <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_sed_route">hook_sed_route() (pyDeltaRCM.hook_tools.hook_tools method)</a>
+      <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_solve_water_and_sediment_timestep">hook_solve_water_and_sediment_timestep() (pyDeltaRCM.hook_tools.hook_tools method)</a>
 </li>
       <li><a href="reference/hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools">hook_tools (class in pyDeltaRCM.hook_tools)</a>
 </li>
@@ -349,9 +355,11 @@
 </li>
       <li><a href="reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_output_file">init_output_file() (pyDeltaRCM.init_tools.init_tools method)</a>
 </li>
+      <li><a href="reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_output_infrastructure">init_output_infrastructure() (pyDeltaRCM.init_tools.init_tools method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_output_infrastructure">init_output_infrastructure() (pyDeltaRCM.init_tools.init_tools method)</a>
+      <li><a href="reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.init_sediment_iteration">init_sediment_iteration() (pyDeltaRCM.sed_tools.sed_tools method)</a>
 </li>
       <li><a href="reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_sediment_routers">init_sediment_routers() (pyDeltaRCM.init_tools.init_tools method)</a>
 </li>
@@ -475,9 +483,13 @@
 </li>
       <li><a href="reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels">route_all_mud_parcels() (pyDeltaRCM.sed_tools.sed_tools method)</a>
 </li>
+      <li><a href="reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels">route_all_sand_parcels() (pyDeltaRCM.sed_tools.sed_tools method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels">route_all_sand_parcels() (pyDeltaRCM.sed_tools.sed_tools method)</a>
+      <li><a href="reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_sediment">route_sediment() (pyDeltaRCM.sed_tools.sed_tools method)</a>
+</li>
+      <li><a href="reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.route_water">route_water() (pyDeltaRCM.water_tools.water_tools method)</a>
 </li>
       <li><a href="_autosummary/pyDeltaRCM.preprocessor.BasePreprocessor.html#pyDeltaRCM.preprocessor.BasePreprocessor.run_jobs">run_jobs() (pyDeltaRCM.preprocessor.BasePreprocessor method)</a>
 </li>
@@ -539,10 +551,10 @@
 </li>
       <li><a href="_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.save_stage_grids">save_stage_grids (pyDeltaRCM.model.DeltaModel property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint">save_the_checkpoint() (pyDeltaRCM.iteration_tools.iteration_tools method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.save_time_since_checkpoint">save_time_since_checkpoint (pyDeltaRCM.model.DeltaModel property)</a>
 </li>
       <li><a href="_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.save_time_since_data">save_time_since_data (pyDeltaRCM.model.DeltaModel property)</a>
@@ -584,6 +596,8 @@
       <li><a href="reference/debug_tools/index.html#pyDeltaRCM.debug_tools.debug_tools.show_line">show_line() (pyDeltaRCM.debug_tools.debug_tools method)</a>
 </li>
       <li><a href="_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.SLR">SLR (pyDeltaRCM.model.DeltaModel property)</a>
+</li>
+      <li><a href="reference/iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep">solve_water_and_sediment_timestep() (pyDeltaRCM.iteration_tools.iteration_tools method)</a>
 </li>
       <li><a href="_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.start_subsidence">start_subsidence (pyDeltaRCM.model.DeltaModel property)</a>
 </li>
@@ -682,7 +696,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="#" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pyDeltaRCM 1.3.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Index</a></li> 
       </ul>
     </div>

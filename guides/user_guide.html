@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>User Guide &#8212; pyDeltaRCM 1.3.0 documentation</title>
+    <title>User Guide &#8212; pyDeltaRCM 1.3.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="10min.html" title="10-minute tutorial"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
       </ul>
     </div>  
@@ -360,7 +360,7 @@ To subclass the <a class="reference internal" href="../_autosummary/pyDeltaRCM.m
 </div>
 <p>Hooks are methods in the model sequence that do nothing by default, but can be augmented to provide arbitrary desired behavior in the model.
 Hooks have been integrated throughout the model initialization and update sequences, to allow the users to achieve complex behavior at various stages of the model sequence.
-For example, <code class="docutils literal notranslate"><span class="pre">hook_run_one_timestep</span></code> is a hook which occurs immediately before the  model <code class="xref py py-obj docutils literal notranslate"><span class="pre">run_one_timestep</span></code> method.</p>
+For example, <code class="docutils literal notranslate"><span class="pre">hook_solve_water_and_sediment_timestep</span></code> is a hook which occurs immediately before the model <code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_water_and_sediment_timestep</span></code> method.</p>
 <p>To utilize the hooks, we simply define a method in our subclass with the name corresponding to the hook we want to augment to achieve the desired behavior.
 For example, to change the behavior of the subsidence field to vary randomly in magnitude on each iteration:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyDeltaRCM.shared_tools</span> <span class="kn">import</span> <span class="n">get_random_uniform</span>
@@ -571,7 +571,7 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
         <li class="right" >
           <a href="10min.html" title="10-minute tutorial"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 1.3.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
       </ul>
     </div>

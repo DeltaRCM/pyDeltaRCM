@@ -7,7 +7,7 @@ class VariableBedloadModel(pyDeltaRCM.DeltaModel):
         self._changed = False
         self._changed_back = False
 
-    def hook_run_one_timestep(self):
+    def hook_solve_water_and_sediment_timestep(self):
         """Change the state depending on the _time.
         """
         # check if the state has been changed, and time to change it
