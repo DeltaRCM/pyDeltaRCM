@@ -284,7 +284,11 @@ def plot_ind(_ind, *args, shape=None, **kwargs):
         ax = plt.gca()
 
     if len(args) == 0:
-        args = 'r.',
+        # args = 'r.',
+        if not ('color' in kwargs.keys()):
+            kwargs['color'] = 'red'
+        if not ('marker' in kwargs.keys()):
+            kwargs['marker'] = '.'
     if isinstance(_ind, tuple):
         if not len(_ind) == 2:
             raise ValueError('Expected tuple length to be 2, but was %s'
@@ -323,7 +327,11 @@ def plot_line(_ind, *args, shape=None, nozeros=False, **kwargs):
         ax = plt.gca()
 
     if len(args) == 0:
-        args = 'k-',
+        # args = 'k-',
+        if not ('color' in kwargs.keys()):
+            kwargs['color'] = 'k'
+        if not ('marker' in kwargs.keys()):
+            kwargs['ls'] = '-'
     if isinstance(_ind, tuple):
         raise NotImplementedError
         # if not len(_ind) == 2:

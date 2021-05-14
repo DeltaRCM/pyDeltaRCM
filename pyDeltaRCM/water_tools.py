@@ -143,7 +143,7 @@ class water_tools(abc.ABC):
             new_inds, looped = _check_for_loops(
                 self.free_surf_walk_inds, new_inds, _step, self.L0,
                 self.CTR, self.stage - self.H_SL)
-            looped = looped.astype(np.bool)
+            looped = looped.astype(bool)
 
             # set the current_inds to be the new_inds values
             #   (i.e., take the step)
@@ -320,7 +320,7 @@ class water_tools(abc.ABC):
             self.log_info(_msg, verbosity=2)
 
             indices_blank = np.zeros(
-                (np.int(self._Np_water), np.int(self.stepmax / 4)), dtype=np.int)
+                (np.int(self._Np_water), np.int(self.stepmax / 4)), dtype=int)
 
             self.free_surf_walk_inds = np.hstack((self.free_surf_walk_inds, indices_blank))
 
