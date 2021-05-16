@@ -1345,7 +1345,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @channel_flow_velocity.setter
     def channel_flow_velocity(self, new_u0):
         self.u0 = new_u0
-        self.create_other_variables()
+        self.create_boundary_conditions()
         self.init_sediment_routers()
 
     @property
@@ -1356,7 +1356,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @channel_width.setter
     def channel_width(self, new_N0_meters):
         self.N0_meters = new_N0_meters
-        self.create_other_variables()
+        self.create_boundary_conditions()
         self.init_sediment_routers()
         if self.channel_width != new_N0_meters:
             warnings.warn(UserWarning(
@@ -1372,7 +1372,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @channel_flow_depth.setter
     def channel_flow_depth(self, new_d):
         self.h0 = new_d
-        self.create_other_variables()
+        self.create_boundary_conditions()
         self.init_sediment_routers()
 
     @property
@@ -1410,7 +1410,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @influx_sediment_concentration.setter
     def influx_sediment_concentration(self, new_C0):
         self.C0_percent = new_C0 * 100
-        self.create_other_variables()
+        self.create_boundary_conditions()
         self.init_sediment_routers()
 
     @property
