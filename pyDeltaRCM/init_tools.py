@@ -198,8 +198,67 @@ class init_tools(abc.ABC):
         _msg = 'Random seed is: %s ' % str(self._seed)
         self.log_info(_msg, verbosity=0)
 
+    def create_other_variables(self):
+        """Model implementation variables.
+
+        Creates variables for model implementation, from specified boundary
+        condition variables. This method is run during initial model
+        instantition. Internally, this method calls :obj:`set_constants` and
+        :obj:`create_boundary_conditions`.
+
+        .. note::
+
+            It is usually not necessary to re-run this method if you change
+            boundary condition variables, and instead only re-run
+            :obj:`create_boundary_conditions`.
+        """
+        _msg = 'Setting other variables'
+        self.log_info(_msg, verbosity=1)
+
+        self.init_Np_water = self._Np_water
+        self.init_Np_sed = self._Np_sed
+
+        self.dx = float(self._dx)
+
+        self.theta_sand = self._coeff_theta_sand * self._theta_water
+        self.theta_mud = self._coeff_theta_mud * self._theta_water
+
+        self.U_dep_mud = self._coeff_U_dep_mud * self._u0
+        self.U_ero_sand = self._coeff_U_ero_sand * self._u0
+        self.U_ero_mud = self._coeff_U_ero_mud * self._u0
+
+        self.L = int(round(self._Length / self._dx))        # num cells in x
+        self.W = int(round(self._Width / self._dx))         # num cells in y
+
+        # cross-stream center of domain idx
+        self.CTR = floor(self.W / 2.) - 1
+        if self.CTR <= 1:
+            self.CTR = floor(self.W / 2.)
+
+        self.set_constants()
+
+        self.create_boundary_conditions()
+
+        self._save_any_grids = (self._save_eta_grids or
+                                self._save_depth_grids or
+                                self._save_stage_grids or
+                                self._save_discharge_grids or
+                                self._save_velocity_grids or
+                                self._save_sedflux_grids or
+                                self._save_sandfrac_grids or
+                                self._save_discharge_components or
+                                self._save_velocity_components)
+        if self._save_any_grids:  # always save metadata if saving grids
+            self._save_metadata = True
+        self._is_finalized = False
+
     def set_constants(self):
-        """Set the model constants."""
+        """Set the model constants.
+
+        Configure constants, including coordinates and distances, as well as
+        environmental constants (gravity), and kernels for smoothing
+        topography.
+        """
         _msg = 'Setting model constants'
         self.log_info(_msg, verbosity=1)
 
@@ -243,41 +302,35 @@ class init_tools(abc.ABC):
                                  [1, 0, 1],
                                  [1, 1, 1]]).astype(np.int64)
 
-    def create_other_variables(self):
-        """Model implementation variables.
+    def create_boundary_conditions(self):
+        """Create model boundary conditions
 
-        Creates variables for model implementation, from specified boundary
-        condition variables. This method is run during initial model
-        instantition, but it is also run any time an inlet flow condition
-        variable is changed, including `channel_flow_velocity`,
-        `channel_width`, `channel_flow_depth`, and
-        `influx_sediment_concentration`.
+        This method is run during model initialization to determine the
+        boundary conditions based on the initial conditions specified as model
+        input.
+
+        However, the method also should be called when certain boundary
+        condition variables are updated (e.g., during some custom model runs).
+        For example, if some property of the inlet flow condition is changed,
+        you will *likely* want to re-run this method (e.g., `u0`), because
+        there are several other parameters that depend on the value of the
+        inlet flow velocity (e.g., `Qw0` and `Qs0`); of course, your
+        scientific question may choose to leave these parameters as they are
+        too (in which case you should *not* re-run this method).
+
+        .. note::
+
+            This method is automatically called dor the "named" variables used
+            by the BMI wrapper (e.g., `channel_flow_velocity`,
+            `channel_width`, `channel_flow_depth`, and
+            `influx_sediment_concentration`., so you do not need to call it
+            again if you modify the model boundary conditions that way.
         """
-        _msg = 'Setting other variables'
-        self.log_info(_msg, verbosity=1)
-
-        self.init_Np_water = self._Np_water
-        self.init_Np_sed = self._Np_sed
-
-        self.dx = float(self._dx)
-
-        self.theta_sand = self._coeff_theta_sand * self._theta_water
-        self.theta_mud = self._coeff_theta_mud * self._theta_water
-
-        self.U_dep_mud = self._coeff_U_dep_mud * self._u0
-        self.U_ero_sand = self._coeff_U_ero_sand * self._u0
-        self.U_ero_mud = self._coeff_U_ero_mud * self._u0
-
-        self.L = int(round(self._Length / self._dx))        # num cells in x
-        self.W = int(round(self._Width / self._dx))         # num cells in y
-
         # inlet length and width
         self.L0 = max(
             1, min(int(round(self._L0_meters / self._dx)), self.L // 4))
         self.N0 = max(
             3, min(int(round(self._N0_meters / self._dx)), self.W // 4))
-
-        self.set_constants()
 
         self.u_max = 2.0 * self._u0  # maximum allowed flow velocity
         self.C0 = self._C0_percent * 1 / 100.  # sediment concentration
@@ -285,28 +338,20 @@ class init_tools(abc.ABC):
         # (m) critial depth to switch to "dry" node
         self.dry_depth = min(0.1, 0.1 * self._h0)
 
-        # cross-stream center of domain idx
-        self.CTR = floor(self.W / 2.) - 1
-        if self.CTR <= 1:
-            self.CTR = floor(self.W / 2.)
-
-        self.gamma = (self.g * self._S0 * self._dx /
-                      (self._u0**2))  # water weighting coeff
+        self.gamma = (self.g * self.S0 * self._dx /
+                      (self.u0**2))  # water weighting coeff
 
         # (m^3) reference volume, volume to fill cell to characteristic depth
         self.V0 = self.h0 * (self._dx**2)
-        self.Qw0 = self._u0 * self.h0 * self.N0 * self._dx    # const discharge
+        self.Qw0 = self.u0 * self.h0 * self.N0 * self._dx    # const discharge
 
         # at inlet
-        self.qw0 = self._u0 * self.h0  # water unit input discharge
+        self.qw0 = self.u0 * self.h0  # water unit input discharge
         self.Qp_water = self.Qw0 / self._Np_water  # volume each water parcel
         self.qs0 = self.qw0 * self.C0  # sed unit discharge
         self.dVs = 0.1 * self.N0**2 * self.V0  # total sed added per timestep
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
         self.Vp_sed = self.dVs / self._Np_sed  # volume of each sediment parcel
-
-        # determine the value for the basin depth
-        self._hb = self.hb or self.h0
 
         # max number of jumps for parcel
         if self.stepmax is None:
@@ -329,25 +374,25 @@ class init_tools(abc.ABC):
         self.diffusion_multiplier = (self._dt / self.N_crossdiff * self._alpha
                                      * 0.5 / self._dx**2)
 
-        self._save_any_grids = (self._save_eta_grids or
-                                self._save_depth_grids or
-                                self._save_stage_grids or
-                                self._save_discharge_grids or
-                                self._save_velocity_grids or
-                                self._save_sedflux_grids or
-                                self._save_sandfrac_grids or
-                                self._save_discharge_components or
-                                self._save_velocity_components)
-        if self._save_any_grids:  # always save metadata if saving grids
-            self._save_metadata = True
-        self._is_finalized = False
-
     def create_domain(self):
-        """
-        Creates the model domain
+        """Create the model domain.
+
+        This method initializes the model domain, including coordinate arrays,
+        gridded fields (eta, qw, etc.) and cell type information. The method
+        is called during initialization of the `DeltaModel`, and likely does
+        not need to be called again.
+
+        .. hint::
+
+            If you need to modify the model domain after it has been created,
+            it is probably safe to modify attributes directly, but take care
+            to ensure any dependent fields are also approrpriately changed.
         """
         _msg = 'Creating model domain'
         self.log_info(_msg, verbosity=1)
+
+        # resolve any boundary conditions
+        self._hb = self.hb or self.h0  # basin depth
 
         # ---- empty arrays ----
         self.x, self.y = np.meshgrid(np.arange(0, self.W),
@@ -437,6 +482,11 @@ class init_tools(abc.ABC):
 
         These are preinitialized because the "boxing" for jitted functions is
         expensive, so we avoid boxing up the constants on each iteration.
+
+        .. important::
+
+            If you change any model boundary conditions, you likely should
+            reinitialize the sediment routers (i.e., rerun this method)
         """
         _msg = 'Initializing sediment routers'
         self.log_info(_msg, verbosity=1)
