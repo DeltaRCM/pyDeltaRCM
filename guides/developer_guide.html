@@ -46,19 +46,158 @@
   <section id="developer-guide">
 <h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Permalink to this headline">¶</a></h1>
 <a class="reference external image-reference" href="https://github.com/DeltaRCM/pyDeltaRCM/actions"><img alt="https://github.com/DeltaRCM/pyDeltaRCM/workflows/actions/badge.svg" src="https://github.com/DeltaRCM/pyDeltaRCM/workflows/actions/badge.svg" /></a>
-<p>Guide to developers!</p>
+<p>This guide provides additional details for implementation that did not make it into the user guide.
+If you have not yet read the user guide, that is the place to start, then visit and refer to this guide for details as necessary.</p>
 <section id="best-practices">
 <h2>Best Practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h2>
 <section id="reproducibility">
 <h3>Reproducibility<a class="headerlink" href="#reproducibility" title="Permalink to this headline">¶</a></h3>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">Todo</p>
-<p>add some notes about reproducible model runs. Look at shared tools docs for starting point.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>tl;dr: any random numbers must be generated within a jitted function.</p>
 </div>
+<p>A major goal of the <cite>pyDeltaRCM</cite> project is to enable fully reproducible simulation results.
+Variability in pyDeltaRCM arises from the weighted random walks of water and sediment parcels during model iteration, so the state of the random source is essential to reproducibility.
+We encourage developers to ensure that their subclass models are also reproducible, and provide some information on how to do so in this section.</p>
+<p>For many subclassing models, it will be straightforward to ensure models are reproducible.
+Out of the box, models will use the core <cite>pyDeltaRCM</cite> “seed” functionality to make models reproducible, and checkpointing should easily integrate with most use cases.
+However, models that implement processes or functions that rely on random numbers or samples from random distributions will need to take care to ensure models are reproducible.</p>
+<section id="random-numbers">
+<h4>Random numbers<a class="headerlink" href="#random-numbers" title="Permalink to this headline">¶</a></h4>
+<p>For <cite>pyDeltaRCM</cite>, the source of random values is a pseudo-random number generator (RNG) from <cite>numpy</cite>, which works by inputting the current state of the RNG to an algorithm, and returning a sample (an integer) that can be mapped to any probability density function.
+Each time the RNG yields a sample, the RNG state is changed, such that repeated samples from the RNG appear to be random, but are actually a deterministic sequence for a given initial RNG state (i.e., for a given seed).</p>
+<p>As a result of the deterministic RNG, model runs are <em>exactly</em> reproducible if they begin from the same initial RNG state.
+However, this means that any change to the state of the RNG that is not recorded will make a run non-reproducible.
+Additionally, any “random” behavior implemented in the model <em>that does not also</em> modify the state of the RNG, is non-reproducible.</p>
+<p>With a default setup of <cite>numpy</cite>, the functions of <cite>np.random</cite> will utilize the same underlying random number generator, such that the following code always evaluates to the same results.
+In this case, it would be relatively simple to keep runs reproducible, because any call to a <cite>np.random</cite> function would modify the state of the underlying generator.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">();</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">();</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">();</span>
+<span class="go">0.771320643266746</span>
+<span class="go">0.03777261440227079</span>
+<span class="go">0.7488038825386119</span>
+</pre></div>
+</div>
+<p>In <cite>pyDeltaRCM</cite> though, we use <cite>numba</cite> just-in-time compilation for several steps in the model routine to make execution faster, including getting the random values that drive parcel movement during model iteration.
+Within a Python console, calls to the <cite>numba</cite> RNG will not affect the state of the <cite>numpy</cite> RNG, and vice versa; even though the pre-JIT compiled code appears to call <cite>np.random.uniform</cite> (e.g., <a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.get_random_uniform" title="pyDeltaRCM.shared_tools.get_random_uniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_random_uniform</span></code></a>).</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><cite>pyDeltaRCM</cite> only takes responsibility for the <cite>numba</cite> RNG!</p>
+</div>
+</section>
+<section id="a-simple-example">
+<h4>A simple example<a class="headerlink" href="#a-simple-example" title="Permalink to this headline">¶</a></h4>
+<p>So why does it matter?
+Well, calling <cite>np.random.normal(100, 10)</cite> in a model subclass will give you a random value, and modify the state of the <cite>numpy</cite> RNG, but it will not affect the state of the <cite>numba</cite> RNG (the one <cite>pyDeltaRCM</cite> actually keeps track of).
+Thus, the values returned from the call to <cite>np.random.normal</cite> are not known and are not reproducible.</p>
+<p>In the following simple example, see how the reproducible model uses a random number generated from a jitted function. This ensures the <cite>numba</cite> RNG is used for random variability in the model, and runs are reproducible.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">njit</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@njit</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">get_random_normal</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="sd">&quot;&quot;&quot;Get a random number from standard normal distribution.</span>
+<span class="gp">... </span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">BrokenAndNotReproducible</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="sd">&quot;&quot;&quot;Initialize a model that can never be reproduced.</span>
+<span class="gp">... </span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="n">input_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="sd">&quot;&quot;&quot;Reimplement update method for demonstration.&quot;&quot;&quot;</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># the core pyDeltaRCM RNG is used in computations, e.g.,</span>
+<span class="gp">... </span>        <span class="n">_sample0</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">shared_tools</span><span class="o">.</span><span class="n">get_random_uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># now, we do something custom in our subclass</span>
+<span class="gp">... </span>        <span class="n">_sample1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># and write it out to view</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="n">_sample0</span><span class="p">,</span> <span class="n">_sample1</span><span class="p">)</span>
+
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">BeautifulAndVeryReproducible</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="sd">&quot;&quot;&quot;Initialize a reproducible model.</span>
+<span class="gp">... </span><span class="sd">        &quot;&quot;&quot;</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="n">input_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="sd">&quot;&quot;&quot;Reimplement update method for demonstration.&quot;&quot;&quot;</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># the core pyDeltaRCM RNG is used in computations, e.g.,</span>
+<span class="gp">... </span>        <span class="n">_sample0</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">shared_tools</span><span class="o">.</span><span class="n">get_random_uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># now, we do something custom in our subclass</span>
+<span class="gp">... </span>        <span class="n">_sample1</span> <span class="o">=</span> <span class="n">get_random_normal</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># and write it out to view</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="n">_sample0</span><span class="p">,</span> <span class="n">_sample1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, we will initialize and run each model for three timesteps, twice. Running each twice will allow us to see if the model is reproducible (i.e., are all of the numbers exactly the same between runs).
+First, run the <cite>Broken</cite> model:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">broken</span> <span class="o">=</span> <span class="n">BrokenAndNotReproducible</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">broken</span><span class="o">.</span><span class="n">update</span><span class="p">()</span> 
+<span class="go">0.771320643266746 1.213653088541954</span>
+<span class="go">0.0207519493594015 -0.40009453994985783</span>
+<span class="go">0.6336482349262754 0.7719410676752912</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">broken</span> <span class="o">=</span> <span class="n">BrokenAndNotReproducible</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">broken</span><span class="o">.</span><span class="n">update</span><span class="p">()</span> 
+<span class="go">0.771320643266746 -0.17926017697487434</span>
+<span class="go">0.0207519493594015 -0.4421037872728855</span>
+<span class="go">0.6336482349262754 -0.2725394596633578</span>
+</pre></div>
+</div>
+<p>Now, run the reproducible model:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">beautiful</span> <span class="o">=</span> <span class="n">BeautifulAndVeryReproducible</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">beautiful</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="go">0.771320643266746 0.03777261440227079</span>
+<span class="go">0.7488038825386119 -0.1354484915560101</span>
+<span class="go">0.4985070123025904 -0.6643797082723693</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">beautiful</span> <span class="o">=</span> <span class="n">BeautifulAndVeryReproducible</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">beautiful</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="go">0.771320643266746 0.03777261440227079</span>
+<span class="go">0.7488038825386119 -0.1354484915560101</span>
+<span class="go">0.4985070123025904 -0.6643797082723693</span>
+</pre></div>
+</div>
+<p>From these results, we can see that the values returned from the built-in uniform RNG as the first sample of each iteration (i.e., the left column) is always deterministic (in <cite>broken</cite> and <cite>beautiful</cite>), whereas both the built-in and the custom RNG are deterministic (in <cite>beautiful</cite>).</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Be sure to only generate random numbers inside jitted functions!</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is generally okay to not worry about reproducibility when you are developing your subclassing model and trying to work out how model mechanics will depend on randomness – but once you start to do real simulations you may analyze, be sure to take the time to make your model reproducible.</p>
+</div>
+</section>
 </section>
 <section id="model-development">
 <h3>Model development<a class="headerlink" href="#model-development" title="Permalink to this headline">¶</a></h3>
-<div class="admonition-todo admonition" id="id2">
+<div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
 <p>add some notes about slicing arrays, and how we pad them with a custom pad operation when needed. Look at shared tools docs for starting point.</p>
 </div>
@@ -77,7 +216,11 @@
   <ul>
 <li><a class="reference internal" href="#">Developer Guide</a><ul>
 <li><a class="reference internal" href="#best-practices">Best Practices</a><ul>
-<li><a class="reference internal" href="#reproducibility">Reproducibility</a></li>
+<li><a class="reference internal" href="#reproducibility">Reproducibility</a><ul>
+<li><a class="reference internal" href="#random-numbers">Random numbers</a></li>
+<li><a class="reference internal" href="#a-simple-example">A simple example</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#model-development">Model development</a></li>
 </ul>
 </li>
