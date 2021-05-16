@@ -109,7 +109,8 @@ def get_random_uniform(limit):
     """Get a random number from the uniform distribution.
 
     Get a random number from the uniform distribution, defined over the
-    interval ``[0, limit]``, where `limit` is an input parameter (often ``1``).
+    interval ``[0, limit]``, where `limit` is an input parameter (usually
+    ``1``).
 
     .. hint::
 
