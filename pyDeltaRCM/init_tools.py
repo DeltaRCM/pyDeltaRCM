@@ -429,7 +429,7 @@ class init_tools(abc.ABC):
         self.sfc_sum = np.zeros_like(self.depth)
 
         # ---- domain ----
-        cell_land = 2
+        cell_land = -2
         cell_channel = 1
         cell_ocean = 0
         cell_edge = -1
@@ -471,7 +471,7 @@ class init_tools(abc.ABC):
 
         self.cell_type[bounds >= min(self.L - 5, self.W / 2 - 5)] = cell_edge
 
-        self.cell_type[:self.L0, :] = -cell_land
+        self.cell_type[:self.L0, :] = cell_land
         self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
 
         self.inlet = np.array(np.unique(np.where(self.cell_type == 1)[1]))
