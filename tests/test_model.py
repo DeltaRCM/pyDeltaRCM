@@ -476,7 +476,7 @@ class TestPublicSettersAndGetters:
         _delta = DeltaModel(input_file=p)
 
         # mock the init methods
-        _delta.create_other_variables = mock.MagicMock()
+        _delta.create_boundary_conditions = mock.MagicMock()
         _delta.init_sediment_routers = mock.MagicMock()
 
         # check initials
@@ -489,14 +489,14 @@ class TestPublicSettersAndGetters:
         assert _delta.channel_flow_velocity == _delta._u0
 
         # assert reinitializers called
-        assert (_delta.create_other_variables.called is True)
+        assert (_delta.create_boundary_conditions.called is True)
         assert (_delta.init_sediment_routers.called is True)
 
     def test_setting_getting_channel_width(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
-        _delta.create_other_variables = mock.MagicMock()
+        _delta.create_boundary_conditions = mock.MagicMock()
         _delta.init_sediment_routers = mock.MagicMock()
 
         # check initials
@@ -504,14 +504,14 @@ class TestPublicSettersAndGetters:
 
         # change value
         #  the channel width is then changed internally with `N0`, according
-        #  to the `create_other_variables` so no change is actually made
+        #  to the `create_boundary_conditions` so no change is actually made
         #  here.
         with pytest.warns(UserWarning):
             _delta.channel_width = 300
         assert _delta.channel_width == 250  # not changed!
 
         # assert reinitializers called
-        assert (_delta.create_other_variables.called is True)
+        assert (_delta.create_boundary_conditions.called is True)
         assert (_delta.init_sediment_routers.called is True)
 
     def test_setting_getting_flow_depth(self, tmp_path):
@@ -519,7 +519,7 @@ class TestPublicSettersAndGetters:
         _delta = DeltaModel(input_file=p)
 
         # mock the init methods
-        _delta.create_other_variables = mock.MagicMock()
+        _delta.create_boundary_conditions = mock.MagicMock()
         _delta.init_sediment_routers = mock.MagicMock()
 
         # check initials
@@ -532,7 +532,7 @@ class TestPublicSettersAndGetters:
         assert _delta.channel_flow_depth == _delta._h0
 
         # assert reinitializers called
-        assert (_delta.create_other_variables.called is True)
+        assert (_delta.create_boundary_conditions.called is True)
         assert (_delta.init_sediment_routers.called is True)
 
     def test_setting_getting_influx_concentration(self, tmp_path):
@@ -540,7 +540,7 @@ class TestPublicSettersAndGetters:
         _delta = DeltaModel(input_file=p)
 
         # mock the init methods
-        _delta.create_other_variables = mock.MagicMock()
+        _delta.create_boundary_conditions = mock.MagicMock()
         _delta.init_sediment_routers = mock.MagicMock()
 
         # check initials
@@ -551,7 +551,7 @@ class TestPublicSettersAndGetters:
         assert _delta.C0_percent == 0.3
 
         # assert reinitializers called
-        assert (_delta.create_other_variables.called is True)
+        assert (_delta.create_boundary_conditions.called is True)
         assert (_delta.init_sediment_routers.called is True)
 
     def test_getter_nosetter_sea_surface_elevation(self, tmp_path):
