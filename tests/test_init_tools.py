@@ -150,6 +150,30 @@ class TestModelDomainSetup:
         assert np.any(delta.sfc_sum) == 0
 
 
+class TestCreateBoundaryConditions:
+
+    # base case during init is covered by tests elsewhere!
+
+    def test_change_variable_updated_bcs(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        _delta = DeltaModel(input_file=p)
+
+        # what is Qw0 before?
+        assert _delta.Qw0 == 1250.0
+
+        # change u0
+        _delta.u0 = 2
+
+        # nothing has happened to Qw0 yet
+        assert _delta.u0 == 2
+        assert _delta.Qw0 == 1250.0
+
+        # now call to recreate, see what happened
+        _delta.create_boundary_conditions()
+        assert _delta.u0 == 2
+        assert _delta.Qw0 == 2500.0
+
+
 class TestInitSubsidence:
 
     def test_subsidence_bounds(self, tmp_path):

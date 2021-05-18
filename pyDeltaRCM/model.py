@@ -643,8 +643,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_eta_figs is True) and \
           ('eta' not in self._save_fig_list.keys()):
             self._save_fig_list['eta'] = ['eta']
-        elif (save_eta_figs is False) and \
-          ('eta' in self._save_fig_list.keys()):
+        elif ((save_eta_figs is False) and
+              ('eta' in self._save_fig_list.keys())):
             del self._save_fig_list['eta']
         self._save_eta_figs = save_eta_figs
 
@@ -660,8 +660,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_stage_figs is True) and \
           ('stage' not in self._save_fig_list.keys()):
             self._save_fig_list['stage'] = ['stage']
-        elif (save_stage_figs is False) and \
-          ('stage' in self._save_fig_list.keys()):
+        elif ((save_stage_figs is False) and
+              ('stage' in self._save_fig_list.keys())):
             del self._save_fig_list['stage']
         self._save_stage_figs = save_stage_figs
 
@@ -677,8 +677,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_depth_figs is True) and \
           ('depth' not in self._save_fig_list.keys()):
             self._save_fig_list['depth'] = ['depth']
-        elif (save_depth_figs is False) and \
-          ('depth' in self._save_fig_list.keys()):
+        elif ((save_depth_figs is False) and
+              ('depth' in self._save_fig_list.keys())):
             del self._save_fig_list['depth']
         self._save_depth_figs = save_depth_figs
 
@@ -694,8 +694,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_discharge_figs is True) and \
           ('discharge' not in self._save_fig_list.keys()):
             self._save_fig_list['discharge'] = ['qw']
-        elif (save_discharge_figs is False) and \
-          ('discharge' in self._save_fig_list):
+        elif ((save_discharge_figs is False) and
+              ('discharge' in self._save_fig_list)):
             del self._save_fig_list['discharge']
         self._save_discharge_figs = save_discharge_figs
 
@@ -711,8 +711,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_velocity_figs is True) and \
           ('velocity' not in self._save_fig_list.keys()):
             self._save_fig_list['velocity'] = ['uw']
-        elif (save_velocity_figs is False) and \
-          ('velocity' in self._save_fig_list.keys()):
+        elif ((save_velocity_figs is False) and
+              ('velocity' in self._save_fig_list.keys())):
             del self._save_fig_list['sedflux']
         self._save_velocity_figs = save_velocity_figs
 
@@ -728,8 +728,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_sedflux_figs is True) and \
           ('sedflux' not in self._save_fig_list.keys()):
             self._save_fig_list['sedflux'] = ['qs']
-        elif (save_sedflux_figs is False) and \
-          ('sedflux' in self._save_fig_list):
+        elif ((save_sedflux_figs is False) and
+              ('sedflux' in self._save_fig_list)):
             del self._save_fig_list['sedflux']
         self._save_sedflux_figs = save_sedflux_figs
 
@@ -746,8 +746,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_sandfrac_figs is True) and \
           ('sandfrac' not in self._save_fig_list.keys()):
             self._save_fig_list['sandfrac'] = ['sand_frac']
-        elif (save_sandfrac_figs is False) and \
-          ('sandfrac' in self._save_fig_list):
+        elif ((save_sandfrac_figs is False) and
+              ('sandfrac' in self._save_fig_list)):
             del self._save_fig_list['sandfrac']
         self._save_sandfrac_figs = save_sandfrac_figs
 
@@ -804,8 +804,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
           ('eta' not in self._save_var_list.keys()):
             self._save_var_list['eta'] = ['eta', 'meters', 'f4',
                                           ('total_time', 'length', 'width')]
-        elif (save_eta_grids is False) and \
-          ('eta' in self._save_var_list.keys()):
+        elif ((save_eta_grids is False) and
+              ('eta' in self._save_var_list.keys())):
             del self._save_var_list['eta']
         self._save_eta_grids = save_eta_grids
 
@@ -822,8 +822,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
           ('stage' not in self._save_var_list.keys()):
             self._save_var_list['stage'] = ['stage', 'meters', 'f4',
                                             ('total_time', 'length', 'width')]
-        elif (save_stage_grids is False) and \
-          ('stage' in self._save_var_list.keys()):
+        elif ((save_stage_grids is False) and
+              ('stage' in self._save_var_list.keys())):
             del self._save_var_list['stage']
         self._save_stage_grids = save_stage_grids
 
@@ -840,8 +840,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
           ('depth' not in self._save_var_list.keys()):
             self._save_var_list['depth'] = ['depth', 'meters', 'f4',
                                             ('total_time', 'length', 'width')]
-        elif (save_depth_grids is False) and \
-          ('depth' in self._save_var_list.keys()):
+        elif ((save_depth_grids is False) and
+              ('depth' in self._save_var_list.keys())):
             del self._save_var_list['depth']
         self._save_depth_grids = save_depth_grids
 
@@ -861,8 +861,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
                                                 'f4',
                                                 ('total_time', 'length',
                                                  'width')]
-        elif (save_discharge_grids is False) and \
-          ('discharge' in self._save_var_list.keys()):
+        elif ((save_discharge_grids is False) and
+              ('discharge' in self._save_var_list.keys())):
             del self._save_var_list['discharge']
         self._save_discharge_grids = save_discharge_grids
 
@@ -880,8 +880,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             self._save_var_list['velocity'] = ['uw', 'meters per second', 'f4',
                                                ('total_time', 'length',
                                                 'width')]
-        elif (save_velocity_grids is False) and \
-          ('velocity' in self._save_var_list.keys()):
+        elif ((save_velocity_grids is False) and
+              ('velocity' in self._save_var_list.keys())):
             del self._save_var_list['velocity']
         self._save_velocity_grids = save_velocity_grids
 
@@ -900,8 +900,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
                                               'f4',
                                               ('total_time', 'length',
                                                'width')]
-        elif (save_sedflux_grids is False) and \
-          ('sedflux' in self._save_var_list.keys()):
+        elif ((save_sedflux_grids is False) and
+              ('sedflux' in self._save_var_list.keys())):
             del self._save_var_list['sedflux']
         self._save_sedflux_grids = save_sedflux_grids
 
@@ -920,8 +920,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             self._save_var_list['sandfrac'] = ['sand_frac', 'fraction', 'f4',
                                                ('total_time', 'length',
                                                 'width')]
-        elif (save_sandfrac_grids is False) and \
-          ('sandfrac' in self._save_var_list.keys()):
+        elif ((save_sandfrac_grids is False) and
+              ('sandfrac' in self._save_var_list.keys())):
             del self._save_var_list['sandfrac']
         self._save_sandfrac_grids = save_sandfrac_grids
 
@@ -1345,7 +1345,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @channel_flow_velocity.setter
     def channel_flow_velocity(self, new_u0):
         self.u0 = new_u0
-        self.create_other_variables()
+        self.create_boundary_conditions()
         self.init_sediment_routers()
 
     @property
@@ -1356,7 +1356,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @channel_width.setter
     def channel_width(self, new_N0_meters):
         self.N0_meters = new_N0_meters
-        self.create_other_variables()
+        self.create_boundary_conditions()
         self.init_sediment_routers()
         if self.channel_width != new_N0_meters:
             warnings.warn(UserWarning(
@@ -1372,7 +1372,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @channel_flow_depth.setter
     def channel_flow_depth(self, new_d):
         self.h0 = new_d
-        self.create_other_variables()
+        self.create_boundary_conditions()
         self.init_sediment_routers()
 
     @property
@@ -1410,7 +1410,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @influx_sediment_concentration.setter
     def influx_sediment_concentration(self, new_C0):
         self.C0_percent = new_C0 * 100
-        self.create_other_variables()
+        self.create_boundary_conditions()
         self.init_sediment_routers()
 
     @property
