@@ -110,6 +110,9 @@ We can inspect the result of this function, as it will be called in the model su
         <span class="c1"># find the new velocity and set it to the model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_array</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocity_array</span><span class="p">)</span>
 
+        <span class="c1"># update other boundary conditions using u0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_boundary_conditions</span><span class="p">()</span>
+
         <span class="c1"># log the new value</span>
         <span class="n">_msg</span> <span class="o">=</span> <span class="s1">&#39;Changed velocity value to </span><span class="si">{u0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">u0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">u0</span><span class="p">)</span>
@@ -122,6 +125,10 @@ We can inspect the result of this function, as it will be called in the model su
 <span class="k">while</span> <span class="n">mdl</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
     <span class="n">mdl</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For information on updating boundary conditions after changing certain model parameters see <a class="reference internal" href="updating_boundary_conditions.html"><span class="doc">Updating model boundary conditions</span></a>.</p>
 </div>
 </section>
 </section>

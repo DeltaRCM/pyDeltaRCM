@@ -68,9 +68,45 @@
 <dt class="sig sig-object py" id="pyDeltaRCM.init_tools.init_tools">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.init_tools.</span></span><span class="sig-name descname"><span class="pre">init_tools</span></span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py method">
+<dt class="sig sig-object py" id="pyDeltaRCM.init_tools.init_tools.create_boundary_conditions">
+<span class="sig-name descname"><span class="pre">create_boundary_conditions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools.create_boundary_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create model boundary conditions</p>
+<p>This method is run during model initialization to determine the
+boundary conditions based on the initial conditions specified as model
+input.</p>
+<p>However, the method also should be called when certain boundary
+condition variables are updated (e.g., during some custom model runs).
+For example, if some property of the inlet flow condition is changed,
+you will <em>likely</em> want to re-run this method (e.g., <cite>u0</cite>), because
+there are several other parameters that depend on the value of the
+inlet flow velocity (e.g., <cite>Qw0</cite> and <cite>Qs0</cite>); of course, your
+scientific question may choose to leave these parameters as they are
+too (in which case you should <em>not</em> re-run this method). See
+<a class="reference internal" href="../../examples/updating_boundary_conditions.html"><span class="doc">Updating model boundary conditions</span></a> for more information.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is automatically called for the “named” variables used
+by the BMI wrapper (e.g., <cite>channel_flow_velocity</cite>,
+<cite>channel_width</cite>, <cite>channel_flow_depth</cite>, and
+<cite>influx_sediment_concentration</cite>., so you do not need to call it
+again if you modify the model boundary conditions that way.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.init_tools.init_tools.create_domain">
 <span class="sig-name descname"><span class="pre">create_domain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools.create_domain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates the model domain</p>
+<dd><p>Create the model domain.</p>
+<p>This method initializes the model domain, including coordinate arrays,
+gridded fields (eta, qw, etc.) and cell type information. The method
+is called during initialization of the <cite>DeltaModel</cite>, and likely does
+not need to be called again.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>If you need to modify the model domain after it has been created,
+it is probably safe to modify attributes directly, but take care
+to ensure any dependent fields are also approrpriately changed.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -79,10 +115,14 @@
 <dd><p>Model implementation variables.</p>
 <p>Creates variables for model implementation, from specified boundary
 condition variables. This method is run during initial model
-instantition, but it is also run any time an inlet flow condition
-variable is changed, including <cite>channel_flow_velocity</cite>,
-<cite>channel_width</cite>, <cite>channel_flow_depth</cite>, and
-<cite>influx_sediment_concentration</cite>.</p>
+instantition. Internally, this method calls <a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.set_constants" title="pyDeltaRCM.init_tools.init_tools.set_constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_constants</span></code></a> and
+<a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.create_boundary_conditions" title="pyDeltaRCM.init_tools.init_tools.create_boundary_conditions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_boundary_conditions</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is usually not necessary to re-run this method if you change
+boundary condition variables, and instead only re-run
+<a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.create_boundary_conditions" title="pyDeltaRCM.init_tools.init_tools.create_boundary_conditions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_boundary_conditions</span></code></a>.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -151,6 +191,11 @@ setting.</p>
 <dd><p>Initialize the sediment router object here.</p>
 <p>These are preinitialized because the “boxing” for jitted functions is
 expensive, so we avoid boxing up the constants on each iteration.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If you change any model boundary conditions, you likely should
+reinitialize the sediment routers (i.e., rerun this method)</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -220,6 +265,9 @@ values specified into the log file.</p>
 <dt class="sig sig-object py" id="pyDeltaRCM.init_tools.init_tools.set_constants">
 <span class="sig-name descname"><span class="pre">set_constants</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools.set_constants" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the model constants.</p>
+<p>Configure constants, including coordinates and distances, as well as
+environmental constants (gravity), and kernels for smoothing
+topography.</p>
 </dd></dl>
 
 </dd></dl>

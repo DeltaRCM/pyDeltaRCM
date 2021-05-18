@@ -20,6 +20,7 @@
       ~DeltaModel.check_size_of_indices_matrix
       ~DeltaModel.compute_free_surface
       ~DeltaModel.compute_sand_frac
+      ~DeltaModel.create_boundary_conditions
       ~DeltaModel.create_domain
       ~DeltaModel.create_other_variables
       ~DeltaModel.determine_random_seed
