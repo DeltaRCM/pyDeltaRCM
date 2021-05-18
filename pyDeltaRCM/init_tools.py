@@ -316,11 +316,12 @@ class init_tools(abc.ABC):
         there are several other parameters that depend on the value of the
         inlet flow velocity (e.g., `Qw0` and `Qs0`); of course, your
         scientific question may choose to leave these parameters as they are
-        too (in which case you should *not* re-run this method).
+        too (in which case you should *not* re-run this method). See
+        :doc:`/examples/updating_boundary_conditions` for more information.
 
         .. note::
 
-            This method is automatically called dor the "named" variables used
+            This method is automatically called for the "named" variables used
             by the BMI wrapper (e.g., `channel_flow_velocity`,
             `channel_width`, `channel_flow_depth`, and
             `influx_sediment_concentration`., so you do not need to call it
