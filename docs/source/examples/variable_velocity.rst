@@ -82,6 +82,9 @@ We define a model subclass to handle the changing boundary condition:
             # find the new velocity and set it to the model
             self.u0 = np.interp(self._time, self._time_array, self._velocity_array)
 
+            # update other boundary conditions using u0
+            self.create_boundary_conditions()
+
             # log the new value
             _msg = 'Changed velocity value to {u0}'.format(
                 u0=self.u0)
@@ -105,3 +108,8 @@ and then simply run with:
 
     while mdl.time < end_time:
         mdl.update()
+
+
+.. note::
+
+    For information on updating boundary conditions after changing certain model parameters see :doc:`updating_boundary_conditions`.

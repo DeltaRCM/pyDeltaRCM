@@ -18,6 +18,7 @@ Modifying boundary conditions
 .. toctree::
    :maxdepth: 1
 
+   updating_boundary_conditions
    subsidence_region
    variable_bedload
    variable_velocity
