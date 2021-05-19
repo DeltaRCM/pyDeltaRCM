@@ -8,6 +8,9 @@ pyDeltaRCM approximates hydrodynamics through the use of a weighted random walk.
 See [1]_ and [2]_ for a complete description of hydrodynamic assumptions in the DeltaRCM model.
 In this documentation, we focus on the details of *model implementation*, rather than *model design*.
 
+The water routing operations are orchestrated by :obj:`~water_tools.route_water`; the following sections narrate the sequence of events within a single call of this method.
+
+
 Routing individual water parcels
 ================================
 
@@ -99,9 +102,19 @@ Similar to :func:`~_smooth_free_surface` described above, :meth:`~water_tools.fl
 Finalizing and boundary conditions to sediment routing
 ======================================================
 
-.. todo::
+The final step of the water routing operations in each call to :obj:`~water_tools.route_water` is the updating of model fields, and application of a few corrections and boundary conditions.
+These operations are handled within :obj:`~water_tools.finalize_water_iteration`.
 
-   Incomplete. Need to describe the updating of depth from stage, limiting everything to above H_SL, updating velocity and discharge fields, etc.
+First, the `stage` field is limited to elevations above or equal to sea level `H_SL`.
+Then, the `depth` field is updated as the vertical distance between the `stage` field and the bed elevation `eta`.
+These operations ensure that these fields are in agreement over the entire model domain.
+
+Next, methods :obj:`~water_tools.update_flow_field` and :obj:`~water_tools.update_velocity_field` are called, which handle the updating of water discharge and water velocity fields, respectively.
+
+
+.. note::
+  
+  The next step in the model `update` sequence is sediment routing (:obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`). For more information on the next stage, see :doc:`morphodynamics`.
 
 
 References

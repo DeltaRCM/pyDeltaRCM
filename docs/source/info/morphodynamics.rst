@@ -90,10 +90,22 @@ The impact of routing *all* sand and mud parcels on bed elevation is shown in th
 Model Stability
 ===============
 
-Model stability depends on...
+Model stability depends on a number of conditions.
+At its core though, model stability depends on the bed elevation rate of change, bot over space and over time. 
+Rapid and abrupt bed elevation change trigger numerical instability that can *occasionally* run-away and cause model runs to fail.
+A number of processes are included in the DeltaRCM framework to help limit the possibility of failed runs.
 
 .. note::
    Incomplete.
+
+
+Limiting bed elevation change
+-----------------------------
+
+At each sediment parcel step, bed elevation change is limited to 1/4 of the local flow depth. 
+Additionally, an edge case where repeated channel bed deposition creates a local `depth` < 0 is restricted by enforcing zero deposition if the `depth` < 0.
+These regulations are implemented in the `BaseRouter` class, as :obj:`~pyDeltaRCM.sed_tools.BaseRouter._limit_Vp_change`.
+
 
 .. topographic-diffusion:
 
@@ -127,6 +139,15 @@ The reference volume (:math:`V_0`) impacts model stability. This volume characte
     V_0 = h_0 {\delta_c}^2
 
 where :math:`h_0` is the inlet channel depth (meters) and :math:`\delta_c` is the cell length (meters).
+
+
+Notes for modeling best practices
+=================================
+
+* Stop simulations before the delta reaches the edge of the computational domain. If a distributary channel reaches the domain edge, this channel is likely to become locked in place, and will convey sediment outside the computational domain, thus violating any statements of mass conservation. Generally, simulations that reach the edge of the domain should be discarded. 
+* Stop simulations before the delta reaches a grade condition, where the topset slope is equal to background slope `S0`. This is really only an issue for large domains run for long duration.
+* Use a sufficient number of water and sediment parcels (> 2000). Too few parcels will result in a rough water surface, irregular sediment deposition, and a rough bed elevation.
+
 
 
 References
