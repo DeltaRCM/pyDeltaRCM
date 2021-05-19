@@ -32,6 +32,21 @@ class hook_tools(abc.ABC):
 
         Called immediately before
         :obj:`~pyDeltaRCM.init_tools.init_tools.import_files`.
+
+        This is the recommended hook to use for defining custom yaml parameters
+        for a subclassed model. To allow the model to successfully load custom
+        yaml parameters, expected types and default values need to be provided
+        as a dictionary in a model attribute, `_subclass_parameters`, which
+        should be defined here.
+
+        The expected format is:
+
+        .. code::
+
+            self._subclass_parameters = dict()
+            self._subclass_parameters['custom_param'] = {
+                'type': ['expected_type'], 'default': default_value}  # noqa: E501
+
         """
         pass
 
@@ -208,6 +223,19 @@ class hook_tools(abc.ABC):
 
             self._save_var_list['meta']['new_meta_name'] = ['varname', 'units',
                                                             'type', (dimensions)]  # noqa: E501
+
+        Expected format for time-varying metadata entries to the `meta`
+        dictionary nested within the `self._save_var_list` dictionary:
+
+        .. code::
+
+            self._save_var_list['meta']['new_meta_attribute_name'] = [
+                None, 'units', 'type', (dimensions)]  # noqa: E501
+
+        .. note::
+
+            For a vector of time-varying metadata, the dimension
+            should be specified as ('total_time').
 
         Expected format for time varying grid entries as keys within the
         `self._save_var_list` dictionary:

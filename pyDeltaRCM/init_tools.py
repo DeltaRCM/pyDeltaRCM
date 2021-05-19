@@ -109,6 +109,11 @@ class init_tools(abc.ABC):
             else:
                 default_dict[k]['type'] = [eval(_v) for _v in v['type']]
 
+        # merge optional subclass params into defaults (subclass supercedes)
+        if hasattr(self, '_subclass_parameters'):
+            default_dict.update(self._subclass_parameters)
+            delattr(self, '_subclass_parameters')  # dont need attr anymore
+
         # only access the user input file if provided.
         if self.input_file:
             try:
