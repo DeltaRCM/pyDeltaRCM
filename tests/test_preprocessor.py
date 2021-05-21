@@ -1038,6 +1038,12 @@ class TestParallelJob:
         pj.deltamodel.output_checkpoint = mock.MagicMock()
         pj.deltamodel.finalize = mock.MagicMock()
 
+        # mock initialization and their hooks
+        pj.deltamodel.init_output_file = mock.MagicMock()
+        pj.deltamodel.hook_init_output_file = mock.MagicMock()
+        pj.deltamodel.hook_output_data = mock.MagicMock()
+        pj.deltamodel.hook_output_checkpoint = mock.MagicMock()
+
         # run the method (call update 10 times)
         pj.run()
 
@@ -1050,6 +1056,11 @@ class TestParallelJob:
         assert pj.deltamodel.output_data.call_count == 11  # once in init
         assert pj.deltamodel.output_checkpoint.call_count == 11  # once in init
         assert pj.deltamodel.finalize.call_count == 1
+        # hooks/initialization
+        assert pj.deltamodel.init_output_file.call_count == 1
+        assert pj.deltamodel.hook_init_output_file.call_count == 1
+        assert pj.deltamodel.hook_output_data.call_count == 11
+        assert pj.deltamodel.hook_output_checkpoint.call_count == 11
 
         # check the log outputs for successes
         _calls = [mock.call({'job': 0, 'stage': 0, 'code': 0}),

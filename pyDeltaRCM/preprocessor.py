@@ -854,8 +854,13 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
                     self.deltamodel.load_checkpoint(defer_output=False)
                 else:
                     # infrastructure deferred, need to trigger manually
+                    self.deltamodel.hook_init_output_file()
                     self.deltamodel.init_output_file()
+
+                    self.deltamodel.hook_output_data()
                     self.deltamodel.output_data()
+
+                    self.deltamodel.hook_output_checkpoint()
                     self.deltamodel.output_checkpoint()
 
                 # run the simualtion
