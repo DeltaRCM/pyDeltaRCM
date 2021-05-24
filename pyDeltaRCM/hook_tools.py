@@ -36,8 +36,8 @@ class hook_tools(abc.ABC):
         This is the recommended hook to use for defining custom yaml parameters
         for a subclassed model. To allow the model to successfully load custom
         yaml parameters, expected types and default values need to be provided
-        as a dictionary in a model attribute, `subclass_parameters`, which
-        should be defined here.
+        as dictionary key-value pairs to the model attribute,
+        `subclass_parameters`.
 
         The expected format is:
 
