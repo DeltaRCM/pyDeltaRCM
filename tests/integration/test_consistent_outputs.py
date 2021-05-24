@@ -156,3 +156,78 @@ class TestModelIsReproducible:
         assert np.all(ModelA.stage == ModelB.stage)
         assert np.all(ModelA.sand_frac == ModelB.sand_frac)
         assert np.all(ModelA.active_layer == ModelB.active_layer)
+
+
+class CustomParamModel(DeltaModel):
+    """Subclass for custom yaml parameters."""
+    def __init__(self, input_file=None, defer_output=False, **kwargs):
+        super().__init__(input_file, **kwargs)
+
+    def hook_import_files(self):
+        """Hook to define custom yaml parameters."""
+        self.subclass_parameters['new_str'] = {
+            'type': ['str'], 'default': 'DefaultString'
+        }
+        self.subclass_parameters['new_val'] = {
+            'type': ['int', 'float'], 'default': 0
+        }
+
+
+class TestCustomParams:
+
+    def test_custom_defaults(self, tmp_path):
+        """Default subclass yaml parameters."""
+        file_name = 'user_parameters.yaml'
+        p = utilities.yaml_from_dict(tmp_path, file_name)
+        # initialize model
+        _delta = CustomParamModel(input_file=p)
+        # assert that hook has been used and default params exist
+        assert _delta.subclass_parameters['new_str']['default'] == \
+            'DefaultString'
+        assert _delta.subclass_parameters['new_val']['default'] == 0
+        assert hasattr(_delta, 'subclass_parameters')
+        assert _delta.new_str == 'DefaultString'
+        assert _delta.new_val == 0
+
+    def test_yaml_custom_params(self, tmp_path):
+        """Specify custom params in yaml."""
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+        utilities.write_parameter_to_file(f, 'new_str', 'Customized')
+        utilities.write_parameter_to_file(f, 'new_val', 10.5)
+        f.close()
+        # initialize model
+        _delta = CustomParamModel(input_file=p)
+        # assert that hook has been used and default params exist
+        assert _delta.subclass_parameters['new_str']['default'] == \
+            'DefaultString'
+        assert _delta.subclass_parameters['new_val']['default'] == 0
+        assert hasattr(_delta, 'subclass_parameters')
+        assert _delta.new_str == 'Customized'
+        assert _delta.new_val == 10.5
+
+    def test_kwargs_custom_params(self, tmp_path):
+        """Try to specify one custom parameter via kwargs."""
+        file_name = 'user_parameters.yaml'
+        p = utilities.yaml_from_dict(tmp_path, file_name)
+        # initialize model
+        _delta = CustomParamModel(input_file=p, new_val=-5.25)
+        # assert that hook has been used and default params exist
+        assert _delta.subclass_parameters['new_str']['default'] == \
+            'DefaultString'
+        assert _delta.subclass_parameters['new_val']['default'] == 0
+        assert hasattr(_delta, 'subclass_parameters')
+        assert _delta.new_str == 'DefaultString'
+        assert _delta.new_val == -5.25
+
+    def test_invalid_custom_params(self, tmp_path):
+        """Specify invalid custom param type in yaml."""
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+        utilities.write_parameter_to_file(f, 'new_val', 'invalid_str')
+        f.close()
+        # initialize model
+        with pytest.raises(TypeError):
+            _ = CustomParamModel(input_file=p)

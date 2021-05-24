@@ -42,3 +42,11 @@ Modifying variables saved in the output file
    :maxdepth: 1
 
    custom_saving
+
+Defining custom YAML parameters
+-------------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   custom_yaml
