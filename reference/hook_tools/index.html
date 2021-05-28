@@ -143,6 +143,16 @@ subclassing models.</p>
 <dd><p>Hook <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.import_files" title="pyDeltaRCM.init_tools.init_tools.import_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_files</span></code></a>.</p>
 <p>Called immediately before
 <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.import_files" title="pyDeltaRCM.init_tools.init_tools.import_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_files</span></code></a>.</p>
+<p>This is the recommended hook to use for defining custom yaml parameters
+for a subclassed model. To allow the model to successfully load custom
+yaml parameters, expected types and default values need to be provided
+as dictionary key-value pairs to the model attribute,
+<cite>subclass_parameters</cite>.</p>
+<p>The expected format is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">subclass_parameters</span><span class="p">[</span><span class="s1">&#39;custom_param&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;expected_type&#39;</span><span class="p">],</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">default_value</span><span class="p">}</span>  <span class="c1"># noqa: E501</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -156,6 +166,17 @@ subclassing models.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">_save_var_list</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">][</span><span class="s1">&#39;new_meta_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;varname&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">,</span>
                                                 <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">dimensions</span><span class="p">)]</span>  <span class="c1"># noqa: E501</span>
 </pre></div>
+</div>
+<p>Expected format for time-varying metadata entries to the <cite>meta</cite>
+dictionary nested within the <cite>self._save_var_list</cite> dictionary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">_save_var_list</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">][</span><span class="s1">&#39;new_meta_attribute_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">dimensions</span><span class="p">)]</span>  <span class="c1"># noqa: E501</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a vector of time-varying metadata, the dimension
+should be specified as (‘total_time’).</p>
 </div>
 <p>Expected format for time varying grid entries as keys within the
 <cite>self._save_var_list</cite> dictionary:</p>
