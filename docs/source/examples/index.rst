@@ -35,18 +35,11 @@ Modifying behavior of the Preprocessor
 
 * none
 
-Modifying variables saved in the output file
---------------------------------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   custom_saving
-
-Defining custom YAML parameters
--------------------------------
+Modifying Model Input/Output
+----------------------------
 
 .. toctree::
    :maxdepth: 1
 
    custom_yaml
+   custom_saving
