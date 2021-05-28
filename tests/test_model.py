@@ -23,6 +23,8 @@ class Test__init__:
 
         assert _delta.time_iter == 0.
         assert _delta._is_finalized is False
+        # check that subclass parameter dictionary has been initialized
+        assert _delta.subclass_parameters == {}
 
     def test_error_if_no_file_found(self):
         with pytest.raises(FileNotFoundError):

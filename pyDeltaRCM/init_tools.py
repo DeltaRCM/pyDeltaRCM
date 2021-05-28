@@ -137,15 +137,40 @@ class init_tools(abc.ABC):
                 if type(user_dict[k]) in expected_type:
                     input_file_vars[k] = user_dict[k]
                 else:
-                    raise TypeError('Input for "{_k}" not of the right type '
-                                    'in yaml configuration file "{_file}". '
-                                    'Input type was "{_wastype}", '
-                                    'but needs to be "{_exptype}".'
-                                    .format(_k=str(k), _file=self.input_file,
-                                            _wastype=type(k).__name__,
-                                            _exptype=expected_type))
+                    raise TypeError(f'Input for {str(k)} not of the '
+                                    'right type in yaml configuration '
+                                    'file {self.input_file}. '
+                                    'Input type was {type(k).__name__}, '
+                                    'but needs to be {expected_type}.')
             else:
                 input_file_vars[k] = default_dict[k]['default']
+
+        # add custom subclass yaml parameters (yaml or defaults) to input vars
+        for k, v in self.subclass_parameters.items():
+            if k in input_file_vars:
+                warnings.warn(UserWarning(
+                    'Custom subclass parameter name is already a '
+                    'default yaml parameter of the model, '
+                    'custom parameter value will not be used.'
+                ))
+            elif k in user_dict:
+                # get expected types
+                if not type(v['type']) is list:
+                    expected_type = [eval(v['type'])]
+                else:
+                    expected_type = [eval(_v) for _v in v['type']]
+                # evaluate against expected types
+                if type(user_dict[k]) in expected_type:
+                    input_file_vars[k] = user_dict[k]
+                else:
+                    raise TypeError(f'Input for {str(k)} not of the '
+                                    'right type in yaml configuration '
+                                    'file {self.input_file}. '
+                                    'Input type was {type(k).__name__}, '
+                                    'but needs to be {expected_type}.')
+            else:
+                # set using default value
+                input_file_vars[k] = v['default']
 
         # save the input file as a hidden attr and grab needed value
         self._input_file_vars = input_file_vars

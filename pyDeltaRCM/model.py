@@ -84,6 +84,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         _src_dir = os.path.realpath(os.path.dirname(__file__))
         self.default_file = os.path.join(_src_dir, 'default.yml')
 
+        # infrastructure for custom yaml parameters if needed
+        if hasattr(self, 'subclass_parameters') is False:
+            self.subclass_parameters = dict()  # init dict for custom params
+
         # check for any deprecated hooks
         self._check_deprecated_hooks()
 
