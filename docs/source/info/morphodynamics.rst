@@ -91,12 +91,39 @@ Model Stability
 ===============
 
 Model stability depends on a number of conditions.
-At its core though, model stability depends on the bed elevation rate of change, bot over space and over time. 
-Rapid and abrupt bed elevation change trigger numerical instability that can *occasionally* run-away and cause model runs to fail.
+At its core though, model stability depends on the bed elevation rate of change over space and time. 
+Rapid and/or abrupt bed elevation change trigger numerical instability that can *occasionally* run-away and cause model runs to fail.
 A number of processes are included in the DeltaRCM framework to help limit the possibility of failed runs.
 
-.. note::
-   Incomplete.
+
+.. _reference-volume:
+
+Reference Volume
+----------------
+
+The reference volume if the foundational unit (:math:`V_0`) impacting model stability.
+This value characterizes the volume on one inlet-channel cell, from the channel bed to the water surface:
+
+.. math::
+
+    V_0 = h_0 {\delta_c}^2
+
+where :math:`h_0` is the inlet channel depth (meters) and :math:`\delta_c` is the cell length (meters).
+
+
+Time stepping
+-------------
+
+Perhaps most important to model stability is the model timestep. 
+Recall that for each iteration, the number of parcels and input sediment discharge (as `h0 u0 (c0_percent)/100`) are set by the user (fixed).
+Therefore, to control stability, the duration of time represented by each iteration (i.e., the timestep) is determined such that changes in bed elevation per iteration are small.
+The model timestep is determined as:
+
+.. math::
+
+    dt = dV_s / N_{p,sed}
+
+where :math:`N_{p,sed}` is the number of sediment parcels, :math:`dV_s` is a characteristic sediment volume, based on the reference volume and inlet width as :math:`dV_s = 0.1 N_0^2 V_0`, where :math:`N_0` is the number of cells across the inlet.
 
 
 Limiting bed elevation change
@@ -126,19 +153,6 @@ In the following example, :obj:`~pyDeltaRCM.DeltaModel.N_crossdiff` takes the :d
 .. plot:: sed_tools/topo_diffusion.py
 
 The impact of topographic diffusion is minor compared to the bed elevation change driven by parcel erosion or deposition (:ref:`sand and mud routing effects <sand-mud-route-comparison>`).
-
-.. _reference-volume:
-
-Reference Volume
-----------------
-
-The reference volume (:math:`V_0`) impacts model stability. This volume characterizes the volume on one inlet-channel cell, from the channel bed to the water surface:
-
-.. math::
-
-    V_0 = h_0 {\delta_c}^2
-
-where :math:`h_0` is the inlet channel depth (meters) and :math:`\delta_c` is the cell length (meters).
 
 
 Notes for modeling best practices
