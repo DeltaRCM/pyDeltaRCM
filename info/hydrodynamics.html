@@ -47,8 +47,9 @@
   <section id="hydrodynamics">
 <h1>Hydrodynamics<a class="headerlink" href="#hydrodynamics" title="Permalink to this headline">¶</a></h1>
 <p>pyDeltaRCM approximates hydrodynamics through the use of a weighted random walk.
-See <a class="footnote-reference brackets" href="#id5" id="id1">1</a> and <a class="footnote-reference brackets" href="#id6" id="id2">2</a> for a complete description of hydrodynamic assumptions in the DeltaRCM model.
+See <a class="footnote-reference brackets" href="#id4" id="id1">1</a> and <a class="footnote-reference brackets" href="#id5" id="id2">2</a> for a complete description of hydrodynamic assumptions in the DeltaRCM model.
 In this documentation, we focus on the details of <em>model implementation</em>, rather than <em>model design</em>.</p>
+<p>The water routing operations are orchestrated by <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.route_water" title="pyDeltaRCM.water_tools.water_tools.route_water"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_water</span></code></a>; the following sections narrate the sequence of events within a single call of this method.</p>
 <section id="routing-individual-water-parcels">
 <h2>Routing individual water parcels<a class="headerlink" href="#routing-individual-water-parcels" title="Permalink to this headline">¶</a></h2>
 <p>Probabilities for water parcel routing <em>to all neighbors and to self</em> for <em>each cell</em> are computed <em>once</em> at the beginning of the water routing routine (<a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.get_water_weight_array" title="pyDeltaRCM.water_tools.water_tools.get_water_weight_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_water_weight_array</span></code></a> called from <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="pyDeltaRCM.water_tools.water_tools.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>).</p>
@@ -127,20 +128,26 @@ If this condition is met for a given dry cell, the dry cell is flooded: the stag
 </section>
 <section id="finalizing-and-boundary-conditions-to-sediment-routing">
 <h2>Finalizing and boundary conditions to sediment routing<a class="headerlink" href="#finalizing-and-boundary-conditions-to-sediment-routing" title="Permalink to this headline">¶</a></h2>
-<div class="admonition-todo admonition" id="id4">
-<p class="admonition-title">Todo</p>
-<p>Incomplete. Need to describe the updating of depth from stage, limiting everything to above H_SL, updating velocity and discharge fields, etc.</p>
+<p>The final step of the water routing operations in each call to <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.route_water" title="pyDeltaRCM.water_tools.water_tools.route_water"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_water</span></code></a> is the updating of model fields, and application of a few corrections and boundary conditions.
+These operations are handled within <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.finalize_water_iteration" title="pyDeltaRCM.water_tools.water_tools.finalize_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_water_iteration</span></code></a>.</p>
+<p>First, the <cite>stage</cite> field is limited to elevations above or equal to sea level <cite>H_SL</cite>.
+Then, the <cite>depth</cite> field is updated as the vertical distance between the <cite>stage</cite> field and the bed elevation <cite>eta</cite>.
+These operations ensure that these fields are in agreement over the entire model domain.</p>
+<p>Next, methods <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.update_flow_field" title="pyDeltaRCM.water_tools.water_tools.update_flow_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_flow_field</span></code></a> and <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.update_velocity_field" title="pyDeltaRCM.water_tools.water_tools.update_velocity_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_velocity_field</span></code></a> are called, which handle the updating of water discharge and water velocity fields, respectively.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The next step in the model <cite>update</cite> sequence is sediment routing (<a class="reference internal" href="../reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_sediment" title="pyDeltaRCM.sed_tools.sed_tools.route_sediment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_sediment</span></code></a>). For more information on the next stage, see <a class="reference internal" href="morphodynamics.html"><span class="doc">Morphodynamics</span></a>.</p>
 </div>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <dl class="footnote brackets">
-<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>A reduced-complexity model for river delta formation – Part 1: Modeling
 deltas with channel dynamics, M. Liang, V. R. Voller, and C. Paola, Earth
 Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.org/10.5194/esurf-3-67-2015">https://doi.org/10.5194/esurf-3-67-2015</a></p>
 </dd>
-<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
 <dd><p>A reduced-complexity model for river delta formation – Part 2:
 Assessment of the flow routing scheme, M. Liang, N. Geleynse,
 D. A. Edmonds, and P. Passalacqua, Earth Surf. Dynam., 3, 87–104, 2015.
