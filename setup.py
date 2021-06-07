@@ -12,6 +12,10 @@ setup(name='pyDeltaRCM',
       packages=['pyDeltaRCM'],
       include_package_data=True,
       url='https://github.com/DeltaRCM/pyDeltaRCM',
+      project_urls={
+            'Documentation': 'https://deltarcm.org/pyDeltaRCM',
+            'Source': 'https://github.com/DeltaRCM/pyDeltaRCM',
+            'Tracker': 'https://github.com/deltaRCM/pyDeltaRCM/issues'},
       install_requires=['matplotlib', 'netCDF4', 'scipy', 'numpy', 'pyyaml',
                         'numba'],
       entry_points={
