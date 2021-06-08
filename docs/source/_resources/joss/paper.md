@@ -13,7 +13,7 @@ authors:
     orcid: 0000-0002-1343-193X
     affiliation: "1"
   - name: Eric Barefoot
-    orcid: XXXXXXXXXXXXX
+    orcid: 0000-0001-5770-2116
     affiliation: "2"
   - name: Paola Passalacqua
     affiliation: "1"
@@ -23,7 +23,7 @@ affiliations:
     index: 1
   - name: Department of Earth, Environmental and Planetary Sciences, Rice University, Houston, TX, USA
     index: 2
-date: 11 June 2021
+date: 08 June 2021
 bibliography: paper.bib
 ---
 
