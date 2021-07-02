@@ -2,6 +2,7 @@
 import pytest
 
 import platform
+import os
 
 import unittest.mock as mock
 
@@ -484,6 +485,22 @@ class TestPreprocessorSetJobsSetups:
                            match=r'Colon operator found '
                                   'in matrix expansion key.'):  # noqa: E127
             _ = preprocessor.Preprocessor(input_file=p)
+
+    def test_output_table_correctly(self, tmp_path):
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
+        utilities.write_set_to_file(
+            f, [{'f_bedload': 0.77, 'u0': 1, 'C0_percent': 0.033}])
+        f.close()
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=3)
+
+        # now check what the file looks like
+        with open(os.path.join(
+                tmp_path, 'test', 'jobs_parameters.txt'), 'r') as tbl:
+            Lines = tbl.readlines()
+
+        assert Lines[0] == 'job_id, f_bedload, u0, C0_percent\n'
 
 
 class TestPreprocessorEnsembleJobsSetups:

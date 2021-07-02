@@ -395,7 +395,8 @@ class BasePreprocessor(abc.ABC):
         #   Python preprocessing / postprocessing
         matrix_table_file = os.path.join(
             self._jobs_root, 'jobs_parameters.txt')
-        self._matrix_table_header = ', '.join(['job_id', *set0_set])
+        self._matrix_table_header = ', '.join(
+            ['job_id', *[i for i in _set[0].keys()]])
         np.savetxt(matrix_table_file, self._matrix_table,
                    fmt='%s', delimiter=',', comments='',
                    header=self._matrix_table_header)
