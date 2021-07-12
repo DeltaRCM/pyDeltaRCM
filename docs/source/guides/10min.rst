@@ -31,9 +31,9 @@ So, we simply create a `for` loop, and call the `update` function, and then wrap
 .. code:: python
 
     >>> for _ in range(0, 5):
-    ...     delta.update()
+    ...     default_delta.update()
 
-    >>> delta.finalize()
+    >>> default_delta.finalize()
 
 That's it! You ran the pyDeltaRCM model for five timesteps, with just five lines of code. 
 
@@ -54,13 +54,21 @@ The model with set parameters
 -----------------------------
 
 To run a simulation with a non-default set of parameters, we use a configuration file written in the YAML markup language named `10min_tutorial.yaml`.
-For example, we can specify where we would like the output file to be placed with the `out_dir` parameter, ensure that our simulation is easily reproducible by setting the random `seed` parameter, and examine what is the effect of a high fraction of bedload:
+This markup file allows us to specify model boundary conditions and input and output settings. 
+Anything you set in this file will override the :doc:`default parameters <../reference/model/yaml_defaults>` for the model.
+
+The YAML configuration file is central to managing *pyDeltaRCM* simulations, so we did not create this file for you; you will need to create the YAML file yourself.
+To create the YAML file, open up your favorite plain-text editing application (e.g., gedit, notepad).
+YAML syntax is pretty simple for basic configurations, essentially amounting to each line representing a parameter-value pair, separated by a colon.
+For this example, let's specify three simulation controls: where we want the output file to be placed via the `out_dir` parameter, we will ensure that our simulation is easily reproducible by setting the random `seed` parameter, and we can examine what is the effect of a high fraction of bedload with the `f_bedload` parameter.
+Enter the following in your text editor, and save the file as ``10min_tutorial.yaml``, making sure to place the file in a location accessible to your interpreter.
 
 .. code:: yaml
 
     out_dir: '10min_tutorial'
     seed: 451220118313
     f_bedload: 0.9
+
 
 Now, we can create a second instance of the :obj:`~pyDeltaRCM.model.DeltaModel()`, this time using the input yaml file.
 
