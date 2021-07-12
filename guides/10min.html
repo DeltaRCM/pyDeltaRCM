@@ -66,9 +66,9 @@ The default options are a reasonable set for exploring some controls of the mode
 <p>The delta model is run forward with a call to the <code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code> method.
 So, we simply create a <cite>for</cite> loop, and call the <cite>update</cite> function, and then wrap everything up with a call to <code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code> the model:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">delta</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">default_delta</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">default_delta</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>That’s it! You ran the pyDeltaRCM model for five timesteps, with just five lines of code.</p>
@@ -88,7 +88,13 @@ So, we simply create a <cite>for</cite> loop, and call the <cite>update</cite> f
 <section id="the-model-with-set-parameters">
 <h2>The model with set parameters<a class="headerlink" href="#the-model-with-set-parameters" title="Permalink to this headline">¶</a></h2>
 <p>To run a simulation with a non-default set of parameters, we use a configuration file written in the YAML markup language named <cite>10min_tutorial.yaml</cite>.
-For example, we can specify where we would like the output file to be placed with the <cite>out_dir</cite> parameter, ensure that our simulation is easily reproducible by setting the random <cite>seed</cite> parameter, and examine what is the effect of a high fraction of bedload:</p>
+This markup file allows us to specify model boundary conditions and input and output settings.
+Anything you set in this file will override the <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">default parameters</span></a> for the model.</p>
+<p>The YAML configuration file is central to managing <em>pyDeltaRCM</em> simulations, so we did not create this file for you; you will need to create the YAML file yourself.
+To create the YAML file, open up your favorite plain-text editing application (e.g., gedit, notepad).
+YAML syntax is pretty simple for basic configurations, essentially amounting to each line representing a parameter-value pair, separated by a colon.
+For this example, let’s specify three simulation controls: where we want the output file to be placed via the <cite>out_dir</cite> parameter, we will ensure that our simulation is easily reproducible by setting the random <cite>seed</cite> parameter, and we can examine what is the effect of a high fraction of bedload with the <cite>f_bedload</cite> parameter.
+Enter the following in your text editor, and save the file as <code class="docutils literal notranslate"><span class="pre">10min_tutorial.yaml</span></code>, making sure to place the file in a location accessible to your interpreter.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;10min_tutorial&#39;</span>
 <span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">451220118313</span>
 <span class="nt">f_bedload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.9</span>
@@ -150,7 +156,7 @@ For example, we can specify where we would like the output file to be placed wit
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -179,7 +185,7 @@ For example, we can specify where we would like the output file to be placed wit
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.0.
     </div>
   </body>
 </html>
