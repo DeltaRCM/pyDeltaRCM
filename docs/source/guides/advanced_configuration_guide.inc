@@ -19,7 +19,7 @@ To use matrix expansion to configure multiple model runs, the dimensions of the 
 .. code:: yaml
 
     out_dir: 'out_dir'
-    dx: 2.0
+    dx: 40.0
     h0: 1.0
 
     matrix:
@@ -124,6 +124,10 @@ Customizing model operations with subclasses and hooks
 The :obj:`~pyDeltaRCM.DeltaModel` is designed for flexibility and extension by users, and to support arbitrary and imaginative changes to the model routine.
 For example, one could easily extend the model to include additional delta controls (such as vegetation or permafrost development), or modify the model domain boundary conditions (such as imposing a sloped receiving basin).
 This flexibility is achieved by "subclassing" the `DeltaModel` to create a custom model object, and using "hooks" in the model to achieve the desired modifications.
+
+.. important::
+
+    If you plan to customize the model, but did not follow the :ref:`developer installation instructions <dev-install>`, you should return an follow those instructions now.
 
 Subclassing is a standard concept in object-oriented programming, whereby a `subclass` obtains all the functionality of the `parent` object, and then adds/modifies existing functionality of the parent, to create a new class of object (i.e., the `subclass`).
 To subclass the :obj:`~pyDeltaRCM.model.DeltaModel` we simply create a new Python object class, which inherits from the model class:
