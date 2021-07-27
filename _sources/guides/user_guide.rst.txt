@@ -88,7 +88,7 @@ Putting the above snippets together gives a complete **minimum working example s
 
 .. code-block:: python
 
-    >>> mdl = DeltaModel()
+    >>> mdl = pyDeltaRCM.DeltaModel()
 
     >>> for _ in range(0, 5):
     ...    mdl.update()
@@ -103,8 +103,8 @@ Configuring an input YAML file
 ==============================
 
 The configuration for a pyDeltaRCM run is set up by a parameter set, usually described in the ``YAML`` markup format.
-To configure a run, you should create a file called, for example, ``run_parameters.yml``.
-Inside this file you can specify parameters for your run, with each parameter on a new line. For example, if ``run_parameters.yml`` contained the line:
+To configure a run, you should create a file called, for example, ``model_configuration.yml``.
+Inside this file you can specify parameters for your run, with each parameter on a new line. For example, if ``model_configuration.yml`` contained the line:
 
 .. code-block:: yaml
 
@@ -125,7 +125,7 @@ Starting model runs
 There are two API levels at which you can interact with the pyDeltaRCM model.
 There is a "high-level" model API, which takes as argument a YAML configuration file, and will compose a list of jobs as indicated in the YAML file; the setup can be configured to automatically execute the job list, as well.
 The "low-level" API consists of creating a model instance from a YAML configuration file and manually handling the timestepping, or optionally, augmenting operations of the model to implement new features.
-
+Generally, if you are modifying the model source code or doing anything non-standard with your simulation runs, you will want to use the low-level API. The high-level API is extremely helpful for exploring parameter spaces.
 
 
 .. _high_level_api:
@@ -139,8 +139,8 @@ For the following high-level API demonstrations, consider a YAML input file name
 
 .. code-block:: yaml
 
-    Length: 5000
-    Width: 2000
+    S0: 0.005
+    seed: 42
     timesteps: 500
 
 
@@ -248,7 +248,7 @@ The simplest case to use the low-level API is to do
 
 .. code::
 
-    >>> delta = DeltaModel(input_file='model_configuration.yml')
+    >>> delta = pyDeltaRCM.DeltaModel(input_file='model_configuration.yml')
 
     >>> for _ in range(0, 5000):
     ...    delta.update()
@@ -261,7 +261,7 @@ For example:
 
 .. code::
 
-    >>> delta = DeltaModel(input_file='model_configuration.yml',
+    >>> delta = pyDeltaRCM.DeltaModel(input_file='model_configuration.yml',
     ...                    SLR=1e-9)
 
 

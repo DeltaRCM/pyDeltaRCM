@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>User Guide &#8212; pyDeltaRCM 2.0.1 documentation</title>
+    <title>User Guide &#8212; pyDeltaRCM 2.0.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="10min.html" title="10-minute tutorial"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
       </ul>
     </div>  
@@ -99,7 +99,7 @@ We use the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.
 <p>Specifically, calling <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.finalize" title="pyDeltaRCM.model.DeltaModel.finalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code></a> will ensure that any data output during the model run to the <a class="reference internal" href="../info/outputfile.html"><span class="doc">output NetCDF4 file</span></a> is correctly saved to the disk and does not become corrupted while the script is exiting.
 Note that the output file is periodically saved during the model run, so things might be okay if you forget to <code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code> at the end of your simulation, but it is considered a best practice to explicitly close the output file with <code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code>.</p>
 <p>Putting the above snippets together gives a complete <strong>minimum working example script</strong>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span> <span class="o">=</span> <span class="n">DeltaModel</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">()</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
 <span class="gp">... </span>   <span class="n">mdl</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
@@ -112,8 +112,8 @@ Note that the output file is periodically saved during the model run, so things 
 <section id="configuring-an-input-yaml-file">
 <h2>Configuring an input YAML file<a class="headerlink" href="#configuring-an-input-yaml-file" title="Permalink to this headline">¶</a></h2>
 <p>The configuration for a pyDeltaRCM run is set up by a parameter set, usually described in the <code class="docutils literal notranslate"><span class="pre">YAML</span></code> markup format.
-To configure a run, you should create a file called, for example, <code class="docutils literal notranslate"><span class="pre">run_parameters.yml</span></code>.
-Inside this file you can specify parameters for your run, with each parameter on a new line. For example, if <code class="docutils literal notranslate"><span class="pre">run_parameters.yml</span></code> contained the line:</p>
+To configure a run, you should create a file called, for example, <code class="docutils literal notranslate"><span class="pre">model_configuration.yml</span></code>.
+Inside this file you can specify parameters for your run, with each parameter on a new line. For example, if <code class="docutils literal notranslate"><span class="pre">model_configuration.yml</span></code> contained the line:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">S0</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.005</span>
 <span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">42</span>
 </pre></div>
@@ -127,13 +127,14 @@ Default values of the YAML configuration are listed in the <a class="reference i
 <h2>Starting model runs<a class="headerlink" href="#starting-model-runs" title="Permalink to this headline">¶</a></h2>
 <p>There are two API levels at which you can interact with the pyDeltaRCM model.
 There is a “high-level” model API, which takes as argument a YAML configuration file, and will compose a list of jobs as indicated in the YAML file; the setup can be configured to automatically execute the job list, as well.
-The “low-level” API consists of creating a model instance from a YAML configuration file and manually handling the timestepping, or optionally, augmenting operations of the model to implement new features.</p>
+The “low-level” API consists of creating a model instance from a YAML configuration file and manually handling the timestepping, or optionally, augmenting operations of the model to implement new features.
+Generally, if you are modifying the model source code or doing anything non-standard with your simulation runs, you will want to use the low-level API. The high-level API is extremely helpful for exploring parameter spaces.</p>
 <section id="high-level-model-api">
 <span id="high-level-api"></span><h3>High-level model API<a class="headerlink" href="#high-level-model-api" title="Permalink to this headline">¶</a></h3>
 <p>The high-level API is accessed via either a shell prompt or python script, and handles setting up the model configuration and running the model a specified duration.</p>
 <p>For the following high-level API demonstrations, consider a YAML input file named <code class="docutils literal notranslate"><span class="pre">model_configuration.yml</span></code> which looks like:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">Length</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5000</span>
-<span class="nt">Width</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2000</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">S0</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.005</span>
+<span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">42</span>
 <span class="nt">timesteps</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">500</span>
 </pre></div>
 </div>
@@ -215,7 +216,7 @@ $ pyDeltaRCM --config model_configuration.yml --timesteps <span class="m">5000</
 <p>The low-level API is the same as that described at the beginning of this guide.
 Interact with the model by creating your own script, and manipulating model outputs at the desired level.
 The simplest case to use the low-level API is to do</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span> <span class="o">=</span> <span class="n">DeltaModel</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="s1">&#39;model_configuration.yml&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="s1">&#39;model_configuration.yml&#39;</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5000</span><span class="p">):</span>
 <span class="gp">... </span>   <span class="n">delta</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
@@ -226,7 +227,7 @@ The simplest case to use the low-level API is to do</p>
 <p>However, you can also inspect/modify the <code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code> method, and change the order of operations, or add operations, as desired; see the <a class="reference internal" href="#customize-the-model"><span class="std std-ref">guide to customizing the model</span></a> below.
 If you are working with the low-level API, you can optionally pass any valid key in the YAML configuration file as a keyword argument during model instantiation.
 For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span> <span class="o">=</span> <span class="n">DeltaModel</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="s1">&#39;model_configuration.yml&#39;</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="s1">&#39;model_configuration.yml&#39;</span><span class="p">,</span>
 <span class="gp">... </span>                   <span class="n">SLR</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -243,7 +244,7 @@ See <a class="reference internal" href="#customize-the-model"><span class="std s
 <span id="matrix-expansion-tag"></span><h4>Matrix expansion<a class="headerlink" href="#matrix-expansion" title="Permalink to this headline">¶</a></h4>
 <p>To use matrix expansion to configure multiple model runs, the dimensions of the matrix (i.e., the variables you want to run) should be listed below the <cite>matrix</cite> key. For example, the following configuration is a one-dimensional matrix with the variable <cite>f_bedload</cite>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;out_dir&#39;</span>
-<span class="nt">dx</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="nt">dx</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">40.0</span>
 <span class="nt">h0</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
 
 <span class="nt">matrix</span><span class="p">:</span>
@@ -330,6 +331,10 @@ Note that, <cite>matrix</cite> specification is not supported with the <cite>set
 <p id="customize-the-model">The <code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel</span></code> is designed for flexibility and extension by users, and to support arbitrary and imaginative changes to the model routine.
 For example, one could easily extend the model to include additional delta controls (such as vegetation or permafrost development), or modify the model domain boundary conditions (such as imposing a sloped receiving basin).
 This flexibility is achieved by “subclassing” the <cite>DeltaModel</cite> to create a custom model object, and using “hooks” in the model to achieve the desired modifications.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If you plan to customize the model, but did not follow the <a class="reference internal" href="../meta/installing.html#dev-install"><span class="std std-ref">developer installation instructions</span></a>, you should return an follow those instructions now.</p>
+</div>
 <p>Subclassing is a standard concept in object-oriented programming, whereby a <cite>subclass</cite> obtains all the functionality of the <cite>parent</cite> object, and then adds/modifies existing functionality of the parent, to create a new class of object (i.e., the <cite>subclass</cite>).
 To subclass the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel" title="pyDeltaRCM.model.DeltaModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel</span></code></a> we simply create a new Python object class, which inherits from the model class:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -571,13 +576,13 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
         <li class="right" >
           <a href="10min.html" title="10-minute tutorial"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>

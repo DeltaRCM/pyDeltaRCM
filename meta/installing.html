@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Installing &#8212; pyDeltaRCM 2.0.1 documentation</title>
+    <title>Installing &#8212; pyDeltaRCM 2.0.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="../index.html" title="Welcome to the PyDeltaRCM documentation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Installing</a></li> 
       </ul>
     </div>  
@@ -45,27 +45,33 @@
             
   <section id="installing">
 <h1>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h1>
-<p>We recommend installing pyDeltaRCM in a virtual environment.
-That said, <em>pyDeltaRCM</em> depends on a small number of packages (<a class="reference internal" href="#dependencies-list"><span class="std std-ref">list of dependencies</span></a>), many of which are likely already in a Python user/developer’s regular use, so it’s probably safe to install it in your base environment, too.</p>
+<p>We recommend installing <em>pyDeltaRCM</em> in a virtual environment.
+That said, <em>pyDeltaRCM</em> depends on a small number of packages (<a class="reference internal" href="#dependencies-list"><span class="std std-ref">list of dependencies</span></a>), many of which are likely already in a Python user/developer’s regular use, so it’s probably safe to install <em>pyDeltaRCM</em> in your base environment, too.</p>
 <section id="id1">
 <h2>Installing<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>We describe installation flavors for both users and developers below.</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
-<p>If you are looking to make any modifications to the code base, you should follow the developer instructions.</p>
+<p>If you are looking to make any modifications to the model source code, you should follow the developer instructions.</p>
 </div>
 <p>We suggest using the Anaconda Python distribution, which you can obtain via <a class="reference external" href="https://www.anaconda.com/products/individual">the project website</a>.</p>
 <p>Before proceeding, you may wish to create a virtual environment for the <em>pyDeltaRCM</em> project.
-With Anaconda:</p>
+With Anaconda on Linux:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda create -n deltarcm
+<span class="gp">$ </span>conda activate deltarcm
 </pre></div>
 </div>
-<p>See <a class="reference external" href="https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment">this helpful guide</a> for creating virtual environments with <cite>venv</cite> if you do not use Anaconda.</p>
+<p>For more informtaion, see <a class="reference external" href="https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment">this guide</a> for help on creating and activating a virtual environment with Anaconda on other platforms.
+See <a class="reference external" href="https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment">this guide</a> for creating virtual environments with <cite>venv</cite> if you do not use Anaconda.</p>
 <section id="user-installation">
 <h3>User installation<a class="headerlink" href="#user-installation" title="Permalink to this headline">¶</a></h3>
 <p>For a user installation, simply install from the pypi package repository:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip install pyDeltaRCM
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You may need to <a class="reference external" href="https://pip.pypa.io/en/stable/installing/">first install</a> <cite>pip</cite>.</p>
 </div>
 </section>
 <section id="developer-installation">
@@ -76,7 +82,8 @@ This will allow you to submit suggestions and contribute to <em>pyDeltaRCM</em>.
 <p class="admonition-title">Note</p>
 <p>You do not <em>need</em> to create a fork if your are just testing, but it may save you time and headache down the road. If you choose not to, just use the main repository url below (<a class="reference external" href="https://github.com/DeltaRCM/pyDeltaRCM.git">https://github.com/DeltaRCM/pyDeltaRCM.git</a>).</p>
 </div>
-<p>First download or clone your fork of the project:</p>
+<p>First, you will need to <a class="reference external" href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">install git</a>  if you do not already have it.
+Then, download or clone your fork of the project:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git clone https://github.com/&lt;your-username&gt;/pyDeltaRCM.git
 </pre></div>
 </div>
@@ -178,13 +185,13 @@ This will allow you to submit suggestions and contribute to <em>pyDeltaRCM</em>.
         <li class="right" >
           <a href="../index.html" title="Welcome to the PyDeltaRCM documentation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Installing</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>
