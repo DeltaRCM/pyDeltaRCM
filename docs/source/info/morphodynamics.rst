@@ -158,8 +158,8 @@ The impact of topographic diffusion is minor compared to the bed elevation chang
 Notes for modeling best practices
 =================================
 
-* Stop simulations before the delta reaches the edge of the computational domain. If a distributary channel reaches the domain edge, this channel is likely to become locked in place, and will convey sediment outside the computational domain, thus violating any statements of mass conservation. Generally, simulations that reach the edge of the domain should be discarded. 
-* Stop simulations before the delta reaches a grade condition, where the topset slope is equal to background slope `S0`. This is really only an issue for large domains run for long duration.
+* Stop simulations before the delta reaches the edge of the computational domain. Delta channel dynamics are changed when a distributary channel reaches the domain edge, because sediment is conveyed to outside the computational domain where it no longer feeds back on channel development. Channels become "locked" in place in this scenario [2]_, because the domain edge is an infinite sediment sink, and therefore rendering invalid any assumptions about stationarity of delta dynamics and/or stratigraphy. Moreover, the downstream water surface boundary condition (`H_SL`) will be violated if a channel reaches the domain edge. Generally, simulations that reach the edge of the domain should be discarded.
+* Stop simulations before the delta reaches a condition where the topset slope is equal to the background slope parameter (`S0`). When the background slope is reached, the transport capacity of sediment through the delta is diminished such that channels "clog" up and trigger model instabilities. This is really only an issue for large domains run for long duration.
 * Use a sufficient number of water and sediment parcels (> 2000). Too few parcels will result in a rough water surface, irregular sediment deposition, and a rough bed elevation.
 
 
@@ -170,3 +170,6 @@ References
 .. [1] A reduced-complexity model for river delta formation – Part 1: Modeling
        deltas with channel dynamics, M. Liang, V. R. Voller, and C. Paola, Earth
        Surf. Dynam., 3, 67–86, 2015. https://doi.org/10.5194/esurf-3-67-2015
+
+.. [2] Liang, M., Kim, W., and Passalacqua, P. (2016), How much subsidence is
+       enough to change the morphology of river deltas?, Geophysical Research Letters, 43, 10,266--10,276, doi:10.1002/2016GL070519.
