@@ -138,10 +138,10 @@ class init_tools(abc.ABC):
                     input_file_vars[k] = user_dict[k]
                 else:
                     raise TypeError(f'Input for {str(k)} not of the '
-                                    'right type in yaml configuration '
-                                    'file {self.input_file}. '
-                                    'Input type was {type(k).__name__}, '
-                                    'but needs to be {expected_type}.')
+                                    f'right type in yaml configuration '
+                                    f'file {self.input_file}. '
+                                    f'Input type was {type(k).__name__}, '
+                                    f'but needs to be {expected_type}.')
             else:
                 input_file_vars[k] = default_dict[k]['default']
 
@@ -164,10 +164,10 @@ class init_tools(abc.ABC):
                     input_file_vars[k] = user_dict[k]
                 else:
                     raise TypeError(f'Input for {str(k)} not of the '
-                                    'right type in yaml configuration '
-                                    'file {self.input_file}. '
-                                    'Input type was {type(k).__name__}, '
-                                    'but needs to be {expected_type}.')
+                                    f'right type in yaml configuration '
+                                    f'file {self.input_file}. '
+                                    f'Input type was {type(k).__name__}, '
+                                    f'but needs to be {expected_type}.')
             else:
                 # set using default value
                 input_file_vars[k] = v['default']
