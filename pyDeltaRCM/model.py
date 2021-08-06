@@ -1224,7 +1224,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         stepmax is the maximum number of jumps a parcel (water or sediment)
         can make. If the parcel reaches the oceanic boundary before stepmax is
         reached, then this condition is not invoked. However if the parcel
-        does not reach the oceaninc bounary but does reach "stepmax" jumps,
+        does not reach the oceanic bounary but does reach "stepmax" jumps,
         then the parcel will just stop moving and disappear.
 
         If stepmax is not specified in the yaml, the default value assigned

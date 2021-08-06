@@ -35,7 +35,11 @@ So, we simply create a `for` loop, and call the `update` function, and then wrap
 
     >>> default_delta.finalize()
 
-That's it! You ran the pyDeltaRCM model for five timesteps, with just five lines of code. 
+.. note::
+
+    Additional calls to update the model can be called up until the model is finalized.
+
+That's it! You ran the pyDeltaRCM model for five timesteps, with just five lines of code.
 
 We can visualize the delta bed elevation, though it's not very exciting after only five timesteps...
 
@@ -54,7 +58,7 @@ The model with set parameters
 -----------------------------
 
 To run a simulation with a non-default set of parameters, we use a configuration file written in the YAML markup language named `10min_tutorial.yaml`.
-This markup file allows us to specify model boundary conditions and input and output settings. 
+This markup file allows us to specify model boundary conditions and input and output settings.
 Anything you set in this file will override the :doc:`default parameters <../reference/model/yaml_defaults>` for the model.
 
 The YAML configuration file is central to managing *pyDeltaRCM* simulations, so we did not create this file for you; you will need to create the YAML file yourself.
