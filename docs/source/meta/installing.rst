@@ -26,7 +26,7 @@ With Anaconda on Linux:
     $ conda activate deltarcm
 
 For more informtaion, see `this guide <https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment>`_ for help on creating and activating a virtual environment with Anaconda on other platforms.
-See `this guide <https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment>`_ for creating virtual environments with `venv` if you do not use Anaconda.
+See `this helpful guide <https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment>`_ for creating virtual environments with `venv` if you do not use Anaconda.
 
 
 User installation
