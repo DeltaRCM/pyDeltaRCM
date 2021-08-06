@@ -18,17 +18,33 @@ In this documentation, we focus on the details of *model implementation*, rather
 Sediment Transport
 ==================
 
-.. note::
-   Incomplete.
+Sediment transport in the model is computed according to an excess stress approach.
+Conceptually, sand is routed as bed-material load, and mud is routed as fully suspended load.
+
+For sand parcels, the *transport capacity* is determined by the scaling between sediment flux and flow velocity, and takes the form of the Meyer-Peter and Müller (1948) [3]_ formula:
+
+.. math::
+
+      q_{s\_cap} = q_{s0} \frac{u^\beta_{loc}}{u^\beta_0},
+
+where :math:`u_{loc}` is the depth averaged flow velocity in the cell, :math:`beta` is an exponent set to 3 by default (:obj:`~pyDeltaRCM.model.DeltaModel.beta`), and :math:`q_{s0}` is the unit-width upstream sand flux input at the inlet channel.
+At each step of the model domain, sand is either eroded or deposited to the bed depending on the local flow velocity :math:`u_{loc}` and local sediment transport :math:`q_{s\_loc}`. 
+Sand is deposited where local transport (i.e., the sand put into that cell from upstream) is greater than the cell transport capacity :math:`q_{s\_loc} > q_{s\_cap}`.
+Sand is eroded from the bed when the local velocity is greater than the threshold erosion velocity (:obj:`~pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand`) **and** the local transport is less than the local transport capacity.
+
+
+Mud parcels do not have any local capacity (i.e., fully suspended washload transport). 
+At each parcel step, mud is either eroded or deposited (or neither), depending on the relative value of local flow velocity :math:`u_{loc}` and the threshold erosion and deposition values (:obj:`~pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud` and :obj:`~pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud`).
+
+.. note:: 
+
+      A complete conceptual description of sediment erosion and deposition routing rules can be found in the original DeltaRCM reference Liang et al., 2015 [1]_.
 
 
 .. _sediment-routing-weighting:
 
 Sediment routing weighting
 --------------------------
-
-.. note::
-   Incomplete.
 
 Sediment routing probability for a given cell :math:`j` to neighbor cell :math:`i` is computed according to:
 
@@ -173,3 +189,6 @@ References
 
 .. [2] Liang, M., Kim, W., and Passalacqua, P. (2016), How much subsidence is
        enough to change the morphology of river deltas?, Geophysical Research Letters, 43, 10,266--10,276, doi:10.1002/2016GL070519.
+
+.. [3] Meyer-Peter, E. and Müller, R.: Formulas for bed-load transport, in: 
+       Proceedings of the 2nd Meeting of IAHSR, Stockholm, Sweden, 39–64, 1948.
