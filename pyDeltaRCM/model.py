@@ -234,6 +234,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             self.output_netcdf.close()
             _msg = 'Closed output NetCDF4 file'
             self.log_info(_msg, verbosity=1)
+        except AttributeError:
+            self.log_info('No output NetCDF4 file to close.')
         except Exception as e:
             self.logger.error('Failed to close output NetCDF4 file')
             self.logger.exception(e)
