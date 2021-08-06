@@ -38,7 +38,7 @@ Each folder will contain a copy of the configuration file used for that job; for
     h0: 1.0
     f_bedload: 0.5
 
-Additionally, a log file for each job is located in the output folder, and any output grid files or images specified by the input configuration will be located in the respective job output folder.
+Additionally, a log file for each job is located in the output folder, and any output grid files or images specified by the input configuration will be located in the respective job output folder (note: there is no output NetCDF4 file for these runs).
 
 .. note:: You must specify the `out_dir` key in the input YAML configuration to use matrix expansion.
 

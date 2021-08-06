@@ -423,7 +423,7 @@ class TestFinalize:
 
         # assert calls
         #  should hit all options since no saves
-        assert _delta.log_info.call_count == 1
+        assert _delta.log_info.call_count == 2
 
         # these were originally included in `finalize`, but no longer.
         #   the checks for no call are here to ensure we don't revert

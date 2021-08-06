@@ -303,7 +303,7 @@ class TestTimingOutputData:
 
         # assert calls
         #   should only hit top-levels
-        assert _delta.log_info.call_count == 1
+        assert _delta.log_info.call_count == 2
         assert _delta.output_data.call_count == 0
         assert _delta.output_checkpoint.call_count == 0
 
