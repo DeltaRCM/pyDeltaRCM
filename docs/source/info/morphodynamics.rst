@@ -81,7 +81,7 @@ where :math:`\Delta V` is the volume of sediment to be eroded or deposited from 
 
 .. note::
 
-    Total sediment mass is preserved, but individual categories of sand and mud are not. I.e., it is assumed that there is an infinite supply of sand and/or mud to erode and entrain at any location in the model domain.
+    Total sediment mass is preserved during erosion, but individual categories of sand and mud are not. I.e., it is assumed that there is an infinite supply of sand and/or mud to erode and entrain at any location in the model domain.
 
 Following a change in the bed elevation, the local flow depth is updated and then local flow velocity is updated according to fluid mass conservation (i.e., ``uw = qw / h``; :obj:`~sed_tools.BaseRouter._update_fields`; [1]_).
 
