@@ -71,6 +71,10 @@ So, we simply create a <cite>for</cite> loop, and call the <cite>update</cite> f
 <span class="gp">&gt;&gt;&gt; </span><span class="n">default_delta</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Additional calls to update the model can be called up until the model is finalized.</p>
+</div>
 <p>That’s it! You ran the pyDeltaRCM model for five timesteps, with just five lines of code.</p>
 <p>We can visualize the delta bed elevation, though it’s not very exciting after only five timesteps…</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>

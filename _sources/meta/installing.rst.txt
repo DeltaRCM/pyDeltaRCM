@@ -22,7 +22,7 @@ With Anaconda on Linux:
 
 .. code:: console
 
-    $ conda create -n deltarcm
+    $ conda create -n deltarcm python=3
     $ conda activate deltarcm
 
 For more informtaion, see `this guide <https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment>`_ for help on creating and activating a virtual environment with Anaconda on other platforms.
@@ -102,6 +102,4 @@ Dependencies
 ============
 
 .. literalinclude:: ../../../requirements.txt
-   :linenos: 
-
-
+   :linenos:
