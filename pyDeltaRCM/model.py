@@ -1221,22 +1221,23 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @property
     def stepmax(self):
         """
-        stepmax is the maximum number of jumps a parcel can make.
+        `stepmax` is the maximum number of jumps a parcel can make.
 
-        stepmax is the maximum number of jumps a parcel (water or sediment)
-        can make. If the parcel reaches the oceanic boundary before stepmax is
-        reached, then this condition is not invoked. However if the parcel
-        does not reach the oceanic bounary but does reach "stepmax" jumps,
-        then the parcel will just stop moving and disappear.
+        The maximum number of jumps a parcel (water or sediment) can take is
+        determined by `stepmax`. If the parcel reaches the oceanic boundary
+        before `stepmax` is reached, then this condition is not invoked.
+        However if the parcel does not reach the oceanic bounary but does
+        reach `stepmax` jumps, then the parcel will just stop moving and
+        disappear.
 
-        If stepmax is not specified in the yaml, the default value assigned
+        If `stepmax` is not specified in the yaml, the default value assigned
         is 2 times the perimeter of the domain (2 * (self.L + self.W)).
 
         .. note::
-           If stepmax is set too low and many parcels reach the stepmax
+           If `stepmax` is set too low and many parcels reach the `stepmax`
            condition during routing, then there may be a considerable
            amount of sediment 'missing' from the system as any sediment in
-           a parcel that hits the stepmax threshold disappears from the
+           a parcel that hits the `stepmax` threshold disappears from the
            simulation.
         """
         return self._stepmax
