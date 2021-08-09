@@ -1,11 +1,13 @@
-******************
-Output File Format
-******************
+=================
+Model Output File
+=================
 
-Model outputs are saved using the `netCDF4 <http://unidata.github.io/netcdf4-python/>`_ file format.
+If configured to save any output data, model outputs are saved using the `netCDF4 <http://unidata.github.io/netcdf4-python/>`_ file format.
+
 
 Gridded Variables
------------------
+=================
+
 In any given run, the saving parameters "save_<var>_grids" control whether or
 not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file.
 In the netCDF4 file, a 3-D array with the dimensions
@@ -13,8 +15,10 @@ In the netCDF4 file, a 3-D array with the dimensions
 to be saved. The appropriate units for these variables are stored as well,
 such as "meters per second" for the *velocity* grid.
 
+
 Grid Coordinates
-----------------
+================
+
 To save the model information associated with the domain itself, variables
 associated with the grid are saved as well. These are the meshed 2-D grids
 corresponding to the distance of each cell from the boundary in the "Width"
@@ -23,8 +27,10 @@ boundary of each cell in the "Length" dimension, as *y* in meters. Similarly, a
 *time* variable is stored which is a 1-D array (vector) holding the model time
 values in seconds, associated with each set of saved output data.
 
+
 Model Metadata
---------------
+==============
+
 In addition to the grid coordinates, model metadata is saved as a group of
 1-D arrays (vectors) and 0-D arrays (floats and integers). The values that are
 saved as metadata are the following:
@@ -39,11 +45,13 @@ saved as metadata are the following:
 - Sediment concentration: `C0_percent`
 - Characteristic Velocity: `u0`
 - If subsidence is enabled:
-   - Subsidence start time: `start_subsidence`
-   - Subsidence rate: `sigma`
+  - Subsidence start time: `start_subsidence`
+  - Subsidence rate: `sigma`
+
 
 Working with Model Outputs
---------------------------
+==========================
+
 The resulting netCDF4 output file can be read using any netCDF4-compatible
 library. These libraries range from the
 `netCDF4 Python package <https://github.com/Unidata/netcdf4-python>`_ itself,
@@ -52,3 +60,24 @@ to higher-level libraries such as
 *pyDeltaRCM*, there is also a package under development called
 `DeltaMetrics <https://github.com/DeltaRCM/DeltaMetrics>`_,
 that is being designed to help post-process and analyze *pyDeltaRCM* outputs.
+
+
+Here, we show how to read the output NetCDF file with Python package ``netCDF4``.
+
+.. code::
+
+   import netCDF4 as nc
+
+   data = nc.Dataset('pyDeltaRCM_output.nc')  # the output file path!
+
+This `data` object is a `Dataset` object that can be sliced the same was as a `numpy` array.
+For example, we can slice the final bed elevation and velocity of a model run:
+
+.. code::
+
+   final_bed_elevation = data['eta'][-1, :, :]
+   final_velocity = data['velocity'][-1, :, :]
+
+These slices look like this, if we were to plot them.
+
+.. plot:: guides/output_file.py

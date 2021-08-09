@@ -122,6 +122,14 @@ Inside this file you can specify parameters for your run, with each parameter on
 Multiple parameters can be specified line by line.</p>
 <p>Default values are substituted for any parameter not explicitly given in the <code class="docutils literal notranslate"><span class="pre">input_file</span></code> <code class="docutils literal notranslate"><span class="pre">.yml</span></code> file.
 Default values of the YAML configuration are listed in the <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">Default Model Variable Values</span></a>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The best practice for model configurations is to create a YAML file with only the settings you want to change specified. Hint: comment a line out with <code class="docutils literal notranslate"><span class="pre">#</span></code> so it will not be used in the model.</p>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Check the model log files to make sure your configuration was interpreted as you  expected!</p>
+</div>
 </section>
 <section id="starting-model-runs">
 <h2>Starting model runs<a class="headerlink" href="#starting-model-runs" title="Permalink to this headline">¶</a></h2>
@@ -306,6 +314,10 @@ The ensemble expansion can be applied to configuration files that include a matr
 </pre></div>
 </div>
 <p>The above configuration file would produce 6 model runs, 3 with a basin depth (<cite>h0</cite>) of 1.0, and 3 with a basin depth of 2.0.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>If you are debugging and experimenting, it may be helpful to comment out a line in your YAML, rather than deleting it completely! E.g., <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">ensemble:</span> <span class="pre">3</span></code>) would disable ensemble expansion.</p>
+</div>
 </section>
 <section id="set-expansion">
 <span id="set-expansion-tag"></span><h4>Set expansion<a class="headerlink" href="#set-expansion" title="Permalink to this headline">¶</a></h4>
@@ -456,7 +468,80 @@ parameters:</p>
 <h3>Advanced Subsidence Configurations<a class="headerlink" href="#advanced-subsidence-configurations" title="Permalink to this headline">¶</a></h3>
 <p>Subsidence behavior can be easily modified by <a class="reference internal" href="#customize-the-model"><span class="std std-ref">creating a subclass</span></a> and overwriting the <a class="reference internal" href="../reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_subsidence" title="pyDeltaRCM.init_tools.init_tools.init_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_subsidence</span></code></a> or <a class="reference internal" href="../reference/iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_subsidence</span></code></a> methods, or even more simply the relevant model hooks.</p>
 <p>An example of using subclassing to create a model setup with subsidence confined to only part of the model domain is included in the documentation:</p>
-<p><a class="reference internal" href="../examples/subsidence_region.html"><span class="doc">Constraining subsidence to part of the domain</span></a></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../examples/subsidence_region.html"><span class="doc">Constraining subsidence to part of the domain</span></a></p></li>
+</ul>
+</section>
+</section>
+<section id="model-output-file">
+<h2>Model Output File<a class="headerlink" href="#model-output-file" title="Permalink to this headline">¶</a></h2>
+<p>If configured to save any output data, model outputs are saved using the <a class="reference external" href="http://unidata.github.io/netcdf4-python/">netCDF4</a> file format.</p>
+<section id="gridded-variables">
+<h3>Gridded Variables<a class="headerlink" href="#gridded-variables" title="Permalink to this headline">¶</a></h3>
+<p>In any given run, the saving parameters “save_&lt;var&gt;_grids” control whether or
+not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file.
+In the netCDF4 file, a 3-D array with the dimensions
+<em>time</em> x <em>length</em> x <em>width</em> is created for each 2-D grid variable that is set
+to be saved. The appropriate units for these variables are stored as well,
+such as “meters per second” for the <em>velocity</em> grid.</p>
+</section>
+<section id="grid-coordinates">
+<h3>Grid Coordinates<a class="headerlink" href="#grid-coordinates" title="Permalink to this headline">¶</a></h3>
+<p>To save the model information associated with the domain itself, variables
+associated with the grid are saved as well. These are the meshed 2-D grids
+corresponding to the distance of each cell from the boundary in the “Width”
+dimension of the domain, <em>x</em> in meters. As well as the distance away from the
+boundary of each cell in the “Length” dimension, as <em>y</em> in meters. Similarly, a
+<em>time</em> variable is stored which is a 1-D array (vector) holding the model time
+values in seconds, associated with each set of saved output data.</p>
+</section>
+<section id="model-metadata">
+<h3>Model Metadata<a class="headerlink" href="#model-metadata" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the grid coordinates, model metadata is saved as a group of
+1-D arrays (vectors) and 0-D arrays (floats and integers). The values that are
+saved as metadata are the following:</p>
+<ul class="simple">
+<li><p>Length of the land surface: <cite>L0</cite></p></li>
+<li><p>Width of the inlet channel: <cite>N0</cite></p></li>
+<li><p>Center of the domain: <cite>CTR</cite></p></li>
+<li><p>Length of cell faces: <cite>dx</cite></p></li>
+<li><p>Depth of inlet channel: <cite>h0</cite></p></li>
+<li><p>Sea level: <cite>H_SL</cite></p></li>
+<li><p>Bedload fraction: <cite>f_bedload</cite></p></li>
+<li><p>Sediment concentration: <cite>C0_percent</cite></p></li>
+<li><p>Characteristic Velocity: <cite>u0</cite></p></li>
+<li><p>If subsidence is enabled:
+- Subsidence start time: <cite>start_subsidence</cite>
+- Subsidence rate: <cite>sigma</cite></p></li>
+</ul>
+</section>
+<section id="working-with-model-outputs">
+<h3>Working with Model Outputs<a class="headerlink" href="#working-with-model-outputs" title="Permalink to this headline">¶</a></h3>
+<p>The resulting netCDF4 output file can be read using any netCDF4-compatible
+library. These libraries range from the
+<a class="reference external" href="https://github.com/Unidata/netcdf4-python">netCDF4 Python package</a> itself,
+to higher-level libraries such as
+<a class="reference external" href="https://github.com/pydata/xarray">xarray</a>. For deltas, and specifically
+<em>pyDeltaRCM</em>, there is also a package under development called
+<a class="reference external" href="https://github.com/DeltaRCM/DeltaMetrics">DeltaMetrics</a>,
+that is being designed to help post-process and analyze <em>pyDeltaRCM</em> outputs.</p>
+<p>Here, we show how to read the output NetCDF file with Python package <code class="docutils literal notranslate"><span class="pre">netCDF4</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">netCDF4</span> <span class="k">as</span> <span class="nn">nc</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="s1">&#39;pyDeltaRCM_output.nc&#39;</span><span class="p">)</span>  <span class="c1"># the output file path!</span>
+</pre></div>
+</div>
+<p>This <cite>data</cite> object is a <cite>Dataset</cite> object that can be sliced the same was as a <cite>numpy</cite> array.
+For example, we can slice the final bed elevation and velocity of a model run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">final_bed_elevation</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;eta&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+<span class="n">final_velocity</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;velocity&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+</pre></div>
+</div>
+<p>These slices look like this, if we were to plot them.</p>
+<p>(<a class="reference external" href="../pyplots/guides/output_file.png">png</a>, <a class="reference external" href="../pyplots/guides/output_file.hires.png">hires.png</a>)</p>
+<figure class="align-default">
+<img alt="../_images/output_file.png" class="plot-directive" src="../_images/output_file.png" />
+</figure>
 </section>
 <section id="supporting-documentation-and-files">
 <h3>Supporting documentation and files<a class="headerlink" href="#supporting-documentation-and-files" title="Permalink to this headline">¶</a></h3>
@@ -470,6 +555,7 @@ parameters:</p>
 <p>Examples:</p>
 <blockquote>
 <div><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/deltaRCM/pyDeltaRCM/blob/develop/docs/source/examples/simple_example.ipynb">Simple simulation in Jupyter Notebook</a></p></li>
 <li><p><a class="reference internal" href="../examples/slight_slope.html"><span class="doc">Slightly sloping basin</span></a></p></li>
 <li><p><a class="reference internal" href="../examples/subsidence_region.html"><span class="doc">Constraining subsidence to part of the domain</span></a></p></li>
 <li><p><a class="reference internal" href="../examples/custom_saving.html"><span class="doc">Saving custom fields to the output file</span></a></p></li>
@@ -529,6 +615,13 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
 <li><a class="reference internal" href="#turning-on-subsidence-in-pydeltarcm">Turning on Subsidence in pyDeltaRCM</a></li>
 <li><a class="reference internal" href="#controlling-subsidence-behavior">Controlling Subsidence Behavior</a></li>
 <li><a class="reference internal" href="#advanced-subsidence-configurations">Advanced Subsidence Configurations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#model-output-file">Model Output File</a><ul>
+<li><a class="reference internal" href="#gridded-variables">Gridded Variables</a></li>
+<li><a class="reference internal" href="#grid-coordinates">Grid Coordinates</a></li>
+<li><a class="reference internal" href="#model-metadata">Model Metadata</a></li>
+<li><a class="reference internal" href="#working-with-model-outputs">Working with Model Outputs</a></li>
 <li><a class="reference internal" href="#supporting-documentation-and-files">Supporting documentation and files</a></li>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>

@@ -551,7 +551,7 @@ YAML configuration file.</p></li>
 <td><p>start_subsidence defines the start time at which subsidence begins.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.stepmax" title="pyDeltaRCM.model.DeltaModel.stepmax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stepmax</span></code></a></p></td>
-<td><p>stepmax is the maximum number of jumps a parcel can make.</p></td>
+<td><p><cite>stepmax</cite> is the maximum number of jumps a parcel can make.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.subsidence_rate" title="pyDeltaRCM.model.DeltaModel.subsidence_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subsidence_rate</span></code></a></p></td>
 <td><p>subsidence_rate defines the maximum rate of subsidence.</p></td>
@@ -1149,20 +1149,21 @@ and used.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.stepmax">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">stepmax</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.stepmax" title="Permalink to this definition">¶</a></dt>
-<dd><p>stepmax is the maximum number of jumps a parcel can make.</p>
-<p>stepmax is the maximum number of jumps a parcel (water or sediment)
-can make. If the parcel reaches the oceanic boundary before stepmax is
-reached, then this condition is not invoked. However if the parcel
-does not reach the oceanic bounary but does reach “stepmax” jumps,
-then the parcel will just stop moving and disappear.</p>
-<p>If stepmax is not specified in the yaml, the default value assigned
+<dd><p><cite>stepmax</cite> is the maximum number of jumps a parcel can make.</p>
+<p>The maximum number of jumps a parcel (water or sediment) can take is
+determined by <cite>stepmax</cite>. If the parcel reaches the oceanic boundary
+before <cite>stepmax</cite> is reached, then this condition is not invoked.
+However if the parcel does not reach the oceanic bounary but does
+reach <cite>stepmax</cite> jumps, then the parcel will just stop moving and
+disappear.</p>
+<p>If <cite>stepmax</cite> is not specified in the yaml, the default value assigned
 is 2 times the perimeter of the domain (2 * (self.L + self.W)).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If stepmax is set too low and many parcels reach the stepmax
+<p>If <cite>stepmax</cite> is set too low and many parcels reach the <cite>stepmax</cite>
 condition during routing, then there may be a considerable
 amount of sediment ‘missing’ from the system as any sediment in
-a parcel that hits the stepmax threshold disappears from the
+a parcel that hits the <cite>stepmax</cite> threshold disappears from the
 simulation.</p>
 </div>
 </dd></dl>
