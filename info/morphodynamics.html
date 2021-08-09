@@ -49,20 +49,27 @@
 <p>pyDeltaRCM approximates sediment dispersal through the use of a weighted random
 walk dictated by water flux.
 In turn, sediment dispersal drives bed elevation change in the model domain by mass conservation.</p>
-<p>See <a class="footnote-reference brackets" href="#id7" id="id1">1</a> for a complete description of morphodynamic assumptions in the DeltaRCM model.
+<p>See <a class="footnote-reference brackets" href="#id10" id="id1">1</a> for a complete description of morphodynamic assumptions in the DeltaRCM model.
 In this documentation, we focus on the details of <em>model implementation</em>, rather than <em>model design</em>.</p>
 <section id="sediment-transport">
 <span id="id2"></span><h2>Sediment Transport<a class="headerlink" href="#sediment-transport" title="Permalink to this headline">¶</a></h2>
+<p>Sediment transport in the model is computed according to an excess stress approach.
+Conceptually, sand is routed as bed-material load, and mud is routed as fully suspended load.</p>
+<p>For sand parcels, the <em>transport capacity</em> is determined by the scaling between sediment flux and flow velocity, and takes the form of the Meyer-Peter and Müller (1948) <a class="footnote-reference brackets" href="#id12" id="id3">3</a> formula:</p>
+<div class="math">
+<p><img src="../_images/math/59db6c5d6c1a3636509e6d2d270e44ea5f097c84.png" alt="q_{s\_cap} = q_{s0} \frac{u^\beta_{loc}}{u^\beta_0},"/></p>
+</div><p>where <img class="math" src="../_images/math/cd628e888545793dd620fc5ee2f549da494e9a2b.png" alt="u_{loc}"/> is the depth averaged flow velocity in the cell, <img class="math" src="../_images/math/f8a6d12e6efc3cc5d4e52fc44100fdb2ec898507.png" alt="beta"/> is an exponent set to 3 by default (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.beta" title="pyDeltaRCM.model.DeltaModel.beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beta</span></code></a>), and <img class="math" src="../_images/math/7a866c6e95cb5af096afa2704e73059469867639.png" alt="q_{s0}"/> is the unit-width upstream sand flux input at the inlet channel.
+At each step of the model domain, sand is either eroded or deposited to the bed depending on the local flow velocity <img class="math" src="../_images/math/cd628e888545793dd620fc5ee2f549da494e9a2b.png" alt="u_{loc}"/> and local sediment transport <img class="math" src="../_images/math/3f9a12a01513863815d2bd442d8aa61a9642e4ba.png" alt="q_{s\_loc}"/>.
+Sand is deposited where local transport (i.e., the sand put into that cell from upstream) is greater than the cell transport capacity <img class="math" src="../_images/math/bf988f5d0d66f3ff8c73d89921622b7261d50f7d.png" alt="q_{s\_loc} &gt; q_{s\_cap}"/>.
+Sand is eroded from the bed when the local velocity is greater than the threshold erosion velocity (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand" title="pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_U_ero_sand</span></code></a>) <strong>and</strong> the local transport is less than the local transport capacity.</p>
+<p>Mud parcels do not have any local capacity (i.e., fully suspended washload transport).
+At each parcel step, mud is either eroded or deposited (or neither), depending on the relative value of local flow velocity <img class="math" src="../_images/math/cd628e888545793dd620fc5ee2f549da494e9a2b.png" alt="u_{loc}"/> and the threshold erosion and deposition values (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud" title="pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_U_ero_mud</span></code></a> and <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud" title="pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_U_dep_mud</span></code></a>).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Incomplete.</p>
+<p>A complete conceptual description of sediment erosion and deposition routing rules can be found in the original DeltaRCM reference Liang et al., 2015 <a class="footnote-reference brackets" href="#id10" id="id4">1</a>.</p>
 </div>
 <section id="sediment-routing-weighting">
-<span id="id3"></span><h3>Sediment routing weighting<a class="headerlink" href="#sediment-routing-weighting" title="Permalink to this headline">¶</a></h3>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Incomplete.</p>
-</div>
+<span id="id5"></span><h3>Sediment routing weighting<a class="headerlink" href="#sediment-routing-weighting" title="Permalink to this headline">¶</a></h3>
 <p>Sediment routing probability for a given cell <img class="math" src="../_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> to neighbor cell <img class="math" src="../_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> is computed according to:</p>
 <div class="math">
 <p><img src="../_images/math/e30c6e04e007a9386ee17f37a5fd4b36a49a1631.png" alt="w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},"/></p>
@@ -87,9 +94,9 @@ The vertical change in the channel bed is dictated by sediment mass conservation
 </div><p>where <img class="math" src="../_images/math/f465ef3c39d3fcacdb5a0200658903bdad960cc3.png" alt="\Delta V"/> is the volume of sediment to be eroded or deposited from the bed at a given cell along the parcel walk.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Total sediment mass is preserved, but individual categories of sand and mud are not. I.e., it is assumed that there is an infinite supply of sand and/or mud to erode and entrain at any location in the model domain.</p>
+<p>Total sediment mass is preserved during erosion, but individual categories of sand and mud are not. I.e., it is assumed that there is an infinite supply of sand and/or mud to erode and entrain at any location in the model domain.</p>
 </div>
-<p>Following a change in the bed elevation, the local flow depth is updated and then local flow velocity is updated according to fluid mass conservation (i.e., <code class="docutils literal notranslate"><span class="pre">uw</span> <span class="pre">=</span> <span class="pre">qw</span> <span class="pre">/</span> <span class="pre">h</span></code>; <code class="xref py py-obj docutils literal notranslate"><span class="pre">_update_fields</span></code>; <a class="footnote-reference brackets" href="#id7" id="id4">1</a>).</p>
+<p>Following a change in the bed elevation, the local flow depth is updated and then local flow velocity is updated according to fluid mass conservation (i.e., <code class="docutils literal notranslate"><span class="pre">uw</span> <span class="pre">=</span> <span class="pre">qw</span> <span class="pre">/</span> <span class="pre">h</span></code>; <code class="xref py py-obj docutils literal notranslate"><span class="pre">_update_fields</span></code>; <a class="footnote-reference brackets" href="#id10" id="id6">1</a>).</p>
 <p>Sediment parcels are routed through the model domain step-by-step and in serial, such that changes in the bed elevation caused by one sediment parcel will affect the weighted random walks of all subsequent sediment parcels (<a class="reference internal" href="#sediment-routing-weighting"><span class="std std-ref">Sediment routing weighting</span></a>), due to the updated flow field.</p>
 <p>Sediment parcel routing is handled by first routing all sand parcels, applying a topographic diffusion (see below and <a class="reference internal" href="../reference/sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.topo_diffusion" title="pyDeltaRCM.sed_tools.sed_tools.topo_diffusion"><code class="xref py py-meth docutils literal notranslate"><span class="pre">topo_diffusion()</span></code></a>), and then routing all mud parcels.
 The impact of routing <em>all</em> sand and mud parcels on bed elevation is shown in the table below.</p>
@@ -126,13 +133,13 @@ The impact of routing <em>all</em> sand and mud parcels on bed elevation is show
 </table>
 </section>
 <section id="model-stability">
-<span id="id5"></span><h2>Model Stability<a class="headerlink" href="#model-stability" title="Permalink to this headline">¶</a></h2>
+<span id="id7"></span><h2>Model Stability<a class="headerlink" href="#model-stability" title="Permalink to this headline">¶</a></h2>
 <p>Model stability depends on a number of conditions.
 At its core though, model stability depends on the bed elevation rate of change over space and time.
 Rapid and/or abrupt bed elevation change trigger numerical instability that can <em>occasionally</em> run-away and cause model runs to fail.
 A number of processes are included in the DeltaRCM framework to help limit the possibility of failed runs.</p>
 <section id="reference-volume">
-<span id="id6"></span><h3>Reference Volume<a class="headerlink" href="#reference-volume" title="Permalink to this headline">¶</a></h3>
+<span id="id8"></span><h3>Reference Volume<a class="headerlink" href="#reference-volume" title="Permalink to this headline">¶</a></h3>
 <p>The reference volume if the foundational unit (<img class="math" src="../_images/math/3b91308a0751f9601ef49963a6a62565abff8ac7.png" alt="V_0"/>) impacting model stability.
 This value characterizes the volume on one inlet-channel cell, from the channel bed to the water surface:</p>
 <div class="math">
@@ -174,18 +181,26 @@ In the following example, <code class="xref py py-obj docutils literal notransla
 <section id="notes-for-modeling-best-practices">
 <h4>Notes for modeling best practices<a class="headerlink" href="#notes-for-modeling-best-practices" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><p>Stop simulations before the delta reaches the edge of the computational domain. If a distributary channel reaches the domain edge, this channel is likely to become locked in place, and will convey sediment outside the computational domain, thus violating any statements of mass conservation. Generally, simulations that reach the edge of the domain should be discarded.</p></li>
-<li><p>Stop simulations before the delta reaches a grade condition, where the topset slope is equal to background slope <cite>S0</cite>. This is really only an issue for large domains run for long duration.</p></li>
+<li><p>Stop simulations before the delta reaches the edge of the computational domain. Delta channel dynamics are changed when a distributary channel reaches the domain edge, because sediment is conveyed to outside the computational domain where it no longer feeds back on channel development. Channels become “locked” in place in this scenario <a class="footnote-reference brackets" href="#id11" id="id9">2</a>, because the domain edge is an infinite sediment sink, and therefore rendering invalid any assumptions about stationarity of delta dynamics and/or stratigraphy. Moreover, the downstream water surface boundary condition (<cite>H_SL</cite>) will be violated if a channel reaches the domain edge. Generally, simulations that reach the edge of the domain should be discarded.</p></li>
+<li><p>Stop simulations before the delta reaches a condition where the topset slope is equal to the background slope parameter (<cite>S0</cite>). When the background slope is reached, the transport capacity of sediment through the delta is diminished such that channels “clog” up and trigger model instabilities. This is really only an issue for large domains run for long duration.</p></li>
 <li><p>Use a sufficient number of water and sediment parcels (&gt; 2000). Too few parcels will result in a rough water surface, irregular sediment deposition, and a rough bed elevation.</p></li>
 </ul>
 </section>
 <section id="references">
 <h4>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h4>
 <dl class="footnote brackets">
-<dt class="label" id="id7"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id4">2</a>)</span></dt>
+<dt class="label" id="id10"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id4">2</a>,<a href="#id6">3</a>)</span></dt>
 <dd><p>A reduced-complexity model for river delta formation – Part 1: Modeling
 deltas with channel dynamics, M. Liang, V. R. Voller, and C. Paola, Earth
 Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.org/10.5194/esurf-3-67-2015">https://doi.org/10.5194/esurf-3-67-2015</a></p>
+</dd>
+<dt class="label" id="id11"><span class="brackets"><a class="fn-backref" href="#id9">2</a></span></dt>
+<dd><p>Liang, M., Kim, W., and Passalacqua, P. (2016), How much subsidence is
+enough to change the morphology of river deltas?, Geophysical Research Letters, 43, 10,266–10,276, doi:10.1002/2016GL070519.</p>
+</dd>
+<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dd><p>Meyer-Peter, E. and Müller, R.: Formulas for bed-load transport, in:
+Proceedings of the 2nd Meeting of IAHSR, Stockholm, Sweden, 39–64, 1948.</p>
 </dd>
 </dl>
 </section>

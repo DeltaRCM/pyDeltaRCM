@@ -197,10 +197,21 @@ First, run the <cite>Broken</cite> model:</p>
 </section>
 <section id="model-development">
 <h3>Model development<a class="headerlink" href="#model-development" title="Permalink to this headline">¶</a></h3>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">Todo</p>
-<p>add some notes about slicing arrays, and how we pad them with a custom pad operation when needed. Look at shared tools docs for starting point.</p>
+<section id="slicing-and-neighbors">
+<h4>Slicing and neighbors<a class="headerlink" href="#slicing-and-neighbors" title="Permalink to this headline">¶</a></h4>
+<p>Slicing an array to find the array values of neighbors is a common operation in the model.
+The preferred way to slice is by 1) padding the array with <a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.custom_pad" title="pyDeltaRCM.shared_tools.custom_pad"><code class="xref py py-func docutils literal notranslate"><span class="pre">custom_pad()</span></code></a>, and 2) looping through rows and columns to directly index. This approach makes for readable and reasonably fast code; for example, to find any cells that are higher than all neighbors:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pad_eta</span> <span class="o">=</span> <span class="n">shared_tools</span><span class="o">.</span><span class="n">custom_pad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">):</span>
+        <span class="n">eta_nbrs</span> <span class="o">=</span> <span class="n">pad_eta</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">j</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">eta_nbrs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">eta_nbrs</span><span class="p">)</span>
+</pre></div>
 </div>
+<p>There are also several model attributes that may be helpful in development; we suggest using these builtins rather than creating your own whenever possible (see <a class="reference internal" href="../reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.set_constants" title="pyDeltaRCM.init_tools.init_tools.set_constants"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_constants()</span></code></a> and the model source code).</p>
+</section>
 </section>
 </section>
 </section>
@@ -221,7 +232,10 @@ First, run the <cite>Broken</cite> model:</p>
 <li><a class="reference internal" href="#a-simple-example">A simple example</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#model-development">Model development</a></li>
+<li><a class="reference internal" href="#model-development">Model development</a><ul>
+<li><a class="reference internal" href="#slicing-and-neighbors">Slicing and neighbors</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

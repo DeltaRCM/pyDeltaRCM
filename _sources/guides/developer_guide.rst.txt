@@ -214,7 +214,20 @@ From these results, we can see that the values returned from the built-in unifor
 Model development
 -----------------
 
-.. todo::
+Slicing and neighbors 
+~~~~~~~~~~~~~~~~~~~~~
 
-    add some notes about slicing arrays, and how we pad them with a custom pad operation when needed. Look at shared tools docs for starting point.
+Slicing an array to find the array values of neighbors is a common operation in the model.
+The preferred way to slice is by 1) padding the array with :func:`~pyDeltaRCM.shared_tools.custom_pad`, and 2) looping through rows and columns to directly index. This approach makes for readable and reasonably fast code; for example, to find any cells that are higher than all neighbors:
 
+.. code::
+    
+    pad_eta = shared_tools.custom_pad(self.eta)
+    for i in range(self.L):
+        for j in range(self.W):
+            eta_nbrs = pad_eta[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+            eta_nbrs[1, 1] = -np.inf
+            
+            np.all(self.eta[i, j] > eta_nbrs)
+
+There are also several model attributes that may be helpful in development; we suggest using these builtins rather than creating your own whenever possible (see :meth:`~pyDeltaRCM.init_tools.init_tools.set_constants` and the model source code).

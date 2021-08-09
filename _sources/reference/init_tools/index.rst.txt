@@ -4,9 +4,33 @@
 init_tools
 **********
 
-.. todo::
+.. currentmodule:: pyDeltaRCM.init_tools
 
-    Add paragraph description of the module. What stages are defined here generally? Make a table with the main ones like in water tools?
+
+The model initialization is managed by :obj:`~pyDeltaRCM.model.DeltaModel.__init__`, but the actual initialization is mostly handled by routines in `init_tools`.
+The major steps of initialization are:
+
+.. autosummary::
+
+    init_tools.import_files
+    init_tools.init_logger
+    init_tools.process_input_to_model
+    init_tools.determine_random_seed
+    init_tools.create_other_variables
+    init_tools.create_domain
+    init_tools.init_sediment_routers
+    init_tools.init_subsidence
+
+and then depending on the checkpointing configuration, the following methods may be called:
+
+.. autosummary::
+
+    init_tools.load_checkpoint
+    init_tools.init_output_file
+    pyDeltaRCM.interation_tools.output_data
+    pyDeltaRCM.interation_tools.output_checkpoint
+    pyDeltaRCM.interation_tools.log_model_time
+
 
 Public API methods attached to model
 ------------------------------------

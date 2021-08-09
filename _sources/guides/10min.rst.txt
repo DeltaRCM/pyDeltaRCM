@@ -13,7 +13,7 @@ This simple guide will show you the absolute basics of getting a `pyDeltaRCM` mo
 A default model
 ---------------
 
-You can get a model running with five simple lines of code.
+You can get a model running with five simple lines of Python code. Note that you can run *pyDeltaRCM* in either a standalone script or part of an interactive session.
 First, we instantiate the main :obj:`~pyDeltaRCM.DeltaModel` model object.
 
 .. code:: python

@@ -46,10 +46,55 @@
             
   <section id="init-tools">
 <h1>init_tools<a class="headerlink" href="#init-tools" title="Permalink to this headline">¶</a></h1>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">Todo</p>
-<p>Add paragraph description of the module. What stages are defined here generally? Make a table with the main ones like in water tools?</p>
-</div>
+<p>The model initialization is managed by <a class="reference internal" href="../../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.__init__" title="pyDeltaRCM.model.DeltaModel.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>, but the actual initialization is mostly handled by routines in <cite>init_tools</cite>.
+The major steps of initialization are:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.import_files" title="pyDeltaRCM.init_tools.init_tools.import_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_tools.import_files</span></code></a>([kwargs_dict])</p></td>
+<td><p>Import the input files.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.init_logger" title="pyDeltaRCM.init_tools.init_tools.init_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_tools.init_logger</span></code></a>()</p></td>
+<td><p>Initialize a logger.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.process_input_to_model" title="pyDeltaRCM.init_tools.init_tools.process_input_to_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_tools.process_input_to_model</span></code></a>()</p></td>
+<td><p>Process input file to model variables.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.determine_random_seed" title="pyDeltaRCM.init_tools.init_tools.determine_random_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_tools.determine_random_seed</span></code></a>()</p></td>
+<td><p>Set the random seed if given.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.create_other_variables" title="pyDeltaRCM.init_tools.init_tools.create_other_variables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_tools.create_other_variables</span></code></a>()</p></td>
+<td><p>Model implementation variables.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.create_domain" title="pyDeltaRCM.init_tools.init_tools.create_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_tools.create_domain</span></code></a>()</p></td>
+<td><p>Create the model domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.init_sediment_routers" title="pyDeltaRCM.init_tools.init_tools.init_sediment_routers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_tools.init_sediment_routers</span></code></a>()</p></td>
+<td><p>Initialize the sediment router object here.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.init_subsidence" title="pyDeltaRCM.init_tools.init_tools.init_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_tools.init_subsidence</span></code></a>()</p></td>
+<td><p>Initialize subsidence pattern.</p></td>
+</tr>
+</tbody>
+</table>
+<p>and then depending on the checkpointing configuration, the following methods may be called:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.load_checkpoint" title="pyDeltaRCM.init_tools.init_tools.load_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_tools.load_checkpoint</span></code></a>([defer_output])</p></td>
+<td><p>Load the checkpoint from the .npz file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.init_output_file" title="pyDeltaRCM.init_tools.init_tools.init_output_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_tools.init_output_file</span></code></a>()</p></td>
+<td><p>Creates a netCDF file to store output grids.</p></td>
+</tr>
+</tbody>
+</table>
 <section id="public-api-methods-attached-to-model">
 <h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Permalink to this headline">¶</a></h2>
 <p>The following methods are defined in the <code class="docutils literal notranslate"><span class="pre">init_tools</span></code> class, of the <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.init_tools</span></code> module.</p>
@@ -268,6 +313,18 @@ values specified into the log file.</p>
 <p>Configure constants, including coordinates and distances, as well as
 environmental constants (gravity), and kernels for smoothing
 topography.</p>
+<dl class="simple">
+<dt>Some of the constants defined herein:</dt><dd><ul class="simple">
+<li><p><cite>self.g</cite>, gravitational acceleration</p></li>
+<li><p><cite>self.distances</cite>, distance from cell <cite>i,j</cite> to neighbors (and self)  # noqa: E501</p></li>
+<li><p><cite>self.iwalk</cite>, step distance cross domain to cell in indexed direction</p></li>
+<li><p><cite>self.jwalk</cite>, step distance down domain to cell in indexed direction</p></li>
+<li><p><cite>self.ravel_walk</cite>, flattened index distance to cell in indexed direction</p></li>
+</ul>
+</dd>
+</dl>
+<p>Each of these attributes also has a <cite>self.xxxxx_flat</cite> sibling
+attribute, which is simply the flattened version of that attribute.</p>
 </dd></dl>
 
 </dd></dl>
