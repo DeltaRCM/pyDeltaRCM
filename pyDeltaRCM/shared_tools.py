@@ -150,8 +150,26 @@ def get_random_uniform(limit):
 def get_start_indices(inlet, inlet_weights, num_starts):
     """Get start indices.
 
-    .. todo:: Description needed. Where is it used?
+    Reutrn a randomly generated list of starting points for parcel routing.
+    These starting points are selected from the `inlet` array.
 
+    Parameters
+    ----------
+    inlet : ndarray
+        Array of inlet cells.
+
+    inlet_weights : ndarray
+        Array of weights to select items from :obj:`inlet`. Should have same
+        dimensions.
+
+    num_starts : int
+        Number of starting points to generate.
+
+    Returns
+    -------
+    start_indices : ndarray
+        :obj:`num_starts` starting points, generated from :obj:`inlet`
+         according to weights in :obj:`inlet_weights`. 
     """
     norm_weights = inlet_weights / np.sum(inlet_weights)
     idxs = []
@@ -162,14 +180,14 @@ def get_start_indices(inlet, inlet_weights, num_starts):
 
 
 @njit
-def get_steps(new_cells, iwalk, jwalk):
-    """Find the values giving the next step.
+def get_steps(new_direction, iwalk, jwalk):
+    """Find the values given the next step.
 
-    .. todo:: Description needed. Where is it used?
-
+    Get the steps for updating discharge and velocity arrays based on the
+    direction of each step.
     """
-    istep = iwalk[new_cells]
-    jstep = jwalk[new_cells]
+    istep = iwalk[new_direction]
+    jstep = jwalk[new_direction]
     dist = np.sqrt(istep * istep + jstep * jstep)
     astep = (dist != 0)
 

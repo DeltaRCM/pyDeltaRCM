@@ -34,7 +34,7 @@ Each folder will contain a copy of the configuration file used for that job; for
 .. code:: yaml
 
     out_dir: 'out_dir/job_000'
-    dx: 2.0
+    dx: 40.0
     h0: 1.0
     f_bedload: 0.5
 
