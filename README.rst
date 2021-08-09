@@ -48,9 +48,11 @@ Executing the model
 
 We recommend you check out our `pyDeltaRCM in 10 minutes tutorial <https://deltarcm.org/pyDeltaRCM/guides/10min.html>`_, which is part of our documentation.
 
+Beyond that breif tutorial, we have a comprehensive `User Documentation <https://deltarcm.org/pyDeltaRCM/index.html#user-documentation>`_ and `Developer Documentation <https://deltarcm.org/pyDeltaRCM/index.html#developer-documentation>`_ to check out.
+
 
 Additional notes
 ################
 
-This model repository no longer includes support for the `Basic Model Interface (BMI) <https://bmi.readthedocs.io/en/latest/?badge=latest>`_.
-We have separated BMI support for pyDeltaRCM to another repository (`the BMI_pyDeltaRCM model <https://deltarcm.org/BMI_pyDeltaRCM/>`_).
+This repository no longer includes the `Basic Model Interface (BMI) <https://bmi.readthedocs.io/en/latest/?badge=latest>`_ wrapper to the DeltaRCM model.
+*pyDeltaRCM* maintains BMI compatibility through another repository (`the BMI_pyDeltaRCM model <https://deltarcm.org/BMI_pyDeltaRCM/>`_).
