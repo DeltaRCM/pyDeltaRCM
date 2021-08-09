@@ -90,6 +90,10 @@ The ensemble expansion can be applied to configuration files that include a matr
 
 The above configuration file would produce 6 model runs, 3 with a basin depth (`h0`) of 1.0, and 3 with a basin depth of 2.0.
 
+.. hint::
+
+    If you are debugging and experimenting, it may be helpful to comment out a line in your YAML, rather than deleting it completely! E.g., ``# ensemble: 3``) would disable ensemble expansion.
+
 .. _set_expansion_tag:
 
 Set expansion

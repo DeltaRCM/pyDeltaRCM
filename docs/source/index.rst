@@ -22,6 +22,7 @@ Project information
    meta/license
    meta/conduct
 
+.. _user_documentation:
 
 User documentation
 ##################

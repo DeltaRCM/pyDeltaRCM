@@ -27,9 +27,9 @@ and then depending on the checkpointing configuration, the following methods may
 
     init_tools.load_checkpoint
     init_tools.init_output_file
-    pyDeltaRCM.interation_tools.output_data
-    pyDeltaRCM.interation_tools.output_checkpoint
-    pyDeltaRCM.interation_tools.log_model_time
+    pyDeltaRCM.iteration_tools.iteration_tools.output_data
+    pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint
+    pyDeltaRCM.iteration_tools.iteration_tools.log_model_time
 
 
 Public API methods attached to model

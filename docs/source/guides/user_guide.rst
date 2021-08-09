@@ -119,8 +119,11 @@ Default values of the YAML configuration are listed in the :doc:`/reference/mode
 
 .. important::
 
-    The best practice for model configurations is to create a YAML file with only the settings you want to change specified.
+    The best practice for model configurations is to create a YAML file with only the settings you want to change specified. Hint: comment a line out with ``#`` so it will not be used in the model.
 
+.. hint::
+
+    Check the model log files to make sure your configuration was interpreted as you  expected!
 
 ===================
 Starting model runs
@@ -298,6 +301,7 @@ Model reference:
 
 Examples:
 
+    * `Simple simulation in Jupyter Notebook <https://github.com/deltaRCM/pyDeltaRCM/blob/develop/docs/source/examples/simple_example.ipynb>`_
     * :doc:`/examples/slight_slope`
     * :doc:`/examples/subsidence_region`
     * :doc:`/examples/custom_saving`
