@@ -283,6 +283,16 @@ class init_tools(abc.ABC):
         Configure constants, including coordinates and distances, as well as
         environmental constants (gravity), and kernels for smoothing
         topography.
+
+        Some of the constants defined herein:
+            * `self.g`, gravitational acceleration
+            * `self.distances`, distance from cell `i,j` to neighbors (and self)  # noqa: E501
+            * `self.iwalk`, step distance cross domain to cell in indexed direction
+            * `self.jwalk`, step distance down domain to cell in indexed direction
+            * `self.ravel_walk`, flattened index distance to cell in indexed direction
+
+        Each of these attributes also has a `self.xxxxx_flat` sibling
+        attribute, which is simply the flattened version of that attribute.
         """
         _msg = 'Setting model constants'
         self.log_info(_msg, verbosity=1)
