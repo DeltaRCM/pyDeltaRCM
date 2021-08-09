@@ -117,6 +117,10 @@ Multiple parameters can be specified line by line.
 Default values are substituted for any parameter not explicitly given in the ``input_file`` ``.yml`` file.
 Default values of the YAML configuration are listed in the :doc:`/reference/model/yaml_defaults`.
 
+.. important::
+
+    The best practice for model configurations is to create a YAML file with only the settings you want to change specified.
+
 
 ===================
 Starting model runs

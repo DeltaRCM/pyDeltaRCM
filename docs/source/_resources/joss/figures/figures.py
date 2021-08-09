@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
         nt = 4
         ts = np.linspace(0, data['eta'].shape[0]-1,
-                         num=nt, dtype=np.int)  # linearly interpolate ts
+                         num=nt, dtype=int)  # linearly interpolate ts
 
         # make the timeseries plot
         fig, ax = plt.subplots(1, nt, figsize=(11, 2), dpi=300)
