@@ -58,8 +58,11 @@ The model with set parameters
 -----------------------------
 
 To run a simulation with a non-default set of parameters, we use a configuration file written in the YAML markup language named `10min_tutorial.yaml`.
-This markup file allows us to specify model boundary conditions and input and output settings.
-Anything you set in this file will override the :doc:`default parameters <../reference/model/yaml_defaults>` for the model.
+The markup file allows us to specify model boundary conditions and input and output settings, where anything set in the file will override the :doc:`default parameters <../reference/model/yaml_defaults>` for the model, and anything *not* specified will take the default value.
+
+.. important::
+
+    The best practice for model configurations is to create a YAML file with only the settings you want to change specified.
 
 The YAML configuration file is central to managing *pyDeltaRCM* simulations, so we did not create this file for you; you will need to create the YAML file yourself.
 To create the YAML file, open up your favorite plain-text editing application (e.g., gedit, notepad).

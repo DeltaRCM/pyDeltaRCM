@@ -117,6 +117,13 @@ Multiple parameters can be specified line by line.
 Default values are substituted for any parameter not explicitly given in the ``input_file`` ``.yml`` file.
 Default values of the YAML configuration are listed in the :doc:`/reference/model/yaml_defaults`.
 
+.. important::
+
+    The best practice for model configurations is to create a YAML file with only the settings you want to change specified. Hint: comment a line out with ``#`` so it will not be used in the model.
+
+.. hint::
+
+    Check the model log files to make sure your configuration was interpreted as you  expected!
 
 ===================
 Starting model runs
@@ -269,6 +276,7 @@ Keyword arguments supplied at this point will supersede values specified in the 
 See :ref:`our guide for model customization <customize_the_model>` for a complete explanation and demonstration for how to modify model behavior.
 
 ..
+    =============================
     Advanced model configurations
     =============================
     ** Advanced model configuration guide is imported from another file. **
@@ -277,11 +285,21 @@ See :ref:`our guide for model customization <customize_the_model>` for a complet
 
 
 ..
+    =======================
     Working with Subsidence
     =======================
     ** Subsidence guide is imported from another file. **
 
 .. include:: subsidence_guide.inc
+
+
+..
+    =======================
+    dsfasf
+    =======================
+    ** Subsidence guide is imported from another file. **
+
+.. include:: /info/outputfile.rst
 
 
 Supporting documentation and files
@@ -294,6 +312,7 @@ Model reference:
 
 Examples:
 
+    * `Simple simulation in Jupyter Notebook <https://github.com/deltaRCM/pyDeltaRCM/blob/develop/docs/source/examples/simple_example.ipynb>`_
     * :doc:`/examples/slight_slope`
     * :doc:`/examples/subsidence_region`
     * :doc:`/examples/custom_saving`
