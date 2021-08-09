@@ -276,6 +276,7 @@ Keyword arguments supplied at this point will supersede values specified in the 
 See :ref:`our guide for model customization <customize_the_model>` for a complete explanation and demonstration for how to modify model behavior.
 
 ..
+    =============================
     Advanced model configurations
     =============================
     ** Advanced model configuration guide is imported from another file. **
@@ -284,11 +285,21 @@ See :ref:`our guide for model customization <customize_the_model>` for a complet
 
 
 ..
+    =======================
     Working with Subsidence
     =======================
     ** Subsidence guide is imported from another file. **
 
 .. include:: subsidence_guide.inc
+
+
+..
+    =======================
+    dsfasf
+    =======================
+    ** Subsidence guide is imported from another file. **
+
+.. include:: /info/outputfile.rst
 
 
 Supporting documentation and files

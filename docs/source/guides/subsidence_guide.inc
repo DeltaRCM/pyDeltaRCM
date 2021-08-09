@@ -43,5 +43,5 @@ Subsidence behavior can be easily modified by :ref:`creating a subclass <customi
 
 An example of using subclassing to create a model setup with subsidence confined to only part of the model domain is included in the documentation:
 
-:doc:`/examples/subsidence_region`
+* :doc:`/examples/subsidence_region`
 
