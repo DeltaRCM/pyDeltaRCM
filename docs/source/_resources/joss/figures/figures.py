@@ -47,7 +47,7 @@ if __name__ == '__main__':
     elif _input_flag == 'plot':
 
         # set up attributes needed for plotting
-        H_SL, h, n = 0, 3, 0.3  # sea level, basin depth, surf relief
+        H_SL, h, n = 0, 4, 0.3  # sea level, basin depth, surf relief
         blues = matplotlib.cm.get_cmap('Blues_r', 64)
         greens = matplotlib.cm.get_cmap('YlGn_r', 64)
         combined = np.vstack((blues(np.linspace(0.1, 0.7, 5)),
