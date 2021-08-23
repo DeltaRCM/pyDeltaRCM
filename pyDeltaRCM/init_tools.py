@@ -683,6 +683,10 @@ class init_tools(abc.ABC):
 
         Sets up the dictionary object for the standard metadata.
         """
+        # elapsed-time metadata
+        self._save_var_list['meta']['elapsed_time'] = [
+            'elapsed_time', 'seconds', 'f4', ()]
+
         # fixed metadata
         self._save_var_list['meta']['L0'] = ['L0', 'cells', 'i8', ()]
         self._save_var_list['meta']['N0'] = ['N0', 'cells', 'i8', ()]

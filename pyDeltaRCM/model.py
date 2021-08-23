@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import warnings
 import logging
+import time
 import datetime
 import os
 
@@ -72,6 +73,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         :doc:`/guides/user_guide`.
 
         """
+        self.elapsed_time = time.time()  # UNIX time at start
         self.__pyDeltaRCM_version__ = _get_version()
 
         self._time = 0.
@@ -231,6 +233,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
                                'model already finalized!')
 
         try:
+            self.save_elapsed_time()
             self.output_netcdf.close()
             _msg = 'Closed output NetCDF4 file'
             self.log_info(_msg, verbosity=1)

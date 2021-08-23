@@ -2,6 +2,7 @@
 
 import os
 import warnings
+import time
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -423,6 +424,15 @@ class iteration_tools(abc.ABC):
             _msg = 'Failed to save {var_name} grid to netCDF file.'.format(var_name=var_name)
             self.logger.error(_msg)
             warnings.warn(UserWarning('Cannot save grid to netCDF file.'))
+
+    def save_elapsed_time(self):
+        """Record and save elapsed time to the netCDF metadata."""
+        if self._save_metadata:
+            self.elapsed_time = time.time() - self.elapsed_time
+            self._save_var_list['meta']['elapsed_time'] = \
+                self.elapsed_time
+            _msg = 'Saved elapsed time since model initialization.'
+            self.log_info(_msg, verbosity=1)
 
     def save_the_checkpoint(self):
         """Save checkpoint files.
