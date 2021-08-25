@@ -31,7 +31,7 @@ bibliography: paper.bib
 
 River deltas provide many societal benefits, and sustainability of these landforms may be impacted by human modification and global climate change.
 Reduced-complexity numerical delta models incorporate limited physical processes, allowing researchers to assess the spatiotemporal evolution of landscape response to individual processes and environmental forcings.
-This is useful to understand, for example, shifting delta morphology due to sea-level rise, changing vegetal cover, or flooding intensity.
+Isolating individual processes is useful to understand, for example, shifting delta morphology due to sea-level rise, changing vegetal cover, or flooding intensity.
 As a result, many numerical delta models have been proposed in the literature, and results from these studies are difficult to compare because of various design and implementation choices.
 *pyDeltaRCM* (`v2.0`) delivers a computationally efficient and easy-to-customize implementation of the DeltaRCM numerical model [@liang_reduced_1_2015], enabling comparison and reproducibility in studies of delta change due to various environmental forcings.
 
