@@ -68,7 +68,7 @@ Importantly, separating custom code from core model code makes clear how differe
 The *pyDeltaRCM* documentation provides several examples for how to implement custom model behavior on top of the core `DeltaModel` object.
 
 *pyDeltaRCM* also provides infrastructure to accelerate scientific exploration, such as the ability to configure multiple simulations from a single file.
-A preprocessor orchestrates `parallel` simulations for multi-core systems (optionally), and implements several tools to support simulations exploring a parameter space.
+Additionally, a preprocessor orchestrates `parallel` simulations for multi-core systems (optionally), and implements several tools to support simulations exploring a parameter space.
 For example, `matrix` expansion converts lists of parameters into an n-dimensional set of simulations.
 Similarly, replicate simulations can be created via an `ensemble` specification.
 
