@@ -2,17 +2,21 @@
 pyDeltaRCM
 **************
 
-.. image:: https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg
-    :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
-
 .. image:: https://badge.fury.io/py/pyDeltaRCM.svg
     :target: https://badge.fury.io/py/pyDeltaRCM
+ 
+.. image:: https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg
+    :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
 
 .. image:: https://codecov.io/gh/DeltaRCM/pyDeltaRCM/branch/develop/graph/badge.svg
   :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM
 
 .. image:: https://app.codacy.com/project/badge/Grade/1c137d0227914741a9ba09f0b00a49a7
     :target: https://www.codacy.com/gh/DeltaRCM/pyDeltaRCM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DeltaRCM/pyDeltaRCM&amp;utm_campaign=Badge_Grade
+
+.. image:: https://joss.theoj.org/papers/10.21105/joss.03398/status.svg
+   :target: https://doi.org/10.21105/joss.03398
+
 
 *pyDeltaRCM* is a computationally efficient, free and open source, and easy-to-customize numerical delta model based on the original DeltaRCM model design (`Matlab deltaRCM <https://csdms.colorado.edu/wiki/Model:DeltaRCM>`_ model by Man Liang; `Liang et al., 2015 <https://doi.org/10.5194/esurf-3-67-2015>`_).
 *pyDeltaRCM* delivers improved model stability and capabilities, infrastructure to support exploration with minimal boilerplate code, and establishes an approach to extending model capabilities that ensures reproducible and comparable studies.
