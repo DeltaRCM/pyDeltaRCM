@@ -4,7 +4,6 @@ pyDeltaRCM
 
 .. image:: https://badge.fury.io/py/pyDeltaRCM.svg
     :target: https://badge.fury.io/py/pyDeltaRCM
-
  
 .. image:: https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg
     :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
