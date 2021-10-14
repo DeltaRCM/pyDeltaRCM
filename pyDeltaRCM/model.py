@@ -1270,6 +1270,8 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         to match the input expected by `xarray`, which eases interaction with
         model outputs. The change in format is from inconsistently named
         dimensions and *coordinate variables*, to homogeneous definitions.
+        Also, the legacy format specified the variables `x` and `y` as 2d
+        grids, whereas the updated format uses 1d coordinate arrays.
         
         .. important::
 
@@ -1281,10 +1283,10 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         |             | default           | legacy                          |
         +=============+===================+=================================+
         | dimensions  | `time`, `x`, `y`  | `total_time`, `length`, `width` |
-        +---------------+------------------------+--------------------------+
-        | variables   | `time`, `x`, `y`  | `time`, `x`, `y`                |
+        +-------------+-------------------+---------------------------------+
+        | variables   | `time`, `x`, `y`  | `time`, `y`, `x`; x, y as 2D    |
         +-------------+------------------------+----------------------------+
-        | data        | `t-x-y` array     | `t-x-y` array                   |
+        | data        | `t-x-y` array     | `t-y-x` array                   |
         +-------------+-------------------+---------------------------------+
 
         .. hint::
