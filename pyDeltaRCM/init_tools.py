@@ -430,12 +430,15 @@ class init_tools(abc.ABC):
         # resolve any boundary conditions
         self._hb = self.hb or self.h0  # basin depth
 
-        # ---- empty arrays ----
+        # ---- coordinates ----
+        self.xc = np.arange(0, self.W) * self._dx
+        self.yc = np.arange(0, self.L) * self._dx
         self.x, self.y = np.meshgrid(np.arange(0, self.W),
                                      np.arange(0, self.L))
         self.X, self.Y = np.meshgrid(np.arange(0, self.W+1)*self._dx,
                                      np.arange(0, self.L+1)*self._dx)
 
+        # ---- empty arrays ----
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int64)
         self.eta = np.zeros((self.L, self.W), dtype=np.float32)
         self.eta0 = np.copy(self.eta)  # establish eta0 copy
@@ -593,25 +596,26 @@ class init_tools(abc.ABC):
             self.output_netcdf.description = 'Output from pyDeltaRCM'
             self.output_netcdf.history = ('Created '
                                           + time_lib.ctime(time_lib.time()))
-            self.output_netcdf.source = 'pyDeltaRCM'
+            self.output_netcdf.source = 'pyDeltaRCM v{ver}'.format(
+                ver=self.__pyDeltaRCM_version__)
 
             # create master dimensions
-            self.output_netcdf.createDimension('length', self.L)
-            self.output_netcdf.createDimension('width', self.W)
-            self.output_netcdf.createDimension('total_time', None)
+            self.output_netcdf.createDimension('y', self.L)
+            self.output_netcdf.createDimension('x', self.W)
+            self.output_netcdf.createDimension('time', None)
 
             # create master coordinates (as netCDF variables)
             x = self.output_netcdf.createVariable(
-                'x', 'f4', ('length', 'width'))
+                'x', 'f4', ('x'))
             y = self.output_netcdf.createVariable(
-                'y', 'f4', ('length', 'width'))
+                'y', 'f4', ('y'))
             time = self.output_netcdf.createVariable('time', 'f4',
-                                                     ('total_time',))
+                                                     ('time',))
             x.units = 'meters'
             y.units = 'meters'
             time.units = 'second'
-            x[:] = self.x
-            y[:] = self.y
+            x[:] = self.xc
+            y[:] = self.yc
 
             # set up variables for output data grids
             def _create_grid_variable(varname, varunits,
@@ -692,7 +696,7 @@ class init_tools(abc.ABC):
         self._save_var_list['meta']['hb'] = ['hb', 'meters', 'f4', ()]
         self._save_var_list['meta']['cell_type'] = ['cell_type',
                                                     'type', 'i8',
-                                                    ('length', 'width')]
+                                                    ('y', 'x')]
         # subsidence metadata
         if self._toggle_subsidence:
             self._save_var_list['meta']['start_subsidence'] = [
@@ -700,17 +704,17 @@ class init_tools(abc.ABC):
             ]
             self._save_var_list['meta']['sigma'] = [
                 'sigma', 'meters per timestep', 'f4',
-                ('length', 'width')
+                ('y', 'x')
             ]
         # time-varying metadata
         self._save_var_list['meta']['H_SL'] = [None, 'meters', 'f4',
-                                               ('total_time')]
+                                               ('time')]
         self._save_var_list['meta']['f_bedload'] = [None, 'fraction',
-                                                    'f4', ('total_time')]
+                                                    'f4', ('time')]
         self._save_var_list['meta']['C0_percent'] = [None, 'percent',
-                                                     'f4', ('total_time')]
+                                                     'f4', ('time')]
         self._save_var_list['meta']['u0'] = [None, 'meters per second',
-                                             'f4', ('total_time')]
+                                             'f4', ('time')]
 
     def load_checkpoint(self, defer_output=False):
         """Load the checkpoint from the .npz file.
