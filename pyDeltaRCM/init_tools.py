@@ -179,7 +179,7 @@ class init_tools(abc.ABC):
         if self._input_file_vars['legacy_netcdf']:
             self._netcdf_coords = ('total_time', 'length', 'width')
         else:
-            self._netcdf_coords = ('time', 'y', 'x')
+            self._netcdf_coords = ('time', 'x', 'y')
 
     def process_input_to_model(self):
         """Process input file to model variables.
@@ -436,8 +436,8 @@ class init_tools(abc.ABC):
         self._hb = self.hb or self.h0  # basin depth
 
         # ---- coordinates ----
-        self.xc = np.arange(0, self.W) * self._dx
-        self.yc = np.arange(0, self.L) * self._dx
+        self.xc = np.arange(0, self.L) * self._dx
+        self.yc = np.arange(0, self.W) * self._dx
         self.x, self.y = np.meshgrid(np.arange(0, self.W),
                                      np.arange(0, self.L))
         self.X, self.Y = np.meshgrid(np.arange(0, self.W+1)*self._dx,
