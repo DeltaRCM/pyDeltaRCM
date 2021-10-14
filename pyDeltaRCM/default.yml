@@ -183,4 +183,4 @@ clobber_netcdf:
   default: False
 legacy_netcdf:
   type: 'bool'
-  default: True
+  default: False
