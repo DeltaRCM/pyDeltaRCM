@@ -29,7 +29,11 @@ grid.
 Grid Coordinates
 ================
 
-Grid coordinates are specified in the variables `time`, `x`, and `y` in the output netCDF4 file. These arrays are 1D arrays, which specify the location of each cell in the domain in *dimensional* coordinates (e.g., meters). In the downstream direction, the the distance of each cell from the inlet boundary is specified in `x` in meters. Similarly, the cross-domain distance is specified in `y` in meters. Lastly, the `time` variable is stored as a 1D array with model `time` in seconds.
+Grid coordinates are specified in the variables `time`, `x`, and `y` in the output netCDF4 file.
+These arrays are 1D arrays, which specify the location of each cell in the domain in *dimensional* coordinates (e.g., meters).
+In the downstream direction,  the distance of each cell from the inlet boundary is specified in `x` in meters.
+Similarly, the cross-domain distance is specified in `y` in meters.
+Lastly, the `time` variable is stored as a 1D array with model `time` in seconds.
 
 
 Model Metadata

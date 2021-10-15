@@ -114,6 +114,8 @@ Output Settings
 
 :attr:`pyDeltaRCM.model.DeltaModel.clobber_netcdf`
 
+:attr:`pyDeltaRCM.model.DeltaModel.legacy_netcdf`
+
 
 Reduced-Complexity Routing Parameters
 =====================================
