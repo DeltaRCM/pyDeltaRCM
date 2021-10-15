@@ -1,7 +1,3 @@
-.. |br| raw:: html
-
-  <div style="line-height: 0; padding: 0; margin: 0"></div>
-
 **************
 pyDeltaRCM
 **************
@@ -9,12 +5,8 @@ pyDeltaRCM
 .. image:: https://badge.fury.io/py/pyDeltaRCM.svg
     :target: https://badge.fury.io/py/pyDeltaRCM
 
-|br|    
-
 .. image:: https://joss.theoj.org/papers/10.21105/joss.03398/status.svg
    :target: https://doi.org/10.21105/joss.03398
-
-|br|
 
 .. image:: https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg
     :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
