@@ -181,3 +181,6 @@ sand_frac_bc:
 clobber_netcdf:
   type: 'bool'
   default: False
+legacy_netcdf:
+  type: 'bool'
+  default: False

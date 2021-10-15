@@ -809,7 +809,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_eta_grids is True) and \
           ('eta' not in self._save_var_list.keys()):
             self._save_var_list['eta'] = ['eta', 'meters', 'f4',
-                                          ('total_time', 'length', 'width')]
+                                          self._netcdf_coords]
         elif ((save_eta_grids is False) and
               ('eta' in self._save_var_list.keys())):
             del self._save_var_list['eta']
@@ -827,7 +827,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_stage_grids is True) and \
           ('stage' not in self._save_var_list.keys()):
             self._save_var_list['stage'] = ['stage', 'meters', 'f4',
-                                            ('total_time', 'length', 'width')]
+                                            self._netcdf_coords]
         elif ((save_stage_grids is False) and
               ('stage' in self._save_var_list.keys())):
             del self._save_var_list['stage']
@@ -845,7 +845,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_depth_grids is True) and \
           ('depth' not in self._save_var_list.keys()):
             self._save_var_list['depth'] = ['depth', 'meters', 'f4',
-                                            ('total_time', 'length', 'width')]
+                                            self._netcdf_coords]
         elif ((save_depth_grids is False) and
               ('depth' in self._save_var_list.keys())):
             del self._save_var_list['depth']
@@ -865,8 +865,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             self._save_var_list['discharge'] = ['qw',
                                                 'cubic meters per second',
                                                 'f4',
-                                                ('total_time', 'length',
-                                                 'width')]
+                                                self._netcdf_coords]
         elif ((save_discharge_grids is False) and
               ('discharge' in self._save_var_list.keys())):
             del self._save_var_list['discharge']
@@ -884,8 +883,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_velocity_grids is True) and \
           ('velocity' not in self._save_var_list.keys()):
             self._save_var_list['velocity'] = ['uw', 'meters per second', 'f4',
-                                               ('total_time', 'length',
-                                                'width')]
+                                               self._netcdf_coords]
         elif ((save_velocity_grids is False) and
               ('velocity' in self._save_var_list.keys())):
             del self._save_var_list['velocity']
@@ -904,8 +902,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
           ('sedflux' not in self._save_var_list.keys()):
             self._save_var_list['sedflux'] = ['qs', 'cubic meters per second',
                                               'f4',
-                                              ('total_time', 'length',
-                                               'width')]
+                                              self._netcdf_coords]
         elif ((save_sedflux_grids is False) and
               ('sedflux' in self._save_var_list.keys())):
             del self._save_var_list['sedflux']
@@ -924,8 +921,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         if (save_sandfrac_grids is True) and \
           ('sandfrac' not in self._save_var_list.keys()):
             self._save_var_list['sandfrac'] = ['sand_frac', 'fraction', 'f4',
-                                               ('total_time', 'length',
-                                                'width')]
+                                               self._netcdf_coords]
         elif ((save_sandfrac_grids is False) and
               ('sandfrac' in self._save_var_list.keys())):
             del self._save_var_list['sandfrac']
@@ -944,11 +940,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             if ('discharge_x' not in self._save_var_list.keys()):
                 self._save_var_list['discharge_x'] = [
                     'qx', 'cubic meters per second', 'f4',
-                    ('total_time', 'length', 'width')]
+                    self._netcdf_coords]
             if ('discharge_y' not in self._save_var_list.keys()):
                 self._save_var_list['discharge_y'] = [
                     'qy', 'cubic meters per second', 'f4',
-                    ('total_time', 'length', 'width')]
+                    self._netcdf_coords]
         elif (save_discharge_components is False):
             if ('discharge_x' in self._save_var_list.keys()):
                 del self._save_var_list['discharge_x']
@@ -969,11 +965,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             if ('velocity_x' not in self._save_var_list.keys()):
                 self._save_var_list['velocity_x'] = [
                     'ux', 'meters per second', 'f4',
-                    ('total_time', 'length', 'width')]
+                    self._netcdf_coords]
             if ('velocity_y' not in self._save_var_list.keys()):
                 self._save_var_list['velocity_y'] = [
                     'uy', 'meters per second', 'f4',
-                    ('total_time', 'length', 'width')]
+                    self._netcdf_coords]
         elif (save_velocity_components is False):
             if ('velocity_x' in self._save_var_list.keys()):
                 del self._save_var_list['velocity_x']
@@ -1262,6 +1258,47 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     @clobber_netcdf.setter
     def clobber_netcdf(self, clobber_netcdf):
         self._clobber_netcdf = clobber_netcdf
+
+    @property
+    def legacy_netcdf(self):
+        """Enable output in legacy netCDF format.
+
+        .. note:: new in `v2.1.0`.
+
+        Default behavior, legacy_netcdf: False, is for the model to use the
+        new `v2.1.0` output netCDF format. The updated format is configured
+        to match the input expected by `xarray`, which eases interaction with
+        model outputs. The change in format is from inconsistently named
+        dimensions and *coordinate variables*, to homogeneous definitions.
+        Also, the legacy format specified the variables `x` and `y` as 2d
+        grids, whereas the updated format uses 1d coordinate arrays.
+        
+        .. important::
+
+            There are no changes to the dimensionality of data such as bed
+            elevation or velocity, only the metadata specifying the location of
+            the data are changed.
+
+        +-------------+-------------------+---------------------------------+
+        |             | default           | legacy                          |
+        +=============+===================+=================================+
+        | dimensions  | `time`, `x`, `y`  | `total_time`, `length`, `width` |
+        +-------------+-------------------+---------------------------------+
+        | variables   | `time`, `x`, `y`  | `time`, `y`, `x`; x, y as 2D    |
+        +-------------+-------------------+---------------------------------+
+        | data        | `t-x-y` array     | `t-y-x` array                   |
+        +-------------+-------------------+---------------------------------+
+
+        .. hint::
+
+            If you are beginning a new project, use `legacy_netcdf == False`,
+            and update scripts accordingly.
+        """
+        return self._legacy_netcdf
+
+    @legacy_netcdf.setter
+    def legacy_netcdf(self, legacy_netcdf):
+        self._legacy_netcdf = legacy_netcdf
 
     @property
     def time(self):

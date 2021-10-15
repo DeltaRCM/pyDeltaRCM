@@ -176,6 +176,10 @@ class init_tools(abc.ABC):
         self._input_file_vars = input_file_vars
         self.out_dir = self._input_file_vars['out_dir']
         self.verbose = self._input_file_vars['verbose']
+        if self._input_file_vars['legacy_netcdf']:
+            self._netcdf_coords = ('total_time', 'length', 'width')
+        else:
+            self._netcdf_coords = ('time', 'x', 'y')
 
     def process_input_to_model(self):
         """Process input file to model variables.
@@ -275,6 +279,7 @@ class init_tools(abc.ABC):
                                 self._save_velocity_components)
         if self._save_any_grids:  # always save metadata if saving grids
             self._save_metadata = True
+
         self._is_finalized = False
 
     def set_constants(self):
@@ -430,12 +435,15 @@ class init_tools(abc.ABC):
         # resolve any boundary conditions
         self._hb = self.hb or self.h0  # basin depth
 
-        # ---- empty arrays ----
+        # ---- coordinates ----
+        self.xc = np.arange(0, self.L) * self._dx
+        self.yc = np.arange(0, self.W) * self._dx
         self.x, self.y = np.meshgrid(np.arange(0, self.W),
                                      np.arange(0, self.L))
         self.X, self.Y = np.meshgrid(np.arange(0, self.W+1)*self._dx,
                                      np.arange(0, self.L+1)*self._dx)
 
+        # ---- empty arrays ----
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int64)
         self.eta = np.zeros((self.L, self.W), dtype=np.float32)
         self.eta0 = np.copy(self.eta)  # establish eta0 copy
@@ -593,25 +601,39 @@ class init_tools(abc.ABC):
             self.output_netcdf.description = 'Output from pyDeltaRCM'
             self.output_netcdf.history = ('Created '
                                           + time_lib.ctime(time_lib.time()))
-            self.output_netcdf.source = 'pyDeltaRCM'
+            self.output_netcdf.source = 'pyDeltaRCM v{ver}'.format(
+                ver=self.__pyDeltaRCM_version__)
 
-            # create master dimensions
-            self.output_netcdf.createDimension('length', self.L)
-            self.output_netcdf.createDimension('width', self.W)
-            self.output_netcdf.createDimension('total_time', None)
+            # create master dimensions (pulls from `self._netcdf_coords`)
+            self.output_netcdf.createDimension(self._netcdf_coords[1], self.L)
+            self.output_netcdf.createDimension(self._netcdf_coords[2], self.W)
+            self.output_netcdf.createDimension(self._netcdf_coords[0], None)
 
             # create master coordinates (as netCDF variables)
-            x = self.output_netcdf.createVariable(
-                'x', 'f4', ('length', 'width'))
-            y = self.output_netcdf.createVariable(
-                'y', 'f4', ('length', 'width'))
-            time = self.output_netcdf.createVariable('time', 'f4',
-                                                     ('total_time',))
-            x.units = 'meters'
-            y.units = 'meters'
+            time = self.output_netcdf.createVariable(
+                'time', 'f4', (self._netcdf_coords[0],))
             time.units = 'second'
-            x[:] = self.x
-            y[:] = self.y
+
+            if self._legacy_netcdf:
+                # old format is 2d array x and y
+                x = self.output_netcdf.createVariable(
+                    'x', 'f4', self._netcdf_coords[1:])
+                y = self.output_netcdf.createVariable(
+                    'y', 'f4', self._netcdf_coords[1:])
+                x[:] = self.x
+                y[:] = self.y
+
+            else:
+                # new output format is 1d x and y
+                x = self.output_netcdf.createVariable(
+                    'x', 'f4', ('x'))
+                y = self.output_netcdf.createVariable(
+                    'y', 'f4', ('y'))
+                x[:] = self.xc
+                y[:] = self.yc
+
+            x.units = 'meter'
+            y.units = 'meter'
 
             # set up variables for output data grids
             def _create_grid_variable(varname, varunits,
@@ -692,7 +714,7 @@ class init_tools(abc.ABC):
         self._save_var_list['meta']['hb'] = ['hb', 'meters', 'f4', ()]
         self._save_var_list['meta']['cell_type'] = ['cell_type',
                                                     'type', 'i8',
-                                                    ('length', 'width')]
+                                                    self._netcdf_coords[1:]]
         # subsidence metadata
         if self._toggle_subsidence:
             self._save_var_list['meta']['start_subsidence'] = [
@@ -700,17 +722,20 @@ class init_tools(abc.ABC):
             ]
             self._save_var_list['meta']['sigma'] = [
                 'sigma', 'meters per timestep', 'f4',
-                ('length', 'width')
+                self._netcdf_coords[1:]
             ]
         # time-varying metadata
         self._save_var_list['meta']['H_SL'] = [None, 'meters', 'f4',
-                                               ('total_time')]
+                                               (self._netcdf_coords[0])]
         self._save_var_list['meta']['f_bedload'] = [None, 'fraction',
-                                                    'f4', ('total_time')]
+                                                    'f4',
+                                                    (self._netcdf_coords[0])]
         self._save_var_list['meta']['C0_percent'] = [None, 'percent',
-                                                     'f4', ('total_time')]
+                                                     'f4',
+                                                     (self._netcdf_coords[0])]
         self._save_var_list['meta']['u0'] = [None, 'meters per second',
-                                             'f4', ('total_time')]
+                                             'f4',
+                                             (self._netcdf_coords[0])]
 
     def load_checkpoint(self, defer_output=False):
         """Load the checkpoint from the .npz file.
