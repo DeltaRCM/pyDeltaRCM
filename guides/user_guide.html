@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>User Guide &#8212; pyDeltaRCM 2.0.3 documentation</title>
+    <title>User Guide &#8212; pyDeltaRCM 2.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="10min.html" title="10-minute tutorial"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
       </ul>
     </div>  
@@ -479,21 +479,29 @@ parameters:</p>
 <section id="gridded-variables">
 <h3>Gridded Variables<a class="headerlink" href="#gridded-variables" title="Permalink to this headline">¶</a></h3>
 <p>In any given run, the saving parameters “save_&lt;var&gt;_grids” control whether or
-not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file.
-In the netCDF4 file, a 3-D array with the dimensions
-<em>time</em> x <em>length</em> x <em>width</em> is created for each 2-D grid variable that is set
-to be saved. The appropriate units for these variables are stored as well,
-such as “meters per second” for the <em>velocity</em> grid.</p>
+not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file. In
+the netCDF4 file, a 3-D array with the dimensions <cite>time</cite> <img class="math" src="../_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/>
+<cite>x</cite> <img class="math" src="../_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/> <cite>y</cite> is created for each 2-D grid variable that is set to
+be saved. Note that <cite>x</cite> is the <em>downstream</em> coordinate, rather than the
+Cartesian <cite>x</cite> when displaying the grid. The appropriate units for all
+variables are stored: for example “meters per second” for the <em>velocity</em>
+grid.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The format of the output netCDF file coordinate changed in <cite>v2.1.0</cite>. The
+old format is documented
+in <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.legacy_netcdf" title="pyDeltaRCM.model.DeltaModel.legacy_netcdf"><code class="xref py py-attr docutils literal notranslate"><span class="pre">legacy_netcdf</span></code></a>, and that input
+parameter <cite>legacy_netcdf</cite> can be used to create on output netcdf file with
+the old coordinate configuration.</p>
+</div>
 </section>
 <section id="grid-coordinates">
 <h3>Grid Coordinates<a class="headerlink" href="#grid-coordinates" title="Permalink to this headline">¶</a></h3>
-<p>To save the model information associated with the domain itself, variables
-associated with the grid are saved as well. These are the meshed 2-D grids
-corresponding to the distance of each cell from the boundary in the “Width”
-dimension of the domain, <em>x</em> in meters. As well as the distance away from the
-boundary of each cell in the “Length” dimension, as <em>y</em> in meters. Similarly, a
-<em>time</em> variable is stored which is a 1-D array (vector) holding the model time
-values in seconds, associated with each set of saved output data.</p>
+<p>Grid coordinates are specified in the variables <cite>time</cite>, <cite>x</cite>, and <cite>y</cite> in the output netCDF4 file.
+These arrays are 1D arrays, which specify the location of each cell in the domain in <em>dimensional</em> coordinates (e.g., meters).
+In the downstream direction,  the distance of each cell from the inlet boundary is specified in <cite>x</cite> in meters.
+Similarly, the cross-domain distance is specified in <cite>y</cite> in meters.
+Lastly, the <cite>time</cite> variable is stored as a 1D array with model <cite>time</cite> in seconds.</p>
 </section>
 <section id="model-metadata">
 <h3>Model Metadata<a class="headerlink" href="#model-metadata" title="Permalink to this headline">¶</a></h3>
@@ -669,13 +677,13 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
         <li class="right" >
           <a href="10min.html" title="10-minute tutorial"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">User Guide</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
     </div>
   </body>
 </html>

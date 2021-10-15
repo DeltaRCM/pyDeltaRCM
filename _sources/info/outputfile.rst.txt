@@ -9,23 +9,31 @@ Gridded Variables
 =================
 
 In any given run, the saving parameters "save_<var>_grids" control whether or
-not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file.
-In the netCDF4 file, a 3-D array with the dimensions
-*time* x *length* x *width* is created for each 2-D grid variable that is set
-to be saved. The appropriate units for these variables are stored as well,
-such as "meters per second" for the *velocity* grid.
+not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file. In
+the netCDF4 file, a 3-D array with the dimensions `time` :math:`\times`
+`x` :math:`\times` `y` is created for each 2-D grid variable that is set to
+be saved. Note that `x` is the *downstream* coordinate, rather than the
+Cartesian `x` when displaying the grid. The appropriate units for all
+variables are stored: for example "meters per second" for the *velocity*
+grid.
+
+.. note::
+   
+   The format of the output netCDF file coordinate changed in `v2.1.0`. The
+   old format is documented
+   in :attr:`~pyDeltaRCM.model.DeltaModel.legacy_netcdf`, and that input
+   parameter `legacy_netcdf` can be used to create on output netcdf file with
+   the old coordinate configuration.
 
 
 Grid Coordinates
 ================
 
-To save the model information associated with the domain itself, variables
-associated with the grid are saved as well. These are the meshed 2-D grids
-corresponding to the distance of each cell from the boundary in the "Width"
-dimension of the domain, *x* in meters. As well as the distance away from the
-boundary of each cell in the "Length" dimension, as *y* in meters. Similarly, a
-*time* variable is stored which is a 1-D array (vector) holding the model time
-values in seconds, associated with each set of saved output data.
+Grid coordinates are specified in the variables `time`, `x`, and `y` in the output netCDF4 file.
+These arrays are 1D arrays, which specify the location of each cell in the domain in *dimensional* coordinates (e.g., meters).
+In the downstream direction,  the distance of each cell from the inlet boundary is specified in `x` in meters.
+Similarly, the cross-domain distance is specified in `y` in meters.
+Lastly, the `time` variable is stored as a 1D array with model `time` in seconds.
 
 
 Model Metadata

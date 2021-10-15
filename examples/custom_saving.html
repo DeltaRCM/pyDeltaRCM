@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Saving custom fields to the output file &#8212; pyDeltaRCM 2.0.3 documentation</title>
+    <title>Saving custom fields to the output file &#8212; pyDeltaRCM 2.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="custom_yaml.html" title="Defining custom YAML parameters"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Examples of using and working with pyDeltaRCM</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Saving custom fields to the output file</a></li> 
       </ul>
@@ -59,10 +59,10 @@ Trying to set up figures to save that are not variables of that shape will resul
 <p>When adding variables or metadata to be initialized and subsequently saved in the output netCDF, the key-value pair relationship is as follows.
 The key added to <code class="docutils literal notranslate"><span class="pre">self._save_var_list</span></code> is the name of the variable as it will be recorded in the netCDF file, this <em>does not</em> have to correspond to the name of an attribute in the model.
 To add a variable to the metadata, a key must be added to <code class="docutils literal notranslate"><span class="pre">self._save_var_list['meta']</span></code>.
-The expected value for a given key is a list containing strings indicating the model attribute to be saved, its units, the variable type, and lastly the variable dimensions (e.g., <code class="docutils literal notranslate"><span class="pre">['active_layer',</span> <span class="pre">'fraction',</span> <span class="pre">'f4',</span> <span class="pre">('total_time',</span> <span class="pre">'length',</span> <span class="pre">'width')]</span></code> for the active layer).</p>
+The expected value for a given key is a list containing strings indicating the model attribute to be saved, its units, the variable type, and lastly the variable dimensions (e.g., <code class="docutils literal notranslate"><span class="pre">['active_layer',</span> <span class="pre">'fraction',</span> <span class="pre">'f4',</span> <span class="pre">('time',</span> <span class="pre">'x',</span> <span class="pre">'y')]</span></code> for the active layer).</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>The dimensions of the custom variable being specified must match <em>exactly</em> with one of the three standard dimensions: length, width, total_time.
+<p>The dimensions of the custom variable being specified must match <em>exactly</em> with one of the three standard dimensions: <cite>x</cite>, <cite>y</cite>, <cite>time</cite>.
 Use of an invalid dimension will result in an error.</p>
 </div>
 <p>An example of using the hook and creating a model subclass to customize the figures, gridded variables, and metadata being saved is provided below.</p>
@@ -87,8 +87,8 @@ Use of an invalid dimension will result in an error.</p>
 <span class="gp">...</span>
 <span class="gp">... </span>        <span class="c1"># save the active layer grid each save_dt w/ a short name</span>
 <span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">_save_var_list</span><span class="p">[</span><span class="s1">&#39;actlay&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;active_layer&#39;</span><span class="p">,</span> <span class="s1">&#39;fraction&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                         <span class="s1">&#39;f4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;total_time&#39;</span><span class="p">,</span>
-<span class="gp">... </span>                                                <span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">)]</span>
+<span class="gp">... </span>                                         <span class="s1">&#39;f4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                                <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">)]</span>
 <span class="gp">...</span>
 <span class="gp">... </span>        <span class="c1"># save number of water parcels w/ a long name</span>
 <span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">_save_var_list</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">][</span><span class="s1">&#39;water_parcels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Np_water&#39;</span><span class="p">,</span>
@@ -109,7 +109,7 @@ For simplicity we will just check that the appropriate parameters were added to 
 <span class="go">{&#39;active_layer&#39;: [&#39;active_layer&#39;]}</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mdl</span><span class="o">.</span><span class="n">_save_var_list</span><span class="p">)</span>
-<span class="go">{&#39;meta&#39;: {&#39;water_parcels&#39;: [&#39;Np_water&#39;, &#39;parcels&#39;, &#39;i8&#39;, ()]}, &#39;actlay&#39;: [&#39;active_layer&#39;, &#39;fraction&#39;, &#39;f4&#39;, (&#39;total_time&#39;, &#39;length&#39;, &#39;width&#39;)]}</span>
+<span class="go">{&#39;meta&#39;: {&#39;water_parcels&#39;: [&#39;Np_water&#39;, &#39;parcels&#39;, &#39;i8&#39;, ()]}, &#39;actlay&#39;: [&#39;active_layer&#39;, &#39;fraction&#39;, &#39;f4&#39;, (&#39;time&#39;, &#39;x&#39;, &#39;y&#39;)]}</span>
 </pre></div>
 </div>
 </section>
@@ -160,14 +160,14 @@ For simplicity we will just check that the appropriate parameters were added to 
         <li class="right" >
           <a href="custom_yaml.html" title="Defining custom YAML parameters"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.0.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Examples of using and working with pyDeltaRCM</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Saving custom fields to the output file</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
     </div>
   </body>
 </html>

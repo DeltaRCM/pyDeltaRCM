@@ -134,6 +134,7 @@
       ~DeltaModel.hb
       ~DeltaModel.influx_sediment_concentration
       ~DeltaModel.itermax
+      ~DeltaModel.legacy_netcdf
       ~DeltaModel.omega_flow
       ~DeltaModel.omega_sfc
       ~DeltaModel.out_dir

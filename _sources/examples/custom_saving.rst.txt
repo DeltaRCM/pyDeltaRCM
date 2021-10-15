@@ -17,11 +17,11 @@ For example, ``self._save_fig_list['active_layer'] = ['active_layer']`` will pro
 When adding variables or metadata to be initialized and subsequently saved in the output netCDF, the key-value pair relationship is as follows.
 The key added to ``self._save_var_list`` is the name of the variable as it will be recorded in the netCDF file, this *does not* have to correspond to the name of an attribute in the model.
 To add a variable to the metadata, a key must be added to ``self._save_var_list['meta']``.
-The expected value for a given key is a list containing strings indicating the model attribute to be saved, its units, the variable type, and lastly the variable dimensions (e.g., ``['active_layer', 'fraction', 'f4', ('total_time', 'length', 'width')]`` for the active layer).
+The expected value for a given key is a list containing strings indicating the model attribute to be saved, its units, the variable type, and lastly the variable dimensions (e.g., ``['active_layer', 'fraction', 'f4', ('time', 'x', 'y')]`` for the active layer).
 
 .. important::
 
-    The dimensions of the custom variable being specified must match *exactly* with one of the three standard dimensions: length, width, total_time.
+    The dimensions of the custom variable being specified must match *exactly* with one of the three standard dimensions: `x`, `y`, `time`.
     Use of an invalid dimension will result in an error.
 
 An example of using the hook and creating a model subclass to customize the figures, gridded variables, and metadata being saved is provided below.
@@ -49,8 +49,8 @@ An example of using the hook and creating a model subclass to customize the figu
     ...
     ...         # save the active layer grid each save_dt w/ a short name
     ...         self._save_var_list['actlay'] = ['active_layer', 'fraction',
-    ...                                          'f4', ('total_time',
-    ...                                                 'length', 'width')]
+    ...                                          'f4', ('time',
+    ...                                                 'x', 'y')]
     ...
     ...         # save number of water parcels w/ a long name
     ...         self._save_var_list['meta']['water_parcels'] = ['Np_water',
@@ -83,4 +83,4 @@ For simplicity we will just check that the appropriate parameters were added to 
     {'active_layer': ['active_layer']}
 
     >>> print(mdl._save_var_list)
-    {'meta': {'water_parcels': ['Np_water', 'parcels', 'i8', ()]}, 'actlay': ['active_layer', 'fraction', 'f4', ('total_time', 'length', 'width')]}
+    {'meta': {'water_parcels': ['Np_water', 'parcels', 'i8', ()]}, 'actlay': ['active_layer', 'fraction', 'f4', ('time', 'x', 'y')]}
