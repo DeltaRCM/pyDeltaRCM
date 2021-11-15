@@ -1353,6 +1353,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             self.sigma = (self.sigma / self._dt) * new_time_step
 
         self._dt = new_time_step
+        self.init_sediment_routers()
 
     @property
     def time_iter(self):
