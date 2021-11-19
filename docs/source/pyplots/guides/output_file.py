@@ -40,7 +40,7 @@ ax[1].imshow(
     delta.uw, cmap='plasma')
 ax[1].set_xticks([])
 ax[1].set_yticks([])
-ax[0].set_title('velocity')
+ax[1].set_title('velocity')
 
 plt.tight_layout()
 plt.show()
