@@ -729,7 +729,7 @@ class TestSaveGrids:
         assert os.path.isfile(exp_path_nc) is False
 
         # trying to save a grid will raise an exception
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match=r"DeltaModel' object .*"):
             _delta.save_grids('sedflux', _delta.qs, _delta._save_iter)
 
         # assert log was called when exception was raised
