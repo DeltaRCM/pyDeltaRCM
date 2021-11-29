@@ -419,10 +419,11 @@ class iteration_tools(abc.ABC):
         self.log_info(_msg, verbosity=2)
         try:
             self.output_netcdf.variables[var_name][ts, :, :] = var
-        except:
-            _msg = 'Failed to save {var_name} grid to netCDF file.'.format(var_name=var_name)
+        except Exception as e:
+            _msg = (f'Failed to save {var_name} grid to netCDF file, '
+                    f'Exception: {e}')
             self.logger.error(_msg)
-            warnings.warn(UserWarning('Cannot save grid to netCDF file.'))
+            raise Exception(e)
 
     def save_the_checkpoint(self):
         """Save checkpoint files.
