@@ -246,3 +246,9 @@ class hook_tools(abc.ABC):
 
         """
         pass
+
+    def hook_after_route_water(self):
+        pass        
+
+    def hook_after_route_sediment(self):
+        pass
