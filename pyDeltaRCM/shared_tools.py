@@ -151,7 +151,7 @@ def get_inlet_weights(inlet):
 
     This method is called at the top of water and sediment routing steps by
     default, as implemented in the methods
-    :obj:`~pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water` and 
+    :obj:`~pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water` and
     :obj:`~pyDeltaRCM.water_tools.water_tools.get_inlet_weights_sediment`.
 
     The function determines the *weights* describing which inlet cells parcels

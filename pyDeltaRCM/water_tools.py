@@ -64,7 +64,7 @@ class water_tools(abc.ABC):
 
     def get_inlet_weights_water(self, **kwargs):
         """Get weight for inlet cells for water parcels.
-        
+
         This method determines the *weights* describing which inlet cells
         water parcels are fed into the domain (where the cells are
         `self.inlet`).
@@ -73,7 +73,7 @@ class water_tools(abc.ABC):
 
         .. note::
 
-            Reimplement this method in custom subclasses as needed. 
+            Reimplement this method in custom subclasses as needed.
         """
         return shared_tools.get_inlet_weights(self.inlet)
 

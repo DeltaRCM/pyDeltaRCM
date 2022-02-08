@@ -76,7 +76,7 @@ class sed_tools(abc.ABC):
 
     def get_inlet_weights_sediment(self, **kwargs):
         """Get weight for inlet cells for sediment parcels.
-        
+
         This method determines the *weights* describing which inlet cells
         sediment parcels are fed into the domain (where the cells are
         `self.inlet`).

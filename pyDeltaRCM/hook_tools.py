@@ -254,7 +254,7 @@ class hook_tools(abc.ABC):
         routing has completed with the
         method :obj:`~pyDeltaRCM.water_tools.water_tools.route_water`
         """
-        pass        
+        pass
 
     def hook_after_route_sediment(self):
         """Hook called *after* :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`.
