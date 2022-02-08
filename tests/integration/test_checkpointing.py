@@ -187,8 +187,8 @@ class TestCheckpointingIntegrations:
         assert np.all(output['meta']['cell_type'][:] == resumeModel.cell_type)
         assert output['meta']['H_SL'][-1].data == resumeModel.H_SL
         assert output['meta']['f_bedload'][-1].data == resumeModel.f_bedload
-        assert pytest.approx(float(output['meta']['C0_percent'][-1].data) ==
-                             resumeModel.C0_percent)
+        C0_from_file = float(output['meta']['C0_percent'][-1].data)
+        assert pytest.approx(C0_from_file) == resumeModel.C0_percent
         assert output['meta']['u0'][-1].data == resumeModel.u0
 
         # checkpoint interval aligns w/ timestep dt so these should match
@@ -696,7 +696,7 @@ class TestCheckpointingCreatingLoading:
         assert np.all(_opened['eta'][:].data == _new['eta'][0, :, :].data)
         # random field should be saved in the new netCDF file
         # some rounding/truncation happens in the netCDF so we use approx
-        assert pytest.approx(_rand_field == _new['eta'][1, :, :].data)
+        assert pytest.approx(_rand_field) == _new['eta'][1, :, :].data
 
     @pytest.mark.skipif(
         platform.system() != 'Windows',
