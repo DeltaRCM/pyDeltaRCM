@@ -62,6 +62,11 @@ class water_tools(abc.ABC):
         self.pad_depth = np.pad(self.depth, 1, 'edge')
         self.pad_cell_type = np.pad(self.cell_type, 1, 'edge')
 
+    def get_inlet_weights_water(self, **kwargs):
+        """Get weight for inlet cells for water parcels.
+        """
+        return shared_tools._get_inlet_weights(self.inlet)
+
     def run_water_iteration(self):
         """Run a single iteration of travel paths for all water parcels.
 
@@ -81,7 +86,7 @@ class water_tools(abc.ABC):
         self.log_info(_msg, verbosity=2)
 
         # configure the starting indices for each parcel
-        inlet_weights = np.ones_like(self.inlet)
+        inlet_weights = self.get_inlet_weights_water()
         start_indices = shared_tools.get_start_indices(self.inlet,
                                                        inlet_weights,
                                                        self._Np_water)
@@ -320,7 +325,7 @@ class water_tools(abc.ABC):
             self.log_info(_msg, verbosity=2)
 
             indices_blank = np.zeros(
-                (np.int(self._Np_water), np.int(self.stepmax / 4)), dtype=int)
+                (int(self._Np_water), int(self.stepmax / 4)), dtype=int)
 
             self.free_surf_walk_inds = np.hstack((self.free_surf_walk_inds, indices_blank))
 
@@ -811,7 +816,7 @@ def _check_for_loops(free_surf_walk_inds, new_inds, _step,
         the inlet domain edge.
 
     stage_above_SL
-        Water surface elevation minuns the domain sea level.
+        Water surface elevation minus the domain sea level.
 
     Returns
     -------
