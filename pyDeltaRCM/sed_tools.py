@@ -77,13 +77,19 @@ class sed_tools(abc.ABC):
     def get_inlet_weights_sediment(self, **kwargs):
         """Get weight for inlet cells for sediment parcels.
         
+        This method determines the *weights* describing which inlet cells
+        sediment parcels are fed into the domain (where the cells are
+        `self.inlet`).
+        Internally, :obj:`pyDeltaRCM.shared_tools._get_inlet_weights` is
+        called, returning a balanced weighting across all inlet cells.
+
         .. note::
 
             Reimplement this method in custom subclasses as needed. Function
             is passed a string argument `parcel_type`, with information about
-            the parcel being routed for convenience in extending.
+            the parcel being routed for convenience.
         """
-        return shared_tools._get_inlet_weights(self.inlet)
+        return shared_tools.get_inlet_weights(self.inlet)
 
     def route_all_sand_parcels(self):
         """Route sand parcels; topo diffusion.

@@ -64,8 +64,18 @@ class water_tools(abc.ABC):
 
     def get_inlet_weights_water(self, **kwargs):
         """Get weight for inlet cells for water parcels.
+        
+        This method determines the *weights* describing which inlet cells
+        water parcels are fed into the domain (where the cells are
+        `self.inlet`).
+        Internally, :obj:`pyDeltaRCM.shared_tools._get_inlet_weights` is
+        called, returning a balanced weighting across all inlet cells.
+
+        .. note::
+
+            Reimplement this method in custom subclasses as needed. 
         """
-        return shared_tools._get_inlet_weights(self.inlet)
+        return shared_tools.get_inlet_weights(self.inlet)
 
     def run_water_iteration(self):
         """Run a single iteration of travel paths for all water parcels.

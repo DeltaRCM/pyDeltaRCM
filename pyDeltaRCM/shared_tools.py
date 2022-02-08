@@ -146,7 +146,7 @@ def get_random_uniform(limit):
     return np.random.uniform(0, limit)
 
 
-def _get_inlet_weights(inlet):
+def get_inlet_weights(inlet):
     """Get weight for inlet parcels.
 
     This method is called at the top of water and sediment routing steps by

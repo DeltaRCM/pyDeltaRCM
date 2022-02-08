@@ -165,7 +165,8 @@ We then can initialize our new model type, and see that this model has all of th
 
 Hooks are methods in the model sequence that do nothing by default, but can be augmented to provide arbitrary desired behavior in the model.
 Hooks have been integrated throughout the model initialization and update sequences, to allow the users to achieve complex behavior at various stages of the model sequence.
-For example, ``hook_solve_water_and_sediment_timestep`` is a hook which occurs immediately before the model :obj:`solve_water_and_sediment_timestep` method.
+For example, ``hook_solve_water_and_sediment_timestep`` is a hook which occurs *immediately before* the model :obj:`solve_water_and_sediment_timestep` method.
+The standard is for a `hook` to describe the function name that it precedes.
 
 To utilize the hooks, we simply define a method in our subclass with the name corresponding to the hook we want to augment to achieve the desired behavior.
 For example, to change the behavior of the subsidence field to vary randomly in magnitude on each iteration:
@@ -218,7 +219,9 @@ Now, on every iteration of the model, our hooked method will be called immediate
 
 This is a somewhat contrived example to give you a sense of how you can implement changes to the model to achieve desired behavior. 
 
-A complete :doc:`list of model hooks is available here </reference/model/model_hooks>`, but model hooks all follow the convention of beginning with the prefix `hook_` and include the name of the method they *immediately precede* in the model; for example `hook_run_water_iteration` is called immediately before `run_water_iteration` is called.
+A complete :doc:`list of model hooks is available here </reference/model/model_hooks>`, but the standard is for model hooks to follow a convention of beginning with the prefix `hook_` and include the name of the method they *immediately precede* in the model; for example `hook_run_water_iteration` is called immediately before `run_water_iteration` is called.
+There are a few additional hooks integrated into the model that occur *after* logical collections of functions, where a developer is likely to want to integrate a change in behavior.
+These hooks follow the convention name `hook_after_` and then the name of the function they follow; two examples are `hook_after_route_water` and `hook_after_route_sediment`.
 
 .. note::
     
@@ -231,6 +234,7 @@ A complete :doc:`list of model hooks is available here </reference/model/model_h
 There may be cases where hooks are insufficient for the modifications you need to make to the model.
 In this case, you should subclass the model, as depicted above, and re-implement entire methods, as necessary, by copying code from the package to your own subclass.
 However, for stability and forwards-compatibility, you should try to minimize copied code as much as possible.
+If you identify a location in the model framework where you think adding a hook (for example, another `hook_after_` method), please file an issue on the GitHub and we will be happy to consider.
 
 
 Subclassing examples
