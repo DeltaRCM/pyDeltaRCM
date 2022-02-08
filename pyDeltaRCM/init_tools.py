@@ -587,7 +587,8 @@ class init_tools(abc.ABC):
             if (os.path.exists(file_path)) and \
                     (self._clobber_netcdf is False):
                 raise FileExistsError(
-                    'Existing NetCDF4 output file in target output location.')
+                    'Existing NetCDF4 output file in target output location: '
+                    '{file_path}'.format(file_path=file_path))
             elif (os.path.exists(file_path)) and \
                     (self._clobber_netcdf is True):
                 _msg = 'Replacing existing netCDF file'
@@ -659,17 +660,18 @@ class init_tools(abc.ABC):
 
             self.output_netcdf.createGroup('meta')
             for _val in self._save_var_list['meta'].keys():
-                # time-varying initialize w/ None value, fixed use attribute
+                # time-varying initialize w/ None value
                 if (self._save_var_list['meta'][_val][0] is None):
                     _create_meta_variable(
                         _val, self._save_var_list['meta'][_val][0],
                         self._save_var_list['meta'][_val][1],
                         self._save_var_list['meta'][_val][2],
                         self._save_var_list['meta'][_val][3])
+                # for scalars, get the attribute and store it
                 else:
                     _create_meta_variable(
-                        _val, getattr(self,
-                                      self._save_var_list['meta'][_val][0]),
+                        _val, getattr(
+                            self, self._save_var_list['meta'][_val][0]),
                         self._save_var_list['meta'][_val][1],
                         self._save_var_list['meta'][_val][2],
                         self._save_var_list['meta'][_val][3])
