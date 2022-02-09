@@ -41,10 +41,12 @@ class iteration_tools(abc.ABC):
         # water iterations
         self.hook_route_water()
         self.route_water()
+        self.hook_after_route_water()
 
         # sediment iteration
         self.hook_route_sediment()
         self.route_sediment()
+        self.hook_after_route_sediment()
 
     def run_one_timestep(self):
         """Deprecated, since v1.3.1. Use :obj:`solve_water_and_sediment_timestep`."""

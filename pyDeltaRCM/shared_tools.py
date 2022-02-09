@@ -146,6 +146,30 @@ def get_random_uniform(limit):
     return np.random.uniform(0, limit)
 
 
+def get_inlet_weights(inlet):
+    """Get weight for inlet parcels.
+
+    This method is called at the top of water and sediment routing steps by
+    default, as implemented in the methods
+    :obj:`~pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water` and
+    :obj:`~pyDeltaRCM.water_tools.water_tools.get_inlet_weights_sediment`.
+
+    The function determines the *weights* describing which inlet cells parcels
+    are fed into the domain. As implemented by default, returns "ones" for
+    all inlet cell locations, so that the input sediment source is balanced
+    across all inlet cells. The returned weight array is typically passed
+    to :obj:`get_start_indices` to determine the locations to feed parcels
+    into the domain based on the weights determined by this function.
+
+    Parameters
+    ----------
+    inlet : :obj:`ndarray` of int
+        Integer array specifying the inlet cell indices.
+    """
+    inlet_weights = np.ones_like(inlet)
+    return inlet_weights
+
+
 @njit
 def get_start_indices(inlet, inlet_weights, num_starts):
     """Get start indices.

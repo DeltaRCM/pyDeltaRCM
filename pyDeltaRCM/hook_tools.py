@@ -246,3 +246,21 @@ class hook_tools(abc.ABC):
 
         """
         pass
+
+    def hook_after_route_water(self):
+        """Hook called *after* :obj:`~pyDeltaRCM.water_tools.water_tools.route_water`.
+
+        Unlike the standard model hooks, this hook is called *after* water
+        routing has completed with the
+        method :obj:`~pyDeltaRCM.water_tools.water_tools.route_water`
+        """
+        pass
+
+    def hook_after_route_sediment(self):
+        """Hook called *after* :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`.
+
+        Unlike the standard model hooks, this hook is called *after* sed
+        routing has completed with the
+        method :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`
+        """
+        pass
