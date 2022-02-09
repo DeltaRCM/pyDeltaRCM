@@ -133,21 +133,21 @@ Here, we will change the model time value directly, so that we can verify that t
 </figure>
 <p class="rubric">Running the model for real</p>
 <p>Given a yaml file (<code class="docutils literal notranslate"><span class="pre">variable_bedload.yaml</span></code>):</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">Length</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5000.</span>
-<span class="nt">Width</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10000.</span>
-<span class="nt">dx</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
-<span class="nt">N0_meters</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">500</span>
-<span class="nt">C0_percent</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
-<span class="nt">SLR</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.5e-8</span>
-<span class="nt">h0</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="nt">u0</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.1</span>
-<span class="nt">coeff_U_dep_mud</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.5</span>
-<span class="nt">parallel</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">Length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5000.</span><span class="w"></span>
+<span class="nt">Width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10000.</span><span class="w"></span>
+<span class="nt">dx</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+<span class="nt">N0_meters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span><span class="w"></span>
+<span class="nt">C0_percent</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
+<span class="nt">SLR</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.5e-8</span><span class="w"></span>
+<span class="nt">h0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
+<span class="nt">u0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.1</span><span class="w"></span>
+<span class="nt">coeff_U_dep_mud</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w"></span>
+<span class="nt">parallel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
 
-<span class="nt">matrix</span><span class="p">:</span>
-  <span class="nt">f_bedload</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0.3</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0.7</span>
+<span class="nt">matrix</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">f_bedload</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span><span class="w"></span>
 </pre></div>
 </div>
 <p>and a script to run the code:</p>
@@ -173,12 +173,16 @@ Here, we will change the model time value directly, so that we can verify that t
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="subsidence_region.html"
-                        title="previous chapter">Constraining subsidence to part of the domain</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="variable_velocity.html"
-                        title="next chapter">Time-varying inlet velocity</a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="subsidence_region.html"
+                          title="previous chapter">Constraining subsidence to part of the domain</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="variable_velocity.html"
+                          title="next chapter">Time-varying inlet velocity</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -219,7 +223,7 @@ Here, we will change the model time value directly, so that we can verify that t
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

@@ -208,6 +208,21 @@ If it is, flood the dry cell.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water">
+<span class="sig-name descname"><span class="pre">get_inlet_weights_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get weight for inlet cells for water parcels.</p>
+<p>This method determines the <em>weights</em> describing which inlet cells
+water parcels are fed into the domain (where the cells are
+<cite>self.inlet</cite>).
+Internally, <code class="xref py py-obj docutils literal notranslate"><span class="pre">pyDeltaRCM.shared_tools._get_inlet_weights</span></code> is
+called, returning a balanced weighting across all inlet cells.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Reimplement this method in custom subclasses as needed.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.get_water_weight_array">
 <span class="sig-name descname"><span class="pre">get_water_weight_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.get_water_weight_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get step direction weights for each cell.</p>
@@ -399,7 +414,7 @@ the <em>flat</em> index into the domain shape.</p></li>
 <li><p><strong>CTR</strong> – Domain shape parameter, index along inlet wall making the center of
 the domain. I.e., <cite>(0, CTR)</cite> is the midpoint across the inlet, along
 the inlet domain edge.</p></li>
-<li><p><strong>stage_above_SL</strong> – Water surface elevation minuns the domain sea level.</p></li>
+<li><p><strong>stage_above_SL</strong> – Water surface elevation minus the domain sea level.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -498,8 +513,9 @@ with the resultant computed water surface.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">water_tools</a><ul>
 <li><a class="reference internal" href="#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
 <li><a class="reference internal" href="#water-tools-helper-functions">water_tools helper functions</a></li>
@@ -507,12 +523,17 @@ with the resultant computed water surface.</p>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="../init_tools/index.html"
-                        title="previous chapter">init_tools</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../sed_tools/index.html"
-                        title="next chapter">sed_tools</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../init_tools/index.html"
+                          title="previous chapter">init_tools</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../sed_tools/index.html"
+                          title="next chapter">sed_tools</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -553,7 +574,7 @@ with the resultant computed water surface.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

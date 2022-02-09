@@ -88,6 +88,27 @@ loop to get many random numbers.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pyDeltaRCM.shared_tools.get_inlet_weights">
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></span><span class="sig-name descname"><span class="pre">get_inlet_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inlet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.get_inlet_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get weight for inlet parcels.</p>
+<p>This method is called at the top of water and sediment routing steps by
+default, as implemented in the methods
+<a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water" title="pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_inlet_weights_water</span></code></a> and
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">get_inlet_weights_sediment</span></code>.</p>
+<p>The function determines the <em>weights</em> describing which inlet cells parcels
+are fed into the domain. As implemented by default, returns “ones” for
+all inlet cell locations, so that the input sediment source is balanced
+across all inlet cells. The returned weight array is typically passed
+to <a class="reference internal" href="#pyDeltaRCM.shared_tools.get_start_indices" title="pyDeltaRCM.shared_tools.get_start_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_start_indices</span></code></a> to determine the locations to feed parcels
+into the domain based on the weights determined by this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inlet</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code> of int) – Integer array specifying the inlet cell indices.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.shared_tools.get_start_indices">
 <span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.shared_tools.</span></span><span class="sig-name descname"><span class="pre">get_start_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inlet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inlet_weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_starts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.shared_tools.get_start_indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get start indices.</p>
@@ -499,8 +520,9 @@ throughout documentation and version-controlled release.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">shared_tools</a><ul>
 <li><a class="reference internal" href="#shared-functions">Shared functions</a></li>
 <li><a class="reference internal" href="#time-scaling-functions">Time scaling functions</a></li>
@@ -509,12 +531,17 @@ throughout documentation and version-controlled release.</p>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html"
-                        title="previous chapter">pyDeltaRCM.sed_tools.BaseRouter</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../hook_tools/index.html"
-                        title="next chapter">hook_tools</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html"
+                          title="previous chapter">pyDeltaRCM.sed_tools.BaseRouter</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../hook_tools/index.html"
+                          title="next chapter">hook_tools</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -555,7 +582,7 @@ throughout documentation and version-controlled release.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

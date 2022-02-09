@@ -82,6 +82,24 @@ subclassing models.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyDeltaRCM.hook_tools.hook_tools.hook_after_route_sediment">
+<span class="sig-name descname"><span class="pre">hook_after_route_sediment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_after_route_sediment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook called <em>after</em> <a class="reference internal" href="../sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_sediment" title="pyDeltaRCM.sed_tools.sed_tools.route_sediment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_sediment</span></code></a>.</p>
+<p>Unlike the standard model hooks, this hook is called <em>after</em> sed
+routing has completed with the
+method <a class="reference internal" href="../sed_tools/index.html#pyDeltaRCM.sed_tools.sed_tools.route_sediment" title="pyDeltaRCM.sed_tools.sed_tools.route_sediment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_sediment</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyDeltaRCM.hook_tools.hook_tools.hook_after_route_water">
+<span class="sig-name descname"><span class="pre">hook_after_route_water</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_after_route_water" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook called <em>after</em> <a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.route_water" title="pyDeltaRCM.water_tools.water_tools.route_water"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_water</span></code></a>.</p>
+<p>Unlike the standard model hooks, this hook is called <em>after</em> water
+routing has completed with the
+method <a class="reference internal" href="../water_tools/index.html#pyDeltaRCM.water_tools.water_tools.route_water" title="pyDeltaRCM.water_tools.water_tools.route_water"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_water</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.hook_tools.hook_tools.hook_apply_subsidence">
 <span class="sig-name descname"><span class="pre">hook_apply_subsidence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_apply_subsidence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook <a class="reference internal" href="../iteration_tools/index.html#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_subsidence</span></code></a>.</p>
@@ -302,20 +320,26 @@ should be specified as (‘total_time’).</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">hook_tools</a><ul>
 <li><a class="reference internal" href="#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="../shared_tools/index.html"
-                        title="previous chapter">shared_tools</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../debug_tools/index.html"
-                        title="next chapter">debug_tools</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../shared_tools/index.html"
+                          title="previous chapter">shared_tools</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../debug_tools/index.html"
+                          title="next chapter">debug_tools</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -356,7 +380,7 @@ should be specified as (‘total_time’).</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

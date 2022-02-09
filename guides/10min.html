@@ -102,9 +102,9 @@ To create the YAML file, open up your favorite plain-text editing application (e
 YAML syntax is pretty simple for basic configurations, essentially amounting to each line representing a parameter-value pair, separated by a colon.
 For this example, let’s specify three simulation controls: where we want the output file to be placed via the <cite>out_dir</cite> parameter, we will ensure that our simulation is easily reproducible by setting the random <cite>seed</cite> parameter, and we can examine what is the effect of a high fraction of bedload with the <cite>f_bedload</cite> parameter.
 Enter the following in your text editor, and save the file as <code class="docutils literal notranslate"><span class="pre">10min_tutorial.yaml</span></code>, making sure to place the file in a location accessible to your interpreter.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;10min_tutorial&#39;</span>
-<span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">451220118313</span>
-<span class="nt">f_bedload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.9</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;10min_tutorial&#39;</span><span class="w"></span>
+<span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">451220118313</span><span class="w"></span>
+<span class="nt">f_bedload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Now, we can create a second instance of the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel" title="pyDeltaRCM.model.DeltaModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel()</span></code></a>, this time using the input yaml file.</p>
@@ -136,8 +136,9 @@ Enter the following in your text editor, and save the file as <code class="docut
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">10-minute tutorial</a><ul>
 <li><a class="reference internal" href="#a-default-model">A default model</a></li>
 <li><a class="reference internal" href="#the-model-with-set-parameters">The model with set parameters</a></li>
@@ -146,12 +147,17 @@ Enter the following in your text editor, and save the file as <code class="docut
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="getting_started.html"
-                        title="previous chapter">Getting Started</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="user_guide.html"
-                        title="next chapter">User Guide</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="getting_started.html"
+                          title="previous chapter">Getting Started</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="user_guide.html"
+                          title="next chapter">User Guide</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -192,7 +198,7 @@ Enter the following in your text editor, and save the file as <code class="docut
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

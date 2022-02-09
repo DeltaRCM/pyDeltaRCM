@@ -19,6 +19,7 @@ Shared functions
 This module defines several functions that are used throughout the model, and so are organized here for convenience.
 
 .. autofunction:: get_random_uniform
+.. autofunction:: get_inlet_weights
 .. autofunction:: get_start_indices
 .. autofunction:: get_steps
 .. autofunction:: random_pick

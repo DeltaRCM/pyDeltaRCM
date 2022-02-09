@@ -29,8 +29,12 @@
       ~DeltaModel.finalize_timestep
       ~DeltaModel.finalize_water_iteration
       ~DeltaModel.flooding_correction
+      ~DeltaModel.get_inlet_weights_sediment
+      ~DeltaModel.get_inlet_weights_water
       ~DeltaModel.get_water_weight_array
       ~DeltaModel.get_wet_mask_nh
+      ~DeltaModel.hook_after_route_sediment
+      ~DeltaModel.hook_after_route_water
       ~DeltaModel.hook_apply_subsidence
       ~DeltaModel.hook_compute_free_surface
       ~DeltaModel.hook_compute_sand_frac

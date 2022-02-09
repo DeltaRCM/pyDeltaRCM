@@ -114,8 +114,8 @@ Note that the output file is periodically saved during the model run, so things 
 <p>The configuration for a pyDeltaRCM run is set up by a parameter set, usually described in the <code class="docutils literal notranslate"><span class="pre">YAML</span></code> markup format.
 To configure a run, you should create a file called, for example, <code class="docutils literal notranslate"><span class="pre">model_configuration.yml</span></code>.
 Inside this file you can specify parameters for your run, with each parameter on a new line. For example, if <code class="docutils literal notranslate"><span class="pre">model_configuration.yml</span></code> contained the line:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">S0</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.005</span>
-<span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">42</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">S0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.005</span><span class="w"></span>
+<span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">42</span><span class="w"></span>
 </pre></div>
 </div>
 <p>then a <code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel</span></code> model instance initialized with this file specified as <code class="docutils literal notranslate"><span class="pre">input_file</span></code> will have a slope of 0.005, and will use a random seed of 42.
@@ -141,9 +141,9 @@ Generally, if you are modifying the model source code or doing anything non-stan
 <span id="high-level-api"></span><h3>High-level model API<a class="headerlink" href="#high-level-model-api" title="Permalink to this headline">¶</a></h3>
 <p>The high-level API is accessed via either a shell prompt or python script, and handles setting up the model configuration and running the model a specified duration.</p>
 <p>For the following high-level API demonstrations, consider a YAML input file named <code class="docutils literal notranslate"><span class="pre">model_configuration.yml</span></code> which looks like:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">S0</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.005</span>
-<span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">42</span>
-<span class="nt">timesteps</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">500</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">S0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.005</span><span class="w"></span>
+<span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">42</span><span class="w"></span>
+<span class="nt">timesteps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span><span class="w"></span>
 </pre></div>
 </div>
 <section id="command-line-api">
@@ -251,23 +251,23 @@ See <a class="reference internal" href="#customize-the-model"><span class="std s
 <section id="matrix-expansion">
 <span id="matrix-expansion-tag"></span><h4>Matrix expansion<a class="headerlink" href="#matrix-expansion" title="Permalink to this headline">¶</a></h4>
 <p>To use matrix expansion to configure multiple model runs, the dimensions of the matrix (i.e., the variables you want to run) should be listed below the <cite>matrix</cite> key. For example, the following configuration is a one-dimensional matrix with the variable <cite>f_bedload</cite>:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;out_dir&#39;</span>
-<span class="nt">dx</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">40.0</span>
-<span class="nt">h0</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;out_dir&#39;</span><span class="w"></span>
+<span class="nt">dx</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">40.0</span><span class="w"></span>
+<span class="nt">h0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
 
-<span class="nt">matrix</span><span class="p">:</span>
-  <span class="nt">f_bedload</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0.5</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
+<span class="nt">matrix</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">f_bedload</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w"></span>
 </pre></div>
 </div>
 <p>This configuration would produce two model runs, one with bedload fraction (<cite>f_bedload</cite>) 0.5 and another with bedload fraction 0.2, and both with grid spacing (<cite>dx</cite>) 2.0 and basin depth (<cite>h0</cite>) 1.0.
 The matrix expansions will create two folders at <cite>./out_dir/job_000</cite> and <cite>./out_dir/job_001</cite> that each correspond to a created job.
 Each folder will contain a copy of the configuration file used for that job; for example, the full configuration for <cite>job_000</cite> is:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;out_dir/job_000&#39;</span>
-<span class="nt">dx</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">40.0</span>
-<span class="nt">h0</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
-<span class="nt">f_bedload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;out_dir/job_000&#39;</span><span class="w"></span>
+<span class="nt">dx</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">40.0</span><span class="w"></span>
+<span class="nt">h0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
+<span class="nt">f_bedload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Additionally, a log file for each job is located in the output folder, and any output grid files or images specified by the input configuration will be located in the respective job output folder (note: there is no output NetCDF4 file for these runs).</p>
@@ -276,16 +276,16 @@ Each folder will contain a copy of the configuration file used for that job; for
 <p>You must specify the <cite>out_dir</cite> key in the input YAML configuration to use matrix expansion.</p>
 </div>
 <p>Multiple dimensional matrix expansion is additionally supported. For example, the following configuration produces six jobs:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;out_dir&#39;</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;out_dir&#39;</span><span class="w"></span>
 
-<span class="nt">matrix</span><span class="p">:</span>
-  <span class="nt">f_bedload</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0.5</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0.4</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
-  <span class="nt">h0</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="nt">matrix</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">f_bedload</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.4</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w"></span>
+<span class="w">  </span><span class="nt">h0</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -295,22 +295,22 @@ Each folder will contain a copy of the configuration file used for that job; for
 Like the matrix expansion, the <cite>out_dir</cite> key must be specified in the input configuration file.
 The <cite>ensemble</cite> key can be added to any configuration file that does not explicitly define the random seed.
 As an example, two model runs can be generated with the same input sediment fraction using the following configuration <cite>.yml</cite>:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;out_dir&#39;</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;out_dir&#39;</span><span class="w"></span>
 
-<span class="nt">f_bedload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.5</span>
-<span class="nt">ensemble</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="nt">f_bedload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w"></span>
+<span class="nt">ensemble</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
 </pre></div>
 </div>
 <p>This configuration file would produce two model runs that share the same parameters, but have different initial random seed values.
 The ensemble expansion can be applied to configuration files that include a matrix expansion as well:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span> <span class="s">&#39;out_dir&#39;</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">out_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;out_dir&#39;</span><span class="w"></span>
 
-<span class="nt">ensemble</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="nt">ensemble</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
 
-<span class="nt">matrix</span><span class="p">:</span>
-  <span class="nt">h0</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="nt">matrix</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">h0</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The above configuration file would produce 6 model runs, 3 with a basin depth (<cite>h0</cite>) of 1.0, and 3 with a basin depth of 2.0.</p>
@@ -325,9 +325,9 @@ The ensemble expansion can be applied to configuration files that include a matr
 For example, to vary <cite>Qw0</cite> while holding <cite>Qs0</cite> fixed requires modifying both <cite>C0_percent</cite> and some water-discharge-controlling parameter <em>simultaneously</em>; this cannot be achieved with <cite>matrix</cite> expansion.</p>
 <p>To use set expansion, add the <cite>set</cite> key to a configuration file, and define a <em>list</em> of <em>dictionaries</em> which set the parameters of each run to be completed.
 For example, to configure two model runs, the first with parameters <code class="docutils literal notranslate"><span class="pre">u0:</span> <span class="pre">1.0</span></code> and <code class="docutils literal notranslate"><span class="pre">h0:</span> <span class="pre">1.0</span></code>, and the second with parameters <code class="docutils literal notranslate"><span class="pre">u0:</span> <span class="pre">1.2</span></code> and <code class="docutils literal notranslate"><span class="pre">h0:</span> <span class="pre">1.2</span></code>:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">set</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nt">u0</span><span class="p">:</span> <span class="nv">1.0</span><span class="p p-Indicator">,</span><span class="nt"> h0</span><span class="p">:</span> <span class="nv">1.0</span><span class="p p-Indicator">}</span>
-  <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nt">u0</span><span class="p">:</span> <span class="nv">1.2</span><span class="p p-Indicator">,</span><span class="nt"> h0</span><span class="p">:</span> <span class="nv">1.2</span><span class="p p-Indicator">}</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">set</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">u0</span><span class="p">:</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">,</span><span class="nt"> h0</span><span class="p">:</span><span class="w"> </span><span class="nv">1.0</span><span class="p p-Indicator">}</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">u0</span><span class="p">:</span><span class="w"> </span><span class="nv">1.2</span><span class="p p-Indicator">,</span><span class="nt"> h0</span><span class="p">:</span><span class="w"> </span><span class="nv">1.2</span><span class="p p-Indicator">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>All jobs in the <cite>set</cite> specification must have the exact same set of keys.</p>
@@ -377,7 +377,8 @@ To subclass the <a class="reference internal" href="../_autosummary/pyDeltaRCM.m
 </div>
 <p>Hooks are methods in the model sequence that do nothing by default, but can be augmented to provide arbitrary desired behavior in the model.
 Hooks have been integrated throughout the model initialization and update sequences, to allow the users to achieve complex behavior at various stages of the model sequence.
-For example, <code class="docutils literal notranslate"><span class="pre">hook_solve_water_and_sediment_timestep</span></code> is a hook which occurs immediately before the model <code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_water_and_sediment_timestep</span></code> method.</p>
+For example, <code class="docutils literal notranslate"><span class="pre">hook_solve_water_and_sediment_timestep</span></code> is a hook which occurs <em>immediately before</em> the model <code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_water_and_sediment_timestep</span></code> method.
+The standard is for a <cite>hook</cite> to describe the function name that it precedes.</p>
 <p>To utilize the hooks, we simply define a method in our subclass with the name corresponding to the hook we want to augment to achieve the desired behavior.
 For example, to change the behavior of the subsidence field to vary randomly in magnitude on each iteration:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyDeltaRCM.shared_tools</span> <span class="kn">import</span> <span class="n">get_random_uniform</span>
@@ -415,7 +416,9 @@ For example, to change the behavior of the subsidence field to vary randomly in 
 </pre></div>
 </div>
 <p>This is a somewhat contrived example to give you a sense of how you can implement changes to the model to achieve desired behavior.</p>
-<p>A complete <a class="reference internal" href="../reference/model/model_hooks.html"><span class="doc">list of model hooks is available here</span></a>, but model hooks all follow the convention of beginning with the prefix <cite>hook_</cite> and include the name of the method they <em>immediately precede</em> in the model; for example <cite>hook_run_water_iteration</cite> is called immediately before <cite>run_water_iteration</cite> is called.</p>
+<p>A complete <a class="reference internal" href="../reference/model/model_hooks.html"><span class="doc">list of model hooks is available here</span></a>, but the standard is for model hooks to follow a convention of beginning with the prefix <cite>hook_</cite> and include the name of the method they <em>immediately precede</em> in the model; for example <cite>hook_run_water_iteration</cite> is called immediately before <cite>run_water_iteration</cite> is called.
+There are a few additional hooks integrated into the model that occur <em>after</em> logical collections of functions, where a developer is likely to want to integrate a change in behavior.
+These hooks follow the convention name <cite>hook_after_</cite> and then the name of the function they follow; two examples are <cite>hook_after_route_water</cite> and <cite>hook_after_route_sediment</cite>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>While we could overwrite <code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_subsidence</span></code> to achieve a similar behavior, using hooks makes it easy for others to see which components of the model you have changed behavior for; this is essential to reproducible science.</p>
@@ -426,7 +429,8 @@ For example, to change the behavior of the subsidence field to vary randomly in 
 </div>
 <p>There may be cases where hooks are insufficient for the modifications you need to make to the model.
 In this case, you should subclass the model, as depicted above, and re-implement entire methods, as necessary, by copying code from the package to your own subclass.
-However, for stability and forwards-compatibility, you should try to minimize copied code as much as possible.</p>
+However, for stability and forwards-compatibility, you should try to minimize copied code as much as possible.
+If you identify a location in the model framework where you think adding a hook (for example, another <cite>hook_after_</cite> method), please file an issue on the GitHub and we will be happy to consider.</p>
 <section id="subclassing-examples">
 <h4>Subclassing examples<a class="headerlink" href="#subclassing-examples" title="Permalink to this headline">¶</a></h4>
 <p>We maintain a number of <a class="reference internal" href="../examples/index.html"><span class="doc">examples of pyDeltaRCM use</span></a>, which show  DeltaModel subclasses implementing various hooks, and reimplementing existing methods, to achieve complex behavior.</p>
@@ -458,9 +462,9 @@ along boundary.</p>
 <p>If, for example we wanted the basin to begin to subside after 2000 seconds
 with a rate of 2e-10 m/s, we would write our yaml file with the following
 parameters:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">toggle_subsidence</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="nt">start_subsidence</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2000</span>
-<span class="nt">subsidence_rate</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2e-10</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">toggle_subsidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="nt">start_subsidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2000</span><span class="w"></span>
+<span class="nt">subsidence_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2e-10</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -590,8 +594,9 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">User Guide</a><ul>
 <li><a class="reference internal" href="#running-the-model">Running the model</a></li>
 <li><a class="reference internal" href="#configuring-an-input-yaml-file">Configuring an input YAML file</a></li>
@@ -638,12 +643,17 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="10min.html"
-                        title="previous chapter">10-minute tutorial</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="../info/index.html"
-                        title="next chapter">Model Information</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="10min.html"
+                          title="previous chapter">10-minute tutorial</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="../info/index.html"
+                          title="next chapter">Model Information</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -683,7 +693,7 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>
