@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>hook_tools &#8212; pyDeltaRCM 2.1.2 documentation</title>
+    <title>hook_tools &#8212; pyDeltaRCM 2.1.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -33,7 +33,7 @@
         <li class="right" >
           <a href="../shared_tools/index.html" title="shared_tools"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">API reference</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">hook_tools</a></li> 
       </ul>
@@ -79,6 +79,28 @@ model mechanics or anything else. This may mean that an old hook is
 Therefore, we enforce that no old hooks may be used as method names of
 subclassing models.</p>
 <p>This helper method is early in the <cite>DeltaModel</cite> <cite>__init__</cite> routine.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyDeltaRCM.hook_tools.hook_tools.hook_after_create_domain">
+<span class="sig-name descname"><span class="pre">hook_after_create_domain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_after_create_domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook called <em>after</em> <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.create_domain" title="pyDeltaRCM.init_tools.init_tools.create_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_domain</span></code></a>.</p>
+<p>Unlike the standard model hooks, this hook is called <em>after</em> the
+domain has been created with the
+method <a class="reference internal" href="../init_tools/index.html#pyDeltaRCM.init_tools.init_tools.create_domain" title="pyDeltaRCM.init_tools.init_tools.create_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_domain</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyDeltaRCM.hook_tools.hook_tools.hook_after_finalize_timestep">
+<span class="sig-name descname"><span class="pre">hook_after_finalize_timestep</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.hook_tools.hook_tools.hook_after_finalize_timestep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook called <em>after</em> <code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_timestep</span></code>.</p>
+<p>Unlike the standard model hooks, this hook is called <em>after</em> the
+finalize timestep method has completed.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>This is the last method called before logging and outputting data
+for each timestep.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -373,7 +395,7 @@ should be specified as (‘total_time’).</p>
         <li class="right" >
           <a href="../shared_tools/index.html" title="shared_tools"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">hook_tools</a></li> 
       </ul>

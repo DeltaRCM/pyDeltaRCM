@@ -33,6 +33,8 @@
       ~DeltaModel.get_inlet_weights_water
       ~DeltaModel.get_water_weight_array
       ~DeltaModel.get_wet_mask_nh
+      ~DeltaModel.hook_after_create_domain
+      ~DeltaModel.hook_after_finalize_timestep
       ~DeltaModel.hook_after_route_sediment
       ~DeltaModel.hook_after_route_water
       ~DeltaModel.hook_apply_subsidence
