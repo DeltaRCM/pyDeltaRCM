@@ -113,6 +113,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         # create the model domain based on configuration
         self.hook_create_domain()
         self.create_domain()
+        self.hook_after_create_domain()
 
         # initialize the sediment router classes
         self.init_sediment_routers()
@@ -194,6 +195,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
 
         self.hook_finalize_timestep()
         self.finalize_timestep()
+        self.hook_after_finalize_timestep()
 
         # update time-tracking fields
         self._time += self.dt
