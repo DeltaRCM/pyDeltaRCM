@@ -247,6 +247,15 @@ class hook_tools(abc.ABC):
         """
         pass
 
+    def hook_after_create_domain(self):
+        """Hook called *after* :obj:`~pyDeltaRCM.init_tools.init_tools.create_domain`.
+
+        Unlike the standard model hooks, this hook is called *after* the
+        domain has been created with the
+        method :obj:`~pyDeltaRCM.init_tools.init_tools.create_domain`
+        """
+        pass
+
     def hook_after_route_water(self):
         """Hook called *after* :obj:`~pyDeltaRCM.water_tools.water_tools.route_water`.
 
@@ -264,3 +273,16 @@ class hook_tools(abc.ABC):
         method :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`
         """
         pass
+
+    def hook_after_finalize_timestep(self):
+        """Hook called *after* :obj:`~pyDeltaRCM.iteration_tools.finalize_timestep`.
+
+        Unlike the standard model hooks, this hook is called *after* the
+        finalize timestep method has completed. 
+
+        .. hint::
+
+            This is the last method called before logging and outputting data
+            for each timestep.
+        """
+        pass    
