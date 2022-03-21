@@ -14,6 +14,18 @@ Welcome to the PyDeltaRCM documentation
 Project information
 ###################
 
+.. image:: https://badge.fury.io/gh/DeltaRCM%2FpyDeltaRCM.svg
+    :target: https://github.com/DeltaRCM/pyDeltaRCM/releases
+
+.. image:: https://badge.fury.io/py/pyDeltaRCM.svg
+    :target: https://badge.fury.io/py/pyDeltaRCM
+
+.. image:: https://img.shields.io/static/v1?label=GitHub&logo=github&message=source&color=brightgreen
+    :target: https://github.com/DeltaRCM/pyDeltaRCM
+
+.. image:: https://joss.theoj.org/papers/10.21105/joss.03398/status.svg
+   :target: https://doi.org/10.21105/joss.03398
+
 .. toctree::
    :maxdepth: 1
 
@@ -21,6 +33,7 @@ Project information
    meta/contributing
    meta/license
    meta/conduct
+
 
 .. _user_documentation:
 
@@ -39,6 +52,18 @@ User documentation
 
 Developer documentation
 #######################
+
+.. image:: https://badge.fury.io/py/pyDeltaRCM.svg
+    :target: https://badge.fury.io/py/pyDeltaRCM
+
+.. image:: https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg
+    :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
+    
+.. image:: https://codecov.io/gh/DeltaRCM/pyDeltaRCM/branch/develop/graph/badge.svg
+  :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM
+
+.. image:: https://app.codacy.com/project/badge/Grade/1c137d0227914741a9ba09f0b00a49a7
+    :target: https://www.codacy.com/gh/DeltaRCM/pyDeltaRCM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DeltaRCM/pyDeltaRCM&amp;utm_campaign=Badge_Grade   
 
 .. toctree::
    :maxdepth: 3
