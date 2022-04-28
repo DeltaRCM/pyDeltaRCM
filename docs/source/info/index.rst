@@ -14,6 +14,7 @@ All of these questions and more are answered here!
 .. toctree::
    :maxdepth: 1
 
+   initialization
    yamlparameters
    modeltime
    hydrodynamics
