@@ -1,6 +1,7 @@
 # unit tests for shared_tools.py
 
 import pytest
+from pathlib import Path
 
 import numpy as np
 
@@ -11,7 +12,7 @@ from . import utilities
 
 class TestGetAndSetRandom:
 
-    def test_set_random_get_expected(self, tmp_path):
+    def test_set_random_get_expected(self, tmp_path: Path) -> None:
         """
         Test for function shared_tools.get_random_uniform and
         test for function shared_tools.set_random_seed
@@ -29,7 +30,7 @@ class TestGetAndSetRandom:
 
 class TestGetSteps:
 
-    def test_get_steps(self, tmp_path):
+    def test_get_steps(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         delta = DeltaModel(input_file=p)
@@ -56,7 +57,7 @@ class TestGetSteps:
 
 class TestRandomPick:
 
-    def test_random_pick(self):
+    def test_random_pick(self) -> None:
         """
         Test for function shared_tools.random_pick
         """
@@ -66,7 +67,7 @@ class TestRandomPick:
         # should return first index
         assert shared_tools.random_pick(probs) == 0
 
-    def test_random_pick_diff_fixed(self):
+    def test_random_pick_diff_fixed(self) -> None:
         """
         Test for function shared_tools.random_pick
         """
@@ -76,7 +77,7 @@ class TestRandomPick:
         # should return third index
         assert shared_tools.random_pick(probs) == 2
 
-    def test_random_pick_not_zeroed(self):
+    def test_random_pick_not_zeroed(self) -> None:
         """
         Test for function shared_tools.random_pick
         """
@@ -95,7 +96,7 @@ class TestRandomPick:
         assert np.all(_rets != 5)
         assert np.all(_rets != 8)
 
-    def test_random_pick_distribution(self):
+    def test_random_pick_distribution(self) -> None:
         """
         Test for function shared_tools.random_pick
         """
@@ -114,7 +115,7 @@ class TestRandomPick:
 
         assert np.all(_histnorm == pytest.approx(probs, rel=0.10))
 
-    def test_random_pick_anybut_first(self, tmp_path):
+    def test_random_pick_anybut_first(self, tmp_path: Path) -> None:
         """
         Test for function shared_tools.random_pick
         """
@@ -142,7 +143,7 @@ class TestRandomPick:
 
 class TestCustomUnravel:
 
-    def test_custom_unravel_square(self):
+    def test_custom_unravel_square(self) -> None:
         arr = np.arange(9).reshape((3, 3))
         # test upper left corner
         x, y = shared_tools.custom_unravel(0, arr.shape)
@@ -161,7 +162,7 @@ class TestCustomUnravel:
         assert x == 2
         assert y == 2
 
-    def test_custom_unravel_rectangle(self):
+    def test_custom_unravel_rectangle(self) -> None:
         arr = np.arange(50).reshape((5, 10))
         # test a few spots
         x, y = shared_tools.custom_unravel(19, arr.shape)
@@ -171,7 +172,7 @@ class TestCustomUnravel:
         assert x == 3
         assert y == 4
 
-    def test_custom_unravel_exceed_error(self):
+    def test_custom_unravel_exceed_error(self) -> None:
         arr = np.arange(9).reshape((3, 3))
         # next line should throw IndexError
         with pytest.raises(IndexError):
@@ -180,7 +181,7 @@ class TestCustomUnravel:
 
 class TestCustomRavel:
 
-    def test_custom_ravel_square(self):
+    def test_custom_ravel_square(self) -> None:
         arr = np.arange(9).reshape((3, 3))
         # test upper left corner
         tup = (0, 0)
@@ -199,7 +200,7 @@ class TestCustomRavel:
         i = shared_tools.custom_ravel(tup, arr.shape)
         assert i == 8
 
-    def test_custom_ravel_rectangle(self):
+    def test_custom_ravel_rectangle(self) -> None:
         arr = np.arange(50).reshape((5, 10))
         # test a few spots
         tup = (1, 9)
@@ -209,7 +210,7 @@ class TestCustomRavel:
         i = shared_tools.custom_ravel(tup, arr.shape)
         assert i == 34
 
-    def test_custom_ravel_exceed_error(self):
+    def test_custom_ravel_exceed_error(self) -> None:
         arr = np.arange(9).reshape((3, 3))
         # next line should throw IndexError
         with pytest.raises(IndexError):
@@ -218,7 +219,7 @@ class TestCustomRavel:
 
 class TestGetWeightSfcInt:
 
-    def test_get_weight_sfc_int(self, tmp_path):
+    def test_get_weight_sfc_int(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         delta = DeltaModel(input_file=p)
 
@@ -241,7 +242,7 @@ class TestGetWeightSfcInt:
 
 class TestVerisonSpecifications:
 
-    def test_version_is_valid(self):
+    def test_version_is_valid(self) -> None:
         v = shared_tools._get_version()
         assert type(v) is str
         dots = [i for i, c in enumerate(v) if c == '.']
@@ -250,11 +251,11 @@ class TestVerisonSpecifications:
 
 class TestScaleModelTime():
 
-    def test_defaults(self):
+    def test_defaults(self) -> None:
         scaled = shared_tools.scale_model_time(86400)
         assert scaled == 86400
 
-    def test_If(self):
+    def test_If(self) -> None:
         scaled = shared_tools.scale_model_time(86400, 0.1)
         assert scaled == 86400 / 0.1
         scaled = shared_tools.scale_model_time(86400, 0.5)
@@ -270,7 +271,7 @@ class TestScaleModelTime():
         with pytest.raises(ValueError, match='Intermittency `If` .*'):
             scaled = shared_tools.scale_model_time(86400, 1.01)
 
-    def test_units(self):
+    def test_units(self) -> None:
         scaled = shared_tools.scale_model_time(86400, units='seconds')
         assert scaled == 86400
         scaled = shared_tools.scale_model_time(86400, units='days')
@@ -280,7 +281,7 @@ class TestScaleModelTime():
         with pytest.raises(ValueError):
             scaled = shared_tools.scale_model_time(86400, units='badstr')
 
-    def test_combinations(self):
+    def test_combinations(self) -> None:
         scaled = shared_tools.scale_model_time(86400, If=0.1, units='days')
         assert scaled == 10
         scaled = shared_tools.scale_model_time(2 * 86400, If=0.1, units='days')

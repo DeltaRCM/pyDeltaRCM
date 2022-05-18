@@ -1,10 +1,11 @@
+import abc
+from typing import Tuple
 
 import numpy as np
 from numba import njit
 from numba import float32, int64
 from numba.experimental import jitclass
 from scipy import ndimage
-import abc
 
 import warnings
 
@@ -15,7 +16,7 @@ from . import shared_tools
 
 class sed_tools(abc.ABC):
 
-    def route_sediment(self):
+    def route_sediment(self) -> None:
         """Sediment routing main method.
 
         This is the main method for sediment routing in the model. It is
@@ -48,7 +49,7 @@ class sed_tools(abc.ABC):
         self.hook_route_all_mud_parcels()
         self.route_all_mud_parcels()
 
-    def sed_route(self):
+    def sed_route(self) -> None:
         """Deprecated, since v1.3.1. Use :obj:`route_sediment`."""
         _msg = ('`sed_route` and `hook_sed_route` are deprecated and '
                 'have been replaced with `route_sediment`. '
@@ -58,7 +59,7 @@ class sed_tools(abc.ABC):
         warnings.warn(UserWarning(_msg))
         self.route_sediment()
 
-    def init_sediment_iteration(self):
+    def init_sediment_iteration(self) -> None:
         """Init the water iteration routine.
 
         Clear and pad fields in preparation for iterating parcels.
@@ -91,7 +92,7 @@ class sed_tools(abc.ABC):
         """
         return shared_tools.get_inlet_weights(self.inlet)
 
-    def route_all_sand_parcels(self):
+    def route_all_sand_parcels(self) -> None:
         """Route sand parcels; topo diffusion.
 
         This method largely wraps the :obj:`SandRouter`. First, the number of
@@ -146,7 +147,7 @@ class sed_tools(abc.ABC):
         self.uy = self._sr.uy  # update component flow fielda
         self.qs = self._sr.qs
 
-    def route_all_mud_parcels(self):
+    def route_all_mud_parcels(self) -> None:
         """Route mud parcels.
 
         This method largely wraps the :obj:`MudRouter`. First, the number of
@@ -200,7 +201,7 @@ class sed_tools(abc.ABC):
         self.ux = self._mr.ux  # update component flow field
         self.uy = self._mr.uy  # update component flow field
 
-    def topo_diffusion(self):
+    def topo_diffusion(self) -> None:
         """Diffuse topography after routing.
 
         Diffuse topography after routing all coarse sediment parcels. The
@@ -300,7 +301,7 @@ r_spec = [('_dt', float32), ('_dx', float32),
           ('U_ero_sand', float32)]
 
 
-class BaseRouter(object):
+class BaseRouter:
     """BaseRouter.
 
     Defines common methods for jitted routers.
@@ -326,7 +327,7 @@ class BaseRouter(object):
     def _route_one_parcel(self):
         ...
 
-    def _choose_next_location(self, px, py):
+    def _choose_next_location(self, px: int, py: int) -> Tuple[int, int, float]:
 
         # choose next location with weights
         stage_nbrs = self.pad_stage[
@@ -359,7 +360,7 @@ class BaseRouter(object):
         return istep, jstep, dist
 
     @abc.abstractmethod
-    def _deposit_or_erode(self, px, py):
+    def _deposit_or_erode(self, px: int, py: int):
         """Determine whether to erode or deposit.
 
         This is the decision making component of the routine, and will be
@@ -367,7 +368,7 @@ class BaseRouter(object):
         """
         ...
 
-    def _update_fields(self, Vp_change, px, py):
+    def _update_fields(self, Vp_change: float, px: int, py: int) -> None:
         """Execute deposit of sand or mud.
 
         Deposit sediment volume `Vp_change`. The change in bed elevation
@@ -434,7 +435,7 @@ class BaseRouter(object):
             self.ux[px, py] = 0
             self.uy[px, py] = 0
 
-    def _compute_Vp_ero(self, Vp_sed, U_loc, U_ero, beta):
+    def _compute_Vp_ero(self, Vp_sed: float, U_loc: float, U_ero: float, beta: float) -> float:
         """Compute volume erorded based on velocity.
 
         The volume of sediment eroded depends on the local flow velocity
@@ -466,7 +467,7 @@ class BaseRouter(object):
         return (Vp_sed * (U_loc**beta - U_ero**beta) /
                 U_ero**beta)
 
-    def _limit_Vp_change(self, Vp, stage, eta, dx, dep_ero):
+    def _limit_Vp_change(self, Vp, stage, eta, dx, dep_ero: int):
         """Limit change in volume to 1/4 of a cell volume.
 
         Function is used by multiple pathways in `mud_dep_ero` and `sand_dep_ero`
@@ -505,7 +506,7 @@ class SandRouter(BaseRouter):
     """
     def __init__(self, _dt, dx, Vp_sed, u_max, qs0, u0, U_ero_sand, f_bedload,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
-                 dry_depth, beta, stepmax, theta_sed):
+                 dry_depth, beta, stepmax, theta_sed) -> None:
 
         self._dt = _dt
         self._dx = dx
@@ -528,7 +529,7 @@ class SandRouter(BaseRouter):
 
     def run(self, start_indices, eta, stage, depth, cell_type,
             uw, ux, uy, Vp_dep_mud, Vp_dep_sand,
-            qw, qx, qy, qs):
+            qw, qx, qy, qs) -> None:
         """The main function to route and deposit/erode sand parcels.
 
         Algorithm is to:
@@ -588,7 +589,7 @@ class SandRouter(BaseRouter):
                                self.Vp_res / 2. / self._dt / self._dx)
             self._route_one_parcel(px, py)
 
-    def _route_one_parcel(self, px, py):
+    def _route_one_parcel(self, px: int, py: int) -> None:
         """Route one parcel.
 
         Algorithm is to:
@@ -647,7 +648,7 @@ class SandRouter(BaseRouter):
             self.qs[px0, py0] += partition  # deposition in current cell
             self.qs[px, py] += partition  # deposition in new cell
 
-    def _deposit_or_erode(self, px, py):
+    def _deposit_or_erode(self, px: int, py: int):
         """Decide if deposit or erode sand.
 
         .. note:: Volumetric change is limited to 1/4 local cell water volume.
@@ -736,7 +737,7 @@ class MudRouter(BaseRouter):
 
     def run(self, start_indices, eta, stage, depth, cell_type,
             uw, ux, uy, Vp_dep_mud, Vp_dep_sand,
-            qw, qx, qy):
+            qw, qx, qy) -> None:
         """The main function to route and deposit/erode mud parcels.
 
         """
@@ -767,7 +768,7 @@ class MudRouter(BaseRouter):
 
             self._route_one_parcel(px, py)
 
-    def _route_one_parcel(self, px, py):
+    def _route_one_parcel(self, px: int, py: int) -> None:
         """Route one parcel.
 
         """
@@ -790,7 +791,7 @@ class MudRouter(BaseRouter):
             if (it == self.stepmax):
                 sed_continue = False
 
-    def _deposit_or_erode(self, px, py):
+    def _deposit_or_erode(self, px: int, py: int) -> None:
         """Decide if deposit or erode mud.
 
         .. note:: Volumetric change is limited to 1/4 local cell water volume.

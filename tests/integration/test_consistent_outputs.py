@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import numpy as np
 
@@ -7,7 +9,7 @@ from pyDeltaRCM import DeltaModel
 
 class TestConsistentOutputsBetweenMerges:
 
-    def test_bed_after_one_update(self, tmp_path):
+    def test_bed_after_one_update(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
@@ -50,7 +52,7 @@ class TestConsistentOutputsBetweenMerges:
         _exp = np.array([-1., -0.9152762, -1.0004134, -1., -1.])
         assert np.all(_delta.eta[:5, 4] == pytest.approx(_exp))
 
-    def test_bed_after_ten_updates(self, tmp_path):
+    def test_bed_after_ten_updates(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
@@ -94,7 +96,7 @@ class TestConsistentOutputsBetweenMerges:
         _exp = np.array([1.7, 0.394864, -0.95006764,  -1., -1.])
         assert np.all(_delta.eta[:5, 4] == pytest.approx(_exp))
 
-    def test_long_multi_validation(self, tmp_path):
+    def test_long_multi_validation(self, tmp_path: Path) -> None:
         # IndexError on corner.
 
         file_name = 'user_parameters.yaml'
@@ -126,7 +128,7 @@ class TestConsistentOutputsBetweenMerges:
 
 class TestModelIsReproducible:
 
-    def test_same_result_two_models(self, tmp_path):
+    def test_same_result_two_models(self, tmp_path: Path) -> None:
         """Test consistency of two models initialized from same yaml."""
         p1 = utilities.yaml_from_dict(tmp_path, 'input_1.yaml',
                                       {'out_dir': tmp_path / 'out_dir_1',
@@ -175,7 +177,7 @@ class CustomParamModel(DeltaModel):
 
 class TestCustomParams:
 
-    def test_custom_defaults(self, tmp_path):
+    def test_custom_defaults(self, tmp_path: Path) -> None:
         """Default subclass yaml parameters."""
         file_name = 'user_parameters.yaml'
         p = utilities.yaml_from_dict(tmp_path, file_name)
@@ -189,7 +191,7 @@ class TestCustomParams:
         assert _delta.new_str == 'DefaultString'
         assert _delta.new_val == 0
 
-    def test_yaml_custom_params(self, tmp_path):
+    def test_yaml_custom_params(self, tmp_path: Path) -> None:
         """Specify custom params in yaml."""
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
@@ -207,7 +209,7 @@ class TestCustomParams:
         assert _delta.new_str == 'Customized'
         assert _delta.new_val == 10.5
 
-    def test_kwargs_custom_params(self, tmp_path):
+    def test_kwargs_custom_params(self, tmp_path: Path) -> None:
         """Try to specify one custom parameter via kwargs."""
         file_name = 'user_parameters.yaml'
         p = utilities.yaml_from_dict(tmp_path, file_name)
@@ -221,7 +223,7 @@ class TestCustomParams:
         assert _delta.new_str == 'DefaultString'
         assert _delta.new_val == -5.25
 
-    def test_invalid_custom_params(self, tmp_path):
+    def test_invalid_custom_params(self, tmp_path: Path) -> None:
         """Specify invalid custom param type in yaml."""
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
