@@ -247,7 +247,12 @@ See <a class="reference internal" href="#customize-the-model"><span class="std s
 <h2>Advanced model configurations<a class="headerlink" href="#advanced-model-configurations" title="Permalink to this headline">¶</a></h2>
 <section id="configuring-multiple-model-runs-from-a-single-yaml-file">
 <span id="configuring-multiple-jobs"></span><h3>Configuring multiple model runs from a single YAML file<a class="headerlink" href="#configuring-multiple-model-runs-from-a-single-yaml-file" title="Permalink to this headline">¶</a></h3>
-<p>Multiple model runs (referred to as “jobs”) can be configured by a single <cite>.yml</cite> configuration file, by using the <cite>matrix</cite> and <cite>ensemble</cite> configuration keys.</p>
+<p>Multiple model runs (referred to as “jobs”) can be configured by a single <cite>.yml</cite> configuration file and passing the file to the high-level API.
+Multiple runs can be configured by using the <cite>matrix</cite>, <cite>ensemble</cite>, and <cite>set</cite> configuration keys in the <cite>.yml</cite> file.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>You cannot use any of <cite>matrix</cite> <cite>ensemble</cite> or <cite>set</cite> with the low-level API. If you need, you could use the high-level API to generate the scripts for each job (e.g., <cite>timesteps: 0</cite>) and then manually generate <cite>DeltaModel</cite> instances from each <cite>.yml</cite> file to then use with the low-level API.</p>
+</div>
 <section id="matrix-expansion">
 <span id="matrix-expansion-tag"></span><h4>Matrix expansion<a class="headerlink" href="#matrix-expansion" title="Permalink to this headline">¶</a></h4>
 <p>To use matrix expansion to configure multiple model runs, the dimensions of the matrix (i.e., the variables you want to run) should be listed below the <cite>matrix</cite> key. For example, the following configuration is a one-dimensional matrix with the variable <cite>f_bedload</cite>:</p>
@@ -693,7 +698,7 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>
