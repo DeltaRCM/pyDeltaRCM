@@ -87,14 +87,14 @@ the parcel being routed for convenience.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.sed_tools.sed_tools.init_sediment_iteration">
-<span class="sig-name descname"><span class="pre">init_sediment_iteration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.init_sediment_iteration" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">init_sediment_iteration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.init_sediment_iteration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Init the water iteration routine.</p>
 <p>Clear and pad fields in preparation for iterating parcels.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels">
-<span class="sig-name descname"><span class="pre">route_all_mud_parcels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">route_all_mud_parcels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Route mud parcels.</p>
 <p>This method largely wraps the <a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.MudRouter.html#pyDeltaRCM.sed_tools.MudRouter" title="pyDeltaRCM.sed_tools.MudRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MudRouter</span></code></a>. First, the number of
 parcels and sand fraction (<code class="xref py py-obj docutils literal notranslate"><span class="pre">f_bedload</span></code>)
@@ -129,7 +129,7 @@ routing.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels">
-<span class="sig-name descname"><span class="pre">route_all_sand_parcels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">route_all_sand_parcels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Route sand parcels; topo diffusion.</p>
 <p>This method largely wraps the <a class="reference internal" href="../../_autosummary/pyDeltaRCM.sed_tools.SandRouter.html#pyDeltaRCM.sed_tools.SandRouter" title="pyDeltaRCM.sed_tools.SandRouter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SandRouter</span></code></a>. First, the number of
 parcels and sand fraction (<code class="xref py py-obj docutils literal notranslate"><span class="pre">f_bedload</span></code>)
@@ -164,7 +164,7 @@ water parcel routing.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.sed_tools.sed_tools.route_sediment">
-<span class="sig-name descname"><span class="pre">route_sediment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.route_sediment" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">route_sediment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.route_sediment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sediment routing main method.</p>
 <p>This is the main method for sediment routing in the model. It is
 called once per <cite>update()</cite> call.</p>
@@ -180,13 +180,13 @@ called once per <cite>update()</cite> call.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.sed_tools.sed_tools.sed_route">
-<span class="sig-name descname"><span class="pre">sed_route</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.sed_route" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sed_route</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.sed_route" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deprecated, since v1.3.1. Use <a class="reference internal" href="#pyDeltaRCM.sed_tools.sed_tools.route_sediment" title="pyDeltaRCM.sed_tools.sed_tools.route_sediment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_sediment</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.sed_tools.sed_tools.topo_diffusion">
-<span class="sig-name descname"><span class="pre">topo_diffusion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.topo_diffusion" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">topo_diffusion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.sed_tools.sed_tools.topo_diffusion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Diffuse topography after routing.</p>
 <p>Diffuse topography after routing all coarse sediment parcels. The
 operation is repeated <cite>N_crossdiff</cite> times.</p>

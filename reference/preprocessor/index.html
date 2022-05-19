@@ -80,7 +80,7 @@
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.preprocessor.preprocessor_wrapper">
-<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.preprocessor.</span></span><span class="sig-name descname"><span class="pre">preprocessor_wrapper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.preprocessor_wrapper" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.preprocessor.</span></span><span class="sig-name descname"><span class="pre">preprocessor_wrapper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.preprocessor.preprocessor_wrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapper for command line interface.</p>
 <p>The <cite>entry_points</cite> setup of a command line interface requires a function,
 so we use this simple wrapper to instantiate and run the jobs.</p>
@@ -96,7 +96,7 @@ jobs configured in the preprocessor. In code:</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate">
-<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.preprocessor.</span></span><span class="sig-name descname"><span class="pre">scale_relative_sea_level_rise_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mmyr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">If</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.preprocessor.</span></span><span class="sig-name descname"><span class="pre">scale_relative_sea_level_rise_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mmyr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">If</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scale a relative sea level rise rate to model time.</p>
 <p>This function scales any relative sea level rise rate (RSLR) (e.g., sea
 level rise, subsidence) to a rate appropriate for the model time. This is
