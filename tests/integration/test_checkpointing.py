@@ -1,11 +1,12 @@
 # unit tests for consistent model outputs
 
-import pytest
-
 import os
 import platform
 import shutil
+from pathlib import Path
+
 import numpy as np
+import pytest
 from netCDF4 import Dataset
 
 import unittest.mock as mock
@@ -29,7 +30,7 @@ class TestCheckpointingIntegrations:
     checkpointing-related issues from model issues.
     """
 
-    def test_simple_checkpoint(self, tmp_path):
+    def test_simple_checkpoint(self, tmp_path: Path) -> None:
         """Test checkpoint vs a base run.
 
         Also, checks resumed model against another checkpoint run.
@@ -95,7 +96,7 @@ class TestCheckpointingIntegrations:
         assert np.all(resumeModel2.sand_frac == resumeModel.sand_frac)
         assert np.all(resumeModel2.active_layer == resumeModel.active_layer)
 
-    def test_checkpoint_nc(self, tmp_path):
+    def test_checkpoint_nc(self, tmp_path: Path) -> None:
         """Test the netCDF that is written to by the checkpointing."""
         # define a yaml for the base model run
         file_name = 'base_run.yaml'
@@ -194,7 +195,7 @@ class TestCheckpointingIntegrations:
         # checkpoint interval aligns w/ timestep dt so these should match
         assert output['time'][-1].tolist() == resumeModel.time
 
-    def test_checkpoint_diff_dt(self, tmp_path):
+    def test_checkpoint_diff_dt(self, tmp_path: Path) -> None:
         """Test when checkpoint_dt does not match dt or save_dt."""
         # define a yaml for the base model run
         file_name = 'base_run.yaml'
@@ -258,7 +259,7 @@ class TestCheckpointingIntegrations:
         assert output['time'][0].tolist() == 0.0
         assert output['time'][-1].tolist() == resumeModel.time
 
-    def test_multi_checkpoints(self, tmp_path):
+    def test_multi_checkpoints(self, tmp_path: Path) -> None:
         """Test using checkpoints multiple times for a given model run."""
         # define a yaml for the base model run
         file_name = 'base_run.yaml'
@@ -318,7 +319,7 @@ class TestCheckpointingIntegrations:
         assert output['time'][0].tolist() == 0.0
         assert output['time'][-1].tolist() == resumeModel02.time
 
-    def test_load_nocheckpoint(self, tmp_path):
+    def test_load_nocheckpoint(self, tmp_path: Path) -> None:
         """Try loading a checkpoint file when one doesn't exist."""
         # define a yaml
         file_name = 'trial_run.yaml'
@@ -334,7 +335,7 @@ class TestCheckpointingIntegrations:
     @pytest.mark.skipif(
         platform.system() != 'Linux',
         reason='Parallel support only on Linux OS.')
-    def test_py_hlvl_parallel_checkpoint(self, tmp_path):
+    def test_py_hlvl_parallel_checkpoint(self, tmp_path: Path) -> None:
         """Test checkpointing in parallel."""
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
@@ -428,7 +429,7 @@ class TestCheckpointingIntegrations:
 
 class TestCheckpointingCreatingLoading:
 
-    def test_load_checkpoint_with_netcdf(self, tmp_path):
+    def test_load_checkpoint_with_netcdf(self, tmp_path: Path) -> None:
         """Test that a run can be resumed when there are outputs.
         """
         # define a yaml with outputs (defaults will output strata)
@@ -461,7 +462,7 @@ class TestCheckpointingCreatingLoading:
         # check that fields match
         assert np.all(_delta.eta == _rand_field)
 
-    def test_create_checkpoint_without_netcdf(self, tmp_path):
+    def test_create_checkpoint_without_netcdf(self, tmp_path: Path) -> None:
         """Test that a checkpoint can be created when there are no outputs
         """
         # define a yaml with NO outputs, but checkpoint
@@ -491,7 +492,7 @@ class TestCheckpointingCreatingLoading:
         # check that fields match
         assert np.all(_delta.eta == _rand_field)
 
-    def test_load_checkpoint_without_netcdf(self, tmp_path):
+    def test_load_checkpoint_without_netcdf(self, tmp_path: Path) -> None:
         """Test that a run can be resumed when there are outputs.
         """
         # define a yaml with NO outputs, but checkpoint
@@ -536,7 +537,7 @@ class TestCheckpointingCreatingLoading:
     @pytest.mark.skipif(
         platform.system() != 'Linux',
         reason='Parallel support only on Linux OS.')
-    def test_load_ckpt_wo_netcdf_parallel_spinup_to_matrix(self, tmp_path):
+    def test_load_ckpt_wo_netcdf_parallel_spinup_to_matrix(self, tmp_path: Path) -> None:
         """
         Test that multiple matrix runs can be resumed from a single checkpoint
         file, and take advantage of the preprocessor parallel infrastructure.
@@ -634,7 +635,7 @@ class TestCheckpointingCreatingLoading:
     @pytest.mark.skipif(
         platform.system() == 'Windows',
         reason='OS differences regarding netCDF permissions.')
-    def test_load_checkpoint_with_open_netcdf(self, tmp_path):
+    def test_load_checkpoint_with_open_netcdf(self, tmp_path: Path) -> None:
         """Test what happens if output netCDF file is actually open.
 
         This is not the same as when the netCDF file is open in another
@@ -701,7 +702,7 @@ class TestCheckpointingCreatingLoading:
     @pytest.mark.skipif(
         platform.system() != 'Windows',
         reason='OS differences regarding netCDF permissions.')
-    def test_load_checkpoint_with_open_netcdf_win(self, tmp_path):
+    def test_load_checkpoint_with_open_netcdf_win(self, tmp_path: Path) -> None:
         """Test what happens if output netCDF file is actually open.
 
         This is not the same as when the netCDF file is open in another

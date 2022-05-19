@@ -1,17 +1,16 @@
-import os
-import sys
-import argparse
 import abc
-import time
-import platform
-
+import argparse
 import itertools
-from pathlib import Path
-import warnings
-
 import multiprocessing
-
+import os
+import platform
+import sys
+import time
+import warnings
 import yaml
+from pathlib import Path
+from typing import List, Union
+
 import numpy as np
 
 from . import shared_tools
@@ -45,16 +44,16 @@ class BasePreprocessor(abc.ABC):
         self._has_set = False
         self._has_matrix = False
 
-        self._file_list = []    # list of yaml files for jobs
-        self._config_list = []  # list of dict configs for jobs
-        self._job_list = []     # list of _Job objects
+        self._file_list: List[Path] = []    # list of yaml files for jobs
+        self._config_list = []              # list of dict configs for jobs
+        self._job_list = []                 # list of _Job objects
 
         self._dryrun = False
 
         self._is_completed = False
 
     @property
-    def file_list(self):
+    def file_list(self) -> List[Path]:
         """File list.
 
         A list of `Path` to input YAML files for jobs constructed by the
@@ -84,7 +83,7 @@ class BasePreprocessor(abc.ABC):
         """
         return self._job_list
 
-    def open_input_file_to_dict(self, input_file):
+    def open_input_file_to_dict(self, input_file: Union[str, Path]):
         """Open an input file and convert it to a dictionary.
 
         This method is used by subclassing Preprocessors to complete the first
@@ -1100,7 +1099,7 @@ class Preprocessor(BasePreprocessor):
         self.construct_file_list()
 
 
-def preprocessor_wrapper():
+def preprocessor_wrapper() -> None:
     """Wrapper for command line interface.
 
     The `entry_points` setup of a command line interface requires a function,
@@ -1144,7 +1143,7 @@ def _write_yaml_config_to_file(_config, _path):
     f.close()
 
 
-def scale_relative_sea_level_rise_rate(mmyr, If=1):
+def scale_relative_sea_level_rise_rate(mmyr: float, If: float = 1) -> float:
     """Scale a relative sea level rise rate to model time.
 
     This function scales any relative sea level rise rate (RSLR) (e.g., sea

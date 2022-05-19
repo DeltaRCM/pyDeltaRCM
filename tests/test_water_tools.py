@@ -1,6 +1,7 @@
 # unit tests for water_tools.py
 
 import pytest
+from pathlib import Path
 
 import numpy as np
 
@@ -14,7 +15,7 @@ from pyDeltaRCM import water_tools
 
 class TestWaterRoute:
 
-    def test_route_water(self, tmp_path):
+    def test_route_water(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
@@ -39,7 +40,7 @@ class TestWaterRoute:
 
 class TestWaterRoutingWeights:
 
-    def test_get_weight_at_cell(self):
+    def test_get_weight_at_cell(self) -> None:
         # prepare necessary ingredients for test
         ind = (0, 4)
         np.random.seed(0)
@@ -65,7 +66,7 @@ class TestWaterRoutingWeights:
 
 class TestInitWaterIteration:
 
-    def test_fields_updated(self, tmp_path):
+    def test_fields_updated(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         delta = DeltaModel(input_file=p)
@@ -100,7 +101,7 @@ class TestCheckForLoops:
     CTR = 4
     L0 = 1
 
-    def test_check_for_loops_no_loops(self):
+    def test_check_for_loops_no_loops(self) -> None:
 
         # set up inds to go to new locations
         new_inds0 = np.array([76, 73])
@@ -117,7 +118,7 @@ class TestCheckForLoops:
         # no loops
         assert np.all(looped == [0, 0])
 
-    def test_check_for_loops_relocate_not_loop(self):
+    def test_check_for_loops_relocate_not_loop(self) -> None:
         """
         Will relocate parcel (repeated ind), but will not mark as a loop,
         because parcel stage is at SL.
@@ -140,7 +141,7 @@ class TestCheckForLoops:
         # one loop
         assert np.all(looped == [0, 0])
 
-    def test_check_for_loops_relocate_and_loop(self):
+    def test_check_for_loops_relocate_and_loop(self) -> None:
         """
         Will relocate parcel (repeated ind), and mark as a loop, because
         parcel stage is not at SL.
@@ -166,7 +167,7 @@ class TestCheckForLoops:
 
 class TestCalculateNewInds:
 
-    def test_calculate_new_inds(self, tmp_path):
+    def test_calculate_new_inds(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         delta = DeltaModel(input_file=p)
 
@@ -188,7 +189,7 @@ class TestCalculateNewInds:
 
 class TestUpdateQFields:
 
-    def test_update_dirQfield(self):
+    def test_update_dirQfield(self) -> None:
         # configure necessary ingredients
         np.random.seed(0)
         qx = np.random.uniform(0, 10, 9)
@@ -208,7 +209,7 @@ class TestUpdateQFields:
         # assertions
         assert np.all(qxdiff[3:6] == pytest.approx(qxdiff_exp))
 
-    def test_update_absQfield(self):
+    def test_update_absQfield(self) -> None:
         # configure necessary ingredients
         np.random.seed(0)
         qw = np.random.uniform(0, 10, 9)
@@ -234,7 +235,7 @@ class TestUpdateQFields:
 
 class TestUpdateFlowField:
 
-    def test_update_flow_field_time0_iteration0(self, tmp_path):
+    def test_update_flow_field_time0_iteration0(self, tmp_path: Path) -> None:
         """
         Check that the flow at the inlet is set as expected
         """
@@ -263,7 +264,7 @@ class TestUpdateFlowField:
 
         assert delta.log_info.call_count == 1
 
-    def test_update_flow_field_time1_iteration0(self, tmp_path):
+    def test_update_flow_field_time1_iteration0(self, tmp_path: Path) -> None:
         """
         Check that the flow in domain is set as expected when no flow (qx &
         qy==0)
@@ -293,7 +294,7 @@ class TestUpdateFlowField:
 
         assert delta.log_info.call_count == 1
 
-    def test_update_flow_field_time1_iteration1(self, tmp_path):
+    def test_update_flow_field_time1_iteration1(self, tmp_path: Path) -> None:
         """
         Check that the flow in domain is set as expected when no flow (qx &
         qy==0)
@@ -323,7 +324,7 @@ class TestUpdateFlowField:
 
         assert delta.log_info.call_count == 1
 
-    def test_update_velocity_field(self, tmp_path):
+    def test_update_velocity_field(self, tmp_path: Path) -> None:
         """
         Check that flow velocity field is updated as expected
         """
