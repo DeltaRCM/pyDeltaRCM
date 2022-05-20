@@ -7,12 +7,7 @@ Advanced model configurations
 Configuring multiple model runs from a single YAML file
 ==============================================================
 
-Multiple model runs (referred to as "jobs") can be configured by a single `.yml` configuration file and passing the file to the high-level API.
-Multiple runs can be configured by using the `matrix`, `ensemble`, and `set` configuration keys in the `.yml` file.
-
-.. important::
-
-    You cannot use any of `matrix` `ensemble` or `set` with the low-level API. If you need, you could use the high-level API to generate the scripts for each job (e.g., `timesteps: 0`) and then manually generate `DeltaModel` instances from each `.yml` file to then use with the low-level API.
+Multiple model runs (referred to as "jobs") can be configured by a single `.yml` configuration file, by using the `matrix` and `ensemble` configuration keys.
 
 .. _matrix_expansion_tag:
 
