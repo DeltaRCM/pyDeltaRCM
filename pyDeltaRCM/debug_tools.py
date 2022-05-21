@@ -49,7 +49,7 @@ class debug_tools(abc.ABC):
                                                                    shp=_attr_shape))
         return _attr
 
-    def show_attribute(self, attribute, **kwargs):
+    def show_attribute(self, attribute: str, **kwargs) -> None:
         """Show an attribute over the model domain.
 
         Show any attribute of the :obj:`~pyDeltaRCM.model.DeltaModel` class
@@ -80,7 +80,7 @@ class debug_tools(abc.ABC):
         _attr = self._get_attribute(attribute)
         plot_domain(_attr, **kwargs)
 
-    def show_ind(self, ind, *args, **kwargs):
+    def show_ind(self, ind, *args, **kwargs) -> None:
         """Show points within the model domain.
 
         Show the location of points (indices) within the model domain. Can
@@ -200,7 +200,7 @@ class debug_tools(abc.ABC):
         return lines
 
 
-def plot_domain(attr, ax=None, grid: bool = True, block: bool = False, label=None, **kwargs):
+def plot_domain(attr, ax=None, grid: bool = True, block: bool = False, label=None, **kwargs) -> None:
     """Plot the model domain.
 
     Public function to plot *any* 2d grid with helper display utils.
@@ -263,7 +263,7 @@ def plot_domain(attr, ax=None, grid: bool = True, block: bool = False, label=Non
         plt.show()
 
 
-def plot_ind(_ind, *args, shape=None, **kwargs):
+def plot_ind(_ind, *args, shape=None, **kwargs) -> None:
     """Plot points within the model domain.
 
     .. todo:: write a complete docstring with parameters etc.
@@ -305,7 +305,7 @@ def plot_ind(_ind, *args, shape=None, **kwargs):
         plt.show()
 
 
-def plot_line(_ind, *args, shape=None, nozeros=False, **kwargs):
+def plot_line(_ind, *args, shape=None, nozeros: bool=False, **kwargs):
     """Plot a line within the model domain.
 
     Method called by :obj:`show_line`.

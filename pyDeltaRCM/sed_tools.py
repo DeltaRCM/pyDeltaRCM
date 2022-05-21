@@ -1,5 +1,5 @@
 import abc
-from typing import Tuple
+from typing import Any, Tuple
 
 import numpy as np
 from numba import njit
@@ -75,7 +75,7 @@ class sed_tools(abc.ABC):
         self.Vp_dep_sand[:] = 0
         self.Vp_dep_mud[:] = 0
 
-    def get_inlet_weights_sediment(self, **kwargs):
+    def get_inlet_weights_sediment(self, **kwargs: Any):
         """Get weight for inlet cells for sediment parcels.
 
         This method determines the *weights* describing which inlet cells
@@ -225,7 +225,7 @@ class sed_tools(abc.ABC):
 
 @njit
 def _get_weight_at_cell_sediment(ind, weight_int, depth_nbrs, ct_nbrs,
-                                 dry_depth, theta, distances_flat):
+                                 dry_depth: float, theta: float, distances_flat: int):
     """Get neighbor weight array for sediment routing.
 
     .. todo::
@@ -320,7 +320,7 @@ class BaseRouter:
         `Router`.
     """
     @abc.abstractmethod
-    def run(self, *args, **kwargs):
+    def run(self, *args: Any, **kwargs: Any):
         ...
 
     @abc.abstractmethod
@@ -467,7 +467,7 @@ class BaseRouter:
         return (Vp_sed * (U_loc**beta - U_ero**beta) /
                 U_ero**beta)
 
-    def _limit_Vp_change(self, Vp, stage, eta, dx, dep_ero: int):
+    def _limit_Vp_change(self, Vp, stage, eta, dx: float, dep_ero: int):
         """Limit change in volume to 1/4 of a cell volume.
 
         Function is used by multiple pathways in `mud_dep_ero` and `sand_dep_ero`
@@ -504,9 +504,10 @@ class SandRouter(BaseRouter):
         :obj:`~pyDeltaRCM.init_tools.init_tools.init_sediment_routers` in any
         property `setter`.
     """
-    def __init__(self, _dt, dx, Vp_sed, u_max, qs0, u0, U_ero_sand, f_bedload,
-                 ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
-                 dry_depth, beta, stepmax, theta_sed) -> None:
+    def __init__(self, _dt: float, dx: float, Vp_sed, u_max: float, qs0: float,
+                 u0, U_ero_sand, f_bedload, ivec_flat, jvec_flat, iwalk_flat,
+                 jwalk_flat, distances_flat, dry_depth: float, beta: float,
+                 stepmax, theta_sed: float) -> None:
 
         self._dt = _dt
         self._dx = dx
@@ -527,7 +528,7 @@ class SandRouter(BaseRouter):
         self.stepmax = stepmax
         self.theta_sed = theta_sed
 
-    def run(self, start_indices, eta, stage, depth, cell_type,
+    def run(self, start_indices: np.ndarray, eta, stage, depth, cell_type,
             uw, ux, uy, Vp_dep_mud, Vp_dep_sand,
             qw, qx, qy, qs) -> None:
         """The main function to route and deposit/erode sand parcels.
@@ -640,7 +641,7 @@ class SandRouter(BaseRouter):
             if (it == self.stepmax):
                 sed_continue = False
 
-    def _partition_sediment(self, px0, py0, px, py, dist):
+    def _partition_sediment(self, px0: int, py0: int, px: int, py: int, dist: float) -> None:
         """Spread sediment flux between two cells.
         """
         partition = self.Vp_res / 2. / self._dt / self._dx
@@ -648,7 +649,7 @@ class SandRouter(BaseRouter):
             self.qs[px0, py0] += partition  # deposition in current cell
             self.qs[px, py] += partition  # deposition in new cell
 
-    def _deposit_or_erode(self, px: int, py: int):
+    def _deposit_or_erode(self, px: int, py: int) -> None:
         """Decide if deposit or erode sand.
 
         .. note:: Volumetric change is limited to 1/4 local cell water volume.
@@ -713,9 +714,9 @@ class MudRouter(BaseRouter):
         :obj:`~pyDeltaRCM.init_tools.init_tools.init_sediment_routers` in any
         property `setter`.
     """
-    def __init__(self, _dt, dx, Vp_sed, u_max, U_dep_mud, U_ero_mud,
+    def __init__(self, _dt: float, dx: float, Vp_sed, u_max: float, U_dep_mud: float, U_ero_mud: float,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
-                 dry_depth, _lambda, beta, stepmax, theta_sed):
+                 dry_depth: float, _lambda, beta: float, stepmax, theta_sed: float) -> None:
 
         self._dt = _dt
         self._dx = dx

@@ -1,15 +1,12 @@
 #! /usr/bin/env python
 
+import abc
 import os
 import warnings
 
 import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.axes_grid1 as axtk
-
-from scipy.sparse import lil_matrix, csc_matrix, hstack
-
-import abc
 
 from . import shared_tools
 
@@ -59,7 +56,7 @@ class iteration_tools(abc.ABC):
         warnings.warn(UserWarning(_msg))
         self.solve_water_and_sediment_timestep()
 
-    def apply_subsidence(self):
+    def apply_subsidence(self) -> None:
         """Apply subsidence pattern.
 
         Apply subsidence to domain if toggle_subsidence is True, and
@@ -330,7 +327,7 @@ class iteration_tools(abc.ABC):
 
             self.output_netcdf.sync()
 
-    def make_figure(self, var, timestep) -> None:
+    def make_figure(self, var: str, timestep) -> None:
         """Create a figure.
 
         Parameters

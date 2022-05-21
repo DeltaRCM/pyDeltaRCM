@@ -4,12 +4,11 @@ import itertools
 import multiprocessing
 import os
 import platform
-import sys
 import time
 import warnings
 import yaml
 from pathlib import Path
-from typing import List, Union
+from typing import Dict, Optional, Type, List, Union
 
 import numpy as np
 
@@ -17,7 +16,7 @@ from . import shared_tools
 from .model import DeltaModel as BaseDeltaModel
 
 
-_ver = ' '.join(('pyDeltaRCM', shared_tools._get_version()))
+_ver: str = ' '.join(('pyDeltaRCM', shared_tools._get_version()))
 
 
 class BasePreprocessor(abc.ABC):
@@ -35,7 +34,7 @@ class BasePreprocessor(abc.ABC):
         out the Python API.
 
     """
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the base preprocessor.
         """
         self._input_file = None  # initialize empty
@@ -114,7 +113,7 @@ class BasePreprocessor(abc.ABC):
 
         return yaml_dict
 
-    def construct_file_list(self):
+    def construct_file_list(self) -> None:
         """Construct the file list.
 
         The job list is constructed by expanding the various multi-job
@@ -145,7 +144,7 @@ class BasePreprocessor(abc.ABC):
         if self._has_ensemble or self._has_set or self._has_matrix:
             self._write_job_configs()
 
-    def _prelim_config_parsing(self):
+    def _prelim_config_parsing(self) -> None:
         """Preliminary configuration parsing.
 
         Extract ``.yml`` file (``self.input_file``) into a dictionary, if
@@ -208,7 +207,7 @@ class BasePreprocessor(abc.ABC):
             user_file.close()
             return yaml_dict
 
-    def _prepare_multijob_output(self):
+    def _prepare_multijob_output(self) -> None:
         if 'out_dir' not in self.config_dict.keys():
             raise ValueError(
                 'You must specify "out_dir" in YAML to use any '
@@ -228,7 +227,7 @@ class BasePreprocessor(abc.ABC):
         else:
             p.mkdir()
 
-    def _expand_ensemble(self):
+    def _expand_ensemble(self) -> None:
         """Create ensemble random seeds and put into matrix.
 
         Ensemble expansion is implemented as a special class of matrix/set
@@ -322,7 +321,7 @@ class BasePreprocessor(abc.ABC):
             # change the variable to expand matrix on future step
             self._has_matrix = True
 
-    def _expand_set(self):
+    def _expand_set(self) -> None:
 
         # determine the set
         _set = self.config_dict.pop('set')
@@ -400,7 +399,7 @@ class BasePreprocessor(abc.ABC):
                    fmt='%s', delimiter=',', comments='',
                    header=self._matrix_table_header)
 
-    def _expand_matrix(self):
+    def _expand_matrix(self) -> None:
         """Expand YAML matrix.
 
         Compute the matrix expansion of parameters listed in `matrix` key.
@@ -489,7 +488,7 @@ class BasePreprocessor(abc.ABC):
                    fmt='%s', delimiter=',', comments='',
                    header=self._matrix_table_header)
 
-    def _write_job_configs(self):
+    def _write_job_configs(self) -> None:
 
         if len(self._config_list) == 0:
             raise ValueError('Config list empty!')
@@ -524,7 +523,7 @@ class BasePreprocessor(abc.ABC):
             # append to the file list
             self._file_list.append(ith_p)
 
-    def run_jobs(self, DeltaModel=None):
+    def run_jobs(self, DeltaModel=None) -> None:
         """Run the set of jobs.
 
         This method can be seen as the actual execution stage of the
@@ -666,7 +665,7 @@ class _BaseJob(abc.ABC):
     """
 
     def __init__(self, i, input_file, config_dict,
-                 DeltaModel=None, defer_output=False):
+                 DeltaModel: Optional[Type[BaseDeltaModel]]=None, defer_output: bool=False) -> None:
         """Initialize a job.
 
         The `input_file` argument is passed to the DeltaModel for
@@ -750,7 +749,7 @@ class _SerialJob(_BaseJob):
     .. note:: You probably don't need to interact with this class directly.
     """
 
-    def __init__(self, i, input_file, config_dict, DeltaModel=None,):
+    def __init__(self, i, input_file, config_dict, DeltaModel=None,) -> None:
         """Initialize a serial job.
 
         The `input_file` argument is passed to the DeltaModel for
@@ -763,7 +762,7 @@ class _SerialJob(_BaseJob):
         super().__init__(i, input_file, config_dict,
                          DeltaModel=DeltaModel, defer_output=False)
 
-    def run(self):
+    def run(self) -> None:
         """Loop the model.
 
         Iterate the timestep ``update`` routine for the specified number of
@@ -816,7 +815,7 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
     """
 
     def __init__(self, i, queue, sema,
-                 input_file, config_dict, DeltaModel=None):
+                 input_file, config_dict, DeltaModel=None) -> None:
         """Initialize a parallel job.
 
         The `input_file` argument is passed to the DeltaModel for
@@ -834,7 +833,7 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
         self.queue = queue
         self.sema = sema  # semaphore for limited multiprocessing
 
-    def run(self):
+    def run(self) -> None:
         """Run the model, with infrastructure for parallel.
 
         Iterate the timestep ``update`` routine for the specified number of
@@ -921,7 +920,7 @@ class PreprocessorCLI(BasePreprocessor):
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the CLI preprocessor.
 
         The initialization includes the entire configuration of the job list
@@ -949,7 +948,7 @@ class PreprocessorCLI(BasePreprocessor):
         # construct file list (expansions)
         self.construct_file_list()
 
-    def process_arguments(self):
+    def process_arguments(self) -> Union[Dict[str, float], Dict[str, int]]:
         """Process the command line arguments.
 
         .. note::
@@ -1052,7 +1051,7 @@ class Preprocessor(BasePreprocessor):
 
     """
 
-    def __init__(self, input_file=None, **kwargs):
+    def __init__(self, input_file=None, **kwargs) -> None:
         """Initialize the python preprocessor.
 
         The initialization includes the entire configuration of the job list
@@ -1119,7 +1118,7 @@ def preprocessor_wrapper() -> None:
     pp.run_jobs()
 
 
-def _write_yaml_config_to_file(_config, _path):
+def _write_yaml_config_to_file(_config, _path) -> None:
     """Write a config to file in output folder.
 
     Write the entire yaml configuation for the configured job out to a

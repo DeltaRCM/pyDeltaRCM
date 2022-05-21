@@ -1,8 +1,7 @@
 #! /usr/bin/env python
-import datetime
-import logging
 import os
 import warnings
+from typing import Any, Union
 
 from .iteration_tools import iteration_tools
 from .sed_tools import sed_tools
@@ -34,7 +33,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
     closed and written to disk.
     """
 
-    def __init__(self, input_file=None, defer_output: bool = False, **kwargs):
+    def __init__(self, input_file=None, defer_output: bool = False, **kwargs: Any) -> None:
         """Creates an instance of the pyDeltaRCM model.
 
         This method handles setting up the run, including parsing input files,
@@ -275,7 +274,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._verbose = verbose
 
     @property
-    def seed(self):
+    def seed(self) -> int:
         """
         seed defines the random number seed used for the simulation.
 
@@ -286,7 +285,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._seed
 
     @seed.setter
-    def seed(self, seed) -> None:
+    def seed(self, seed: int) -> None:
         self._seed = seed
 
     @property
@@ -324,7 +323,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._Width = Width
 
     @property
-    def dx(self):
+    def dx(self) -> float:
         """
         dx is the length of the individual cell faces.
 
@@ -335,14 +334,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._dx
 
     @dx.setter
-    def dx(self, dx) -> None:
+    def dx(self, dx: float) -> None:
         if (dx <= 0) or (dx > self._Length) or (dx > self._Width):
             raise ValueError('dx must be positive and smaller than the' +
                              ' Length and Width parameters.')
         self._dx = dx
 
     @property
-    def L0_meters(self):
+    def L0_meters(self) -> float:
         """
         L0_meters defines the thickness of the land along the coast.
 
@@ -353,13 +352,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._L0_meters
 
     @L0_meters.setter
-    def L0_meters(self, L0_meters) -> None:
+    def L0_meters(self, L0_meters: float) -> None:
         if L0_meters < 0:
             raise ValueError('L0_meters must be a greater than or equal to 0.')
         self._L0_meters = L0_meters
 
     @property
-    def S0(self):
+    def S0(self) -> float:
         """
         S0 is the characteristic slope for the delta.
 
@@ -370,24 +369,24 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._S0
 
     @S0.setter
-    def S0(self, S0) -> None:
+    def S0(self, S0: float) -> None:
         self._S0 = S0
 
     @property
-    def itermax(self):
+    def itermax(self) -> int:
         """
         itermax sets the number of flow routing/free surface iterations.
         """
         return self._itermax
 
     @itermax.setter
-    def itermax(self, itermax) -> None:
+    def itermax(self, itermax: int) -> None:
         if itermax < 0:
             raise ValueError('itermax must be greater than or equal to 0.')
         self._itermax = itermax
 
     @property
-    def Np_water(self):
+    def Np_water(self) -> int:
         """
         Np_water is the number of water parcels simulated.
 
@@ -398,13 +397,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._Np_water
 
     @Np_water.setter
-    def Np_water(self, Np_water) -> None:
+    def Np_water(self, Np_water: int) -> None:
         if Np_water <= 0:
             raise ValueError('Np_water must be a positive number.')
         self._Np_water = Np_water
 
     @property
-    def u0(self):
+    def u0(self) -> float:
         """
         u0 is a reference velocity value.
 
@@ -416,11 +415,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._u0
 
     @u0.setter
-    def u0(self, u0) -> None:
+    def u0(self, u0: float) -> None:
         self._u0 = u0
 
     @property
-    def N0_meters(self):
+    def N0_meters(self) -> float:
         """
         N0_meters defines the width of the inlet channel in meters.
 
@@ -430,13 +429,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._N0_meters
 
     @N0_meters.setter
-    def N0_meters(self, N0_meters) -> None:
+    def N0_meters(self, N0_meters: float) -> None:
         if N0_meters <= 0:
             raise ValueError('N0_meters must be a positive number.')
         self._N0_meters = N0_meters
 
     @property
-    def h0(self):
+    def h0(self) -> float:
         """
         h0 is the reference or characteristic water depth in meters.
 
@@ -449,11 +448,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._h0
 
     @h0.setter
-    def h0(self, h0) -> None:
+    def h0(self, h0: float) -> None:
         self._h0 = h0
 
     @property
-    def hb(self):
+    def hb(self) -> float:
         """
         hb is the basin depth in meters.
 
@@ -465,22 +464,22 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._hb
 
     @hb.setter
-    def hb(self, hb) -> None:
+    def hb(self, hb: float) -> None:
         self._hb = hb
 
     @property
-    def H_SL(self):
+    def H_SL(self) -> float:
         """
         H_SL sets the sea level elevation in meters.
         """
         return self._H_SL
 
     @H_SL.setter
-    def H_SL(self, H_SL) -> None:
+    def H_SL(self, H_SL: float) -> None:
         self._H_SL = H_SL
 
     @property
-    def SLR(self):
+    def SLR(self) -> float:
         """
         SLR is the sea level rise rate.
 
@@ -493,7 +492,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._SLR
 
     @SLR.setter
-    def SLR(self, SLR) -> None:
+    def SLR(self, SLR: float) -> None:
         self._SLR = SLR
 
     @property
@@ -515,7 +514,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._If = If
 
     @property
-    def Np_sed(self):
+    def Np_sed(self) -> int:
         """
         Np_sed is the number of sediment parcels simulated.
 
@@ -526,13 +525,13 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._Np_sed
 
     @Np_sed.setter
-    def Np_sed(self, Np_sed) -> None:
+    def Np_sed(self, Np_sed: int) -> None:
         if Np_sed <= 0:
             raise ValueError('Np_sed must be a positive number.')
         self._Np_sed = Np_sed
 
     @property
-    def f_bedload(self):
+    def f_bedload(self) -> float:
         """
         f_bedload is the bedload fraction of the input sediment.
 
@@ -544,14 +543,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._f_bedload
 
     @f_bedload.setter
-    def f_bedload(self, f_bedload) -> None:
+    def f_bedload(self, f_bedload: float) -> None:
         if (f_bedload < 0) or (f_bedload > 1):
             raise ValueError('Value for f_bedload must be between 0 and 1,'
                              ' inclusive.')
         self._f_bedload = f_bedload
 
     @property
-    def active_layer_thickness(self):
+    def active_layer_thickness(self) -> None:
         """
         Active layer thickness for sand fraction.
 
@@ -565,7 +564,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._active_layer_thickness
 
     @active_layer_thickness.setter
-    def active_layer_thickness(self, active_layer_thickness) -> None:
+    def active_layer_thickness(self, active_layer_thickness: float) -> None:
         if active_layer_thickness is None:
             active_layer_thickness = self._h0 / 2
         elif active_layer_thickness < 0:
@@ -574,7 +573,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._active_layer_thickness = active_layer_thickness
 
     @property
-    def C0_percent(self):
+    def C0_percent(self) -> float:
         """
         C0_percent is the sediment concentration in the input water supply.
 
@@ -584,20 +583,20 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._C0_percent
 
     @C0_percent.setter
-    def C0_percent(self, C0_percent) -> None:
+    def C0_percent(self, C0_percent: float) -> None:
         if C0_percent < 0:
             raise ValueError('C0_percent must be greater than 0.')
         self._C0_percent = C0_percent
 
     @property
-    def Csmooth(self):
+    def Csmooth(self) -> float:
         """
         Csmooth is a free surface smoothing parameter.
         """
         return self._Csmooth
 
     @Csmooth.setter
-    def Csmooth(self, Csmooth) -> None:
+    def Csmooth(self, Csmooth: float) -> None:
         if Csmooth < 0:
             raise ValueError('Csmooth must be greater than or equal to 0.')
         self._Csmooth = Csmooth
@@ -618,14 +617,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._toggle_subsidence = toggle_subsidence
 
     @property
-    def subsidence_rate(self):
+    def subsidence_rate(self) -> float:
         """
         subsidence_rate defines the maximum rate of subsidence.
         """
         return self._subsidence_rate
 
     @subsidence_rate.setter
-    def subsidence_rate(self, subsidence_rate) -> None:
+    def subsidence_rate(self, subsidence_rate: float) -> None:
         self._subsidence_rate = subsidence_rate
 
     @property
@@ -647,7 +646,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._save_eta_figs
 
     @save_eta_figs.setter
-    def save_eta_figs(self, save_eta_figs) -> None:
+    def save_eta_figs(self, save_eta_figs: bool) -> None:
         if (save_eta_figs is True) and \
           ('eta' not in self._save_fig_list.keys()):
             self._save_fig_list['eta'] = ['eta']
@@ -657,14 +656,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_eta_figs = save_eta_figs
 
     @property
-    def save_stage_figs(self):
+    def save_stage_figs(self) -> bool:
         """
         save_stage_figs controls whether or not stage figures are saved.
         """
         return self._save_stage_figs
 
     @save_stage_figs.setter
-    def save_stage_figs(self, save_stage_figs) -> None:
+    def save_stage_figs(self, save_stage_figs: bool) -> None:
         if (save_stage_figs is True) and \
           ('stage' not in self._save_fig_list.keys()):
             self._save_fig_list['stage'] = ['stage']
@@ -674,14 +673,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_stage_figs = save_stage_figs
 
     @property
-    def save_depth_figs(self):
+    def save_depth_figs(self) -> bool:
         """
         save_depth_figs controls saving of water depth figures.
         """
         return self._save_depth_figs
 
     @save_depth_figs.setter
-    def save_depth_figs(self, save_depth_figs) -> None:
+    def save_depth_figs(self, save_depth_figs: bool) -> None:
         if (save_depth_figs is True) and \
           ('depth' not in self._save_fig_list.keys()):
             self._save_fig_list['depth'] = ['depth']
@@ -698,7 +697,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._save_discharge_figs
 
     @save_discharge_figs.setter
-    def save_discharge_figs(self, save_discharge_figs) -> None:
+    def save_discharge_figs(self, save_discharge_figs: bool) -> None:
         if (save_discharge_figs is True) and \
           ('discharge' not in self._save_fig_list.keys()):
             self._save_fig_list['discharge'] = ['qw']
@@ -708,14 +707,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_discharge_figs = save_discharge_figs
 
     @property
-    def save_velocity_figs(self):
+    def save_velocity_figs(self) -> bool:
         """
         save_velocity_figs controls saving of water velocity figures.
         """
         return self._save_velocity_figs
 
     @save_velocity_figs.setter
-    def save_velocity_figs(self, save_velocity_figs) -> None:
+    def save_velocity_figs(self, save_velocity_figs: bool) -> None:
         if (save_velocity_figs is True) and \
           ('velocity' not in self._save_fig_list.keys()):
             self._save_fig_list['velocity'] = ['uw']
@@ -725,14 +724,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_velocity_figs = save_velocity_figs
 
     @property
-    def save_sedflux_figs(self):
+    def save_sedflux_figs(self) -> bool:
         """
         save_sedflux_figs controls saving of sediment flux figures.
         """
         return self._save_sedflux_figs
 
     @save_sedflux_figs.setter
-    def save_sedflux_figs(self, save_sedflux_figs) -> None:
+    def save_sedflux_figs(self, save_sedflux_figs: bool) -> None:
         if (save_sedflux_figs is True) and \
           ('sedflux' not in self._save_fig_list.keys()):
             self._save_fig_list['sedflux'] = ['qs']
@@ -742,7 +741,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_sedflux_figs = save_sedflux_figs
 
     @property
-    def save_sandfrac_figs(self):
+    def save_sandfrac_figs(self) -> bool:
         """
         save_sandfrac_figs controls whether or not figures of the sediment
         surface (i.e., the bed) sand fraction are saved.
@@ -750,7 +749,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._save_sandfrac_figs
 
     @save_sandfrac_figs.setter
-    def save_sandfrac_figs(self, save_sandfrac_figs) -> None:
+    def save_sandfrac_figs(self, save_sandfrac_figs: bool) -> None:
         if (save_sandfrac_figs is True) and \
           ('sandfrac' not in self._save_fig_list.keys()):
             self._save_fig_list['sandfrac'] = ['sand_frac']
@@ -760,7 +759,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_sandfrac_figs = save_sandfrac_figs
 
     @property
-    def save_figs_sequential(self):
+    def save_figs_sequential(self) -> bool:
         """
         save_figs_sequential sets how figures are to be saved.
 
@@ -776,11 +775,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._save_figs_sequential
 
     @save_figs_sequential.setter
-    def save_figs_sequential(self, save_figs_sequential) -> None:
+    def save_figs_sequential(self, save_figs_sequential: bool) -> None:
         self._save_figs_sequential = save_figs_sequential
 
     @property
-    def save_metadata(self):
+    def save_metadata(self) -> bool:
         """
         save_metadata explicit control on whether or not metadata is saved.
 
@@ -796,18 +795,18 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._save_metadata
 
     @save_metadata.setter
-    def save_metadata(self, save_metadata) -> None:
+    def save_metadata(self, save_metadata: bool) -> None:
         self._save_metadata = save_metadata
 
     @property
-    def save_eta_grids(self):
+    def save_eta_grids(self) -> bool:
         """
         save_eta_grids controls whether or not topography information is saved.
         """
         return self._save_eta_grids
 
     @save_eta_grids.setter
-    def save_eta_grids(self, save_eta_grids) -> None:
+    def save_eta_grids(self, save_eta_grids: bool) -> None:
         if (save_eta_grids is True) and \
           ('eta' not in self._save_var_list.keys()):
             self._save_var_list['eta'] = ['eta', 'meters', 'f4',
@@ -818,14 +817,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_eta_grids = save_eta_grids
 
     @property
-    def save_stage_grids(self):
+    def save_stage_grids(self) -> bool:
         """
         save_stage_grids controls whether or not stage information is saved.
         """
         return self._save_stage_grids
 
     @save_stage_grids.setter
-    def save_stage_grids(self, save_stage_grids) -> None:
+    def save_stage_grids(self, save_stage_grids: bool) -> None:
         if (save_stage_grids is True) and \
           ('stage' not in self._save_var_list.keys()):
             self._save_var_list['stage'] = ['stage', 'meters', 'f4',
@@ -836,14 +835,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_stage_grids = save_stage_grids
 
     @property
-    def save_depth_grids(self):
+    def save_depth_grids(self) -> bool:
         """
         save_depth_grids controls whether or not depth information is saved.
         """
         return self._save_depth_grids
 
     @save_depth_grids.setter
-    def save_depth_grids(self, save_depth_grids) -> None:
+    def save_depth_grids(self, save_depth_grids: bool) -> None:
         if (save_depth_grids is True) and \
           ('depth' not in self._save_var_list.keys()):
             self._save_var_list['depth'] = ['depth', 'meters', 'f4',
@@ -854,14 +853,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_depth_grids = save_depth_grids
 
     @property
-    def save_discharge_grids(self):
+    def save_discharge_grids(self) -> bool:
         """
         save_discharge_grids controls saving of water discharge information.
         """
         return self._save_discharge_grids
 
     @save_discharge_grids.setter
-    def save_discharge_grids(self, save_discharge_grids) -> None:
+    def save_discharge_grids(self, save_discharge_grids: bool) -> None:
         if (save_discharge_grids is True) and \
           ('discharge' not in self._save_var_list.keys()):
             self._save_var_list['discharge'] = ['qw',
@@ -874,14 +873,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_discharge_grids = save_discharge_grids
 
     @property
-    def save_velocity_grids(self):
+    def save_velocity_grids(self) -> bool:
         """
         save_velocity_grids controls saving of water velocity information.
         """
         return self._save_velocity_grids
 
     @save_velocity_grids.setter
-    def save_velocity_grids(self, save_velocity_grids) -> None:
+    def save_velocity_grids(self, save_velocity_grids: bool) -> None:
         if (save_velocity_grids is True) and \
           ('velocity' not in self._save_var_list.keys()):
             self._save_var_list['velocity'] = ['uw', 'meters per second', 'f4',
@@ -892,14 +891,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_velocity_grids = save_velocity_grids
 
     @property
-    def save_sedflux_grids(self):
+    def save_sedflux_grids(self) -> bool:
         """
         save_sedflux_grids controls saving of sediment discharge information.
         """
         return self._save_sedflux_grids
 
     @save_sedflux_grids.setter
-    def save_sedflux_grids(self, save_sedflux_grids) -> None:
+    def save_sedflux_grids(self, save_sedflux_grids: bool) -> None:
         if (save_sedflux_grids is True) and \
           ('sedflux' not in self._save_var_list.keys()):
             self._save_var_list['sedflux'] = ['qs', 'cubic meters per second',
@@ -911,7 +910,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_sedflux_grids = save_sedflux_grids
 
     @property
-    def save_sandfrac_grids(self):
+    def save_sandfrac_grids(self) -> bool:
         """
         save_sandfrac_grids controls whether or not the sediment
         surface (i.e., the bed) sand fraction is saved.
@@ -919,7 +918,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._save_sandfrac_grids
 
     @save_sandfrac_grids.setter
-    def save_sandfrac_grids(self, save_sandfrac_grids) -> None:
+    def save_sandfrac_grids(self, save_sandfrac_grids: bool) -> None:
         if (save_sandfrac_grids is True) and \
           ('sandfrac' not in self._save_var_list.keys()):
             self._save_var_list['sandfrac'] = ['sand_frac', 'fraction', 'f4',
@@ -930,14 +929,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_sandfrac_grids = save_sandfrac_grids
 
     @property
-    def save_discharge_components(self):
+    def save_discharge_components(self) -> bool:
         """
         save_discharge_components controls saving of x-y discharge components.
         """
         return self._save_discharge_components
 
     @save_discharge_components.setter
-    def save_discharge_components(self, save_discharge_components) -> None:
+    def save_discharge_components(self, save_discharge_components: bool) -> None:
         if (save_discharge_components is True):
             if ('discharge_x' not in self._save_var_list.keys()):
                 self._save_var_list['discharge_x'] = [
@@ -955,14 +954,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_discharge_components = save_discharge_components
 
     @property
-    def save_velocity_components(self):
+    def save_velocity_components(self) -> bool:
         """
         save_velocity_components controls saving of x-y velocity components.
         """
         return self._save_velocity_components
 
     @save_velocity_components.setter
-    def save_velocity_components(self, save_velocity_components) -> None:
+    def save_velocity_components(self, save_velocity_components: bool) -> None:
         if (save_velocity_components is True):
             if ('velocity_x' not in self._save_var_list.keys()):
                 self._save_var_list['velocity_x'] = [
@@ -980,14 +979,14 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_velocity_components = save_velocity_components
 
     @property
-    def save_dt(self):
+    def save_dt(self) -> bool:
         """
         save_dt defines the saving interval in seconds.
         """
         return self._save_dt
 
     @save_dt.setter
-    def save_dt(self, save_dt) -> None:
+    def save_dt(self, save_dt: bool) -> None:
         self._save_dt = save_dt
 
     @property
@@ -1004,18 +1003,18 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._checkpoint_dt = checkpoint_dt
 
     @property
-    def save_checkpoint(self):
+    def save_checkpoint(self) -> bool:
         """
         save_checkpoint controls saving of model checkpoint information.
         """
         return self._save_checkpoint
 
     @save_checkpoint.setter
-    def save_checkpoint(self, save_checkpoint) -> None:
+    def save_checkpoint(self, save_checkpoint: bool) -> None:
         self._save_checkpoint = save_checkpoint
 
     @property
-    def resume_checkpoint(self):
+    def resume_checkpoint(self) -> Union[bool, str]:
         """
         resume_checkpoint controls loading of a checkpoint if run is resuming.
 
@@ -1029,7 +1028,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._resume_checkpoint
 
     @resume_checkpoint.setter
-    def resume_checkpoint(self, resume_checkpoint) -> None:
+    def resume_checkpoint(self, resume_checkpoint: Union[bool, str]) -> None:
         if isinstance(resume_checkpoint, str):
             self._checkpoint_folder = resume_checkpoint
             self._resume_checkpoint = True
@@ -1038,40 +1037,40 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
             self._resume_checkpoint = resume_checkpoint
 
     @property
-    def omega_sfc(self):
+    def omega_sfc(self) -> float:
         """
         omega_sfc is a water surface underrelaxation parameter.
         """
         return self._omega_sfc
 
     @omega_sfc.setter
-    def omega_sfc(self, omega_sfc) -> None:
+    def omega_sfc(self, omega_sfc: float) -> None:
         self._omega_sfc = omega_sfc
 
     @property
-    def omega_flow(self):
+    def omega_flow(self) -> float:
         """
         omega_flow is a flow velocity underrelaxation parameter.
         """
         return self._omega_flow
 
     @omega_flow.setter
-    def omega_flow(self, omega_flow) -> None:
+    def omega_flow(self, omega_flow: float) -> None:
         self._omega_flow = omega_flow
 
     @property
-    def Nsmooth(self):
+    def Nsmooth(self) -> int:
         """
         Nsmooth defines the number of times the water surface is smoothed.
         """
         return self._Nsmooth
 
     @Nsmooth.setter
-    def Nsmooth(self, Nsmooth) -> None:
+    def Nsmooth(self, Nsmooth: int) -> None:
         self._Nsmooth = Nsmooth
 
     @property
-    def theta_water(self):
+    def theta_water(self) -> float:
         """
         theta_water is the exponent of depth dependence for weighted routing.
 
@@ -1089,11 +1088,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._theta_water
 
     @theta_water.setter
-    def theta_water(self, theta_water) -> None:
+    def theta_water(self, theta_water: float) -> None:
         self._theta_water = theta_water
 
     @property
-    def coeff_theta_sand(self):
+    def coeff_theta_sand(self) -> float:
         """
         coeff_theta_sand is the coefficient applied to theta for sand routing.
 
@@ -1107,11 +1106,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._coeff_theta_sand
 
     @coeff_theta_sand.setter
-    def coeff_theta_sand(self, coeff_theta_sand) -> None:
+    def coeff_theta_sand(self, coeff_theta_sand: float) -> None:
         self._coeff_theta_sand = coeff_theta_sand
 
     @property
-    def coeff_theta_mud(self):
+    def coeff_theta_mud(self) -> float:
         """
         coeff_theta_mud is the coefficient applied to theta for mud routing.
 
@@ -1125,11 +1124,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._coeff_theta_mud
 
     @coeff_theta_mud.setter
-    def coeff_theta_mud(self, coeff_theta_mud) -> None:
+    def coeff_theta_mud(self, coeff_theta_mud: float) -> None:
         self._coeff_theta_mud = coeff_theta_mud
 
     @property
-    def beta(self):
+    def beta(self) -> float:
         """
         beta is the bedload transport capacity exponent.
 
@@ -1139,11 +1138,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._beta
 
     @beta.setter
-    def beta(self, beta) -> None:
+    def beta(self, beta: float) -> None:
         self._beta = beta
 
     @property
-    def sed_lag(self):
+    def sed_lag(self) -> float:
         """
         sed_lag is a "sedimentation lag" parameter.
 
@@ -1154,11 +1153,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._sed_lag
 
     @sed_lag.setter
-    def sed_lag(self, sed_lag) -> None:
+    def sed_lag(self, sed_lag: float) -> None:
         self._sed_lag = sed_lag
 
     @property
-    def coeff_U_dep_mud(self):
+    def coeff_U_dep_mud(self) -> float:
         """
         coeff_U_dep_mud is the threshold velocity for mud sediment deposition.
 
@@ -1169,11 +1168,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._coeff_U_dep_mud
 
     @coeff_U_dep_mud.setter
-    def coeff_U_dep_mud(self, coeff_U_dep_mud) -> None:
+    def coeff_U_dep_mud(self, coeff_U_dep_mud: float) -> None:
         self._coeff_U_dep_mud = coeff_U_dep_mud
 
     @property
-    def coeff_U_ero_mud(self):
+    def coeff_U_ero_mud(self) -> float:
         """
         coeff_U_ero_mud is the mud erosion velocity threshold coefficient.
 
@@ -1184,11 +1183,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._coeff_U_ero_mud
 
     @coeff_U_ero_mud.setter
-    def coeff_U_ero_mud(self, coeff_U_ero_mud) -> None:
+    def coeff_U_ero_mud(self, coeff_U_ero_mud: float) -> None:
         self._coeff_U_ero_mud = coeff_U_ero_mud
 
     @property
-    def coeff_U_ero_sand(self):
+    def coeff_U_ero_sand(self) -> float:
         """
         coeff_U_ero_sand is the sand erosion velocity threshold coefficient.
 
@@ -1199,11 +1198,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._coeff_U_ero_sand
 
     @coeff_U_ero_sand.setter
-    def coeff_U_ero_sand(self, coeff_U_ero_sand) -> None:
+    def coeff_U_ero_sand(self, coeff_U_ero_sand: float) -> None:
         self._coeff_U_ero_sand = coeff_U_ero_sand
 
     @property
-    def alpha(self):
+    def alpha(self) -> float:
         """
         alpha is the topographic diffusion coefficient.
 
@@ -1213,11 +1212,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._alpha
 
     @alpha.setter
-    def alpha(self, alpha) -> None:
+    def alpha(self, alpha: float) -> None:
         self._alpha = alpha
 
     @property
-    def stepmax(self):
+    def stepmax(self) -> int:
         """
         `stepmax` is the maximum number of jumps a parcel can make.
 
@@ -1241,11 +1240,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._stepmax
 
     @stepmax.setter
-    def stepmax(self, stepmax) -> None:
+    def stepmax(self, stepmax: int) -> None:
         self._stepmax = stepmax
 
     @property
-    def clobber_netcdf(self):
+    def clobber_netcdf(self) -> bool:
         """
         Allows overwriting (clobbering) of an existing netCDF output file.
 
@@ -1258,11 +1257,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._clobber_netcdf
 
     @clobber_netcdf.setter
-    def clobber_netcdf(self, clobber_netcdf) -> None:
+    def clobber_netcdf(self, clobber_netcdf: bool) -> None:
         self._clobber_netcdf = clobber_netcdf
 
     @property
-    def legacy_netcdf(self):
+    def legacy_netcdf(self) -> bool:
         """Enable output in legacy netCDF format.
 
         .. note:: new in `v2.1.0`.
@@ -1299,11 +1298,11 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._legacy_netcdf
 
     @legacy_netcdf.setter
-    def legacy_netcdf(self, legacy_netcdf) -> None:
+    def legacy_netcdf(self, legacy_netcdf: bool) -> None:
         self._legacy_netcdf = legacy_netcdf
 
     @property
-    def time(self):
+    def time(self) -> float:
         """Elapsed model time in seconds.
         """
         return self._time
@@ -1358,7 +1357,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.init_sediment_routers()
 
     @property
-    def time_iter(self):
+    def time_iter(self) -> int:
         """Number of time iterations.
 
         The number of times the :obj:`update` method has been called.
@@ -1366,7 +1365,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._time_iter
 
     @property
-    def save_time_since_data(self):
+    def save_time_since_data(self) -> float:
         """Time since data last output.
 
         The elapsed time (seconds) since data was output with
@@ -1375,12 +1374,12 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._save_time_since_data
 
     @property
-    def save_time_since_checkpoint(self):
+    def save_time_since_checkpoint(self) -> float:
         """Time since last data checkpoint was saved."""
         return self._save_time_since_checkpoint
 
     @property
-    def save_iter(self):
+    def save_iter(self) -> int:
         """Number of times data has been saved."""
         return self._save_iter
 
@@ -1390,7 +1389,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self.u0
 
     @channel_flow_velocity.setter
-    def channel_flow_velocity(self, new_u0) -> None:
+    def channel_flow_velocity(self, new_u0: float) -> None:
         self.u0 = new_u0
         self.create_boundary_conditions()
         self.init_sediment_routers()
@@ -1401,7 +1400,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self.N0 * self._dx
 
     @channel_width.setter
-    def channel_width(self, new_N0_meters) -> None:
+    def channel_width(self, new_N0_meters: float) -> None:
         self.N0_meters = new_N0_meters
         self.create_boundary_conditions()
         self.init_sediment_routers()
@@ -1428,7 +1427,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self.H_SL
 
     @sea_surface_mean_elevation.setter
-    def sea_surface_mean_elevation(self, new_se) -> None:
+    def sea_surface_mean_elevation(self, new_se: float) -> None:
         self.H_SL = new_se
 
     @property
@@ -1437,7 +1436,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self.SLR
 
     @sea_surface_elevation_change.setter
-    def sea_surface_elevation_change(self, new_SLR) -> None:
+    def sea_surface_elevation_change(self, new_SLR: float) -> None:
         self.SLR = new_SLR
 
     @property
@@ -1446,7 +1445,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self.f_bedload
 
     @bedload_fraction.setter
-    def bedload_fraction(self, new_u0) -> None:
+    def bedload_fraction(self, new_u0: float) -> None:
         self.f_bedload = new_u0
 
     @property
@@ -1455,7 +1454,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self.C0_percent
 
     @influx_sediment_concentration.setter
-    def influx_sediment_concentration(self, new_C0) -> None:
+    def influx_sediment_concentration(self, new_C0: float) -> None:
         self.C0_percent = new_C0 * 100
         self.create_boundary_conditions()
         self.init_sediment_routers()

@@ -29,7 +29,7 @@ delta.run_water_iteration()
 
 
 NPLOT = 5
-hdr = NPLOT // 2
+hdr: int = NPLOT // 2
 
 # fig, ax = plt.subplots()
 fig = plt.figure(constrained_layout=False, figsize=(6, 9))

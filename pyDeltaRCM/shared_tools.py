@@ -3,7 +3,7 @@ import os
 import re
 import tempfile
 import yaml
-from typing import Tuple
+from typing import Iterator, Type, Tuple
 
 import numpy as np
 from numba import njit, _helperlib
@@ -454,7 +454,7 @@ def _get_version() -> str:
 
 
 @contextlib.contextmanager
-def _docs_temp_directory():
+def _docs_temp_directory() -> Iterator[str]:
     """Helper for creating and tearing down models in documentation.
 
     This function should be used as a context manager, to create a DeltaModel
@@ -478,7 +478,7 @@ def _docs_temp_directory():
     tmpdir.cleanup()
 
 
-def custom_yaml_loader():
+def custom_yaml_loader() -> Type[yaml.loader.SafeLoader]:
     """A custom YAML loader to handle scientific notation.
 
     We are waiting for upstream fix here:

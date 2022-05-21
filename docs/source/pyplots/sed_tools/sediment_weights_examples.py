@@ -17,12 +17,12 @@ cm = matplotlib.cm.get_cmap('tab10')
 
 class SedimentWeightingCalculator(pyDeltaRCM.DeltaModel):
 
-    def __init__(self, input_file=None, **kwargs):
+    def __init__(self, input_file=None, **kwargs) -> None:
 
         # inherit from base model
         super().__init__(input_file, **kwargs)
 
-    def get_sediment_weight_array(self):
+    def get_sediment_weight_array(self) -> None:
         sand_weights = np.zeros((self.L, self.W, 9))
         mud_weights = np.zeros((self.L, self.W, 9))
 
@@ -75,7 +75,7 @@ delta.run_water_iteration()
 
 
 NPLOT = 5
-hdr = NPLOT // 2
+hdr: int = NPLOT // 2
 
 # fig, ax = plt.subplots()
 fig = plt.figure(constrained_layout=False, figsize=(6, 9))

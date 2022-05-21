@@ -162,10 +162,10 @@ class TestModelIsReproducible:
 
 class CustomParamModel(DeltaModel):
     """Subclass for custom yaml parameters."""
-    def __init__(self, input_file=None, defer_output=False, **kwargs):
+    def __init__(self, input_file=None, defer_output: bool=False, **kwargs) -> None:
         super().__init__(input_file, **kwargs)
 
-    def hook_import_files(self):
+    def hook_import_files(self) -> None:
         """Hook to define custom yaml parameters."""
         self.subclass_parameters['new_str'] = {
             'type': ['str'], 'default': 'DefaultString'
