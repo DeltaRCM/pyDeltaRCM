@@ -98,7 +98,8 @@ class Test__init__:
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
         utilities.write_parameter_to_file(f, 'illegal_attribute', True)
         f.close()
-        delta = DeltaModel(input_file=p)
+        with pytest.warns(UserWarning, match=r'One or more .*illegal.*'):
+            delta = DeltaModel(input_file=p)
         assert delta.S0 == 0.00015  # from default.yaml
         assert not hasattr(delta, 'illegal_attribute')
 
