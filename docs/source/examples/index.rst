@@ -2,6 +2,14 @@
 Examples of using and working with pyDeltaRCM
 =============================================
 
+Running the model
+-----------------
+
+.. toctree::
+   :maxdepth: 1
+
+   resume_from_checkpoint
+
 
 Modifying initial conditions
 ----------------------------
@@ -33,7 +41,11 @@ Modifying internal computations
 Modifying behavior of the Preprocessor
 --------------------------------------
 
-* none
+.. toctree::
+   :maxdepth: 1
+
+   custom_class_preprocessor
+
 
 Modifying Model Input/Output
 ----------------------------
