@@ -23,7 +23,7 @@ from . import sed_tools
 
 class init_tools(abc.ABC):
 
-    def init_output_infrastructure(self):
+    def init_output_infrastructure(self) -> None:
         """Initialize the output infrastructure (folder and save lists).
 
         This method is the first called in the initialization of the
@@ -42,7 +42,7 @@ class init_tools(abc.ABC):
         self._save_var_list = dict()  # dict of variables to save
         self._save_var_list['meta'] = dict()  # set up meta dict
 
-    def init_logger(self):
+    def init_logger(self) -> None:
         """Initialize a logger.
 
         The logger is initialized regardless of the value of ``self.verbose``.
@@ -73,7 +73,7 @@ class init_tools(abc.ABC):
         self.log_info('Platform: {}'.format(platform.platform()),
                       verbosity=0)  # log the os
 
-    def import_files(self, kwargs_dict={}):
+    def import_files(self, kwargs_dict={}) -> None:
         """Import the input files.
 
         This method handles the parsing and validation of any options supplied
@@ -207,7 +207,7 @@ class init_tools(abc.ABC):
         else:
             self._netcdf_coords = ('time', 'x', 'y')
 
-    def process_input_to_model(self):
+    def process_input_to_model(self) -> None:
         """Process input file to model variables.
 
         Loop through the items specified in the model configuration and apply
@@ -236,7 +236,7 @@ class init_tools(abc.ABC):
                     var=k, val=v)
                 self.log_info(_msg, verbosity=0)
 
-    def determine_random_seed(self):
+    def determine_random_seed(self) -> None:
         """Set the random seed if given.
 
         If a random seed is specified, set the seed to this value.
@@ -253,7 +253,7 @@ class init_tools(abc.ABC):
         _msg = 'Random seed is: %s ' % str(self._seed)
         self.log_info(_msg, verbosity=0)
 
-    def create_other_variables(self):
+    def create_other_variables(self) -> None:
         """Model implementation variables.
 
         Creates variables for model implementation, from specified boundary
@@ -308,7 +308,7 @@ class init_tools(abc.ABC):
 
         self._is_finalized = False
 
-    def set_constants(self):
+    def set_constants(self) -> None:
         """Set the model constants.
 
         Configure constants, including coordinates and distances, as well as
@@ -368,7 +368,7 @@ class init_tools(abc.ABC):
                                  [1, 0, 1],
                                  [1, 1, 1]]).astype(np.int64)
 
-    def create_boundary_conditions(self):
+    def create_boundary_conditions(self) -> None:
         """Create model boundary conditions
 
         This method is run during model initialization to determine the
@@ -441,7 +441,7 @@ class init_tools(abc.ABC):
         self.diffusion_multiplier = (self._dt / self.N_crossdiff * self._alpha
                                      * 0.5 / self._dx**2)
 
-    def create_domain(self):
+    def create_domain(self) -> None:
         """Create the model domain.
 
         This method initializes the model domain, including coordinate arrays,
@@ -547,7 +547,7 @@ class init_tools(abc.ABC):
         self.inlet = np.array(np.unique(np.where(self.cell_type == 1)[1]))
         self.eta[:] = self.stage - self.depth
 
-    def init_sediment_routers(self):
+    def init_sediment_routers(self) -> None:
         """Initialize the sediment router object here.
 
         These are preinitialized because the "boxing" for jitted functions is
@@ -581,7 +581,7 @@ class init_tools(abc.ABC):
                                         self._beta, self.stepmax,
                                         self.theta_sand)
 
-    def init_output_file(self):
+    def init_output_file(self) -> None:
         """Creates a netCDF file to store output grids.
 
         Fills with default variables.
@@ -705,7 +705,7 @@ class init_tools(abc.ABC):
             _msg = 'Output netCDF file created'
             self.log_info(_msg, verbosity=2)
 
-    def init_subsidence(self):
+    def init_subsidence(self) -> None:
         """Initialize subsidence pattern.
 
         Initializes patterns of subsidence if toggle_subsidence is True
@@ -728,7 +728,7 @@ class init_tools(abc.ABC):
 
             self.sigma = self.subsidence_mask * self._subsidence_rate * self.dt
 
-    def init_metadata_list(self):
+    def init_metadata_list(self) -> None:
         """Populate the list of metadata information.
 
         Sets up the dictionary object for the standard metadata.

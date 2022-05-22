@@ -118,7 +118,7 @@ class debug_tools(abc.ABC):
         else:
             plot_ind(ind, shape=_shape, *args, **kwargs)
 
-    def show_line(self, ind, *args, multiline=False, nozeros=False, **kwargs):
+    def show_line(self, ind, *args, multiline: bool = False, nozeros: bool = False, **kwargs):
         """Show line within the model domain.
 
         Show the location of lines (a series of connected indices) within the
@@ -200,7 +200,7 @@ class debug_tools(abc.ABC):
         return lines
 
 
-def plot_domain(attr, ax=None, grid=True, block=False, label=None, **kwargs):
+def plot_domain(attr, ax=None, grid: bool = True, block: bool = False, label=None, **kwargs):
     """Plot the model domain.
 
     Public function to plot *any* 2d grid with helper display utils.

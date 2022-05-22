@@ -1,6 +1,7 @@
 # unit tests for iteration_tools.py
 
 import pytest
+from pathlib import Path
 
 import os
 import netCDF4
@@ -15,7 +16,7 @@ from . import utilities
 
 class TestSolveWaterAndSedimentTimestep:
 
-    def test_solve_water_and_sediment_timestep_defaults(self, tmp_path):
+    def test_solve_water_and_sediment_timestep_defaults(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         delta = DeltaModel(input_file=p)
@@ -43,7 +44,7 @@ class TestSolveWaterAndSedimentTimestep:
         assert (delta.route_sediment.called is True)
         assert (delta._is_finalized is False)
 
-    def test_solve_water_and_sediment_timestep_itermax_10(self, tmp_path):
+    def test_solve_water_and_sediment_timestep_itermax_10(self, tmp_path: Path) -> None:
         # create a delta with different itermax
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'itermax': 10})
@@ -72,7 +73,7 @@ class TestSolveWaterAndSedimentTimestep:
         assert (delta.route_sediment.called is True)
         assert (delta._is_finalized is False)
 
-    def test_run_one_timestep_deprecated(self, tmp_path):
+    def test_run_one_timestep_deprecated(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
@@ -91,7 +92,7 @@ class TestSolveWaterAndSedimentTimestep:
 
 class TestFinalizeTimestep:
 
-    def test_finalize_timestep(self, tmp_path):
+    def test_finalize_timestep(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'SLR': 0.001})
@@ -113,7 +114,7 @@ class TestFinalizeTimestep:
 
 class TestApplyingSubsidence:
 
-    def test_subsidence_in_update(self, tmp_path):
+    def test_subsidence_in_update(self, tmp_path: Path) -> None:
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'toggle_subsidence': True,
@@ -138,7 +139,7 @@ class TestApplyingSubsidence:
                       pytest.approx(-_delta.h0 - 0.00025))
         _delta.output_netcdf.close()
 
-    def test_subsidence_in_update_delayed_start(self, tmp_path):
+    def test_subsidence_in_update_delayed_start(self, tmp_path: Path) -> None:
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'toggle_subsidence': True,
@@ -171,7 +172,7 @@ class TestApplyingSubsidence:
 
         _delta.solve_water_and_sediment_timestep.call_count == 2
 
-    def test_subsidence_changed_with_timestep(self, tmp_path):
+    def test_subsidence_changed_with_timestep(self, tmp_path: Path) -> None:
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'toggle_subsidence': True,
@@ -189,7 +190,7 @@ class TestApplyingSubsidence:
 
 class TestOutputCheckpoint:
 
-    def test_save_a_checkpoint_checkpoint_False(self, tmp_path):
+    def test_save_a_checkpoint_checkpoint_False(self, tmp_path: Path) -> None:
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_checkpoint': False})
@@ -205,7 +206,7 @@ class TestOutputCheckpoint:
         assert (_delta.save_the_checkpoint.called is False)
         assert (_delta.log_info.called is False)
 
-    def test_save_a_checkpoint_checkpoint_true(self, tmp_path):
+    def test_save_a_checkpoint_checkpoint_true(self, tmp_path: Path) -> None:
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_checkpoint': True})
@@ -225,7 +226,7 @@ class TestOutputCheckpoint:
         assert (_delta.save_the_checkpoint.call_count == 1)
         assert (_delta.log_info.call_count == 1)
 
-    def test_save_a_checkpoint_checkpoint_true_timewarning(self, tmp_path):
+    def test_save_a_checkpoint_checkpoint_true_timewarning(self, tmp_path: Path) -> None:
         # create a delta with subsidence parameters
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_checkpoint': True,
@@ -251,7 +252,7 @@ class TestOutputCheckpoint:
 
 class TestSaveGridsAndFigs:
 
-    def test_save_no_figs_no_grids(self, tmp_path):
+    def test_save_no_figs_no_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1})
         _delta = DeltaModel(input_file=p)
@@ -280,7 +281,7 @@ class TestSaveGridsAndFigs:
         _delta.save_figure.call_count == 0
         _delta.save_grids.call_count == 0
 
-    def test_save_one_fig_no_grids(self, tmp_path):
+    def test_save_one_fig_no_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_eta_figs': True})
@@ -311,7 +312,7 @@ class TestSaveGridsAndFigs:
         _delta.save_figure.call_count == 5
         _delta.save_grids.call_count == 0
 
-    def test_save_one_fig_one_grid(self, tmp_path):
+    def test_save_one_fig_one_grid(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_eta_grids': True,
@@ -345,7 +346,7 @@ class TestSaveGridsAndFigs:
         _delta.save_figure.call_count == 5
         _delta.save_grids.call_count == 5
 
-    def test_save_all_figures_no_grids(self, tmp_path):
+    def test_save_all_figures_no_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_eta_figs': True,
@@ -386,7 +387,7 @@ class TestSaveGridsAndFigs:
         _delta.save_figure.call_count == 5 * 6
         _delta.save_grids.call_count == 0
 
-    def test_save_metadata_no_grids(self, tmp_path):
+    def test_save_metadata_no_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_metadata': True})
@@ -417,7 +418,7 @@ class TestSaveGridsAndFigs:
         assert ds['meta']['H_SL'].shape[0] == 4  # init + 3
         assert ds['meta']['L0'][:] == 3
 
-    def test_save_metadata_and_grids(self, tmp_path):
+    def test_save_metadata_and_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_metadata': True,
@@ -453,7 +454,7 @@ class TestSaveGridsAndFigs:
         assert ds['meta']['L0'][:] == 3
         assert np.all(ds['meta']['f_bedload'][:] == 0.25)
 
-    def test_save_one_grid_metadata_by_default(self, tmp_path):
+    def test_save_one_grid_metadata_by_default(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_metadata': False,
@@ -493,7 +494,7 @@ class TestSaveGridsAndFigs:
 
 class TestSaveFigure:
 
-    def test_save_figure(self, tmp_path):
+    def test_save_figure(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_eta_figs': True})
@@ -518,7 +519,7 @@ class TestSaveFigure:
         exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'eta_00001.png')
         assert os.path.isfile(exp_path_png1)
 
-    def test_save_figure_sequential(self, tmp_path):
+    def test_save_figure_sequential(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_eta_figs': True,
@@ -548,7 +549,7 @@ class TestSaveFigure:
 
 class TestSaveGrids:
 
-    def test_save_eta_grids(self, tmp_path):
+    def test_save_eta_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_eta_grids': True})
@@ -576,7 +577,7 @@ class TestSaveGrids:
         assert _arr.shape[2] == _delta.eta.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
 
-    def test_save_depth_grids(self, tmp_path):
+    def test_save_depth_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_depth_grids': True})
@@ -604,7 +605,7 @@ class TestSaveGrids:
         assert _arr.shape[2] == _delta.depth.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
 
-    def test_save_velocity_grids(self, tmp_path):
+    def test_save_velocity_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_velocity_grids': True})
@@ -632,7 +633,7 @@ class TestSaveGrids:
         assert _arr.shape[2] == _delta.uw.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
 
-    def test_save_stage_grids(self, tmp_path):
+    def test_save_stage_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_stage_grids': True})
@@ -660,7 +661,7 @@ class TestSaveGrids:
         assert _arr.shape[2] == _delta.stage.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
 
-    def test_save_discharge_grids(self, tmp_path):
+    def test_save_discharge_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_discharge_grids': True})
@@ -688,7 +689,7 @@ class TestSaveGrids:
         assert _arr.shape[2] == _delta.qw.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
 
-    def test_save_sedflux_grids(self, tmp_path):
+    def test_save_sedflux_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
                                       'save_sedflux_grids': True})
@@ -716,7 +717,7 @@ class TestSaveGrids:
         assert _arr.shape[2] == _delta.qs.shape[1]
         assert ('meta' in ds.groups)  # if any grids, save meta too
 
-    def test_save_grids_exception(self, tmp_path):
+    def test_save_grids_exception(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml', {'save_dt': 1})
         _delta = DeltaModel(input_file=p)
 

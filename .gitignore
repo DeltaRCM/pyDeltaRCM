@@ -99,6 +99,9 @@ target/
 # SublimeText docs
 *.sublime-*
 
+# VSCode settings directory
+.vscode/
+
 # temp folder
 temp/
 

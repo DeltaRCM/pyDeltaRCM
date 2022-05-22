@@ -701,7 +701,7 @@ def _get_water_weight_array(depth, stage, cell_type, qx, qy,
 
 
 @njit('int64[:](int64[:], float64[:,:])')
-def _choose_next_directions(inds, water_weights):
+def _choose_next_directions(inds: np.ndarray, water_weights: np.ndarray) -> np.ndarray:
     """Get new cell locations, based on water weights.
 
     Algorithm is to:

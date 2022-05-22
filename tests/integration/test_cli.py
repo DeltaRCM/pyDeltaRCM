@@ -1,8 +1,10 @@
-import pytest
+import locale
 import os
 import platform
-import locale
 import subprocess
+from pathlib import Path
+
+import pytest
 
 from .. import utilities
 import pyDeltaRCM as _pyimportedalias
@@ -11,7 +13,7 @@ import pyDeltaRCM as _pyimportedalias
 class TestCommandLineInterfaceDirectly:
 
     # test the entry points
-    def test_entry_point_installed_call(self, tmp_path):
+    def test_entry_point_installed_call(self, tmp_path: Path) -> None:
         """
         test calling the command line feature with a config file.
         """
@@ -40,7 +42,7 @@ class TestCommandLineInterfaceDirectly:
         assert os.path.isfile(exp_path_png0)
         assert os.path.isfile(exp_path_png1)
 
-    def test_entry_point_python_main_call(self, tmp_path):
+    def test_entry_point_python_main_call(self, tmp_path: Path) -> None:
         """
         test calling the python hook command line feature with a config file.
         """
@@ -71,7 +73,7 @@ class TestCommandLineInterfaceDirectly:
         assert os.path.isfile(exp_path_png1)
         assert not os.path.isfile(exp_path_png2)
 
-    def test_entry_point_python_main_call_dryrun(self, tmp_path):
+    def test_entry_point_python_main_call_dryrun(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -93,7 +95,7 @@ class TestCommandLineInterfaceDirectly:
         assert not os.path.isfile(exp_path_nc)   # does not exist because --dryrun
         assert not os.path.isfile(exp_path_png)  # does not exist because --dryrun
 
-    def test_entry_point_python_main_call_timesteps(self, tmp_path):
+    def test_entry_point_python_main_call_timesteps(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'Length', 10.0)
@@ -117,7 +119,7 @@ class TestCommandLineInterfaceDirectly:
         assert os.path.isfile(exp_path_nc)
         assert os.path.isfile(exp_path_png)
 
-    def test_error_if_no_timesteps(self, tmp_path):
+    def test_error_if_no_timesteps(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -126,7 +128,7 @@ class TestCommandLineInterfaceDirectly:
             subprocess.check_output(['python', '-m', 'pyDeltaRCM',
                                      '--config', str(p)])
 
-    def test_entry_point_timesteps(self, tmp_path):
+    def test_entry_point_timesteps(self, tmp_path: Path) -> None:
         """
         test calling the command line feature with a config file.
         """
@@ -154,7 +156,7 @@ class TestCommandLineInterfaceDirectly:
         assert os.path.isfile(exp_path_png0)
         assert os.path.isfile(exp_path_png1)
 
-    def test_entry_point_time(self, tmp_path):
+    def test_entry_point_time(self, tmp_path: Path) -> None:
         """
         test calling the command line feature with a config file.
         """
@@ -182,7 +184,7 @@ class TestCommandLineInterfaceDirectly:
         assert os.path.isfile(exp_path_png0)
         assert os.path.isfile(exp_path_png1)
 
-    def test_version_call(self):
+    def test_version_call(self) -> None:
         """
         test calling the command line feature to query the version.
         """

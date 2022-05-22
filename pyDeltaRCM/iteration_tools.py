@@ -23,7 +23,7 @@ class iteration_tools(abc.ABC):
     these operations largely occur when saving and updating the model.
     """
 
-    def solve_water_and_sediment_timestep(self):
+    def solve_water_and_sediment_timestep(self) -> None:
         """Run water and sediment operations for one timestep.
 
         The first operation called by :meth:`update`, this method iterates the
@@ -48,7 +48,7 @@ class iteration_tools(abc.ABC):
         self.route_sediment()
         self.hook_after_route_sediment()
 
-    def run_one_timestep(self):
+    def run_one_timestep(self) -> None:
         """Deprecated, since v1.3.1. Use :obj:`solve_water_and_sediment_timestep`."""
         _msg = ('`run_one_timestep` and `hook_run_one_timestep` are '
                 'deprecated and have been replaced with '
@@ -87,7 +87,7 @@ class iteration_tools(abc.ABC):
 
                 self.eta[:] = self.eta - self.sigma
 
-    def finalize_timestep(self):
+    def finalize_timestep(self) -> None:
         """Finalize timestep.
 
         Clean up after sediment routing. This includes a correction for
@@ -117,7 +117,7 @@ class iteration_tools(abc.ABC):
 
         self.H_SL = self._H_SL + self._SLR * self._dt
 
-    def log_info(self, message, verbosity=0):
+    def log_info(self, message: str, verbosity: int = 0) -> None:
         """Log message dependent on verbosity settings.
 
         Parameters
@@ -132,7 +132,7 @@ class iteration_tools(abc.ABC):
         if self._verbose >= verbosity:
             self.logger.info(message)
 
-    def log_model_time(self):
+    def log_model_time(self) -> None:
         """Log the time of the model.
 
         Reports the time to the log file, and depending on verbosity, will
@@ -144,7 +144,7 @@ class iteration_tools(abc.ABC):
         if self._verbose > 0:
             print(_timemsg)
 
-    def output_data(self):
+    def output_data(self) -> None:
         """Output grids and figures if needed.
 
         """
@@ -155,7 +155,7 @@ class iteration_tools(abc.ABC):
             self._save_iter += int(1)
             self._save_time_since_data = 0
 
-    def output_checkpoint(self):
+    def output_checkpoint(self) -> None:
         """Output checkpoint if needed.
 
         Save checkpoint data (including rng state) so that the model can be
@@ -186,7 +186,7 @@ class iteration_tools(abc.ABC):
 
                 self._save_time_since_checkpoint = 0
 
-    def compute_sand_frac(self):
+    def compute_sand_frac(self) -> None:
         """Compute the sand fraction as a continous updating data field.
 
         Parameters
@@ -235,7 +235,7 @@ class iteration_tools(abc.ABC):
             self.sand_frac[whr_agg] = mixture
             self.active_layer[whr_agg] = mixture
 
-    def save_grids_and_figs(self):
+    def save_grids_and_figs(self) -> None:
         """Save grids and figures.
 
         Save grids and/or plots of specified variables (``eta``, `discharge``,
@@ -330,7 +330,7 @@ class iteration_tools(abc.ABC):
 
             self.output_netcdf.sync()
 
-    def make_figure(self, var, timestep):
+    def make_figure(self, var, timestep) -> None:
         """Create a figure.
 
         Parameters
@@ -362,7 +362,7 @@ class iteration_tools(abc.ABC):
         return fig
 
     def save_figure(self, fig, directory, filename_root,
-                    timestep, ext='.png', close=True):
+                    timestep, ext: str = '.png', close: bool = True) -> None:
         """Save a figure.
 
         Parameters
@@ -396,7 +396,7 @@ class iteration_tools(abc.ABC):
         if close:
             plt.close()
 
-    def save_grids(self, var_name, var, ts):
+    def save_grids(self, var_name: str, var: np.ndarray, ts: int) -> None:
         """Save a grid into an existing netCDF file.
 
         File should already be open (by :meth:`init_output_grid`) as
@@ -427,7 +427,7 @@ class iteration_tools(abc.ABC):
             self.logger.error(_msg)
             raise Exception(e)
 
-    def save_the_checkpoint(self):
+    def save_the_checkpoint(self) -> None:
         """Save checkpoint files.
 
         Saves the grids to a .npz file so that the model can be
