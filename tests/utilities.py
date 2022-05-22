@@ -1,6 +1,8 @@
-import sys
-import os
 import glob
+import io
+import os
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -11,7 +13,7 @@ from pyDeltaRCM import shared_tools
 # utilities for file writing
 
 
-def create_temporary_file(tmp_path, file_name):
+def create_temporary_file(tmp_path: Path, file_name: str) -> Tuple[Path, io.TextIOWrapper]:
     d = tmp_path / 'configs'
     d.mkdir(parents=True, exist_ok=True)
     p = d / file_name
@@ -19,11 +21,11 @@ def create_temporary_file(tmp_path, file_name):
     return p, f
 
 
-def write_parameter_to_file(f, varname, varvalue):
+def write_parameter_to_file(f: io.TextIOWrapper, varname: str, varvalue: Any) -> None:
     f.write(varname + ': ' + str(varvalue) + '\n')
 
 
-def write_matrix_to_file(f, keys, lists):
+def write_matrix_to_file(f: io.TextIOWrapper, keys: List[str], lists) -> None:
     # assert len(keys) == len(lists)
     f.write('matrix' + ': ' + '\n')
     for i in range(len(keys)):
@@ -32,7 +34,7 @@ def write_matrix_to_file(f, keys, lists):
             f.write('    ' + '- ' + str(lists[i][j]) + '\n')
 
 
-def write_set_to_file(f, set_list):
+def write_set_to_file(f: io.TextIOWrapper, set_list: List[Dict[str, Union[int, float]]]) -> None:
     f.write('set' + ': ' + '\n')
     for i, _set in enumerate(set_list):
         f.write('  - {')
@@ -41,7 +43,7 @@ def write_set_to_file(f, set_list):
         f.write('}' + '\n')
 
 
-def yaml_from_dict(tmp_path, file_name, _dict=None):
+def yaml_from_dict(tmp_path: Path, file_name: str, _dict: Optional[Dict[str, Any]]=None) -> Path:
     p, f = create_temporary_file(tmp_path, file_name)
     if (_dict is None):
         _dict = {'out_dir': tmp_path / 'out_dir'}
@@ -55,7 +57,7 @@ def yaml_from_dict(tmp_path, file_name, _dict=None):
 
 
 @pytest.fixture(scope='function')
-def test_DeltaModel(tmp_path):
+def test_DeltaModel(tmp_path: Path) -> None:
     file_name = 'user_parameters.yaml'
     p, f = create_temporary_file(tmp_path, file_name)
     write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
@@ -107,7 +109,7 @@ class FastIteratingDeltaModel:
     def solve_water_and_sediment_timestep(self):
         """PATCH"""
 
-        def _get_random_field(shp):
+        def _get_random_field(shp: Tuple[int, ...]) -> np.ndarray:
             """Get a field or randoms using the shared function.
 
             It is critical to use the `shared_tools.get_random_uniform` for

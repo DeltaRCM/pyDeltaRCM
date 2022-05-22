@@ -1,6 +1,7 @@
 # unit tests for sed_tools.py
 
 import numpy as np
+from pathlib import Path
 
 import pytest
 import unittest.mock as mock
@@ -11,7 +12,7 @@ from . import utilities
 
 class TestSedimentRoute:
 
-    def test_route_sediment(self, tmp_path):
+    def test_route_sediment(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
@@ -33,7 +34,7 @@ class TestSedimentRoute:
         assert (_delta.topo_diffusion.called is True)
         assert (_delta.route_all_mud_parcels.called is True)
 
-    def test_sed_route_deprecated(self, tmp_path):
+    def test_sed_route_deprecated(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
@@ -52,7 +53,7 @@ class TestSedimentRoute:
 
 class TestInitSedimentIteration:
 
-    def test_fields_cleared(self, tmp_path):
+    def test_fields_cleared(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
@@ -76,7 +77,7 @@ class TestInitSedimentIteration:
 
 class TestRouteAllSandParcels:
 
-    def test_route_sand_parcels(self, tmp_path):
+    def test_route_sand_parcels(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'Np_sed': 1000,
@@ -109,7 +110,7 @@ class TestRouteAllSandParcels:
 
 class TestRouteAllMudParcels:
 
-    def test_route_mud_parcels(self, tmp_path):
+    def test_route_mud_parcels(self, tmp_path: Path) -> None:
         # create a delta with default settings
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'Np_sed': 1000,

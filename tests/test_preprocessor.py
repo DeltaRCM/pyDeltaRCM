@@ -3,6 +3,7 @@ import pytest
 
 import platform
 import os
+from pathlib import Path
 
 import unittest.mock as mock
 
@@ -18,11 +19,11 @@ from . import utilities
 class TestPreprocessorSingleJobSetups:
 
     # test high level python api
-    def test_py_hlvl_wo_args(self):
+    def test_py_hlvl_wo_args(self) -> None:
         with pytest.raises(ValueError):
             _ = preprocessor.Preprocessor()
 
-    def test_py_hlvl_runjobs_simple_param(self, tmp_path):
+    def test_py_hlvl_runjobs_simple_param(self, tmp_path: Path) -> None:
         # a single parameter
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'h0': 7.5})
@@ -47,7 +48,7 @@ class TestPreprocessorSingleJobSetups:
         assert len(pp.file_list) == 1
         assert pp._is_completed is False
 
-    def test_py_hlvl_tsteps_yml_runjobs_sngle(self, tmp_path):
+    def test_py_hlvl_tsteps_yml_runjobs_sngle(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'timesteps': 50})
         pp = preprocessor.Preprocessor(p)
@@ -59,7 +60,7 @@ class TestPreprocessorSingleJobSetups:
         assert not ('time' in pp.config_dict.keys())
         assert not ('time_years' in pp.config_dict.keys())
 
-    def test_py_hlvl_time_yml_runjobs_sngle(self, tmp_path):
+    def test_py_hlvl_time_yml_runjobs_sngle(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'time': 1000})
         pp = preprocessor.Preprocessor(p)
@@ -70,7 +71,7 @@ class TestPreprocessorSingleJobSetups:
         assert pp.config_dict['time'] == 1000
         assert not ('timesteps' in pp.config_dict.keys())
 
-    def test_py_hlvl_time_If_yml_runjobs_sngle(self, tmp_path):
+    def test_py_hlvl_time_If_yml_runjobs_sngle(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'time': 10000,
                                       'If': 0.1})
@@ -83,7 +84,7 @@ class TestPreprocessorSingleJobSetups:
         assert pp.config_dict['If'] == 0.1
         assert not ('timesteps' in pp.config_dict.keys())
 
-    def test_py_hlvl_timeyears_yml_runjobs_sngle(self, tmp_path):
+    def test_py_hlvl_timeyears_yml_runjobs_sngle(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'time_years': 3.16880878140e-05})
         pp = preprocessor.Preprocessor(p)
@@ -96,7 +97,7 @@ class TestPreprocessorSingleJobSetups:
         assert not ('time' in pp.config_dict.keys())
         assert not ('timesteps' in pp.config_dict.keys())
 
-    def test_py_hlvl_timeyears_If_yml_runjobs_sngle(self, tmp_path):
+    def test_py_hlvl_timeyears_If_yml_runjobs_sngle(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'time_years': 0.00031688087814,
                                       'If': 0.1})
@@ -110,7 +111,7 @@ class TestPreprocessorSingleJobSetups:
         assert not ('time' in pp.config_dict.keys())
         assert not ('timesteps' in pp.config_dict.keys())
 
-    def test_py_hlvl_timesteps_and_yaml_argument(self, tmp_path):
+    def test_py_hlvl_timesteps_and_yaml_argument(self, tmp_path: Path) -> None:
         """
         Test that timesteps can come from cli, but others from yaml
         """
@@ -126,7 +127,7 @@ class TestPreprocessorSingleJobSetups:
         assert (pp.config_dict['save_eta_figs'] is True)
         assert not ('time' in pp.config_dict.keys())
 
-    def test_py_hlvl_timesteps_yaml_and_cli(self, tmp_path):
+    def test_py_hlvl_timesteps_yaml_and_cli(self, tmp_path: Path) -> None:
         """
         Test preference for command line argument
         """
@@ -143,7 +144,7 @@ class TestPreprocessorSingleJobSetups:
         assert (pp.config_dict['save_eta_figs'] is True)
         assert not ('time' in pp.config_dict.keys())
 
-    def test_py_hlvl_timesteps_and_time_yaml_and_cli(self, tmp_path):
+    def test_py_hlvl_timesteps_and_time_yaml_and_cli(self, tmp_path: Path) -> None:
         """
         Test that preference is given to command line arguments
 
@@ -169,7 +170,7 @@ class TestPreprocessorSingleJobSetups:
 
 class TestPreprocessorMatrixJobsSetups:
 
-    def test_py_hlvl_mtrx_1list_timesteps_arg(self, tmp_path):
+    def test_py_hlvl_mtrx_1list_timesteps_arg(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -190,7 +191,7 @@ class TestPreprocessorMatrixJobsSetups:
         assert sum([j == 0.6 for j in f_bedload_list]) == 1
         assert pp.config_dict['timesteps'] == 3
 
-    def test_py_hlvl_mtrx_1list_tsteps_cfg(self, tmp_path):
+    def test_py_hlvl_mtrx_1list_tsteps_cfg(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -212,7 +213,7 @@ class TestPreprocessorMatrixJobsSetups:
         assert sum([j == 0.6 for j in f_bedload_list]) == 1
         assert pp.config_dict['timesteps'] == 3
 
-    def test_py_hlvl_mtrx_smthng_null(self, tmp_path):
+    def test_py_hlvl_mtrx_smthng_null(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -234,7 +235,7 @@ class TestPreprocessorMatrixJobsSetups:
         assert sum([j == 2 for j in hb_list]) == 1
         assert sum([j == 7 for j in hb_list]) == 1
 
-    def test_py_hlvl_mtrx_2list(self, tmp_path):
+    def test_py_hlvl_mtrx_2list(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -264,7 +265,7 @@ class TestPreprocessorMatrixJobsSetups:
         assert [0.5, 1.0] in comb_list
         assert not ([0.5, 0.2] in comb_list)
 
-    def test_py_hlvl_mtrx_scientificnotation(self, tmp_path):
+    def test_py_hlvl_mtrx_scientificnotation(self, tmp_path: Path) -> None:
         """Test that preprocessor can read and write scinotation"""
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
@@ -281,7 +282,7 @@ class TestPreprocessorMatrixJobsSetups:
         assert sum([j == 4e-5 for j in SLR_list]) == 3
         assert sum([j == 0.000001 for j in SLR_list]) == 3
 
-    def test_py_hlvL_mtrx_needs_out_dir(self, tmp_path):
+    def test_py_hlvL_mtrx_needs_out_dir(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         # missing out_dir in the config will throw an error
@@ -294,7 +295,7 @@ class TestPreprocessorMatrixJobsSetups:
                            match=r'You must specify "out_dir" in YAML .*'):
             _ = preprocessor.Preprocessor(input_file=p)
 
-    def test_py_hlvl_mtrx_outdir_exists_error(self, tmp_path):
+    def test_py_hlvl_mtrx_outdir_exists_error(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -316,7 +317,7 @@ class TestPreprocessorMatrixJobsSetups:
                            match=r'Job output directory .*'):
             _ = preprocessor.Preprocessor(input_file=p)
 
-    def test_py_hlvl_mtrx_bad_len1(self, tmp_path):
+    def test_py_hlvl_mtrx_bad_len1(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -333,7 +334,7 @@ class TestPreprocessorMatrixJobsSetups:
         assert pp._has_matrix is True
         assert len(pp.file_list) == 3
 
-    def test_py_hlvl_mtrx_bad_listinlist(self, tmp_path):
+    def test_py_hlvl_mtrx_bad_listinlist(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -346,7 +347,7 @@ class TestPreprocessorMatrixJobsSetups:
                            match=r'Depth of matrix expansion must not be > 1'):
             _ = preprocessor.Preprocessor(input_file=p)
 
-    def test_py_hlvl_mtrx_bad_samekey(self, tmp_path):
+    def test_py_hlvl_mtrx_bad_samekey(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'f_bedload', 0.3)
@@ -361,7 +362,7 @@ class TestPreprocessorMatrixJobsSetups:
                                   'in the matrix .*'):  # noqa: E127
             _ = preprocessor.Preprocessor(input_file=p)
 
-    def test_py_hlvl_mtrx_bad_colon(self, tmp_path):
+    def test_py_hlvl_mtrx_bad_colon(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -375,7 +376,7 @@ class TestPreprocessorMatrixJobsSetups:
                                   'in matrix expansion key.'):  # noqa: E127
             _ = preprocessor.Preprocessor(input_file=p)
 
-    def test_py_hlvl_mtrx_no_out_dir_in_mtrx(self, tmp_path):
+    def test_py_hlvl_mtrx_no_out_dir_in_mtrx(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -387,7 +388,7 @@ class TestPreprocessorMatrixJobsSetups:
                            match=r'You cannot specify "out_dir" as .*'):
             _ = preprocessor.Preprocessor(input_file=p, timesteps=3)
 
-    def test_python_highlevelapi_matrix_verbosity(self, tmp_path, capsys):
+    def test_python_highlevelapi_matrix_verbosity(self, tmp_path, capsys) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'verbose', 1)
@@ -413,7 +414,7 @@ class TestPreprocessorMatrixJobsSetups:
 
 class TestPreprocessorSetJobsSetups:
 
-    def test_py_hlvl_set_two_sets(self, tmp_path):
+    def test_py_hlvl_set_two_sets(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -434,7 +435,7 @@ class TestPreprocessorSetJobsSetups:
         assert sum([j == 0.4 for j in f_bedload_list]) == 1
         assert pp.config_dict['timesteps'] == 3
 
-    def test_py_hlvl_set_one_sets(self, tmp_path):
+    def test_py_hlvl_set_one_sets(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -453,7 +454,7 @@ class TestPreprocessorSetJobsSetups:
         assert sum([j == 0.77 for j in f_bedload_list]) == 1
         assert pp.config_dict['timesteps'] == 3
 
-    def test_py_hlvl_set_two_mismatched_sets(self, tmp_path):
+    def test_py_hlvl_set_two_mismatched_sets(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -464,7 +465,7 @@ class TestPreprocessorSetJobsSetups:
                            match=r'All keys in all sets *.'):  # noqa: E127
             _ = preprocessor.Preprocessor(input_file=p)
 
-    def test_py_hlvl_set_bad_not_list(self, tmp_path):
+    def test_py_hlvl_set_bad_not_list(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -475,7 +476,7 @@ class TestPreprocessorSetJobsSetups:
                            match=r'Set list must be *.'):
             _ = preprocessor.Preprocessor(input_file=p)
 
-    def test_py_hlvl_set_bad_colon(self, tmp_path):
+    def test_py_hlvl_set_bad_colon(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -486,7 +487,7 @@ class TestPreprocessorSetJobsSetups:
                                   'in matrix expansion key.'):  # noqa: E127
             _ = preprocessor.Preprocessor(input_file=p)
 
-    def test_output_table_correctly(self, tmp_path):
+    def test_output_table_correctly(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -505,7 +506,7 @@ class TestPreprocessorSetJobsSetups:
 
 class TestPreprocessorEnsembleJobsSetups:
 
-    def test_py_hlvl_ensemble(self, tmp_path):
+    def test_py_hlvl_ensemble(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'ensemble', 2)
@@ -518,7 +519,7 @@ class TestPreprocessorEnsembleJobsSetups:
         assert type(pp.file_list) is list
         assert len(pp.file_list) == 2
 
-    def test_py_hlvl_ensemble_1(self, tmp_path):
+    def test_py_hlvl_ensemble_1(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'ensemble', 1)
@@ -533,7 +534,7 @@ class TestPreprocessorEnsembleJobsSetups:
         assert pp._has_matrix is False
         assert len(pp.file_list) == 1
 
-    def test_py_hlvl_ensemble_badtype(self, tmp_path):
+    def test_py_hlvl_ensemble_badtype(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'ensemble', 2.0)
@@ -544,7 +545,7 @@ class TestPreprocessorEnsembleJobsSetups:
                                   'must be an integer.'):  # noqa: E127
             _ = preprocessor.Preprocessor(input_file=p)
 
-    def test_py_hlvl_ensemble_double_seeds(self, tmp_path):
+    def test_py_hlvl_ensemble_double_seeds(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'ensemble', 2)
@@ -561,7 +562,7 @@ class TestPreprocessorEnsembleJobsSetups:
 
 class TestPreprocessorMatrixAndEnsembleJobsSetups:
 
-    def test_py_hlvl_ensemble_with_matrix(self, tmp_path):
+    def test_py_hlvl_ensemble_with_matrix(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'ensemble', 2)
@@ -576,7 +577,7 @@ class TestPreprocessorMatrixAndEnsembleJobsSetups:
         assert type(pp.file_list) is list
         assert len(pp.file_list) == 6
 
-    def test_py_hlvl_ensemble_matrix_seeds(self, tmp_path):
+    def test_py_hlvl_ensemble_matrix_seeds(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'ensemble', 2)
@@ -594,7 +595,7 @@ class TestPreprocessorMatrixAndEnsembleJobsSetups:
 
 class TestPreprocessorSetAndEnsembleJobsSetups:
 
-    def test_1_set_ensemble_3(self, tmp_path):
+    def test_1_set_ensemble_3(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -618,7 +619,7 @@ class TestPreprocessorSetAndEnsembleJobsSetups:
 
 class TestPreprocessorSetAndMatrixJobsSetups:
 
-    def test_not_possible(self, tmp_path):
+    def test_not_possible(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -640,7 +641,7 @@ class TestPreprocessorParallelJobsSetups:
     configurations locally, but will run jobs on a remote Linux cluster/HPC.
     """
 
-    def test_py_hlvl_parallel_works_onejob(self, tmp_path):
+    def test_py_hlvl_parallel_works_onejob(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
@@ -654,7 +655,7 @@ class TestPreprocessorParallelJobsSetups:
 
         assert pp.config_dict['parallel'] is True
 
-    def test_py_hlvl_parallel_boolean_yaml(self, tmp_path):
+    def test_py_hlvl_parallel_boolean_yaml(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'ensemble', 2)
@@ -669,7 +670,7 @@ class TestPreprocessorParallelJobsSetups:
 
         assert pp.config_dict['parallel'] is True
 
-    def test_py_hlvl_parallel_boolean_cli(self, tmp_path):
+    def test_py_hlvl_parallel_boolean_cli(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'ensemble', 2)
@@ -683,7 +684,7 @@ class TestPreprocessorParallelJobsSetups:
 
         assert pp.config_dict['parallel'] is True
 
-    def test_py_hlvl_parallel_integer_yaml(self, tmp_path):
+    def test_py_hlvl_parallel_integer_yaml(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'ensemble', 2)
@@ -698,7 +699,7 @@ class TestPreprocessorParallelJobsSetups:
 
         assert pp.config_dict['parallel'] == 2
 
-    def test_py_hlvl_parallel_integer_cli(self, tmp_path):
+    def test_py_hlvl_parallel_integer_cli(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'ensemble', 2)
@@ -716,7 +717,7 @@ class TestPreprocessorParallelJobsSetups:
 
 class TestPreprocessorRunJobs:
 
-    def test_dryrun(self, tmp_path):
+    def test_dryrun(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp = preprocessor.Preprocessor(p)
 
@@ -727,7 +728,7 @@ class TestPreprocessorRunJobs:
 
         assert pp._is_completed is False
 
-    def test_run_single_serial_job(self, tmp_path):
+    def test_run_single_serial_job(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp = preprocessor.Preprocessor(p)
 
@@ -741,7 +742,7 @@ class TestPreprocessorRunJobs:
         assert len(pp.job_list) == 1
         assert pp._is_completed is True
 
-    def test_run_two_serial_jobs(self, tmp_path):
+    def test_run_two_serial_jobs(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp = preprocessor.Preprocessor(p)
 
@@ -761,7 +762,7 @@ class TestPreprocessorRunJobs:
     @pytest.mark.skipif(
         platform.system() != 'Linux',
         reason='Parallel support only on Linux OS.')
-    def test_run_five_parallel_jobs_bool(self, tmp_path):
+    def test_run_five_parallel_jobs_bool(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp = preprocessor.Preprocessor(p, parallel=True)
 
@@ -787,7 +788,7 @@ class TestPreprocessorRunJobs:
     @pytest.mark.skipif(
         platform.system() != 'Linux',
         reason='Parallel support only on Linux OS.')
-    def test_run_five_parallel_jobs_int_two(self, tmp_path):
+    def test_run_five_parallel_jobs_int_two(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp = preprocessor.Preprocessor(p, parallel=2)
 
@@ -811,7 +812,7 @@ class TestPreprocessorRunJobs:
     @pytest.mark.skipif(
         platform.system() != 'Linux',
         reason='Parallel support only on Linux OS.')
-    def test_run_five_parallel_jobs_bad_types(self, tmp_path):
+    def test_run_five_parallel_jobs_bad_types(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp_float = preprocessor.Preprocessor(p, parallel=3.33)
         pp_str = preprocessor.Preprocessor(p, parallel='string!')
@@ -834,7 +835,7 @@ class TestPreprocessorRunJobs:
     @pytest.mark.skipif(
         platform.system() == 'Linux',
         reason='Parallel support only on Linux OS.')
-    def test_run_parallel_notimplemented_nonlinux(self, tmp_path):
+    def test_run_parallel_notimplemented_nonlinux(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         pp = preprocessor.Preprocessor(p, parallel=True)
 
@@ -855,7 +856,7 @@ class TestBaseJob:
     .. note:: This patch is handled at the class level above!!
     """
 
-    def test_wo_timesteps(self, tmp_path):
+    def test_wo_timesteps(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         with pytest.raises(ValueError,
@@ -864,7 +865,7 @@ class TestBaseJob:
                 i=0, input_file=p,
                 config_dict={})
 
-    def test_timeargs_precedence_tstepsovertime(self, tmp_path):
+    def test_timeargs_precedence_tstepsovertime(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         basej = preprocessor._BaseJob(
@@ -876,7 +877,7 @@ class TestBaseJob:
         assert basej._job_end_time == basej.deltamodel._dt * 2
         assert basej._job_end_time != 10000
 
-    def test_timeargs_precedence_tstepsovertimeyears(self, tmp_path):
+    def test_timeargs_precedence_tstepsovertimeyears(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         basej = preprocessor._BaseJob(
@@ -889,7 +890,7 @@ class TestBaseJob:
         assert basej._job_end_time != 10000
         assert basej._job_end_time != 10000 * 365.25
 
-    def test_timeargs_precedence_timeovertimeyears(self, tmp_path):
+    def test_timeargs_precedence_timeovertimeyears(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         basej = preprocessor._BaseJob(
@@ -905,7 +906,7 @@ class TestBaseJob:
 
 class TestSerialJob:
 
-    def test_run(self, tmp_path):
+    def test_run(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         sj = preprocessor._SerialJob(
@@ -944,7 +945,7 @@ class TestSerialJob:
                   mock.call('job: 0, stage: 2, code: 0')]
         sj.deltamodel.logger.info.assert_has_calls(_calls)
 
-    def test_run_error_update(self, tmp_path):
+    def test_run_error_update(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         sj = preprocessor._SerialJob(
@@ -986,7 +987,7 @@ class TestSerialJob:
         sj.deltamodel.logger.error.assert_has_calls(_error_calls)
         sj.deltamodel.logger.exception.assert_called_once()
 
-    def test_run_error_finalize(self, tmp_path):
+    def test_run_error_finalize(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         sj = preprocessor._SerialJob(
@@ -1031,7 +1032,7 @@ class TestSerialJob:
 
 class TestParallelJob:
 
-    def test_run(self, tmp_path):
+    def test_run(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         Q = mock.MagicMock()
@@ -1085,7 +1086,7 @@ class TestParallelJob:
                   mock.call({'job': 0, 'stage': 2, 'code': 0})]
         Q.put.assert_has_calls(_calls)
 
-    def test_run_error_update(self, tmp_path):
+    def test_run_error_update(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         Q = mock.MagicMock()
@@ -1134,7 +1135,7 @@ class TestParallelJob:
             [mock.call('error!')])
         pj.deltamodel.logger.exception.assert_called_once()
 
-    def test_run_error_finalize(self, tmp_path):
+    def test_run_error_finalize(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
 
         Q = mock.MagicMock()
@@ -1186,7 +1187,7 @@ class TestParallelJob:
 
 class TestWriteYamlConfigToFile:
 
-    def test_write_single_int(self, tmp_path):
+    def test_write_single_int(self, tmp_path: Path) -> None:
         # set up what to write
         file_path = tmp_path / 'output.yml'
         yaml_dict = {'variable': 1}
@@ -1199,7 +1200,7 @@ class TestWriteYamlConfigToFile:
 
         assert _returned == 'variable: 1\n'
 
-    def test_write_single_float(self, tmp_path):
+    def test_write_single_float(self, tmp_path: Path) -> None:
         # set up what to write
         file_path = tmp_path / 'output.yml'
         yaml_dict = {'variable': 1.5}
@@ -1212,7 +1213,7 @@ class TestWriteYamlConfigToFile:
 
         assert _returned == 'variable: 1.5\n'
 
-    def test_write_single_string(self, tmp_path):
+    def test_write_single_string(self, tmp_path: Path) -> None:
         # set up what to write
         file_path = tmp_path / 'output.yml'
         yaml_dict = {'variable': 'a string'}
@@ -1225,7 +1226,7 @@ class TestWriteYamlConfigToFile:
 
         assert _returned == 'variable: a string\n'
 
-    def test_write_single_bool(self, tmp_path):
+    def test_write_single_bool(self, tmp_path: Path) -> None:
         # set up what to write
         file_path = tmp_path / 'output.yml'
         yaml_dict = {'variable': False}
@@ -1238,7 +1239,7 @@ class TestWriteYamlConfigToFile:
 
         assert _returned == 'variable: False\n'
 
-    def test_write_single_null(self, tmp_path):
+    def test_write_single_null(self, tmp_path: Path) -> None:
         # set up what to write
         file_path = tmp_path / 'output.yml'
         yaml_dict = {'variable': None}
@@ -1251,7 +1252,7 @@ class TestWriteYamlConfigToFile:
 
         assert _returned == 'variable: null\n'
 
-    def test_write_multiple_one_each(self, tmp_path):
+    def test_write_multiple_one_each(self, tmp_path: Path) -> None:
         # set up what to write
         file_path = tmp_path / 'output.yml'
         yaml_dict = {'variable1': 1,
@@ -1274,7 +1275,7 @@ class TestWriteYamlConfigToFile:
 
 class TestPreprocessorImported:
 
-    def test_Preprocessor_toplevelimport(self):
+    def test_Preprocessor_toplevelimport(self) -> None:
         import pyDeltaRCM
 
         assert 'Preprocessor' in dir(pyDeltaRCM)
@@ -1283,10 +1284,10 @@ class TestPreprocessorImported:
 
 class TestScaleRelativeSeaLeveLRiseRate():
 
-    def test_scale_If_1(self):
+    def test_scale_If_1(self) -> None:
         scaled = preprocessor.scale_relative_sea_level_rise_rate(5, If=1)
         assert scaled == 5 / 1000 / 365.25 / 86400
 
-    def test_scale_If_0p1(self):
+    def test_scale_If_0p1(self) -> None:
         scaled = preprocessor.scale_relative_sea_level_rise_rate(5, If=0.1)
         assert scaled == 5 / 1000 / 365.25 / 86400 * 10

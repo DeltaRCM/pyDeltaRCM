@@ -1,11 +1,11 @@
+import contextlib
+import os
+import re
+import tempfile
+import yaml
+from typing import Tuple
 
 import numpy as np
-import yaml
-import re
-import contextlib
-import tempfile
-import os
-
 from numba import njit, _helperlib
 
 # tools shared between deltaRCM water and sediment routing
@@ -17,7 +17,7 @@ earth_grav = 9.81
 
 
 @njit
-def set_random_seed(_seed):
+def set_random_seed(_seed: int) -> None:
     """Set the random seed from an integer.
 
     Set the seed of the random number generator with a single integer.
@@ -80,7 +80,7 @@ def get_random_state():
     return _helperlib.rnd_get_state(ptr)
 
 
-def set_random_state(_state_tuple):
+def set_random_state(_state_tuple) -> None:
     """Set the random state from a tuple.
 
     Set the random state from a tuple in the form returned by
@@ -105,7 +105,7 @@ def set_random_state(_state_tuple):
 
 
 @njit
-def get_random_uniform(limit):
+def get_random_uniform(limit: float) -> float:
     """Get a random number from the uniform distribution.
 
     Get a random number from the uniform distribution, defined over the
@@ -171,7 +171,7 @@ def get_inlet_weights(inlet):
 
 
 @njit
-def get_start_indices(inlet, inlet_weights, num_starts):
+def get_start_indices(inlet: np.ndarray, inlet_weights: np.ndarray, num_starts: int) -> np.ndarray:
     """Get start indices.
 
     Reutrn a randomly generated list of starting points for parcel routing.
@@ -193,7 +193,7 @@ def get_start_indices(inlet, inlet_weights, num_starts):
     -------
     start_indices : ndarray
         :obj:`num_starts` starting points, generated from :obj:`inlet`
-         according to weights in :obj:`inlet_weights`. 
+         according to weights in :obj:`inlet_weights`.
     """
     norm_weights = inlet_weights / np.sum(inlet_weights)
     idxs = []
@@ -204,7 +204,7 @@ def get_start_indices(inlet, inlet_weights, num_starts):
 
 
 @njit
-def get_steps(new_direction, iwalk, jwalk):
+def get_steps(new_direction: int, iwalk, jwalk) -> Tuple[float, int, int, bool]:
     """Find the values given the next step.
 
     Get the steps for updating discharge and velocity arrays based on the
@@ -239,7 +239,7 @@ def random_pick(prob):
 
 
 @njit('UniTuple(int64, 2)(int64, UniTuple(int64, 2))')
-def custom_unravel(i, shape):
+def custom_unravel(i: int, shape: Tuple[int, int]) -> Tuple[int, int]:
     """Unravel indexes for 2D array.
 
     This is a jitted function, equivalent to the `numpy` implementation of
@@ -287,7 +287,7 @@ def custom_unravel(i, shape):
 
 
 @njit('int64(UniTuple(int64, 2), UniTuple(int64, 2))')
-def custom_ravel(tup, shape):
+def custom_ravel(tup: Tuple[int, int], shape: Tuple[int, int]) -> int:
     """Ravel indexes for 2D array.
 
     This is a jitted function, equivalent to the `numpy` implementation of
@@ -333,7 +333,7 @@ def custom_ravel(tup, shape):
 
 
 @njit
-def custom_pad(arr):
+def custom_pad(arr: np.ndarray) -> np.ndarray:
     """Pad an array.
 
     This is a jitted function, equivalent to the `numpy` implementation of
@@ -428,7 +428,7 @@ def get_weight_sfc_int(stage, stage_nbrs, qx, qy, ivec, jvec, distances):
     return weight_sfc, weight_int
 
 
-def _get_version():
+def _get_version() -> str:
     """Extract version from file.
 
     Extract version number from single file, and make it availabe everywhere.
@@ -512,7 +512,7 @@ def custom_yaml_loader():
     return loader
 
 
-def scale_model_time(time, If=1, units='seconds'):
+def scale_model_time(time: float, If: float = 1, units: str ='seconds') -> float:
     """Scale the model time to "real" time.
 
     Model time is executed as assumed flooding conditions, and executed at the
@@ -571,7 +571,7 @@ def scale_model_time(time, If=1, units='seconds'):
     return time / _scale_factor(If, units)
 
 
-def _scale_factor(If, units):
+def _scale_factor(If: float, units: str) -> float:
     """Scaling factor between model time and "real" time.
 
     The scaling factor relates the model time to a real worl time, by the
