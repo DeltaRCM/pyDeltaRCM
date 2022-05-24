@@ -371,8 +371,8 @@ class water_tools(abc.ABC):
         # compiling the water weight array is handled inside a jitted
         #     function below. ~4x faster.
         self.water_weights = _get_water_weight_array(
-            self.depth, self.stage, self.cell_type, self.qx, self.qy,
-            self.ivec_flat, self.jvec_flat, self.distances_flat,
+            self.depth, self.stage, self.weight_mod, self.cell_type,
+            self.qx, self.qy, self.ivec_flat, self.jvec_flat, self.distances_flat,
             self.dry_depth, self.gamma, self._theta_water)
 
     def update_Q(self, dist, current_inds, next_inds, astep, jstep, istep,
@@ -568,7 +568,8 @@ class water_tools(abc.ABC):
 
 
 @njit
-def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
+def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs,
+                              weight_mod, ct_nbrs,
                               dry_depth, gamma, theta):
     """Compute water weights for a given cell.
 
@@ -603,7 +604,7 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
         weight_int = weight_int / np.sum(weight_int)
 
     weight = gamma * weight_sfc + (1 - gamma) * weight_int
-    weight = (depth_nbrs ** theta) * weight
+    weight = ((depth_nbrs * weight_mod) ** theta) * weight
 
     # enforce disallowed choice to not move
     weight[ctr] = 0
@@ -657,7 +658,7 @@ def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
 #       'float32[:], float32[:], float32[:],'
 #       'float64, float64, float64)')
 @njit
-def _get_water_weight_array(depth, stage, cell_type, qx, qy,
+def _get_water_weight_array(depth, stage, weight_mod, cell_type, qx, qy,
                             ivec_flat, jvec_flat, distances_flat,
                             dry_depth, gamma, theta_water):
     """Worker for :obj:`_get_water_weight_array`.
@@ -677,6 +678,7 @@ def _get_water_weight_array(depth, stage, cell_type, qx, qy,
     L, W = depth.shape
     pad_stage = shared_tools.custom_pad(stage)
     pad_depth = shared_tools.custom_pad(depth)
+    pad_weight_mod = shared_tools.custom_pad(weight_mod)
     pad_cell_type = shared_tools.custom_pad(cell_type)
 
     water_weights = np.zeros((L, W, 9))
@@ -685,6 +687,7 @@ def _get_water_weight_array(depth, stage, cell_type, qx, qy,
         for j in range(W):
             stage_nbrs = pad_stage[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
             depth_nbrs = pad_depth[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
+            weight_mod_nbrs = pad_weight_mod[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
             ct_nbrs = pad_cell_type[i - 1 + 1:i + 2 + 1, j - 1 + 1:j + 2 + 1]
 
             weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
@@ -694,7 +697,7 @@ def _get_water_weight_array(depth, stage, cell_type, qx, qy,
 
             water_weights[i, j] = _get_weight_at_cell_water(
                 (i, j), weight_sfc, weight_int,
-                depth_nbrs.ravel(), ct_nbrs.ravel(),
+                depth_nbrs.ravel(), weight_mod_nbrs.ravel(), ct_nbrs.ravel(),
                 dry_depth, gamma, theta_water)
 
     return water_weights
