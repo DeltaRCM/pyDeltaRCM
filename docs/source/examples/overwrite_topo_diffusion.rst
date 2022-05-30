@@ -29,11 +29,7 @@ In this super simple and **likely way over-exaggerated** representation of this 
         """Implementation of tree throw.
         """
 
-        def __init__(self, input_file, **kwargs):
-
-            # requires pyDeltaRCM version where `weight_mod` is 
-            #   implemented as a way to modify water routing.
-            assert version.parse(pyDeltaRCM.__version__) >= version.parse("2.1.4")
+        def __init__(self, input_file=None, **kwargs):
 
             # inherit from base model
             super().__init__(input_file, **kwargs)

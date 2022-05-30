@@ -8,6 +8,7 @@ Running the model
 .. toctree::
    :maxdepth: 1
 
+   basic_runs
    resume_from_checkpoint
 
 
