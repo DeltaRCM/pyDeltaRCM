@@ -41,15 +41,6 @@ Modifying internal computations
    overwrite_topo_diffusion
 
 
-Modifying behavior of the Preprocessor
---------------------------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   custom_class_preprocessor
-
-
 Modifying Model Input/Output
 ----------------------------
 
@@ -58,3 +49,12 @@ Modifying Model Input/Output
 
    custom_yaml
    custom_saving
+
+
+Working with the Preprocessor
+-----------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   custom_class_preprocessor
