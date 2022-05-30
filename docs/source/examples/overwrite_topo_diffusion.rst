@@ -149,6 +149,6 @@ Let's plot the ``.tree`` field just to see that the subclass was instantiated co
     :include-source:
 
     fig, ax = plt.subplots()
-    im = ax.imshow(mdl.trees)
+    im = ax.imshow(mdl.tree)
     plt.colorbar(im, ax=ax, shrink=0.5)
     plt.show()
