@@ -500,6 +500,9 @@ class init_tools(abc.ABC):
         # arrays acting as modifying hooks
         self.mod_water_weight = np.ones_like(self.depth)
 
+        # custom sediment erodibility modifier
+        self.erosion_mod = np.ones_like(self.depth)
+
         # ---- domain ----
         cell_land = -2
         cell_channel = 1
@@ -571,7 +574,7 @@ class init_tools(abc.ABC):
                                        self.iwalk_flat, self.jwalk_flat,
                                        self.distances_flat, self.dry_depth,
                                        self._lambda, self._beta,  self.stepmax,
-                                       self.theta_mud)
+                                       self.theta_mud, self.erosion_mod)
         # initialize the SandRouter object
         self._sr = sed_tools.SandRouter(self._dt, self._dx, self.Vp_sed,
                                         self.u_max, self.qs0, self._u0,
@@ -581,7 +584,7 @@ class init_tools(abc.ABC):
                                         self.iwalk_flat, self.jwalk_flat,
                                         self.distances_flat, self.dry_depth,
                                         self._beta, self.stepmax,
-                                        self.theta_sand)
+                                        self.theta_sand, self.erosion_mod)
 
     def init_output_file(self) -> None:
         """Creates a netCDF file to store output grids.

@@ -298,7 +298,7 @@ r_spec = [('_dt', float32), ('_dx', float32),
           ('Vp_res', float32), ('Vp_dep_mud', float32[:, :]),
           ('Vp_dep_sand', float32[:, :]),
           ('U_dep_mud', float32), ('U_ero_mud', float32),
-          ('U_ero_sand', float32)]
+          ('U_ero_sand', float32), ('erosion_mod', float32[:, :])]
 
 
 class BaseRouter:
@@ -435,7 +435,9 @@ class BaseRouter:
             self.ux[px, py] = 0
             self.uy[px, py] = 0
 
-    def _compute_Vp_ero(self, Vp_sed: float, U_loc: float, U_ero: float, beta: float) -> float:
+    def _compute_Vp_ero(self, Vp_sed: float, U_loc: float,
+                        U_ero: float, beta: float,
+                        erosion_mod: float) -> float:
         """Compute volume erorded based on velocity.
 
         The volume of sediment eroded depends on the local flow velocity
@@ -459,12 +461,15 @@ class BaseRouter:
         beta : :obj:`float`
             unknown.
 
+        erosion_mod : :obj:`float`
+            Local linear modifier for erosion.
+
         Returns
         -------
         Vp_ero : :obj:`float`
             Volume of eroded sediment.
         """
-        return (Vp_sed * (U_loc**beta - U_ero**beta) /
+        return (erosion_mod * Vp_sed * (U_loc**beta - U_ero**beta) /
                 U_ero**beta)
 
     def _limit_Vp_change(self, Vp, stage, eta, dx: float, dep_ero: int):
@@ -507,7 +512,7 @@ class SandRouter(BaseRouter):
     def __init__(self, _dt: float, dx: float, Vp_sed, u_max: float, qs0: float,
                  u0, U_ero_sand, f_bedload, ivec_flat, jvec_flat, iwalk_flat,
                  jwalk_flat, distances_flat, dry_depth: float, beta: float,
-                 stepmax, theta_sed: float) -> None:
+                 stepmax, theta_sed: float, erosion_mod) -> None:
 
         self._dt = _dt
         self._dx = dx
@@ -527,6 +532,7 @@ class SandRouter(BaseRouter):
         self._beta = beta
         self.stepmax = stepmax
         self.theta_sed = theta_sed
+        self.erosion_mod = erosion_mod
 
     def run(self, start_indices: np.ndarray, eta, stage, depth, cell_type,
             uw, ux, uy, Vp_dep_mud, Vp_dep_sand,
@@ -668,6 +674,7 @@ class SandRouter(BaseRouter):
         qs_cap = (self.qs0 * self._f_bedload / self._u0**self._beta *
                   U_loc**self._beta)
         qs_loc = self.qs[px, py]
+        ero_mod_loc = self.erosion_mod[px, py]
 
         Vp_change = 0
         if qs_loc > qs_cap:
@@ -684,7 +691,8 @@ class SandRouter(BaseRouter):
             #     critical erosion threshold for sand, *and* if the local
             #     transport capacity is not yet reached.
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
-                                             self.U_ero_sand, self._beta)
+                                             self.U_ero_sand, self._beta,
+                                             ero_mod_loc)
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
                                               self.eta[px, py], self._dx, 1)
             Vp_change = Vp_change * -1
@@ -716,7 +724,8 @@ class MudRouter(BaseRouter):
     """
     def __init__(self, _dt: float, dx: float, Vp_sed, u_max: float, U_dep_mud: float, U_ero_mud: float,
                  ivec_flat, jvec_flat, iwalk_flat, jwalk_flat, distances_flat,
-                 dry_depth: float, _lambda, beta: float, stepmax, theta_sed: float) -> None:
+                 dry_depth: float, _lambda, beta: float, stepmax,
+                 theta_sed: float, erosion_mod) -> None:
 
         self._dt = _dt
         self._dx = dx
@@ -735,6 +744,7 @@ class MudRouter(BaseRouter):
         self._beta = beta
         self.stepmax = stepmax
         self.theta_sed = theta_sed
+        self.erosion_mod = erosion_mod
 
     def run(self, start_indices, eta, stage, depth, cell_type,
             uw, ux, uy, Vp_dep_mud, Vp_dep_sand,
@@ -800,6 +810,7 @@ class MudRouter(BaseRouter):
         .. important:: TODO: complete description specific for mud transport
         """
         U_loc = self.uw[px, py]
+        ero_mod_loc = self.erosion_mod[px, py]
 
         Vp_change = 0
         if U_loc < self.U_dep_mud:
@@ -811,7 +822,8 @@ class MudRouter(BaseRouter):
 
         if U_loc > self.U_ero_mud:
             Vp_change = self._compute_Vp_ero(self.Vp_sed, U_loc,
-                                             self.U_ero_mud, self._beta)
+                                             self.U_ero_mud, self._beta,
+                                             ero_mod_loc)
             Vp_change = self._limit_Vp_change(Vp_change, self.stage[px, py],
                                               self.eta[px, py], self._dx, 1)
             Vp_change = Vp_change * -1
