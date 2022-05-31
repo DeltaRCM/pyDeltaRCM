@@ -1,7 +1,13 @@
 Default Model Variable Values
 =============================
 
-Default model values are defined as:
+.. hint::
+
+   A complete list of the meaning of each YAML parameter can be found at 
+   :doc:`../info/yaml_parameters`.
+
+
+Default model parameter values are defined as:
 
 .. literalinclude:: ../../../../pyDeltaRCM/default.yml
    :language: yaml
