@@ -56,5 +56,5 @@ A complete list of behavior-modifying arrays in the model follows:
     :header: "Array name", "function", "default value"
     :widths: 20, 50, 10
 
-    `water_mod`, modifies the neighbor-weighting of water parcels during routing according to ``(depth * water_mod)**theta_water``, 1
+    `mod_water_weight`, modifies the neighbor-weighting of water parcels during routing according to ``(depth * mod_water_weight)**theta_water``, 1
 
