@@ -8,6 +8,7 @@ Running the model
 .. toctree::
    :maxdepth: 1
 
+   basic_runs
    resume_from_checkpoint
 
 
@@ -35,16 +36,10 @@ Modifying boundary conditions
 Modifying internal computations
 -------------------------------
 
-* none
-
-
-Modifying behavior of the Preprocessor
---------------------------------------
-
 .. toctree::
    :maxdepth: 1
 
-   custom_class_preprocessor
+   overwrite_topo_diffusion
 
 
 Modifying Model Input/Output
@@ -55,3 +50,12 @@ Modifying Model Input/Output
 
    custom_yaml
    custom_saving
+
+
+Working with the Preprocessor
+-----------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   custom_class_preprocessor
