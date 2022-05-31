@@ -19,3 +19,4 @@ All of these questions and more are answered here!
    hydrodynamics
    morphodynamics
    outputfile
+   ../reference/model/model_hooks
