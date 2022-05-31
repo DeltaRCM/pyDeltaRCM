@@ -496,8 +496,10 @@ class BasePreprocessor(abc.ABC):
 
         # do not write any time information to file
         #   this list defines the time-related keywords
-        _time_list = ['timesteps', 'time', 'time_years']
-
+        _no_list = ['timesteps', 'time', 'time_years']
+        #   do not write any parallel-related information
+        _no_list.append('parallel')
+        
         # loop through each job to write out info
         for c, config in enumerate(self.config_list):
 
@@ -506,9 +508,9 @@ class BasePreprocessor(abc.ABC):
             if self.verbose > 0:
                 print('Writing YAML file for job ' + str(int(c)))
 
-            # strip the time related parameters from the config
+            # strip the not allowed parameters from the config
             config_write = config.copy()
-            [config_write.pop(key) for key in _time_list if key in config_write.keys()]
+            [config_write.pop(key) for key in _no_list if key in config_write.keys()]
 
             ith_dir = Path(config['out_dir'])       # job output folder
             ith_id = ith_dir.parts[-1]              # job id
