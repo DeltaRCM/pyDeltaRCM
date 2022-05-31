@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Resume model run from checkpoint &#8212; pyDeltaRCM 2.1.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,11 +15,12 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Slightly sloping basin" href="slight_slope.html" />
-    <link rel="prev" title="Examples of using and working with pyDeltaRCM" href="index.html" /> 
+    <link rel="prev" title="Basic script to run the model" href="basic_runs.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -31,7 +32,7 @@
           <a href="slight_slope.html" title="Slightly sloping basin"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Examples of using and working with pyDeltaRCM"
+          <a href="basic_runs.html" title="Basic script to run the model"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Examples of using and working with pyDeltaRCM</a> &#187;</li>
@@ -45,13 +46,13 @@
           <div class="body" role="main">
             
   <section id="resume-model-run-from-checkpoint">
-<h1>Resume model run from checkpoint<a class="headerlink" href="#resume-model-run-from-checkpoint" title="Permalink to this headline">¶</a></h1>
+<h1>Resume model run from checkpoint<a class="headerlink" href="#resume-model-run-from-checkpoint" title="Permalink to this heading">¶</a></h1>
 <p>Resuming from checkpoint can be helpful in several situations.</p>
 <p>The simplest scenario is where you want to simply run the simulation for a longer amount of time.
 Another common scenario is where you want to use a single checkpoint file to change conditions in two new “child” runs, and then continue each of these runs.</p>
 <p>Here, we include three examples for resuming from checkpoints.</p>
 <section id="continuing-a-run-for-more-time">
-<h2>Continuing a run for more time<a class="headerlink" href="#continuing-a-run-for-more-time" title="Permalink to this headline">¶</a></h2>
+<h2>Continuing a run for more time<a class="headerlink" href="#continuing-a-run-for-more-time" title="Permalink to this heading">¶</a></h2>
 <p>Create a new model run, run it for two timesteps, then finalize model.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">delta1</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">(</span>
     <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;checkpoint_example&#39;</span><span class="p">,</span>
@@ -109,7 +110,7 @@ We simply specify the output folder that contains the model and the checkpoint f
 </figure>
 </section>
 <section id="continuing-a-run-for-more-time-from-any-file">
-<h2>Continuing a run for more time from any file<a class="headerlink" href="#continuing-a-run-for-more-time-from-any-file" title="Permalink to this headline">¶</a></h2>
+<h2>Continuing a run for more time from any file<a class="headerlink" href="#continuing-a-run-for-more-time-from-any-file" title="Permalink to this heading">¶</a></h2>
 <p>In this example, we will run from a checkpoint file that is shipped with pyDeltaRCM.
 Referencing the documentation for the <code class="xref py py-obj docutils literal notranslate"><span class="pre">resume_checkpoint</span></code> parameter, it is clear that we can specify a checkpoint file by passing a pyDeltaRCM output folder as a string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">delta</span> <span class="o">=</span> <span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">(</span>
@@ -137,7 +138,7 @@ Referencing the documentation for the <code class="xref py py-obj docutils liter
 </figure>
 </section>
 <section id="continuing-multiple-runs-from-any-file-with-preprocessor">
-<h2>Continuing multiple runs from any file with Preprocessor<a class="headerlink" href="#continuing-multiple-runs-from-any-file-with-preprocessor" title="Permalink to this headline">¶</a></h2>
+<h2>Continuing multiple runs from any file with Preprocessor<a class="headerlink" href="#continuing-multiple-runs-from-any-file-with-preprocessor" title="Permalink to this heading">¶</a></h2>
 <p>Here, we set up three jobs which have different <cite>f_bedload</cite> values, while resuming from the checkpoint file shipped with pyDeltaRCM.</p>
 <p>We use the <cite>Preprocessor</cite> to execute the model runs in this example.
 But you could access <code class="docutils literal notranslate"><span class="pre">pp.file_list</span></code> to get the list of yaml configuration files generated and use these manually with the low-level API, if needed.
@@ -202,8 +203,8 @@ This approach would not be a best-practice though, since you can easily pass a c
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="index.html"
-                          title="previous chapter">Examples of using and working with pyDeltaRCM</a></p>
+    <p class="topless"><a href="basic_runs.html"
+                          title="previous chapter">Basic script to run the model</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -226,7 +227,7 @@ This approach would not be a best-practice though, since you can easily pass a c
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -241,7 +242,7 @@ This approach would not be a best-practice though, since you can easily pass a c
           <a href="slight_slope.html" title="Slightly sloping basin"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Examples of using and working with pyDeltaRCM"
+          <a href="basic_runs.html" title="Basic script to run the model"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Examples of using and working with pyDeltaRCM</a> &#187;</li>
@@ -250,7 +251,7 @@ This approach would not be a best-practice though, since you can easily pass a c
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

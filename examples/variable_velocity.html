@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Time-varying inlet velocity &#8212; pyDeltaRCM 2.1.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,10 +15,11 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Using custom classes with the Preprocessor" href="custom_class_preprocessor.html" />
+    <link rel="next" title="Changing topographic diffusion to represent tree throw" href="overwrite_topo_diffusion.html" />
     <link rel="prev" title="Time-varying bedload" href="variable_bedload.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -28,7 +29,7 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="custom_class_preprocessor.html" title="Using custom classes with the Preprocessor"
+          <a href="overwrite_topo_diffusion.html" title="Changing topographic diffusion to represent tree throw"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="variable_bedload.html" title="Time-varying bedload"
@@ -45,12 +46,12 @@
           <div class="body" role="main">
             
   <section id="time-varying-inlet-velocity">
-<h1>Time-varying inlet velocity<a class="headerlink" href="#time-varying-inlet-velocity" title="Permalink to this headline">¶</a></h1>
+<h1>Time-varying inlet velocity<a class="headerlink" href="#time-varying-inlet-velocity" title="Permalink to this heading">¶</a></h1>
 <p>It is straightforward to create models with time-varying boundary conditions.
 In this example, we set up an array of values to use for the inlet flow velocity, depending on the time of the model (i.e., a timeseries).</p>
 <p>In implementation, because we don’t know the timestep of the model before creating it, we interpolate the actual inlet flow velocity from the boundary condition timeseries.</p>
 <section id="define-the-boundary-condition">
-<h2>Define the boundary condition<a class="headerlink" href="#define-the-boundary-condition" title="Permalink to this headline">¶</a></h2>
+<h2>Define the boundary condition<a class="headerlink" href="#define-the-boundary-condition" title="Permalink to this heading">¶</a></h2>
 <p>First, let’s set up the boundary condition array we want to use.
 We’ll set this up in a function, so that it can be called from the model subclass, as well as here for plotting.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_velocity_array</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">5e4</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mf">3.2</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
@@ -85,7 +86,7 @@ We can inspect the result of this function, as it will be called in the model su
 </figure>
 </section>
 <section id="define-the-model-subclass">
-<h2>Define the model subclass<a class="headerlink" href="#define-the-model-subclass" title="Permalink to this headline">¶</a></h2>
+<h2>Define the model subclass<a class="headerlink" href="#define-the-model-subclass" title="Permalink to this heading">¶</a></h2>
 <p>We define a model subclass to handle the changing boundary condition:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ChangingVelocityModel</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Model with changing flow velocity.</span>
@@ -158,8 +159,8 @@ We can inspect the result of this function, as it will be called in the model su
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="custom_class_preprocessor.html"
-                          title="next chapter">Using custom classes with the Preprocessor</a></p>
+    <p class="topless"><a href="overwrite_topo_diffusion.html"
+                          title="next chapter">Changing topographic diffusion to represent tree throw</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -177,7 +178,7 @@ We can inspect the result of this function, as it will be called in the model su
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -189,7 +190,7 @@ We can inspect the result of this function, as it will be called in the model su
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="custom_class_preprocessor.html" title="Using custom classes with the Preprocessor"
+          <a href="overwrite_topo_diffusion.html" title="Changing topographic diffusion to represent tree throw"
              >next</a> |</li>
         <li class="right" >
           <a href="variable_bedload.html" title="Time-varying bedload"
@@ -201,7 +202,7 @@ We can inspect the result of this function, as it will be called in the model su
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

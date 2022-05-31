@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Hydrodynamics &#8212; pyDeltaRCM 2.1.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,13 +46,13 @@
           <div class="body" role="main">
             
   <section id="hydrodynamics">
-<h1>Hydrodynamics<a class="headerlink" href="#hydrodynamics" title="Permalink to this headline">¶</a></h1>
+<h1>Hydrodynamics<a class="headerlink" href="#hydrodynamics" title="Permalink to this heading">¶</a></h1>
 <p>pyDeltaRCM approximates hydrodynamics through the use of a weighted random walk.
-See <a class="footnote-reference brackets" href="#id4" id="id1">1</a> and <a class="footnote-reference brackets" href="#id5" id="id2">2</a> for a complete description of hydrodynamic assumptions in the DeltaRCM model.
+See <a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> and <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> for a complete description of hydrodynamic assumptions in the DeltaRCM model.
 In this documentation, we focus on the details of <em>model implementation</em>, rather than <em>model design</em>.</p>
 <p>The water routing operations are orchestrated by <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.route_water" title="pyDeltaRCM.water_tools.water_tools.route_water"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_water</span></code></a>; the following sections narrate the sequence of events within a single call of this method.</p>
 <section id="routing-individual-water-parcels">
-<h2>Routing individual water parcels<a class="headerlink" href="#routing-individual-water-parcels" title="Permalink to this headline">¶</a></h2>
+<h2>Routing individual water parcels<a class="headerlink" href="#routing-individual-water-parcels" title="Permalink to this heading">¶</a></h2>
 <p>Probabilities for water parcel routing <em>to all neighbors and to self</em> for <em>each cell</em> are computed <em>once</em> at the beginning of the water routing routine (<a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.get_water_weight_array" title="pyDeltaRCM.water_tools.water_tools.get_water_weight_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_water_weight_array</span></code></a> called from <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="pyDeltaRCM.water_tools.water_tools.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>).</p>
 <p>Water routing probability for a given cell <img class="math" src="../_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> to neighbor cell <img class="math" src="../_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> is computed according to:</p>
 <div class="math">
@@ -88,7 +89,7 @@ For example, see the random walks of several parcels below:</p>
 <p>Water routing completes when all water parcels have either 1) reached the model domain boundary, 2) taken a number of steps exceeding <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.stepmax" title="pyDeltaRCM.model.DeltaModel.stepmax"><code class="xref py py-attr docutils literal notranslate"><span class="pre">stepmax</span></code></a>, or 3) been removed from further routing via the <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools._check_for_loops" title="pyDeltaRCM.water_tools._check_for_loops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_check_for_loops</span></code></a> function.</p>
 </section>
 <section id="combining-parcels-into-free-surface">
-<h2>Combining parcels into free surface<a class="headerlink" href="#combining-parcels-into-free-surface" title="Permalink to this headline">¶</a></h2>
+<h2>Combining parcels into free surface<a class="headerlink" href="#combining-parcels-into-free-surface" title="Permalink to this heading">¶</a></h2>
 <p>Following the routing of water parcels, these walks must be converted in some meaningful way to a model field representing a free surface (i.e., the water stage).
 First, the <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="pyDeltaRCM.water_tools.water_tools.compute_free_surface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_free_surface()</span></code></a> is called, which takes as input the current bed elevation, and the path of each water parcel (top row in figure below).</p>
 <p>(<a class="reference external" href="../pyplots/water_tools/compute_free_surface_inputs.png">png</a>, <a class="reference external" href="../pyplots/water_tools/compute_free_surface_inputs.hires.png">hires.png</a>)</p>
@@ -127,7 +128,7 @@ If this condition is met for a given dry cell, the dry cell is flooded: the stag
 <p>Similar to <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools._smooth_free_surface" title="pyDeltaRCM.water_tools._smooth_free_surface"><code class="xref py py-func docutils literal notranslate"><span class="pre">_smooth_free_surface()</span></code></a> described above, <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.flooding_correction" title="pyDeltaRCM.water_tools.water_tools.flooding_correction"><code class="xref py py-meth docutils literal notranslate"><span class="pre">flooding_correction()</span></code></a> acts to remove roughness in the water surface and contributes to <a class="reference internal" href="morphodynamics.html#model-stability"><span class="std std-ref">model stability</span></a>.</p>
 </section>
 <section id="finalizing-and-boundary-conditions-to-sediment-routing">
-<h2>Finalizing and boundary conditions to sediment routing<a class="headerlink" href="#finalizing-and-boundary-conditions-to-sediment-routing" title="Permalink to this headline">¶</a></h2>
+<h2>Finalizing and boundary conditions to sediment routing<a class="headerlink" href="#finalizing-and-boundary-conditions-to-sediment-routing" title="Permalink to this heading">¶</a></h2>
 <p>The final step of the water routing operations in each call to <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.route_water" title="pyDeltaRCM.water_tools.water_tools.route_water"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_water</span></code></a> is the updating of model fields, and application of a few corrections and boundary conditions.
 These operations are handled within <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.finalize_water_iteration" title="pyDeltaRCM.water_tools.water_tools.finalize_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_water_iteration</span></code></a>.</p>
 <p>First, the <cite>stage</cite> field is limited to elevations above or equal to sea level <cite>H_SL</cite>.
@@ -140,20 +141,20 @@ These operations ensure that these fields are in agreement over the entire model
 </div>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<dl class="footnote brackets">
-<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>A reduced-complexity model for river delta formation – Part 1: Modeling
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h2>
+<aside class="footnote brackets" id="id4" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>A reduced-complexity model for river delta formation – Part 1: Modeling
 deltas with channel dynamics, M. Liang, V. R. Voller, and C. Paola, Earth
 Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.org/10.5194/esurf-3-67-2015">https://doi.org/10.5194/esurf-3-67-2015</a></p>
-</dd>
-<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>A reduced-complexity model for river delta formation – Part 2:
+</aside>
+<aside class="footnote brackets" id="id5" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>A reduced-complexity model for river delta formation – Part 2:
 Assessment of the flow routing scheme, M. Liang, N. Geleynse,
 D. A. Edmonds, and P. Passalacqua, Earth Surf. Dynam., 3, 87–104, 2015.
 <a class="reference external" href="https://doi.org/10.5194/esurf-3-87-2015">https://doi.org/10.5194/esurf-3-87-2015</a></p>
-</dd>
-</dl>
+</aside>
 </section>
 </section>
 
@@ -203,7 +204,7 @@ D. A. Edmonds, and P. Passalacqua, Earth Surf. Dynam., 3, 87–104, 2015.
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -227,7 +228,7 @@ D. A. Edmonds, and P. Passalacqua, Earth Surf. Dynam., 3, 87–104, 2015.
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

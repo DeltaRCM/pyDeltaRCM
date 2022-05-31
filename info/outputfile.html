@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Model Output File &#8212; pyDeltaRCM 2.1.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,10 +46,10 @@
           <div class="body" role="main">
             
   <section id="model-output-file">
-<h1>Model Output File<a class="headerlink" href="#model-output-file" title="Permalink to this headline">¶</a></h1>
+<h1>Model Output File<a class="headerlink" href="#model-output-file" title="Permalink to this heading">¶</a></h1>
 <p>If configured to save any output data, model outputs are saved using the <a class="reference external" href="http://unidata.github.io/netcdf4-python/">netCDF4</a> file format.</p>
 <section id="gridded-variables">
-<h2>Gridded Variables<a class="headerlink" href="#gridded-variables" title="Permalink to this headline">¶</a></h2>
+<h2>Gridded Variables<a class="headerlink" href="#gridded-variables" title="Permalink to this heading">¶</a></h2>
 <p>In any given run, the saving parameters “save_&lt;var&gt;_grids” control whether or
 not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file. In
 the netCDF4 file, a 3-D array with the dimensions <cite>time</cite> <img class="math" src="../_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/>
@@ -67,7 +68,7 @@ the old coordinate configuration.</p>
 </div>
 </section>
 <section id="grid-coordinates">
-<h2>Grid Coordinates<a class="headerlink" href="#grid-coordinates" title="Permalink to this headline">¶</a></h2>
+<h2>Grid Coordinates<a class="headerlink" href="#grid-coordinates" title="Permalink to this heading">¶</a></h2>
 <p>Grid coordinates are specified in the variables <cite>time</cite>, <cite>x</cite>, and <cite>y</cite> in the output netCDF4 file.
 These arrays are 1D arrays, which specify the location of each cell in the domain in <em>dimensional</em> coordinates (e.g., meters).
 In the downstream direction,  the distance of each cell from the inlet boundary is specified in <cite>x</cite> in meters.
@@ -75,7 +76,7 @@ Similarly, the cross-domain distance is specified in <cite>y</cite> in meters.
 Lastly, the <cite>time</cite> variable is stored as a 1D array with model <cite>time</cite> in seconds.</p>
 </section>
 <section id="model-metadata">
-<h2>Model Metadata<a class="headerlink" href="#model-metadata" title="Permalink to this headline">¶</a></h2>
+<h2>Model Metadata<a class="headerlink" href="#model-metadata" title="Permalink to this heading">¶</a></h2>
 <p>In addition to the grid coordinates, model metadata is saved as a group of
 1-D arrays (vectors) and 0-D arrays (floats and integers). The values that are
 saved as metadata are the following:</p>
@@ -95,7 +96,7 @@ saved as metadata are the following:</p>
 </ul>
 </section>
 <section id="working-with-model-outputs">
-<h2>Working with Model Outputs<a class="headerlink" href="#working-with-model-outputs" title="Permalink to this headline">¶</a></h2>
+<h2>Working with Model Outputs<a class="headerlink" href="#working-with-model-outputs" title="Permalink to this heading">¶</a></h2>
 <p>The resulting netCDF4 output file can be read using any netCDF4-compatible
 library. These libraries range from the
 <a class="reference external" href="https://github.com/Unidata/netcdf4-python">netCDF4 Python package</a> itself,
@@ -170,7 +171,7 @@ For example, we can slice the final bed elevation and velocity of a model run:</
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -194,7 +195,7 @@ For example, we can slice the final bed elevation and velocity of a model run:</
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

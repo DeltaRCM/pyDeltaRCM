@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>iteration_tools &#8212; pyDeltaRCM 2.1.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
@@ -15,6 +15,7 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -45,19 +46,15 @@
           <div class="body" role="main">
             
   <section id="iteration-tools">
-<h1>iteration_tools<a class="headerlink" href="#iteration-tools" title="Permalink to this headline">¶</a></h1>
+<h1>iteration_tools<a class="headerlink" href="#iteration-tools" title="Permalink to this heading">¶</a></h1>
 <div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
 <p>Add paragraph description of the module. What stages are defined here generally? Make a table with the main ones like in water tools?</p>
 </div>
 <section id="public-api-methods-attached-to-model">
-<h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Permalink to this headline">¶</a></h2>
+<h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Permalink to this heading">¶</a></h2>
 <p>The following methods are defined in the <code class="docutils literal notranslate"><span class="pre">iteration_tools</span></code> class, of the <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.iteration_tools</span></code> module.</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools" title="pyDeltaRCM.iteration_tools.iteration_tools"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iteration_tools</span></code></a>()</p></td>
 <td><p>Tools relating to the updating of the model and model I/O.</p></td>
@@ -106,7 +103,7 @@ flooded cells that are not “wet” (via <code class="xref py py-meth docutils 
 <span class="sig-name descname"><span class="pre">log_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.log_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Log message dependent on verbosity settings.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>message</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – Message string to write to the log as info.</p></li>
 <li><p><strong>verbosity</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional) – Verbosity threshold, whether to write the message to the log or
@@ -129,14 +126,14 @@ report it to stdout.</p>
 <span class="sig-name descname"><span class="pre">make_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.make_figure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a figure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>var</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – Which variable to plot into the figure. Specified as a string and
 looked up via <cite>getattr</cite>.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>fig</strong> – The created figure object.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.figure</span></code></p>
 </dd>
 </dl>
@@ -167,7 +164,7 @@ resumed from this time.</p>
 <span class="sig-name descname"><span class="pre">save_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_figure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save a figure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – The path (and filename without extension) to save the figure to.</p></li>
 <li><p><strong>ext</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – The file extension (default=’.png’). This must be supported by the
@@ -182,12 +179,12 @@ sure to include the ‘.’ before the extension.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.save_grids">
-<span class="sig-name descname"><span class="pre">save_grids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">save_grids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save a grid into an existing netCDF file.</p>
 <p>File should already be open (by <code class="xref py py-meth docutils literal notranslate"><span class="pre">init_output_grid()</span></code>) as
 <code class="docutils literal notranslate"><span class="pre">self.output_netcdf</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>var_name</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – The name of the variable to be saved</p></li>
 <li><p><strong>var</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">ndarray</span></code>) – The numpy array to be saved.</p></li>
@@ -285,7 +282,7 @@ water surface calculation and sediment parcel routing routines.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -309,7 +306,7 @@ water surface calculation and sediment parcel routing routines.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>
