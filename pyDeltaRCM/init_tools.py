@@ -176,11 +176,12 @@ class init_tools(abc.ABC):
         # parameters exist, we warn the user that they are not being used! A
         # special warning is issued for the Preprocessor advanced config
         # keywords, which cannot be passed directly to the DeltaModel.
+        pp_only_kw = ['matrix', 'ensemble', 'set', 'parallel']
         unused_user_keys = [k for k, v in user_dict.items() if not
                             (k in input_file_vars.keys())]
         if len(unused_user_keys) > 0:
             any_in_preprocessor = [k for k in unused_user_keys if
-                                   (k in ['matrix', 'ensemble', 'set'])]
+                                   (k in pp_only_kw)]
             if len(any_in_preprocessor):
                 warnings.warn(UserWarning(
                     'A Preprocessor-only keyword was specified as input in '
@@ -497,6 +498,9 @@ class init_tools(abc.ABC):
             (self._Np_water, self.size_indices), dtype=np.int64)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
+        
+        # arrays acting as modifying hooks
+        self.mod_water_weight = np.ones_like(self.depth)
 
         # ---- domain ----
         cell_land = -2
