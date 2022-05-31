@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Available Model Hooks &#8212; pyDeltaRCM 2.1.3 documentation</title>
+    <title>Available Model Hooks &#8212; pyDeltaRCM 2.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -19,8 +19,8 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Preprocessor" href="../preprocessor/index.html" />
-    <link rel="prev" title="Default Model Variable Values" href="yaml_defaults.html" /> 
+    <link rel="next" title="Examples of using and working with pyDeltaRCM" href="../../examples/index.html" />
+    <link rel="prev" title="Model Output File" href="../../info/outputfile.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -29,14 +29,13 @@
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../preprocessor/index.html" title="Preprocessor"
+          <a href="../../examples/index.html" title="Examples of using and working with pyDeltaRCM"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="yaml_defaults.html" title="Default Model Variable Values"
+          <a href="../../info/outputfile.html" title="Model Output File"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.3 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">model</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../info/index.html" accesskey="U">Model Information</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Available Model Hooks</a></li> 
       </ul>
     </div>  
@@ -48,9 +47,21 @@
             
   <section id="available-model-hooks">
 <h1>Available Model Hooks<a class="headerlink" href="#available-model-hooks" title="Permalink to this heading">¶</a></h1>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Have a suggestion for another <cite>hook</cite> in the DeltaModel? Get in touch via
+the GitHub issue tracker!</p>
+</div>
+<section id="method-hooks">
+<h2>Method hooks<a class="headerlink" href="#method-hooks" title="Permalink to this heading">¶</a></h2>
+<p>As described extensively in the <a class="reference internal" href="../../guides/user_guide.html#customize-the-model"><span class="std std-ref">User Guide on how to customize the model</span></a>, hooks are methods in the model sequence that do
+nothing by default, but can be augmented to provide arbitrary desired
+behavior in the model. Hooks have been integrated throughout the model
+initialization and update sequences, to allow the users to achieve complex
+behavior at various stages of the model sequence.</p>
 <p>A complete list of hooks in the model follows:</p>
 <table class="docutils align-default" id="id1">
-<caption><span class="caption-text">Available model hooks</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<caption><span class="caption-text">Available model method hooks</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 50%" />
 <col style="width: 50%" />
@@ -109,6 +120,35 @@
 </tbody>
 </table>
 </section>
+<section id="array-hooks">
+<h2>Array hooks<a class="headerlink" href="#array-hooks" title="Permalink to this heading">¶</a></h2>
+<p>The <cite>DeltaModel</cite> also incorporates a few arrays that enable a similar effect
+to method hooks. These arrays are initialized with all <code class="docutils literal notranslate"><span class="pre">1</span></code> or all <code class="docutils literal notranslate"><span class="pre">0</span></code>
+values by default (depending on the scenario), and provide a convenient
+location to augment the model with varied behavior.</p>
+<p>A complete list of behavior-modifying arrays in the model follows:</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Available model array hooks</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 63%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Array name</p></th>
+<th class="head"><p>function</p></th>
+<th class="head"><p>default value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><cite>mod_water_weight</cite></p></td>
+<td><p>modifies the neighbor-weighting of water parcels during routing according to <code class="docutils literal notranslate"><span class="pre">(depth</span> <span class="pre">*</span> <span class="pre">mod_water_weight)**theta_water</span></code></p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -118,14 +158,25 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <div>
+    <h3><a href="../../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Available Model Hooks</a><ul>
+<li><a class="reference internal" href="#method-hooks">Method hooks</a></li>
+<li><a class="reference internal" href="#array-hooks">Array hooks</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="yaml_defaults.html"
-                          title="previous chapter">Default Model Variable Values</a></p>
+    <p class="topless"><a href="../../info/outputfile.html"
+                          title="previous chapter">Model Output File</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="../preprocessor/index.html"
-                          title="next chapter">Preprocessor</a></p>
+    <p class="topless"><a href="../../examples/index.html"
+                          title="next chapter">Examples of using and working with pyDeltaRCM</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -155,14 +206,13 @@
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../preprocessor/index.html" title="Preprocessor"
+          <a href="../../examples/index.html" title="Examples of using and working with pyDeltaRCM"
              >next</a> |</li>
         <li class="right" >
-          <a href="yaml_defaults.html" title="Default Model Variable Values"
+          <a href="../../info/outputfile.html" title="Model Output File"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.3 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="index.html" >model</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../info/index.html" >Model Information</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Available Model Hooks</a></li> 
       </ul>
     </div>
