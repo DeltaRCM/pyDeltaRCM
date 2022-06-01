@@ -63,7 +63,7 @@ out the Python API.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.preprocessor.BasePreprocessor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the base preprocessor.</p>
 </dd></dl>
 
@@ -100,7 +100,7 @@ out the Python API.</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.preprocessor.BasePreprocessor._expand_ensemble">
-<span class="sig-name descname"><span class="pre">_expand_ensemble</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._expand_ensemble" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_expand_ensemble</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._expand_ensemble" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create ensemble random seeds and put into matrix.</p>
 <p>Ensemble expansion is implemented as a special class of matrix/set
 expansion where:</p>
@@ -121,7 +121,7 @@ exist (e.g., only ensemble specified), then the matrix is created.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.preprocessor.BasePreprocessor._expand_matrix">
-<span class="sig-name descname"><span class="pre">_expand_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._expand_matrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_expand_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._expand_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Expand YAML matrix.</p>
 <p>Compute the matrix expansion of parameters listed in <cite>matrix</cite> key.</p>
 </dd></dl>
@@ -145,7 +145,7 @@ exist (e.g., only ensemble specified), then the matrix is created.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.preprocessor.BasePreprocessor._prelim_config_parsing">
-<span class="sig-name descname"><span class="pre">_prelim_config_parsing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._prelim_config_parsing" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_prelim_config_parsing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor._prelim_config_parsing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Preliminary configuration parsing.</p>
 <p>Extract <code class="docutils literal notranslate"><span class="pre">.yml</span></code> file (<code class="docutils literal notranslate"><span class="pre">self.input_file</span></code>) into a dictionary, if
 provided. This dictionary provides a few keys used throughout the
@@ -166,7 +166,7 @@ constructed by the preprocessor.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.preprocessor.BasePreprocessor.construct_file_list">
-<span class="sig-name descname"><span class="pre">construct_file_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.construct_file_list" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">construct_file_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.construct_file_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct the file list.</p>
 <p>The job list is constructed by expanding the various multi-job
 specifications. For example, <cite>matrix</cite>, <cite>set</cite>, and
@@ -214,7 +214,7 @@ import of the yaml configuration.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.preprocessor.BasePreprocessor.run_jobs">
-<span class="sig-name descname"><span class="pre">run_jobs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DeltaModel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.run_jobs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run_jobs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DeltaModel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.preprocessor.BasePreprocessor.run_jobs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the set of jobs.</p>
 <p>This method can be seen as the actual execution stage of the
 preprocessor. If <cite>–parallel</cite> is specified in the command line or YAML
