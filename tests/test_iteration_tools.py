@@ -507,11 +507,11 @@ class TestSaveFigure:
         # save two figs with different timesteps
         _delta.save_figure(fig, directory=_delta.prefix,
                            filename_root='eta_',
-                           timestep=0)
+                           save_iter=0)
 
         _delta.save_figure(fig, directory=_delta.prefix,
                            filename_root='eta_',
-                           timestep=1)
+                           save_iter=1)
 
         # check for output eta file
         exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
@@ -533,11 +533,11 @@ class TestSaveFigure:
         # save two figs with different timesteps
         _delta.save_figure(fig, directory=_delta.prefix,
                            filename_root='eta_',
-                           timestep=0)
+                           save_iter=0)
 
         _delta.save_figure(fig, directory=_delta.prefix,
                            filename_root='eta_',
-                           timestep=1)
+                           save_iter=1)
 
         exp_path_png0 = os.path.join(
             tmp_path / 'out_dir', 'eta_00000.png')
