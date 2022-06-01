@@ -1127,7 +1127,7 @@ def preprocessor_wrapper() -> None:
 def _write_yaml_config_to_file(_config, _path) -> None:
     """Write a config to file in output folder.
 
-    Write the entire yaml configuation for the configured job out to a
+    Write the entire yaml configuration for the configured job out to a
     file in the job output foler.
 
     .. note::
