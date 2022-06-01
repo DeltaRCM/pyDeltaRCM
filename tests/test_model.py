@@ -99,17 +99,20 @@ class Test__init__:
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
         utilities.write_parameter_to_file(f, 'illegal_attribute', True)
         f.close()
-        delta = DeltaModel(input_file=p)
+        with pytest.warns(UserWarning, match=r'One or more .*illegal.*'):
+            delta = DeltaModel(input_file=p)
         assert delta.S0 == 0.00015  # from default.yaml
         assert not hasattr(delta, 'illegal_attribute')
 
     def test_not_overwriting_existing_attributes(self, tmp_path: Path) -> None:
+        # this tests that you can't name something that already exists as a keyword name
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
         utilities.write_parameter_to_file(f, 'input_file', '/fake/path.yaml')
         f.close()
-        delta = DeltaModel(input_file=p)
+        with pytest.warns(UserWarning, match=r'One or more .*input_file.*'):
+            delta = DeltaModel(input_file=p)
         assert delta.S0 == 0.00015  # from default.yaml
         assert hasattr(delta, 'input_file')
         assert delta.input_file == p

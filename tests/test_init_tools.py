@@ -317,7 +317,7 @@ class TestLoadCheckpoint:
         assert np.all(_delta.eta == _rand_field)
 
         # now resume from the checkpoint to restore the field
-        with pytest.warns(UserWarning, match=r'NetCDF4 output *.'):
+        with pytest.warns(UserWarning, match=r'NetCDF4 output .*'):
             _delta.load_checkpoint()
 
         # check that fields match
@@ -969,6 +969,42 @@ class TestSettingOtherParametersFromYAMLSettings:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
         assert _delta.active_layer_thickness == _delta.h0 / 2
+
+
+class TestInputParameterResolution:
+
+    def test_parameter_yaml_and_kwargs(self, tmp_path):
+        # the kwargs spec should be taken
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'u0': 0.8})
+        with pytest.warns(UserWarning, match=r'A keyword .*u0.*'):
+            _delta = DeltaModel(input_file=p, u0=11)
+        assert _delta.u0 == 11
+
+    def test_parameter_yaml_unused(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'unusable': 0.8})
+        with pytest.warns(UserWarning, match=r'One or more .*unusable.*'):
+            _ = DeltaModel(input_file=p)
+
+    def test_parameter_kwargs_unused(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        with pytest.warns(UserWarning, match=r'One or more .*unusable.*'):
+            _ = DeltaModel(input_file=p, unusable=0.8)
+
+    def test_parameter_yaml_forbidden(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'matrix': 0.8})
+        with pytest.warns(UserWarning, match=r'A Preprocessor-only .*matrix.*'):
+            _ = DeltaModel(input_file=p)
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'ensemble': 5})
+        with pytest.warns(UserWarning, match=r'A Preprocessor-only .*ensemble.*'):
+            _ = DeltaModel(input_file=p)
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'set': 'whatever'})
+        with pytest.warns(UserWarning, match=r'A Preprocessor-only .*set.*'):
+            _ = DeltaModel(input_file=p)
 
 
 class TestInitMetadataList:

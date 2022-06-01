@@ -9,6 +9,12 @@ provided below. The YAML parameters are sorted by "type", for example,
 :ref:`model-domain-parameters` are those parameters which control the
 definition of the pyDeltaRCM model domain.
 
+.. hint::
+
+    View the complete list of default values and expected types
+    here: :doc:`../reference/model/yaml_defaults`.
+
+
 Model Settings
 ==============
 
@@ -34,10 +40,6 @@ Model Domain Parameters
 
 :attr:`pyDeltaRCM.model.DeltaModel.S0`
 
-:attr:`pyDeltaRCM.model.DeltaModel.itermax`
-
-:attr:`pyDeltaRCM.model.DeltaModel.Np_water`
-
 :attr:`pyDeltaRCM.model.DeltaModel.u0`
 
 :attr:`pyDeltaRCM.model.DeltaModel.N0_meters`
@@ -50,15 +52,11 @@ Model Domain Parameters
 
 :attr:`pyDeltaRCM.model.DeltaModel.SLR`
 
-:attr:`pyDeltaRCM.model.DeltaModel.Np_sed`
-
 :attr:`pyDeltaRCM.model.DeltaModel.f_bedload`
-
-:attr:`pyDeltaRCM.model.DeltaModel.active_layer_thickness`
 
 :attr:`pyDeltaRCM.model.DeltaModel.C0_percent`
 
-:attr:`pyDeltaRCM.model.DeltaModel.Csmooth`
+:attr:`pyDeltaRCM.model.DeltaModel.active_layer_thickness`
 
 :attr:`pyDeltaRCM.model.DeltaModel.toggle_subsidence`
 
@@ -120,11 +118,19 @@ Output Settings
 Reduced-Complexity Routing Parameters
 =====================================
 
+:attr:`pyDeltaRCM.model.DeltaModel.Np_sed`
+
+:attr:`pyDeltaRCM.model.DeltaModel.Np_water`
+
 :attr:`pyDeltaRCM.model.DeltaModel.omega_sfc`
 
 :attr:`pyDeltaRCM.model.DeltaModel.omega_flow`
 
+:attr:`pyDeltaRCM.model.DeltaModel.itermax`
+
 :attr:`pyDeltaRCM.model.DeltaModel.Nsmooth`
+
+:attr:`pyDeltaRCM.model.DeltaModel.Csmooth`
 
 :attr:`pyDeltaRCM.model.DeltaModel.theta_water`
 

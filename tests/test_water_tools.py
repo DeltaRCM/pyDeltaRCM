@@ -54,11 +54,12 @@ class TestWaterRoutingWeights:
         theta = 1
         weight_sfc = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=np.float64)
         weight_int = np.array([0, 0, 0, 0, 0, 1, 0, 1, 1], dtype=np.float64)
+        weight_mod = np.array([0, 0, 0, 0, 0, 1, 0, 1, 1], dtype=np.float64)
 
         # get weights back from the test
         wts = water_tools._get_weight_at_cell_water(
             ind, weight_sfc, weight_int, depth,
-            celltype, dry_thresh, gamma, theta)
+            weight_mod, celltype, dry_thresh, gamma, theta)
         assert np.all(wts[[0, 1, 2, 5]] == 0)
         assert wts[4] == 0
         assert np.any(wts[[3, 6, 7, 8]] != 0)

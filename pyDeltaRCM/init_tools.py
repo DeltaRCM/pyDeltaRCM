@@ -170,6 +170,33 @@ class init_tools(abc.ABC):
                 # set using default value
                 input_file_vars[k] = v['default']
 
+        # compare the processed inputs with the total inputs. If any unused
+        # parameters exist, we warn the user that they are not being used! A
+        # special warning is issued for the Preprocessor advanced config
+        # keywords, which cannot be passed directly to the DeltaModel.
+        pp_only_kw = ['matrix', 'ensemble', 'set', 'parallel']
+        unused_user_keys = [k for k, v in user_dict.items() if not
+                            (k in input_file_vars.keys())]
+        if len(unused_user_keys) > 0:
+            any_in_preprocessor = [k for k in unused_user_keys if
+                                   (k in pp_only_kw)]
+            if len(any_in_preprocessor):
+                warnings.warn(UserWarning(
+                    'A Preprocessor-only keyword was specified as input in '
+                    'yaml file or kwargs: {0}. Advanced configurations '
+                    'are only supported by the Preprocessor via the '
+                    'high-level API. Any parameters specified as part of this '
+                    'advanced keyword configuration will not be used!'.format(
+                        any_in_preprocessor)))
+            else:
+                warnings.warn(UserWarning(
+                    'One or more inputs in yaml file or kwargs were unused by '
+                    'the model during instantiation. '
+                    'The unused keys are: {0}'.format(str(unused_user_keys))))
+
+        # note, the specified parameters are assigned to the model object in
+        # the following function `process_input_to_model`.
+
         # save the input file as a hidden attr and grab needed value
         self._input_file_vars = input_file_vars
         self.out_dir = self._input_file_vars['out_dir']
@@ -469,6 +496,9 @@ class init_tools(abc.ABC):
             (self._Np_water, self.size_indices), dtype=np.int64)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
+        
+        # arrays acting as modifying hooks
+        self.mod_water_weight = np.ones_like(self.depth)
 
         # ---- domain ----
         cell_land = -2

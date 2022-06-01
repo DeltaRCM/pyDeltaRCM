@@ -313,7 +313,6 @@ class TestTimingOutputData:
     def test_save_one_fig_no_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'save_dt': 1,
-                                      'save_strata': False,
                                       'save_eta_figs': True})
         _delta = DeltaModel(input_file=p)
 
