@@ -569,7 +569,7 @@ class water_tools(abc.ABC):
 
 @njit
 def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs, ct_nbrs,
-                              dry_depth, gamma: int, theta):
+                              dry_depth: float, gamma: float, theta: float):
     """Compute water weights for a given cell.
 
     This is a jitted function called by :func:`_get_water_weight_array`.
@@ -929,9 +929,13 @@ def _update_absQfield(qfield, dist, inds, astep, Qp_water, dx):
 
 
 @njit
-def _accumulate_free_surface_walks(free_surf_walk_inds, free_surf_flag,
-                                   cell_type, uw: np.ndarray, ux, uy, depth,
-                                   dx, u0, h0: float, H_SL, S0):
+def _accumulate_free_surface_walks(free_surf_walk_inds: np.ndarray,
+                                   free_surf_flag: np.ndarray,
+                                   cell_type: np.ndarray, uw: np.ndarray,
+                                   ux: np.ndarray, uy: np.ndarray,
+                                   depth: np.ndarray,
+                                   dx: float, u0: float, h0: float,
+                                   H_SL: float, S0: float):
     """Accumulate the free surface by walking parcel paths.
 
     This routine comprises the hydrodynamic physics-based computations.

@@ -258,7 +258,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._out_dir = out_dir
 
     @property
-    def verbose(self) -> bool:
+    def verbose(self) -> int:
         """
         verbose controls the degree of information printed to the log.
 
@@ -270,7 +270,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._verbose
 
     @verbose.setter
-    def verbose(self, verbose: bool) -> None:
+    def verbose(self, verbose: int) -> None:
         self._verbose = verbose
 
     @property
@@ -496,7 +496,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._SLR = SLR
 
     @property
-    def If(self):
+    def If(self) -> float:
         """
         Intermittency factor converting model time to real-world time.
 
@@ -508,7 +508,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._If
 
     @If.setter
-    def If(self, If) -> None:
+    def If(self, If: float) -> None:
         if (If <= 0) or (If > 1):
             raise ValueError('If must be in interval (0, 1].')
         self._If = If
@@ -550,7 +550,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._f_bedload = f_bedload
 
     @property
-    def active_layer_thickness(self) -> None:
+    def active_layer_thickness(self) -> float:
         """
         Active layer thickness for sand fraction.
 
@@ -979,18 +979,18 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self._save_velocity_components = save_velocity_components
 
     @property
-    def save_dt(self) -> bool:
+    def save_dt(self) -> float:
         """
         save_dt defines the saving interval in seconds.
         """
         return self._save_dt
 
     @save_dt.setter
-    def save_dt(self, save_dt: bool) -> None:
+    def save_dt(self, save_dt: float) -> None:
         self._save_dt = save_dt
 
     @property
-    def checkpoint_dt(self):
+    def checkpoint_dt(self) -> float:
         """
         checkpoint_dt defines the interval to create checkpoint information.
         """
@@ -1384,7 +1384,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         return self._save_iter
 
     @property
-    def channel_flow_velocity(self):
+    def channel_flow_velocity(self) -> float:
         """Get channel flow velocity."""
         return self.u0
 
@@ -1395,7 +1395,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.init_sediment_routers()
 
     @property
-    def channel_width(self):
+    def channel_width(self) -> float:
         """Get channel width."""
         return self.N0 * self._dx
 
@@ -1411,7 +1411,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
                 'restrictions.'.format(self.channel_width, new_N0_meters)))
 
     @property
-    def channel_flow_depth(self):
+    def channel_flow_depth(self) -> float:
         """Get channel flow depth."""
         return self.h0
 
@@ -1422,7 +1422,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.init_sediment_routers()
 
     @property
-    def sea_surface_mean_elevation(self):
+    def sea_surface_mean_elevation(self) -> float:
         """Get sea surface mean elevation."""
         return self.H_SL
 
@@ -1440,7 +1440,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.SLR = new_SLR
 
     @property
-    def bedload_fraction(self):
+    def bedload_fraction(self) -> float:
         """Get bedload fraction."""
         return self.f_bedload
 
@@ -1449,7 +1449,7 @@ class DeltaModel(iteration_tools, sed_tools, water_tools,
         self.f_bedload = new_u0
 
     @property
-    def influx_sediment_concentration(self):
+    def influx_sediment_concentration(self) -> float:
         """Get influx sediment concentration."""
         return self.C0_percent
 

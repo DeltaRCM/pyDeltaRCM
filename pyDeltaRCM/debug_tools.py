@@ -305,7 +305,7 @@ def plot_ind(_ind, *args, shape=None, **kwargs) -> None:
         plt.show()
 
 
-def plot_line(_ind, *args, shape=None, nozeros: bool=False, **kwargs):
+def plot_line(_ind, *args, shape=None, nozeros: bool = False, **kwargs):
     """Plot a line within the model domain.
 
     Method called by :obj:`show_line`.

@@ -665,7 +665,8 @@ class _BaseJob(abc.ABC):
     """
 
     def __init__(self, i, input_file, config_dict,
-                 DeltaModel: Optional[Type[BaseDeltaModel]]=None, defer_output: bool=False) -> None:
+                 DeltaModel: Optional[Type[BaseDeltaModel]]=None, 
+                 defer_output: bool=False) -> None:
         """Initialize a job.
 
         The `input_file` argument is passed to the DeltaModel for
@@ -679,10 +680,6 @@ class _BaseJob(abc.ABC):
         self.i = i
         self.input_file = input_file
 
-        # if 'DeltaModel' in config_dict.keys():
-        #     _DM = config_dict['DeltaModel']
-        # else:
-        #     _DM = DeltaModel
         if (DeltaModel is None):
             DeltaModel = BaseDeltaModel
 
@@ -749,7 +746,7 @@ class _SerialJob(_BaseJob):
     .. note:: You probably don't need to interact with this class directly.
     """
 
-    def __init__(self, i, input_file, config_dict, DeltaModel=None,) -> None:
+    def __init__(self, i, input_file, config_dict, DeltaModel=None) -> None:
         """Initialize a serial job.
 
         The `input_file` argument is passed to the DeltaModel for
@@ -760,7 +757,8 @@ class _SerialJob(_BaseJob):
         run time.
         """
         super().__init__(i, input_file, config_dict,
-                         DeltaModel=DeltaModel, defer_output=False)
+                         DeltaModel=DeltaModel,
+                         defer_output=False)
 
     def run(self) -> None:
         """Loop the model.
@@ -827,7 +825,8 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
         """
         # inherit with explicit method resolution order
         _BaseJob.__init__(self, i, input_file, config_dict,
-                          DeltaModel=DeltaModel, defer_output=True)
+                          DeltaModel=DeltaModel,
+                          defer_output=True)
         multiprocessing.Process.__init__(self)
 
         self.queue = queue
