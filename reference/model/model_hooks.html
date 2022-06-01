@@ -145,6 +145,14 @@ location to augment the model with varied behavior.</p>
 <td><p>modifies the neighbor-weighting of water parcels during routing according to <code class="docutils literal notranslate"><span class="pre">(depth</span> <span class="pre">*</span> <span class="pre">mod_water_weight)**theta_water</span></code></p></td>
 <td><p>1</p></td>
 </tr>
+<tr class="row-odd"><td><p><cite>mod_sed_weight</cite></p></td>
+<td><p>modifies the neighbor-weighting of the sediment parcel routing according to <code class="docutils literal notranslate"><span class="pre">(depth</span> <span class="pre">*</span> <span class="pre">mod_sed_weight)**theta_sed</span></code></p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>mod_erosion</cite></p></td>
+<td><p>linearly modifies the “erodibility” of cells according to <code class="docutils literal notranslate"><span class="pre">mod_erosion</span> <span class="pre">*</span> <span class="pre">Vp_sed</span> <span class="pre">*</span> <span class="pre">(U_loc**beta</span> <span class="pre">-</span> <span class="pre">U_ero**beta)</span> <span class="pre">/</span> <span class="pre">U_ero**beta</span></code></p></td>
+<td><p>1</p></td>
+</tr>
 </tbody>
 </table>
 </section>

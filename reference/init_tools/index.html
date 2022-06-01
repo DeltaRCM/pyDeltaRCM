@@ -148,7 +148,7 @@ not need to be called again.</p>
 <p class="admonition-title">Hint</p>
 <p>If you need to modify the model domain after it has been created,
 it is probably safe to modify attributes directly, but take care
-to ensure any dependent fields are also approrpriately changed.</p>
+to ensure any dependent fields are also appropriately changed.</p>
 </div>
 </dd></dl>
 
@@ -158,7 +158,7 @@ to ensure any dependent fields are also approrpriately changed.</p>
 <dd><p>Model implementation variables.</p>
 <p>Creates variables for model implementation, from specified boundary
 condition variables. This method is run during initial model
-instantition. Internally, this method calls <a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.set_constants" title="pyDeltaRCM.init_tools.init_tools.set_constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_constants</span></code></a> and
+instantiation. Internally, this method calls <a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.set_constants" title="pyDeltaRCM.init_tools.init_tools.set_constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_constants</span></code></a> and
 <a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.create_boundary_conditions" title="pyDeltaRCM.init_tools.init_tools.create_boundary_conditions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_boundary_conditions</span></code></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -266,7 +266,7 @@ of the <code class="xref py py-obj docutils literal notranslate"><span class="pr
 optional argument.</p>
 <p>As a standard user, you should not need to worry about any of these
 pathways or options. However, if you are developing pyDeltaRCM or
-customizing the model in any way that involves loadind from
+customizing the model in any way that involves loading from
 checkpoints, you should be aware of these pathways.</p>
 <p>For example, loading from checkpoint will succeed if no netCDF4 file
 is found, where one is expected (e.g., because <code class="xref py py-obj docutils literal notranslate"><span class="pre">_save_any_grids</span></code>
@@ -274,7 +274,7 @@ is <cite>True</cite>). In this case, a new output netcdf file will be created,
 after a <cite>UserWarning</cite> is issued.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>If you are customing the model and intend to use checkpointing and
+<p>If you are customizing the model and intend to use checkpointing and
 the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code> parallel infrastructure, be sure that
 parameter <code class="xref py py-obj docutils literal notranslate"><span class="pre">defer_output</span></code> is <cite>True</cite> until the
 <a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.load_checkpoint" title="pyDeltaRCM.init_tools.init_tools.load_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_checkpoint</span></code></a> method can be called from the thread the
