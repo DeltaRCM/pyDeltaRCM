@@ -388,7 +388,7 @@ class TestPreprocessorMatrixJobsSetups:
                            match=r'You cannot specify "out_dir" as .*'):
             _ = preprocessor.Preprocessor(input_file=p, timesteps=3)
 
-    def test_python_highlevelapi_matrix_verbosity(self, tmp_path, capsys) -> None:
+    def test_python_highlevelapi_matrix_verbosity(self, tmp_path: Path, capsys) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'verbose', 1)

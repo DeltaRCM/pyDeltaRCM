@@ -8,8 +8,6 @@ import sys
 from math import floor
 import numpy as np
 
-from scipy.sparse import lil_matrix, csr_matrix
-
 from netCDF4 import Dataset
 import time as time_lib
 import yaml
@@ -769,7 +767,7 @@ class init_tools(abc.ABC):
                                              'f4',
                                              (self._netcdf_coords[0])]
 
-    def load_checkpoint(self, defer_output=False):
+    def load_checkpoint(self, defer_output: bool = False) -> None:
         """Load the checkpoint from the .npz file.
 
         Uses the file at the path determined by `self.prefix` and a file named
