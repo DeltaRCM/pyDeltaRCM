@@ -257,7 +257,7 @@ class init_tools(abc.ABC):
 
         Creates variables for model implementation, from specified boundary
         condition variables. This method is run during initial model
-        instantition. Internally, this method calls :obj:`set_constants` and
+        instantiation. Internally, this method calls :obj:`set_constants` and
         :obj:`create_boundary_conditions`.
 
         .. note::
@@ -452,7 +452,7 @@ class init_tools(abc.ABC):
 
             If you need to modify the model domain after it has been created,
             it is probably safe to modify attributes directly, but take care
-            to ensure any dependent fields are also approrpriately changed.
+            to ensure any dependent fields are also appropriately changed.
         """
         _msg = 'Creating model domain'
         self.log_info(_msg, verbosity=1)
@@ -499,6 +499,8 @@ class init_tools(abc.ABC):
         
         # arrays acting as modifying hooks
         self.mod_water_weight = np.ones_like(self.depth)
+        self.mod_sed_weight = np.ones_like(self.depth)
+        self.mod_erosion = np.ones_like(self.depth)
 
         # ---- domain ----
         cell_land = -2
@@ -571,7 +573,7 @@ class init_tools(abc.ABC):
                                        self.iwalk_flat, self.jwalk_flat,
                                        self.distances_flat, self.dry_depth,
                                        self._lambda, self._beta,  self.stepmax,
-                                       self.theta_mud)
+                                       self.theta_mud, self.mod_erosion)
         # initialize the SandRouter object
         self._sr = sed_tools.SandRouter(self._dt, self._dx, self.Vp_sed,
                                         self.u_max, self.qs0, self._u0,
@@ -581,7 +583,7 @@ class init_tools(abc.ABC):
                                         self.iwalk_flat, self.jwalk_flat,
                                         self.distances_flat, self.dry_depth,
                                         self._beta, self.stepmax,
-                                        self.theta_sand)
+                                        self.theta_sand, self.mod_erosion)
 
     def init_output_file(self) -> None:
         """Creates a netCDF file to store output grids.
@@ -779,7 +781,7 @@ class init_tools(abc.ABC):
 
         As a standard user, you should not need to worry about any of these
         pathways or options. However, if you are developing pyDeltaRCM or
-        customizing the model in any way that involves loadind from
+        customizing the model in any way that involves loading from
         checkpoints, you should be aware of these pathways.
 
         For example, loading from checkpoint will succeed if no netCDF4 file
@@ -789,7 +791,7 @@ class init_tools(abc.ABC):
 
         .. important::
 
-            If you are customing the model and intend to use checkpointing and
+            If you are customizing the model and intend to use checkpointing and
             the :obj:`Preprocessor` parallel infrastructure, be sure that
             parameter :obj:`defer_output` is `True` until the
             :obj:`load_checkpoint` method can be called from the thread the

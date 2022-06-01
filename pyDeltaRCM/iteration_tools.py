@@ -235,8 +235,8 @@ class iteration_tools(abc.ABC):
     def save_grids_and_figs(self) -> None:
         """Save grids and figures.
 
-        Save grids and/or plots of specified variables (``eta``, `discharge``,
-        ``velocity``, ``depth``, and ``stage``, depending on configuration of
+        Save grids and/or plots of specified variables (``eta``, ``discharge``,
+        ``velocity``, ``depth``, and ``stage``), depending on configuration of
         the relevant flags in the YAML configuration file.
 
         .. note:
