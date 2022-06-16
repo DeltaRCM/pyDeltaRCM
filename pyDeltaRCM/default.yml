@@ -184,9 +184,3 @@ clobber_netcdf:
 legacy_netcdf:
   type: 'bool'
   default: False
-config:
-  type: 'str'
-  default: null
-dryrun:
-  type: 'bool'
-  default: False

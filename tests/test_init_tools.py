@@ -3,6 +3,7 @@
 import pytest
 import unittest.mock as mock
 from pathlib import Path
+import warnings
 
 import numpy as np
 import os
@@ -1004,6 +1005,46 @@ class TestInputParameterResolution:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'set': 'whatever'})
         with pytest.warns(UserWarning, match=r'A Preprocessor-only .*set.*'):
+            _ = DeltaModel(input_file=p)
+
+    def test_parameter_timesteps_unused_no_warning(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'timesteps': 1})
+        # ensure no warnings are emitted
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            _ = DeltaModel(input_file=p)
+
+    def test_parameter_time_unused_no_warning(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'time': 1})
+        # ensure no warnings are emitted
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            _ = DeltaModel(input_file=p)
+
+    def test_parameter_time_years_unused_no_warning(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'time_years': 1})
+        # ensure no warnings are emitted
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            _ = DeltaModel(input_file=p)
+
+    def test_parameter_config_unused_no_warning(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'config': 1})
+        # ensure no warnings are emitted
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            _ = DeltaModel(input_file=p)
+
+    def test_parameter_dryrun_unused_no_warning(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'dryrun': False})
+        # ensure no warnings are emitted
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
             _ = DeltaModel(input_file=p)
 
 
