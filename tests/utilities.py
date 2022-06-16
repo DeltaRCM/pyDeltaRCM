@@ -57,7 +57,7 @@ def yaml_from_dict(tmp_path: Path, file_name: str, _dict: Optional[Dict[str, Any
 
 
 @pytest.fixture(scope='function')
-def test_DeltaModel(tmp_path: Path) -> None:
+def test_DeltaModel(tmp_path: Path) -> DeltaModel:
     file_name = 'user_parameters.yaml'
     p, f = create_temporary_file(tmp_path, file_name)
     write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
@@ -106,7 +106,7 @@ class FastIteratingDeltaModel:
     time and much of the actual computation time.
     """
 
-    def solve_water_and_sediment_timestep(self):
+    def solve_water_and_sediment_timestep(self) -> None:
         """PATCH"""
 
         def _get_random_field(shp: Tuple[int, ...]) -> np.ndarray:
@@ -130,7 +130,7 @@ class FastIteratingDeltaModel:
         self.stage += _get_random_field(shp)
 
 
-def read_endtime_from_log(log_folder):
+def read_endtime_from_log(log_folder) -> float:
     _logs = glob.glob(os.path.join(log_folder, '*.log'))
     assert len(_logs) == 1  # log file exists
     with open(_logs[0], 'r') as _logfile:

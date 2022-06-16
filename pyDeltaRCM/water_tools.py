@@ -10,7 +10,7 @@ from . import shared_tools
 
 class water_tools(abc.ABC):
 
-    def route_water(self):
+    def route_water(self) -> None:
         """Water routing main method.
 
         This is the main method for water routing in the model. It is
@@ -43,7 +43,7 @@ class water_tools(abc.ABC):
             self.hook_finalize_water_iteration(iteration)
             self.finalize_water_iteration(iteration)
 
-    def init_water_iteration(self):
+    def init_water_iteration(self) -> None:
         """Init the water iteration routine.
         """
         _msg = 'Initializing water iteration'
@@ -77,7 +77,7 @@ class water_tools(abc.ABC):
         """
         return shared_tools.get_inlet_weights(self.inlet)
 
-    def run_water_iteration(self):
+    def run_water_iteration(self) -> None:
         """Run a single iteration of travel paths for all water parcels.
 
         Runs all water  parcels (`Np_water` parcels) for `stepmax` steps, or
@@ -191,7 +191,7 @@ class water_tools(abc.ABC):
                     jstep[boundary], istep[boundary],
                     update_current=False, update_next=True)
 
-    def compute_free_surface(self):
+    def compute_free_surface(self) -> None:
         """Calculate free surface after routing all water parcels.
 
         This method uses the `free_surf_walk_inds` matrix accumulated
@@ -277,7 +277,7 @@ class water_tools(abc.ABC):
         # finalize the free surface (combine and smooth)
         self.finalize_free_surface()
 
-    def finalize_free_surface(self):
+    def finalize_free_surface(self) -> None:
         """Finalize the water free surface.
 
         This method occurs after the initial computation of the free surface,
@@ -301,7 +301,7 @@ class water_tools(abc.ABC):
         # apply a flooding correction
         self.flooding_correction()
 
-    def finalize_water_iteration(self, iteration):
+    def finalize_water_iteration(self, iteration: int) -> None:
         """Finish updating flow fields.
 
         Clean up at end of water iteration
@@ -320,7 +320,7 @@ class water_tools(abc.ABC):
         self.update_flow_field(iteration)
         self.update_velocity_field()
 
-    def check_size_of_indices_matrix(self, it):
+    def check_size_of_indices_matrix(self, it) -> None:
         """Check if step path matrix needs to be made larger.
 
         Initial size of self.free_surf_walk_inds is half of self.stepmax
@@ -339,7 +339,7 @@ class water_tools(abc.ABC):
 
             self.free_surf_walk_inds = np.hstack((self.free_surf_walk_inds, indices_blank))
 
-    def get_water_weight_array(self):
+    def get_water_weight_array(self) -> None:
         """Get step direction weights for each cell.
 
         This method is called once, before parcels are stepped, because the
@@ -376,7 +376,7 @@ class water_tools(abc.ABC):
             self.dry_depth, self.gamma, self._theta_water)
 
     def update_Q(self, dist, current_inds, next_inds, astep, jstep, istep,
-                 update_current=False, update_next=False):
+                 update_current: bool=False, update_next: bool=False) -> None:
         """Update discharge field values.
 
         Method is called after one set of water parcel steps.
@@ -424,7 +424,7 @@ class water_tools(abc.ABC):
         boundary = (self.cell_type.flat[inds] == -1)
         return boundary
 
-    def update_flow_field(self, iteration):
+    def update_flow_field(self, iteration: int) -> None:
         """Update water discharge.
 
         Update the water discharge field after one set of water parcels
@@ -460,7 +460,7 @@ class water_tools(abc.ABC):
         self.qy[0, self.inlet] = 0
         self.qw[0, self.inlet] = self.qw0
 
-    def update_velocity_field(self):
+    def update_velocity_field(self) -> None:
         """Update flow velocity fields.
 
         Update the flow velocity fields after one set of water parcels
@@ -480,7 +480,7 @@ class water_tools(abc.ABC):
         self.ux[~mask] = 0
         self.uy[~mask] = 0
 
-    def flooding_correction(self):
+    def flooding_correction(self) -> None:
         """Flood dry cells along the shore if necessary.
 
         Check the neighbors of all dry cells. If any dry cells have wet
@@ -525,7 +525,7 @@ class water_tools(abc.ABC):
 
         return wet_mask_nh
 
-    def build_weight_array(self, array, fix_edges=False, normalize=False):
+    def build_weight_array(self, array, fix_edges: bool=False, normalize: bool=False):
         """Weighting array of neighbors.
 
         Create np.array((8,L,W)) of quantity a
@@ -570,7 +570,7 @@ class water_tools(abc.ABC):
 @njit
 def _get_weight_at_cell_water(ind, weight_sfc, weight_int, depth_nbrs,
                               mod_water_weight, ct_nbrs,
-                              dry_depth, gamma, theta):
+                              dry_depth: float, gamma: float, theta: float):
     """Compute water weights for a given cell.
 
     This is a jitted function called by :func:`_get_water_weight_array`.
@@ -746,7 +746,7 @@ def _choose_next_directions(inds: np.ndarray, water_weights: np.ndarray) -> np.n
 
 
 @njit('int64[:](int64[:], int64[:], int64[:])')
-def _calculate_new_inds(current_inds, new_direction, ravel_walk):
+def _calculate_new_inds(current_inds: np.ndarray, new_direction, ravel_walk):
     """Calculate the new location (current_inds) of parcels.
 
     Use the information of the current parcel (`current_inds`) in conjunction
@@ -789,8 +789,8 @@ def _calculate_new_inds(current_inds, new_direction, ravel_walk):
 
 
 @njit
-def _check_for_loops(free_surf_walk_inds, new_inds, _step,
-                     L0, CTR, stage_above_SL):
+def _check_for_loops(free_surf_walk_inds: np.ndarray, new_inds, _step: int,
+                     L0: int, CTR: int, stage_above_SL: np.ndarray):
     """Check for loops in water parcel pathways.
 
     Look for looping random walks. I.e., this function checks for where a
@@ -932,9 +932,13 @@ def _update_absQfield(qfield, dist, inds, astep, Qp_water, dx):
 
 
 @njit
-def _accumulate_free_surface_walks(free_surf_walk_inds, free_surf_flag,
-                                   cell_type, uw, ux, uy, depth,
-                                   dx, u0, h0, H_SL, S0):
+def _accumulate_free_surface_walks(free_surf_walk_inds: np.ndarray,
+                                   free_surf_flag: np.ndarray,
+                                   cell_type: np.ndarray, uw: np.ndarray,
+                                   ux: np.ndarray, uy: np.ndarray,
+                                   depth: np.ndarray,
+                                   dx: float, u0: float, h0: float,
+                                   H_SL: float, S0: float):
     """Accumulate the free surface by walking parcel paths.
 
     This routine comprises the hydrodynamic physics-based computations.
@@ -1026,7 +1030,7 @@ def _accumulate_free_surface_walks(free_surf_walk_inds, free_surf_flag,
 
 
 @njit
-def _smooth_free_surface(Hin, cell_type, Nsmooth, Csmooth):
+def _smooth_free_surface(Hin, cell_type, Nsmooth: int, Csmooth: int):
     """Smooth the free surface.
 
     Parameters

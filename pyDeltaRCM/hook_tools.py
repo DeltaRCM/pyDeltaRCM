@@ -8,7 +8,7 @@ class hook_tools(abc.ABC):
     </guides/user_guide>`.
     """
 
-    def _check_deprecated_hooks(self):
+    def _check_deprecated_hooks(self) -> None:
         """Check for any old hooks that are defined.
 
         Sometimes hook names need to be deprecated, due to changing underlying
@@ -27,7 +27,7 @@ class hook_tools(abc.ABC):
                     f'`{old_hook}` is deprecated, '
                     f'and has been replaced with `{new_hook}`.')
 
-    def hook_import_files(self):
+    def hook_import_files(self) -> None:
         """Hook :obj:`~pyDeltaRCM.init_tools.init_tools.import_files`.
 
         Called immediately before
@@ -49,7 +49,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_process_input_to_model(self):
+    def hook_process_input_to_model(self) -> None:
         """Hook :obj:`~pyDeltaRCM.init_tools.init_tools.process_input_to_model`.
 
         Called immediately before
@@ -57,7 +57,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_create_other_variables(self):
+    def hook_create_other_variables(self) -> None:
         """Hook :obj:`~pyDeltaRCM.init_tools.init_tools.create_other_variables`.
 
         Called immediately before
@@ -65,7 +65,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_create_domain(self):
+    def hook_create_domain(self) -> None:
         """Hook :obj:`~pyDeltaRCM.init_tools.init_tools.create_domain`.
 
         Called immediately before
@@ -73,7 +73,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_load_checkpoint(self):
+    def hook_load_checkpoint(self) -> None:
         """Hook :obj:`~pyDeltaRCM.init_tools.init_tools.load_checkpoint`.
 
         Called immediately before
@@ -81,7 +81,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_solve_water_and_sediment_timestep(self):
+    def hook_solve_water_and_sediment_timestep(self) -> None:
         """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep`.
 
         Called immediately before
@@ -89,7 +89,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_output_data(self):
+    def hook_output_data(self) -> None:
         """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.output_data`.
 
         Called immediately before
@@ -97,7 +97,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_apply_subsidence(self):
+    def hook_apply_subsidence(self) -> None:
         """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence`.
 
         Called immediately before
@@ -105,7 +105,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_finalize_timestep(self):
+    def hook_finalize_timestep(self) -> None:
         """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep`.
 
         Called immediately before
@@ -113,7 +113,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_output_checkpoint(self):
+    def hook_output_checkpoint(self) -> None:
         """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint`.
 
         Called immediately before
@@ -121,7 +121,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_route_water(self):
+    def hook_route_water(self) -> None:
         """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.route_water`.
 
         Called immediately before
@@ -129,7 +129,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_init_water_iteration(self):
+    def hook_init_water_iteration(self) -> None:
         """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.init_water_iteration`.
 
         Called immediately before
@@ -137,7 +137,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_run_water_iteration(self):
+    def hook_run_water_iteration(self) -> None:
         """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.run_water_iteration`.
 
         Called immediately before
@@ -145,7 +145,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_compute_free_surface(self):
+    def hook_compute_free_surface(self) -> None:
         """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.compute_free_surface`.
 
         Called immediately before
@@ -153,7 +153,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_finalize_water_iteration(self, iteration):
+    def hook_finalize_water_iteration(self, iteration: int) -> None:
         """Hook :obj:`~pyDeltaRCM.water_tools.water_tools.finalize_water_iteration`.
 
         Called immediately before
@@ -161,7 +161,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_route_sediment(self):
+    def hook_route_sediment(self) -> None:
         """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`.
 
         Called immediately before
@@ -169,7 +169,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_init_sediment_iteration(self):
+    def hook_init_sediment_iteration(self) -> None:
         """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.init_sediment_iteration`.
 
         Called immediately before
@@ -177,7 +177,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_route_all_sand_parcels(self):
+    def hook_route_all_sand_parcels(self) -> None:
         """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels`.
 
         Called immediately before
@@ -185,7 +185,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_topo_diffusion(self):
+    def hook_topo_diffusion(self) -> None:
         """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.topo_diffusion`.
 
         Called immediately before
@@ -193,7 +193,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_route_all_mud_parcels(self):
+    def hook_route_all_mud_parcels(self) -> None:
         """Hook :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels`.
 
         Called immediately before
@@ -201,7 +201,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_compute_sand_frac(self):
+    def hook_compute_sand_frac(self) -> None:
         """Hook :obj:`~pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac`.
 
         Called immediately before
@@ -209,7 +209,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_init_output_file(self):
+    def hook_init_output_file(self) -> None:
         """Hook :obj:`~pyDeltaRCM.init_tools.init_tools.init_output_file`.
 
         Called immediately before
@@ -247,7 +247,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_after_create_domain(self):
+    def hook_after_create_domain(self) -> None:
         """Hook called *after* :obj:`~pyDeltaRCM.init_tools.init_tools.create_domain`.
 
         Unlike the standard model hooks, this hook is called *after* the
@@ -256,7 +256,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_after_route_water(self):
+    def hook_after_route_water(self) -> None:
         """Hook called *after* :obj:`~pyDeltaRCM.water_tools.water_tools.route_water`.
 
         Unlike the standard model hooks, this hook is called *after* water
@@ -265,7 +265,7 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_after_route_sediment(self):
+    def hook_after_route_sediment(self) -> None:
         """Hook called *after* :obj:`~pyDeltaRCM.sed_tools.sed_tools.route_sediment`.
 
         Unlike the standard model hooks, this hook is called *after* sed
@@ -274,11 +274,11 @@ class hook_tools(abc.ABC):
         """
         pass
 
-    def hook_after_finalize_timestep(self):
+    def hook_after_finalize_timestep(self) -> None:
         """Hook called *after* :obj:`~pyDeltaRCM.iteration_tools.finalize_timestep`.
 
         Unlike the standard model hooks, this hook is called *after* the
-        finalize timestep method has completed. 
+        finalize timestep method has completed.
 
         .. hint::
 

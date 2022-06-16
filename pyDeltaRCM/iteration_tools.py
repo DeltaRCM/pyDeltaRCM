@@ -1,15 +1,12 @@
 #! /usr/bin/env python
 
+import abc
 import os
 import warnings
 
 import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.axes_grid1 as axtk
-
-from scipy.sparse import lil_matrix, csc_matrix, hstack
-
-import abc
 
 from . import shared_tools
 
@@ -59,7 +56,7 @@ class iteration_tools(abc.ABC):
         warnings.warn(UserWarning(_msg))
         self.solve_water_and_sediment_timestep()
 
-    def apply_subsidence(self):
+    def apply_subsidence(self) -> None:
         """Apply subsidence pattern.
 
         Apply subsidence to domain if toggle_subsidence is True, and
@@ -238,8 +235,8 @@ class iteration_tools(abc.ABC):
     def save_grids_and_figs(self) -> None:
         """Save grids and figures.
 
-        Save grids and/or plots of specified variables (``eta``, `discharge``,
-        ``velocity``, ``depth``, and ``stage``, depending on configuration of
+        Save grids and/or plots of specified variables (``eta``, ``discharge``,
+        ``velocity``, ``depth``, and ``stage``), depending on configuration of
         the relevant flags in the YAML configuration file.
 
         .. note:
@@ -278,7 +275,7 @@ class iteration_tools(abc.ABC):
                                                 self._time)
                         self.save_figure(_fig, directory=self.prefix,
                                          filename_root=f+'_',
-                                         timestep=self.save_iter)
+                                         save_iter=self.save_iter)
                     else:
                         raise AttributeError('Attribute "{_k}" is not of the '
                                              'right shape to be saved as a '
@@ -330,7 +327,7 @@ class iteration_tools(abc.ABC):
 
             self.output_netcdf.sync()
 
-    def make_figure(self, var, timestep) -> None:
+    def make_figure(self, var: str, time: float) -> None:
         """Create a figure.
 
         Parameters
@@ -338,6 +335,9 @@ class iteration_tools(abc.ABC):
         var : :obj:`str`
             Which variable to plot into the figure. Specified as a string and
             looked up via `getattr`.
+
+        time : :obj:`float`
+            The current model time. Used as title in figure.
 
         Returns
         -------
@@ -357,18 +357,29 @@ class iteration_tools(abc.ABC):
         cb.ax.tick_params(labelsize=7)
         ax.use_sticky_edges = False
         ax.margins(y=0.2)
-        ax.set_title(str(var)+'\ntime: '+str(timestep), fontsize=10)
+        ax.set_title(str(var)+'\ntime: '+str(time), fontsize=10)
 
         return fig
 
-    def save_figure(self, fig, directory, filename_root,
-                    timestep, ext: str = '.png', close: bool = True) -> None:
+    def save_figure(self, fig, directory: str, filename_root: str,
+                    save_iter: int, ext: str = '.png',
+                    close: bool = True) -> None:
         """Save a figure.
 
         Parameters
         ----------
-        path : :obj:`str`
-            The path (and filename without extension) to save the figure to.
+        fig : :obj:`matplotlib.Figure`
+            The `Figure` instance to save out.
+
+        directory : :obj:`str`
+            The directory to save the figure into.
+
+        filename_root : :obj:`str`
+            A root name to save the file as (usually the variable name being
+            plotted in the figure). This is the first part of the filename.
+
+        save_iter : :obj:`int`
+            The saving iteration number of this figure.
 
         ext : :obj:`str`, optional
             The file extension (default='.png'). This must be supported by the
@@ -385,18 +396,18 @@ class iteration_tools(abc.ABC):
         """
         if self._save_figs_sequential:
             # save as a padded number with the timestep
-            savepath = os.path.join(directory,
-                                    filename_root + str(timestep).zfill(5) + ext)
+            savepath = os.path.join(
+                directory, filename_root + str(save_iter).zfill(5) + ext)
         else:
             # save as "latest"
-            savepath = os.path.join(directory,
-                                    filename_root + 'latest' + ext)
+            savepath = os.path.join(
+                directory, filename_root + 'latest' + ext)
 
         fig.savefig(savepath)
         if close:
             plt.close()
 
-    def save_grids(self, var_name: str, var: np.ndarray, ts: int) -> None:
+    def save_grids(self, var_name: str, var: np.ndarray, save_idx: int) -> None:
         """Save a grid into an existing netCDF file.
 
         File should already be open (by :meth:`init_output_grid`) as
@@ -410,8 +421,8 @@ class iteration_tools(abc.ABC):
         var : :obj:`ndarray`
             The numpy array to be saved.
 
-        ts : :obj:`int`
-            The current timestep (+1, so human readable)
+        save_idx : :obj:`int`
+            The index to save the data into the NetCDF file.
 
         Returns
         -------
@@ -420,7 +431,7 @@ class iteration_tools(abc.ABC):
         _msg = ' '.join(['saving', str(var_name), 'grid'])
         self.log_info(_msg, verbosity=2)
         try:
-            self.output_netcdf.variables[var_name][ts, :, :] = var
+            self.output_netcdf.variables[var_name][save_idx, :, :] = var
         except Exception as e:
             _msg = (f'Failed to save {var_name} grid to netCDF file, '
                     f'Exception: {e}')

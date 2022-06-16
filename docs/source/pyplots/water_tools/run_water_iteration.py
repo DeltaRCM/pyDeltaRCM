@@ -37,7 +37,7 @@ delta_later.run_water_iteration()
 
 
 # define a function to fill in the walks of given idx
-def _plot_idxs_walks_to_step(delta_inds, _step, _idxs, _ax):
+def _plot_idxs_walks_to_step(delta_inds, _step, _idxs, _ax) -> None:
     for i in range(len(_idxs)):
         iidx = _idxs[i]
         walk = delta_inds[iidx, :]
