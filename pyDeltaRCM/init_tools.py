@@ -180,7 +180,7 @@ class init_tools(abc.ABC):
         # remove special keywords from the dict of user YAML parameters
         # these are keywords related to time or matrix/set expansion
         _no_list = ['timesteps', 'time', 'time_years', 'config', 'dryrun']
-        [user_dict.pop(key) for key in _no_list if key in user_dict.keys()]
+        _ = [user_dict.pop(key) for key in _no_list if key in user_dict.keys()]
         # identify unused parameters
         unused_user_keys = [k for k, v in user_dict.items() if not
                             (k in input_file_vars.keys())]

@@ -510,7 +510,7 @@ class BasePreprocessor(abc.ABC):
 
             # strip the not allowed parameters from the config
             config_write = config.copy()
-            [config_write.pop(key) for key in _no_list if key in config_write.keys()]
+            _ = [config_write.pop(key) for key in _no_list if key in config_write.keys()]
 
             ith_dir = Path(config['out_dir'])       # job output folder
             ith_id = ith_dir.parts[-1]              # job id
