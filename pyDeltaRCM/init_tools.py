@@ -498,7 +498,7 @@ class init_tools(abc.ABC):
             (self._Np_water, self.size_indices), dtype=np.int64)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
-        
+
         # arrays acting as modifying hooks
         self.mod_water_weight = np.ones_like(self.depth)
 
