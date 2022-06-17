@@ -1047,6 +1047,14 @@ class TestInputParameterResolution:
             warnings.simplefilter("error")
             _ = DeltaModel(input_file=p)
 
+    def test_parameter_parallel_unused_no_warning(self, tmp_path):
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'parallel': False})
+        # ensure no warnings are emitted
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            _ = DeltaModel(input_file=p)
+
 
 class TestInitMetadataList:
 
