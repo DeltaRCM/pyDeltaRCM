@@ -174,7 +174,13 @@ class init_tools(abc.ABC):
         # parameters exist, we warn the user that they are not being used! A
         # special warning is issued for the Preprocessor advanced config
         # keywords, which cannot be passed directly to the DeltaModel.
-        pp_only_kw = ['matrix', 'ensemble', 'set', 'parallel']
+        pp_only_kw = ['matrix', 'ensemble', 'set']
+        # remove special keywords from the dict of user YAML parameters
+        # these are keywords related to time or matrix/set expansion
+        _no_list = [
+            'timesteps', 'time', 'time_years', 'config', 'dryrun', 'parallel']
+        _ = [user_dict.pop(key) for key in _no_list if key in user_dict.keys()]
+        # identify unused parameters
         unused_user_keys = [k for k, v in user_dict.items() if not
                             (k in input_file_vars.keys())]
         if len(unused_user_keys) > 0:
@@ -496,7 +502,7 @@ class init_tools(abc.ABC):
             (self._Np_water, self.size_indices), dtype=np.int64)
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
-        
+
         # arrays acting as modifying hooks
         self.mod_water_weight = np.ones_like(self.depth)
         self.mod_sed_weight = np.ones_like(self.depth)

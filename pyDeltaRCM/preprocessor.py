@@ -493,10 +493,6 @@ class BasePreprocessor(abc.ABC):
         if len(self._config_list) == 0:
             raise ValueError('Config list empty!')
 
-        # do not write any time information to file
-        #   this list defines the time-related keywords
-        _time_list = ['timesteps', 'time', 'time_years']
-
         # loop through each job to write out info
         for c, config in enumerate(self.config_list):
 
@@ -504,10 +500,6 @@ class BasePreprocessor(abc.ABC):
             # ith_p = self._write_yaml_config(c, config)
             if self.verbose > 0:
                 print('Writing YAML file for job ' + str(int(c)))
-
-            # strip the time related parameters from the config
-            config_write = config.copy()
-            [config_write.pop(key) for key in _time_list if key in config_write.keys()]
 
             ith_dir = Path(config['out_dir'])       # job output folder
             ith_id = ith_dir.parts[-1]              # job id
@@ -525,7 +517,7 @@ class BasePreprocessor(abc.ABC):
 
             # write the file into the output directory
             ith_p = ith_dir / (str(ith_id) + '.yml')
-            _write_yaml_config_to_file(config_write, ith_p)
+            _write_yaml_config_to_file(config, ith_p)
 
             # append to the file list
             self._file_list.append(ith_p)
@@ -672,7 +664,7 @@ class _BaseJob(abc.ABC):
     """
 
     def __init__(self, i, input_file, config_dict,
-                 DeltaModel: Optional[Type[BaseDeltaModel]]=None, 
+                 DeltaModel: Optional[Type[BaseDeltaModel]]=None,
                  defer_output: bool=False) -> None:
         """Initialize a job.
 
@@ -775,7 +767,7 @@ class _SerialJob(_BaseJob):
         """
         # try to initialize and run the model
         try:
-            # run the simualtion
+            # run the simulation
             while self.deltamodel._time < self._job_end_time:
                 self.deltamodel.update()
 
@@ -1128,7 +1120,7 @@ def _write_yaml_config_to_file(_config, _path) -> None:
     """Write a config to file in output folder.
 
     Write the entire yaml configuration for the configured job out to a
-    file in the job output foler.
+    file in the job output folder.
 
     .. note::
 
