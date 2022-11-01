@@ -49,7 +49,10 @@ pidx = 85
 # set up axis
 # fig, ax = plt.subplots(1, 4, figsize=(10, 5))
 fig = plt.figure()
-gs = fig.add_gridspec(2, 2)
+gs = fig.add_gridspec(
+    2, 2,
+    wspace=0.3,
+    left=0.1, right=0.9)
 
 
 # fill in axis0
@@ -80,7 +83,5 @@ for i in range(n):
 
 ax2.set_ylabel('elevation')
 ax2.set_xlabel('steps along parcel path')
-
-plt.tight_layout()
 
 plt.show()
