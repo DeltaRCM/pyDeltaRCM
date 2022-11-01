@@ -32,7 +32,7 @@ NPLOT = 5
 hdr: int = NPLOT // 2
 
 # fig, ax = plt.subplots()
-fig = plt.figure(constrained_layout=False, figsize=(6, 9))
+fig = plt.figure(figsize=(6, 9))
 gs = fig.add_gridspec(
     nrows=NPLOT+hdr, ncols=5,
     left=0.05, right=0.95, top=0.95, bottom=0.05,

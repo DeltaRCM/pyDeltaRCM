@@ -48,7 +48,7 @@ pidx = 85
 
 # set up axis
 # fig, ax = plt.subplots(1, 4, figsize=(10, 5))
-fig = plt.figure(constrained_layout=True)
+fig = plt.figure()
 gs = fig.add_gridspec(2, 2)
 
 
