@@ -17,6 +17,7 @@
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Examples of using and working with pyDeltaRCM" href="../../examples/index.html" />
@@ -87,13 +88,13 @@ behavior at various stages of the model sequence.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_load_checkpoint" title="pyDeltaRCM.hook_tools.hook_tools.hook_load_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_load_checkpoint</span></code></a></p></td>
 <td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_init_water_iteration" title="pyDeltaRCM.hook_tools.hook_tools.hook_init_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_init_water_iteration</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_output_data" title="pyDeltaRCM.hook_tools.hook_tools.hook_output_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_output_data</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_init_output_file" title="pyDeltaRCM.hook_tools.hook_tools.hook_init_output_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_init_output_file</span></code></a></p></td>
 <td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_run_water_iteration" title="pyDeltaRCM.hook_tools.hook_tools.hook_run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_run_water_iteration</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_output_checkpoint" title="pyDeltaRCM.hook_tools.hook_tools.hook_output_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_output_checkpoint</span></code></a></p></td>
+<tr class="row-even"><td></td>
 <td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_compute_free_surface" title="pyDeltaRCM.hook_tools.hook_tools.hook_compute_free_surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_compute_free_surface</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_init_output_file" title="pyDeltaRCM.hook_tools.hook_tools.hook_init_output_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_init_output_file</span></code></a></p></td>
+<tr class="row-odd"><td></td>
 <td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_finalize_water_iteration" title="pyDeltaRCM.hook_tools.hook_tools.hook_finalize_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_finalize_water_iteration</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td></td>
@@ -116,6 +117,12 @@ behavior at various stages of the model sequence.</p>
 </tr>
 <tr class="row-even"><td></td>
 <td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_after_route_sediment" title="pyDeltaRCM.hook_tools.hook_tools.hook_after_route_sediment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_after_route_sediment</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_output_data" title="pyDeltaRCM.hook_tools.hook_tools.hook_output_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_output_data</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p><a class="reference internal" href="../hook_tools/index.html#pyDeltaRCM.hook_tools.hook_tools.hook_output_checkpoint" title="pyDeltaRCM.hook_tools.hook_tools.hook_output_checkpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hook_output_checkpoint</span></code></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -226,7 +233,7 @@ location to augment the model with varied behavior.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
 </html>

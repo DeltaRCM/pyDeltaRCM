@@ -17,6 +17,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Hydrodynamics" href="hydrodynamics.html" />
@@ -69,25 +70,25 @@ For 25 days of the flood event, the discharge is high enough to exceed the bankf
 To accelerate the computation time of models, we assume that the only important period of time is when the river is at-or-above bankfull discharge, and we collapse the hydrograph to a single value: the bankfull discharge.
 The choice of bankfull discharge for the single-value discharge assumption is a matter of convenience, in that this is readily estimated from field data or measurements.</p>
 <p>The duration of time represented by the single-value discharge assumption is also  determined by the hydrograph.
-We arrive at the so-called <em>intermittency factor</em> (<img class="math" src="../_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>) by finding the fraction of unit-time per unit-time when the river is in flood.
+We arrive at the so-called <em>intermittency factor</em> (<img class="math" src="_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>) by finding the fraction of unit-time per unit-time when the river is in flood.
 For this example, the intermittency factor scales between days and years as</p>
 <div class="math">
-<p><img src="../_images/math/13376e962d8f929d4c66b11ffefb730ef8b16cee.png" alt="\frac{25~\textrm{days}}{365.25~\textrm{days}} \approx 0.07 \equiv I_f"/></p>
+<p><img src="_images/math/13376e962d8f929d4c66b11ffefb730ef8b16cee.png" alt="\frac{25~\textrm{days}}{365.25~\textrm{days}} \approx 0.07 \equiv I_f"/></p>
 </div><p>The intermittency factor thus gives a relationship to scale pyDeltaRCM model time (which is always computed in units of seconds elapsed) from seconds to years.
-For example, for a model run that has elapsed <img class="math" src="../_images/math/c43bc0f79d7fa7584ab97c8973d389b8d8beddce.png" alt="4.32 \times 10^8"/> seconds and an assumed intermittency factor of 0.07:</p>
+For example, for a model run that has elapsed <img class="math" src="_images/math/c43bc0f79d7fa7584ab97c8973d389b8d8beddce.png" alt="4.32 \times 10^8"/> seconds and an assumed intermittency factor of 0.07:</p>
 <div class="math">
-<p><img src="../_images/math/333d8f4d40e5048332ca5078e0d9f853422b7fd2.png" alt="\frac{\textrm{seconds~elapsed}}{I_f} = \frac{4.32 \times 10^8~\textrm{seconds}}{0.07} = 6.17 \times 10^9~\textrm{seconds} \approx 196~\textrm{years}"/></p>
+<p><img src="_images/math/333d8f4d40e5048332ca5078e0d9f853422b7fd2.png" alt="\frac{\textrm{seconds~elapsed}}{I_f} = \frac{4.32 \times 10^8~\textrm{seconds}}{0.07} = 6.17 \times 10^9~\textrm{seconds} \approx 196~\textrm{years}"/></p>
 </div><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>A convenience function is supplied with the low-level API for these time conversions: <a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.scale_model_time" title="pyDeltaRCM.shared_tools.scale_model_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_model_time</span></code></a>.</p>
 </div>
 <p>Applying the intermittency assumption to a four year model simulation reveals the computational advantage of this approach.
-A simulation of every day in the simulation duration would require 1460 days of simulated time (<img class="math" src="../_images/math/cabb77baaacc77b37f3d89c80d3163825517c5a4.png" alt="1.26 \times 10^8"/> seconds).</p>
+A simulation of every day in the simulation duration would require 1460 days of simulated time (<img class="math" src="_images/math/cabb77baaacc77b37f3d89c80d3163825517c5a4.png" alt="1.26 \times 10^8"/> seconds).</p>
 <p>(<a class="reference external" href="../pyplots/modeltime/four_year_plot.png">png</a>, <a class="reference external" href="../pyplots/modeltime/four_year_plot.hires.png">hires.png</a>)</p>
 <figure class="align-default">
 <img alt="../_images/four_year_plot.png" class="plot-directive" src="../_images/four_year_plot.png" />
 </figure>
-<p>In contrast, by condensing the simulated time down to a bankfull discharge only, the intermittency assumption allows us to simulate the same “four year” period in just under 59 days of simulated time (<img class="math" src="../_images/math/87ae2712a99293393aa40bbce6755bae8987d7cf.png" alt="5.08 \times 10^6"/> seconds).</p>
+<p>In contrast, by condensing the simulated time down to a bankfull discharge only, the intermittency assumption allows us to simulate the same “four year” period in just under 59 days of simulated time (<img class="math" src="_images/math/87ae2712a99293393aa40bbce6755bae8987d7cf.png" alt="5.08 \times 10^6"/> seconds).</p>
 <section id="see-also">
 <h2>See also<a class="headerlink" href="#see-also" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
@@ -174,7 +175,7 @@ A simulation of every day in the simulation duration would require 1460 days of 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
 </html>

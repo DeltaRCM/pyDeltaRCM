@@ -17,6 +17,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Using custom classes with the Preprocessor" href="custom_class_preprocessor.html" />
@@ -67,7 +68,7 @@ The expected value for a given key is a list containing strings indicating the m
 Use of an invalid dimension will result in an error.</p>
 </div>
 <p>An example of using the hook and creating a model subclass to customize the figures, gridded variables, and metadata being saved is provided below.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyDeltaRCM</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyDeltaRCM</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">CustomSaveModel</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="sd">&quot;&quot;&quot;A subclass of DeltaModel to save custom figures and variables.</span>
@@ -103,7 +104,7 @@ Use of an invalid dimension will result in an error.</p>
 </div>
 <p>This subclass has added the active layer as a figure and a grid to be saved, as well as the number of water parcels as metadata to be saved.
 For simplicity we will just check that the appropriate parameters were added to the save figure and save variable lists, however please feel free to give this example a try on your local machine and examine the output figures and netCDF file.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;active_layer&#39;</span> <span class="ow">in</span> <span class="n">mdl</span><span class="o">.</span><span class="n">_save_fig_list</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;active_layer&#39;</span> <span class="ow">in</span> <span class="n">mdl</span><span class="o">.</span><span class="n">_save_fig_list</span>
 <span class="go">True</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mdl</span><span class="o">.</span><span class="n">_save_fig_list</span><span class="p">)</span>
@@ -172,7 +173,7 @@ For simplicity we will just check that the appropriate parameters were added to 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
 </html>

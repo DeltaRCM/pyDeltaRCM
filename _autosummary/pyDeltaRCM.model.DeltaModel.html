@@ -17,6 +17,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Default Model Variable Values" href="../reference/model/yaml_defaults.html" />
@@ -836,15 +837,15 @@ why the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.theta_w
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.dt">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.dt" title="Permalink to this definition">¶</a></dt>
 <dd><p>The time step.</p>
-<p>The value of the timestep (<img class="math" src="../_images/math/b4ed9c2e208e08edeca8b1550ec0840acd090276.png" alt="\Delta t"/>) is a balance between
+<p>The value of the timestep (<img class="math" src="_images/math/b4ed9c2e208e08edeca8b1550ec0840acd090276.png" alt="\Delta t"/>) is a balance between
 computation efficiency and model stability <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. The
 <a class="reference internal" href="../info/morphodynamics.html#reference-volume"><span class="std std-ref">Reference Volume</span></a>, which characterizes the
 volume of an inlet-channel cell, and the sediment discharge to the
 model domain scale the timestep as:</p>
 <div class="math">
-<p><img src="../_images/math/c47b2210e488f30a171e5050035de1dd3f9218a1.png" alt="\Delta t = \dfrac{0.1 {N_0}^2 V_0}{Q_{s0}}"/></p>
-</div><p>where <img class="math" src="../_images/math/0c34261ff5ef43c10b3f5dd1bd58d2239ed29cbe.png" alt="Q_{s0}"/> is the sediment discharge into the model domain
-(m:sup:<cite>3</cite>/s), <img class="math" src="../_images/math/3b91308a0751f9601ef49963a6a62565abff8ac7.png" alt="V_0"/> is the reference volume, and <img class="math" src="../_images/math/4018e0bf31c7f82b949cdb647953fb56e75af713.png" alt="N_0"/> is
+<p><img src="_images/math/c47b2210e488f30a171e5050035de1dd3f9218a1.png" alt="\Delta t = \dfrac{0.1 {N_0}^2 V_0}{Q_{s0}}"/></p>
+</div><p>where <img class="math" src="_images/math/0c34261ff5ef43c10b3f5dd1bd58d2239ed29cbe.png" alt="Q_{s0}"/> is the sediment discharge into the model domain
+(m:sup:<cite>3</cite>/s), <img class="math" src="_images/math/3b91308a0751f9601ef49963a6a62565abff8ac7.png" alt="V_0"/> is the reference volume, and <img class="math" src="_images/math/4018e0bf31c7f82b949cdb647953fb56e75af713.png" alt="N_0"/> is
 the number of cells across the channel (determined by <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.N0_meters" title="pyDeltaRCM.model.DeltaModel.N0_meters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N0_meters</span></code></a>
 and <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.dx" title="pyDeltaRCM.model.DeltaModel.dx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dx</span></code></a>).</p>
 <aside class="footnote-list brackets">
@@ -1358,6 +1359,101 @@ information, and a value of 2 increases the verbosity further.</p>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">pyDeltaRCM.model.DeltaModel</a><ul>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel"><code class="docutils literal notranslate"><span class="pre">DeltaModel</span></code></a><ul>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.__init__"><code class="docutils literal notranslate"><span class="pre">DeltaModel.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.C0_percent"><code class="docutils literal notranslate"><span class="pre">DeltaModel.C0_percent</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.Csmooth"><code class="docutils literal notranslate"><span class="pre">DeltaModel.Csmooth</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.H_SL"><code class="docutils literal notranslate"><span class="pre">DeltaModel.H_SL</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.If"><code class="docutils literal notranslate"><span class="pre">DeltaModel.If</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.L0_meters"><code class="docutils literal notranslate"><span class="pre">DeltaModel.L0_meters</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.Length"><code class="docutils literal notranslate"><span class="pre">DeltaModel.Length</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.N0_meters"><code class="docutils literal notranslate"><span class="pre">DeltaModel.N0_meters</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.Np_sed"><code class="docutils literal notranslate"><span class="pre">DeltaModel.Np_sed</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.Np_water"><code class="docutils literal notranslate"><span class="pre">DeltaModel.Np_water</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.Nsmooth"><code class="docutils literal notranslate"><span class="pre">DeltaModel.Nsmooth</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.S0"><code class="docutils literal notranslate"><span class="pre">DeltaModel.S0</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.SLR"><code class="docutils literal notranslate"><span class="pre">DeltaModel.SLR</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.Width"><code class="docutils literal notranslate"><span class="pre">DeltaModel.Width</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.active_layer_thickness"><code class="docutils literal notranslate"><span class="pre">DeltaModel.active_layer_thickness</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.alpha"><code class="docutils literal notranslate"><span class="pre">DeltaModel.alpha</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.bed_elevation"><code class="docutils literal notranslate"><span class="pre">DeltaModel.bed_elevation</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.bedload_fraction"><code class="docutils literal notranslate"><span class="pre">DeltaModel.bedload_fraction</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.beta"><code class="docutils literal notranslate"><span class="pre">DeltaModel.beta</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.channel_flow_depth"><code class="docutils literal notranslate"><span class="pre">DeltaModel.channel_flow_depth</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.channel_flow_velocity"><code class="docutils literal notranslate"><span class="pre">DeltaModel.channel_flow_velocity</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.channel_width"><code class="docutils literal notranslate"><span class="pre">DeltaModel.channel_width</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.checkpoint_dt"><code class="docutils literal notranslate"><span class="pre">DeltaModel.checkpoint_dt</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.clobber_netcdf"><code class="docutils literal notranslate"><span class="pre">DeltaModel.clobber_netcdf</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud"><code class="docutils literal notranslate"><span class="pre">DeltaModel.coeff_U_dep_mud</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud"><code class="docutils literal notranslate"><span class="pre">DeltaModel.coeff_U_ero_mud</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand"><code class="docutils literal notranslate"><span class="pre">DeltaModel.coeff_U_ero_sand</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.coeff_theta_mud"><code class="docutils literal notranslate"><span class="pre">DeltaModel.coeff_theta_mud</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.coeff_theta_sand"><code class="docutils literal notranslate"><span class="pre">DeltaModel.coeff_theta_sand</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.dt"><code class="docutils literal notranslate"><span class="pre">DeltaModel.dt</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.dx"><code class="docutils literal notranslate"><span class="pre">DeltaModel.dx</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.f_bedload"><code class="docutils literal notranslate"><span class="pre">DeltaModel.f_bedload</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.finalize"><code class="docutils literal notranslate"><span class="pre">DeltaModel.finalize()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.h0"><code class="docutils literal notranslate"><span class="pre">DeltaModel.h0</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.hb"><code class="docutils literal notranslate"><span class="pre">DeltaModel.hb</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.influx_sediment_concentration"><code class="docutils literal notranslate"><span class="pre">DeltaModel.influx_sediment_concentration</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.itermax"><code class="docutils literal notranslate"><span class="pre">DeltaModel.itermax</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.legacy_netcdf"><code class="docutils literal notranslate"><span class="pre">DeltaModel.legacy_netcdf</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.omega_flow"><code class="docutils literal notranslate"><span class="pre">DeltaModel.omega_flow</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.omega_sfc"><code class="docutils literal notranslate"><span class="pre">DeltaModel.omega_sfc</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.out_dir"><code class="docutils literal notranslate"><span class="pre">DeltaModel.out_dir</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.resume_checkpoint"><code class="docutils literal notranslate"><span class="pre">DeltaModel.resume_checkpoint</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.sand_frac_bc"><code class="docutils literal notranslate"><span class="pre">DeltaModel.sand_frac_bc</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_checkpoint"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_checkpoint</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_depth_figs"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_depth_figs</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_depth_grids"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_depth_grids</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_discharge_components"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_discharge_components</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_discharge_figs"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_discharge_figs</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_discharge_grids"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_discharge_grids</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_dt"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_dt</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_eta_figs"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_eta_figs</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_eta_grids"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_eta_grids</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_figs_sequential"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_figs_sequential</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_iter"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_iter</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_metadata"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_metadata</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_sandfrac_figs"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_sandfrac_figs</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_sandfrac_grids"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_sandfrac_grids</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_sedflux_figs"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_sedflux_figs</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_sedflux_grids"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_sedflux_grids</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_stage_figs"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_stage_figs</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_stage_grids"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_stage_grids</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_time_since_checkpoint"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_time_since_checkpoint</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_time_since_data"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_time_since_data</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_velocity_components"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_velocity_components</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_velocity_figs"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_velocity_figs</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.save_velocity_grids"><code class="docutils literal notranslate"><span class="pre">DeltaModel.save_velocity_grids</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.sea_surface_elevation"><code class="docutils literal notranslate"><span class="pre">DeltaModel.sea_surface_elevation</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.sea_surface_elevation_change"><code class="docutils literal notranslate"><span class="pre">DeltaModel.sea_surface_elevation_change</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.sea_surface_mean_elevation"><code class="docutils literal notranslate"><span class="pre">DeltaModel.sea_surface_mean_elevation</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.sed_lag"><code class="docutils literal notranslate"><span class="pre">DeltaModel.sed_lag</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.seed"><code class="docutils literal notranslate"><span class="pre">DeltaModel.seed</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.start_subsidence"><code class="docutils literal notranslate"><span class="pre">DeltaModel.start_subsidence</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.stepmax"><code class="docutils literal notranslate"><span class="pre">DeltaModel.stepmax</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.subsidence_rate"><code class="docutils literal notranslate"><span class="pre">DeltaModel.subsidence_rate</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.theta_water"><code class="docutils literal notranslate"><span class="pre">DeltaModel.theta_water</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.time"><code class="docutils literal notranslate"><span class="pre">DeltaModel.time</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.time_iter"><code class="docutils literal notranslate"><span class="pre">DeltaModel.time_iter</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.time_step"><code class="docutils literal notranslate"><span class="pre">DeltaModel.time_step</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.toggle_subsidence"><code class="docutils literal notranslate"><span class="pre">DeltaModel.toggle_subsidence</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.u0"><code class="docutils literal notranslate"><span class="pre">DeltaModel.u0</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update"><code class="docutils literal notranslate"><span class="pre">DeltaModel.update()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.verbose"><code class="docutils literal notranslate"><span class="pre">DeltaModel.verbose</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.water_depth"><code class="docutils literal notranslate"><span class="pre">DeltaModel.water_depth</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="../reference/model/index.html"
                           title="previous chapter">model</a></p>
@@ -1408,7 +1504,7 @@ information, and a value of 2 increases the verbosity further.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
 </html>

@@ -17,6 +17,7 @@
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="sed_tools" href="../sed_tools/index.html" />
@@ -512,8 +513,39 @@ with the resultant computed water surface.</p>
     <h3><a href="../../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">water_tools</a><ul>
-<li><a class="reference internal" href="#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
-<li><a class="reference internal" href="#water-tools-helper-functions">water_tools helper functions</a></li>
+<li><a class="reference internal" href="#public-api-methods-attached-to-model">Public API methods attached to model</a><ul>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools"><code class="docutils literal notranslate"><span class="pre">water_tools</span></code></a><ul>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.build_weight_array"><code class="docutils literal notranslate"><span class="pre">water_tools.build_weight_array()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.check_for_boundary"><code class="docutils literal notranslate"><span class="pre">water_tools.check_for_boundary()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.check_size_of_indices_matrix"><code class="docutils literal notranslate"><span class="pre">water_tools.check_size_of_indices_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.compute_free_surface"><code class="docutils literal notranslate"><span class="pre">water_tools.compute_free_surface()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.finalize_free_surface"><code class="docutils literal notranslate"><span class="pre">water_tools.finalize_free_surface()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.finalize_water_iteration"><code class="docutils literal notranslate"><span class="pre">water_tools.finalize_water_iteration()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.flooding_correction"><code class="docutils literal notranslate"><span class="pre">water_tools.flooding_correction()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water"><code class="docutils literal notranslate"><span class="pre">water_tools.get_inlet_weights_water()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.get_water_weight_array"><code class="docutils literal notranslate"><span class="pre">water_tools.get_water_weight_array()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.get_wet_mask_nh"><code class="docutils literal notranslate"><span class="pre">water_tools.get_wet_mask_nh()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.init_water_iteration"><code class="docutils literal notranslate"><span class="pre">water_tools.init_water_iteration()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.route_water"><code class="docutils literal notranslate"><span class="pre">water_tools.route_water()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.run_water_iteration"><code class="docutils literal notranslate"><span class="pre">water_tools.run_water_iteration()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.update_Q"><code class="docutils literal notranslate"><span class="pre">water_tools.update_Q()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.update_flow_field"><code class="docutils literal notranslate"><span class="pre">water_tools.update_flow_field()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.update_velocity_field"><code class="docutils literal notranslate"><span class="pre">water_tools.update_velocity_field()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#water-tools-helper-functions">water_tools helper functions</a><ul>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools._get_weight_at_cell_water"><code class="docutils literal notranslate"><span class="pre">_get_weight_at_cell_water()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools._choose_next_directions"><code class="docutils literal notranslate"><span class="pre">_choose_next_directions()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools._calculate_new_inds"><code class="docutils literal notranslate"><span class="pre">_calculate_new_inds()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools._check_for_loops"><code class="docutils literal notranslate"><span class="pre">_check_for_loops()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools._update_dirQfield"><code class="docutils literal notranslate"><span class="pre">_update_dirQfield()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools._update_absQfield"><code class="docutils literal notranslate"><span class="pre">_update_absQfield()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools._accumulate_free_surface_walks"><code class="docutils literal notranslate"><span class="pre">_accumulate_free_surface_walks()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.water_tools._smooth_free_surface"><code class="docutils literal notranslate"><span class="pre">_smooth_free_surface()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -569,7 +601,7 @@ with the resultant computed water surface.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
 </html>

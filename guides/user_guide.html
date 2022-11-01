@@ -17,6 +17,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Model Information" href="../info/index.html" />
@@ -197,15 +198,15 @@ It is also possible to specify the input run duration in units of years with the
 $ pyDeltaRCM --config model_configuration.yml --time_years <span class="m">1</span>
 </pre></div>
 </div>
-<p>would each run a simulation for <img class="math" src="../_images/math/e982197bf6146c4049a4a81b670f20fc7c481e96.png" alt="(86400 * 365.25)"/> seconds, or 1 year.</p>
+<p>would each run a simulation for <img class="math" src="_images/math/e982197bf6146c4049a4a81b670f20fc7c481e96.png" alt="(86400 * 365.25)"/> seconds, or 1 year.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Do not specify both time arguments, or specify time arguments with the timesteps argument.
 In the case of multiple argument specification, precedence is given in the order <cite>timesteps</cite> &gt; <cite>time</cite> &gt; <cite>time_years</cite>.</p>
 </div>
-<p>When specifying the time to run the simulation, an additional parameter determining the intermittency factor (<img class="math" src="../_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>) may be specified <code class="docutils literal notranslate"><span class="pre">--If</span></code> at the command line (<code class="docutils literal notranslate"><span class="pre">If:</span></code> in the YAML configuration file, <code class="docutils literal notranslate"><span class="pre">If=</span></code> with the Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code>).
+<p>When specifying the time to run the simulation, an additional parameter determining the intermittency factor (<img class="math" src="_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>) may be specified <code class="docutils literal notranslate"><span class="pre">--If</span></code> at the command line (<code class="docutils literal notranslate"><span class="pre">If:</span></code> in the YAML configuration file, <code class="docutils literal notranslate"><span class="pre">If=</span></code> with the Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code>).
 This argument will scale the specified time-to-model-time, such that the <em>scaled time</em> is equal to the input argument time.
-Specifying the <img class="math" src="../_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>  value is essential when using the model duration run specifications.
+Specifying the <img class="math" src="_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>  value is essential when using the model duration run specifications.
 See <a class="reference internal" href="../info/modeltime.html"><span class="doc">Time in pyDeltaRCM</span></a> for complete information on the scaling between model time and elapsed simulation time.</p>
 </section>
 <section id="running-simulations-in-parallel">
@@ -355,7 +356,7 @@ This flexibility is achieved by “subclassing” the <cite>DeltaModel</cite> to
 </div>
 <p>Subclassing is a standard concept in object-oriented programming, whereby a <cite>subclass</cite> obtains all the functionality of the <cite>parent</cite> object, and then adds/modifies existing functionality of the parent, to create a new class of object (i.e., the <cite>subclass</cite>).
 To subclass the <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel" title="pyDeltaRCM.model.DeltaModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DeltaModel</span></code></a> we simply create a new Python object class, which inherits from the model class:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyDeltaRCM</span>
 
@@ -367,7 +368,7 @@ To subclass the <a class="reference internal" href="../_autosummary/pyDeltaRCM.m
 </pre></div>
 </div>
 <p>We then can initialize our new model type, and see that this model has all of the attributes and functionality of the original <cite>DeltaModel</cite>, but its type is our subclass.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span> <span class="o">=</span> <span class="n">SubclassDeltaModel</span><span class="p">()</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span> <span class="o">=</span> <span class="n">SubclassDeltaModel</span><span class="p">()</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span>
 <span class="go">&lt;SubclassDeltaModel object at 0x...&gt;</span>
@@ -387,7 +388,7 @@ For example, <code class="docutils literal notranslate"><span class="pre">hook_s
 The standard is for a <cite>hook</cite> to describe the function name that it precedes.</p>
 <p>To utilize the hooks, we simply define a method in our subclass with the name corresponding to the hook we want to augment to achieve the desired behavior.
 For example, to change the behavior of the subsidence field to vary randomly in magnitude on each iteration:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyDeltaRCM.shared_tools</span> <span class="kn">import</span> <span class="n">get_random_uniform</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyDeltaRCM.shared_tools</span> <span class="kn">import</span> <span class="n">get_random_uniform</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">RandomSubsidenceModel</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -415,7 +416,7 @@ For example, to change the behavior of the subsidence field to vary randomly in 
 <span class="go">2e-09</span>
 </pre></div>
 </div>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 <span class="go">new_rate: 1.3125136806997149e-09</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 <span class="go">new_rate: 6.692607693286315e-10</span>
@@ -490,8 +491,8 @@ parameters:</p>
 <h3>Gridded Variables<a class="headerlink" href="#gridded-variables" title="Permalink to this heading">¶</a></h3>
 <p>In any given run, the saving parameters “save_&lt;var&gt;_grids” control whether or
 not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file. In
-the netCDF4 file, a 3-D array with the dimensions <cite>time</cite> <img class="math" src="../_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/>
-<cite>x</cite> <img class="math" src="../_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/> <cite>y</cite> is created for each 2-D grid variable that is set to
+the netCDF4 file, a 3-D array with the dimensions <cite>time</cite> <img class="math" src="_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/>
+<cite>x</cite> <img class="math" src="_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/> <cite>y</cite> is created for each 2-D grid variable that is set to
 be saved. Note that <cite>x</cite> is the <em>downstream</em> coordinate, rather than the
 Cartesian <cite>x</cite> when displaying the grid. The appropriate units for all
 variables are stored: for example “meters per second” for the <em>velocity</em>
@@ -700,7 +701,7 @@ Surf. Dynam., 3, 67–86, 2015. <a class="reference external" href="https://doi.
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
 </html>

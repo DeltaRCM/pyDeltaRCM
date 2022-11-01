@@ -17,6 +17,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Constraining subsidence to part of the domain" href="subsidence_region.html" />
@@ -55,7 +56,7 @@ Another possibility is that we would want to change the boundary conditions of t
 </pre></div>
 </div>
 <p>Now, we can see that by the default settings, after initialization, the model flow velocity is 1.0 m/s, flow depth is 5 m, and so the unit water discharge is 5 m2/s.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">u0</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">u0</span>
 <span class="go">1.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">h0</span>
 <span class="go">5.0</span>
@@ -64,11 +65,11 @@ Another possibility is that we would want to change the boundary conditions of t
 </pre></div>
 </div>
 <p>If after some number of model iterations, we wanted to change the inlet flow velocity to be 2.0 m/s, we could simply set this value directly.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">u0</span> <span class="o">=</span> <span class="mf">2.0</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">u0</span> <span class="o">=</span> <span class="mf">2.0</span>
 </pre></div>
 </div>
 <p>But, now the model has been thrown out of equilibrium, where the unit water discharge no longer matches the product of the flow depth and flow velocity.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">u0</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">u0</span>
 <span class="go">2.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">h0</span>
 <span class="go">5.0</span>
@@ -77,7 +78,7 @@ Another possibility is that we would want to change the boundary conditions of t
 </pre></div>
 </div>
 <p>To remedy this, we need to use the <a class="reference internal" href="../reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.create_boundary_conditions" title="pyDeltaRCM.init_tools.init_tools.create_boundary_conditions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_boundary_conditions</span></code></a> method, which will reinitialize a number of fields, based on the current value of the inlet flow velocity.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">create_boundary_conditions</span><span class="p">()</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">create_boundary_conditions</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mdl</span><span class="o">.</span><span class="n">qw0</span>
 <span class="go">10.0</span>
 </pre></div>
@@ -145,7 +146,7 @@ Another possibility is that we would want to change the boundary conditions of t
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
 </html>

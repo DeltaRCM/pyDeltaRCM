@@ -30,9 +30,9 @@ A complete list of hooks in the model follows:
     :obj:`~hook_tools.hook_create_other_variables`, :obj:`~hook_tools.hook_finalize_timestep`
     :obj:`~hook_tools.hook_create_domain`, :obj:`~hook_tools.hook_route_water`
     :obj:`~hook_tools.hook_load_checkpoint`, :obj:`~hook_tools.hook_init_water_iteration`
-    :obj:`~hook_tools.hook_output_data`, :obj:`~hook_tools.hook_run_water_iteration`
-    :obj:`~hook_tools.hook_output_checkpoint`, :obj:`~hook_tools.hook_compute_free_surface`
-    :obj:`~hook_tools.hook_init_output_file`, :obj:`~hook_tools.hook_finalize_water_iteration`
+    :obj:`~hook_tools.hook_init_output_file`, :obj:`~hook_tools.hook_run_water_iteration`
+    , :obj:`~hook_tools.hook_compute_free_surface`
+    , :obj:`~hook_tools.hook_finalize_water_iteration`
     , :obj:`~hook_tools.hook_route_sediment`
     , :obj:`~hook_tools.hook_route_all_sand_parcels`
     , :obj:`~hook_tools.hook_topo_diffusion`
@@ -40,6 +40,8 @@ A complete list of hooks in the model follows:
     , :obj:`~hook_tools.hook_compute_sand_frac`
     , :obj:`~hook_tools.hook_after_route_water`
     , :obj:`~hook_tools.hook_after_route_sediment`
+    , :obj:`~hook_tools.hook_output_data`
+    , :obj:`~hook_tools.hook_output_checkpoint`
 
 
 Array hooks

@@ -17,6 +17,7 @@
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pyDeltaRCM.sed_tools.SandRouter" href="../../_autosummary/pyDeltaRCM.sed_tools.SandRouter.html" />
@@ -229,9 +230,24 @@ document.</p>
     <h3><a href="../../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">sed_tools</a><ul>
-<li><a class="reference internal" href="#public-api-methods-attached-to-model">Public API methods attached to model</a></li>
+<li><a class="reference internal" href="#public-api-methods-attached-to-model">Public API methods attached to model</a><ul>
+<li><a class="reference internal" href="#pyDeltaRCM.sed_tools.sed_tools"><code class="docutils literal notranslate"><span class="pre">sed_tools</span></code></a><ul>
+<li><a class="reference internal" href="#pyDeltaRCM.sed_tools.sed_tools.get_inlet_weights_sediment"><code class="docutils literal notranslate"><span class="pre">sed_tools.get_inlet_weights_sediment()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.sed_tools.sed_tools.init_sediment_iteration"><code class="docutils literal notranslate"><span class="pre">sed_tools.init_sediment_iteration()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.sed_tools.sed_tools.route_all_mud_parcels"><code class="docutils literal notranslate"><span class="pre">sed_tools.route_all_mud_parcels()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.sed_tools.sed_tools.route_all_sand_parcels"><code class="docutils literal notranslate"><span class="pre">sed_tools.route_all_sand_parcels()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.sed_tools.sed_tools.route_sediment"><code class="docutils literal notranslate"><span class="pre">sed_tools.route_sediment()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.sed_tools.sed_tools.sed_route"><code class="docutils literal notranslate"><span class="pre">sed_tools.sed_route()</span></code></a></li>
+<li><a class="reference internal" href="#pyDeltaRCM.sed_tools.sed_tools.topo_diffusion"><code class="docutils literal notranslate"><span class="pre">sed_tools.topo_diffusion()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#router-classes">Router classes</a></li>
-<li><a class="reference internal" href="#sed-tools-helper-functions">sed_tools helper functions</a></li>
+<li><a class="reference internal" href="#sed-tools-helper-functions">sed_tools helper functions</a><ul>
+<li><a class="reference internal" href="#pyDeltaRCM.sed_tools._get_weight_at_cell_sediment"><code class="docutils literal notranslate"><span class="pre">_get_weight_at_cell_sediment()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -287,7 +303,7 @@ document.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
 </html>
