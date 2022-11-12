@@ -18,6 +18,7 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Default Model Variable Values" href="../reference/model/yaml_defaults.html" />
@@ -837,15 +838,15 @@ why the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.theta_w
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.dt">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.dt" title="Permalink to this definition">¶</a></dt>
 <dd><p>The time step.</p>
-<p>The value of the timestep (<img class="math" src="_images/math/b4ed9c2e208e08edeca8b1550ec0840acd090276.png" alt="\Delta t"/>) is a balance between
+<p>The value of the timestep (<span class="math notranslate nohighlight">\(\Delta t\)</span>) is a balance between
 computation efficiency and model stability <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. The
 <a class="reference internal" href="../info/morphodynamics.html#reference-volume"><span class="std std-ref">Reference Volume</span></a>, which characterizes the
 volume of an inlet-channel cell, and the sediment discharge to the
 model domain scale the timestep as:</p>
-<div class="math">
-<p><img src="_images/math/c47b2210e488f30a171e5050035de1dd3f9218a1.png" alt="\Delta t = \dfrac{0.1 {N_0}^2 V_0}{Q_{s0}}"/></p>
-</div><p>where <img class="math" src="_images/math/0c34261ff5ef43c10b3f5dd1bd58d2239ed29cbe.png" alt="Q_{s0}"/> is the sediment discharge into the model domain
-(m:sup:<cite>3</cite>/s), <img class="math" src="_images/math/3b91308a0751f9601ef49963a6a62565abff8ac7.png" alt="V_0"/> is the reference volume, and <img class="math" src="_images/math/4018e0bf31c7f82b949cdb647953fb56e75af713.png" alt="N_0"/> is
+<div class="math notranslate nohighlight">
+\[\Delta t = \dfrac{0.1 {N_0}^2 V_0}{Q_{s0}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q_{s0}\)</span> is the sediment discharge into the model domain
+(m:sup:<cite>3</cite>/s), <span class="math notranslate nohighlight">\(V_0\)</span> is the reference volume, and <span class="math notranslate nohighlight">\(N_0\)</span> is
 the number of cells across the channel (determined by <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.N0_meters" title="pyDeltaRCM.model.DeltaModel.N0_meters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">N0_meters</span></code></a>
 and <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.dx" title="pyDeltaRCM.model.DeltaModel.dx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dx</span></code></a>).</p>
 <aside class="footnote-list brackets">

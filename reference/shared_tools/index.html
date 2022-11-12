@@ -18,6 +18,7 @@
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="hook_tools" href="../hook_tools/index.html" />
@@ -338,11 +339,11 @@ assumption in configuring the model.</p>
 <p>Using this assumption, it is possible to scale up model time to “real”
 time, by assuming an <em>intermittency factor</em>. This intermittency factor is
 the fraction of unit-time that a river is assumed to be flooding.</p>
-<div class="math">
-<p><img src="_images/math/2d75bb2427bb5da598e66bd3bd6ccdc8561d6d86.png" alt="t_r = \dfrac{t}{I_f \cdot S_f}"/></p>
-</div><p>where <img class="math" src="_images/math/907a4add6d5db5b7f197f7924f1371b8ac404fe6.png" alt="t"/> is the model time (<code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code>),
-<img class="math" src="_images/math/ffcb6a2060a20a029a67b98d3c88ea7c8cf4a20f.png" alt="t_r"/> is the “real” scaled time, <img class="math" src="_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/> is the
-intermittency factor, and <img class="math" src="_images/math/c7fb815fe84c8475fc0a74414e2f871fc00a1092.png" alt="S_f"/> is the scale factor to convert base
+<div class="math notranslate nohighlight">
+\[t_r = \dfrac{t}{I_f \cdot S_f}\]</div>
+<p>where <span class="math notranslate nohighlight">\(t\)</span> is the model time (<code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code>),
+<span class="math notranslate nohighlight">\(t_r\)</span> is the “real” scaled time, <span class="math notranslate nohighlight">\(I_f\)</span> is the
+intermittency factor, and <span class="math notranslate nohighlight">\(S_f\)</span> is the scale factor to convert base
 units of seconds to units specified as an input argument. Note that this
 function uses <a class="reference internal" href="#pyDeltaRCM.shared_tools._scale_factor" title="pyDeltaRCM.shared_tools._scale_factor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_scale_factor</span></code></a> internally for this conversion.</p>
 <dl class="field-list simple">

@@ -18,6 +18,7 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Available Model Hooks" href="../reference/model/model_hooks.html" />
@@ -53,8 +54,8 @@
 <h2>Gridded Variables<a class="headerlink" href="#gridded-variables" title="Permalink to this heading">¶</a></h2>
 <p>In any given run, the saving parameters “save_&lt;var&gt;_grids” control whether or
 not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file. In
-the netCDF4 file, a 3-D array with the dimensions <cite>time</cite> <img class="math" src="_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/>
-<cite>x</cite> <img class="math" src="_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/> <cite>y</cite> is created for each 2-D grid variable that is set to
+the netCDF4 file, a 3-D array with the dimensions <cite>time</cite> <span class="math notranslate nohighlight">\(\times\)</span>
+<cite>x</cite> <span class="math notranslate nohighlight">\(\times\)</span> <cite>y</cite> is created for each 2-D grid variable that is set to
 be saved. Note that <cite>x</cite> is the <em>downstream</em> coordinate, rather than the
 Cartesian <cite>x</cite> when displaying the grid. The appropriate units for all
 variables are stored: for example “meters per second” for the <em>velocity</em>

@@ -18,6 +18,7 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Model Output File" href="outputfile.html" />
@@ -58,28 +59,28 @@ In this documentation, we focus on the details of <em>model implementation</em>,
 <p>Sediment transport in the model is computed according to an excess stress approach.
 Conceptually, sand is routed as bed-material load, and mud is routed as fully suspended load.</p>
 <p>For sand parcels, the <em>transport capacity</em> is determined by the scaling between sediment flux and flow velocity, and takes the form of the Meyer-Peter and Müller (1948) <a class="footnote-reference brackets" href="#id12" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> formula:</p>
-<div class="math">
-<p><img src="_images/math/59db6c5d6c1a3636509e6d2d270e44ea5f097c84.png" alt="q_{s\_cap} = q_{s0} \frac{u^\beta_{loc}}{u^\beta_0},"/></p>
-</div><p>where <img class="math" src="_images/math/cd628e888545793dd620fc5ee2f549da494e9a2b.png" alt="u_{loc}"/> is the depth averaged flow velocity in the cell, <img class="math" src="_images/math/f8a6d12e6efc3cc5d4e52fc44100fdb2ec898507.png" alt="beta"/> is an exponent set to 3 by default (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.beta" title="pyDeltaRCM.model.DeltaModel.beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beta</span></code></a>), and <img class="math" src="_images/math/7a866c6e95cb5af096afa2704e73059469867639.png" alt="q_{s0}"/> is the unit-width upstream sand flux input at the inlet channel.
-At each step of the model domain, sand is either eroded or deposited to the bed depending on the local flow velocity <img class="math" src="_images/math/cd628e888545793dd620fc5ee2f549da494e9a2b.png" alt="u_{loc}"/> and local sediment transport <img class="math" src="_images/math/3f9a12a01513863815d2bd442d8aa61a9642e4ba.png" alt="q_{s\_loc}"/>.
-Sand is deposited where local transport (i.e., the sand put into that cell from upstream) is greater than the cell transport capacity <img class="math" src="_images/math/bf988f5d0d66f3ff8c73d89921622b7261d50f7d.png" alt="q_{s\_loc} &gt; q_{s\_cap}"/>.
+<div class="math notranslate nohighlight">
+\[q_{s\_cap} = q_{s0} \frac{u^\beta_{loc}}{u^\beta_0},\]</div>
+<p>where <span class="math notranslate nohighlight">\(u_{loc}\)</span> is the depth averaged flow velocity in the cell, <span class="math notranslate nohighlight">\(beta\)</span> is an exponent set to 3 by default (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.beta" title="pyDeltaRCM.model.DeltaModel.beta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beta</span></code></a>), and <span class="math notranslate nohighlight">\(q_{s0}\)</span> is the unit-width upstream sand flux input at the inlet channel.
+At each step of the model domain, sand is either eroded or deposited to the bed depending on the local flow velocity <span class="math notranslate nohighlight">\(u_{loc}\)</span> and local sediment transport <span class="math notranslate nohighlight">\(q_{s\_loc}\)</span>.
+Sand is deposited where local transport (i.e., the sand put into that cell from upstream) is greater than the cell transport capacity <span class="math notranslate nohighlight">\(q_{s\_loc} &gt; q_{s\_cap}\)</span>.
 Sand is eroded from the bed when the local velocity is greater than the threshold erosion velocity (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand" title="pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_U_ero_sand</span></code></a>) <strong>and</strong> the local transport is less than the local transport capacity.</p>
 <p>Mud parcels do not have any local capacity (i.e., fully suspended washload transport).
-At each parcel step, mud is either eroded or deposited (or neither), depending on the relative value of local flow velocity <img class="math" src="_images/math/cd628e888545793dd620fc5ee2f549da494e9a2b.png" alt="u_{loc}"/> and the threshold erosion and deposition values (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud" title="pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_U_ero_mud</span></code></a> and <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud" title="pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_U_dep_mud</span></code></a>).</p>
+At each parcel step, mud is either eroded or deposited (or neither), depending on the relative value of local flow velocity <span class="math notranslate nohighlight">\(u_{loc}\)</span> and the threshold erosion and deposition values (<a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud" title="pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_U_ero_mud</span></code></a> and <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud" title="pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_U_dep_mud</span></code></a>).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>A complete conceptual description of sediment erosion and deposition routing rules can be found in the original DeltaRCM reference Liang et al., 2015 <a class="footnote-reference brackets" href="#id10" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 </div>
 <section id="sediment-routing-weighting">
 <span id="id5"></span><h3>Sediment routing weighting<a class="headerlink" href="#sediment-routing-weighting" title="Permalink to this heading">¶</a></h3>
-<p>Sediment routing probability for a given cell <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> to neighbor cell <img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> is computed according to:</p>
-<div class="math">
-<p><img src="_images/math/e30c6e04e007a9386ee17f37a5fd4b36a49a1631.png" alt="w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},"/></p>
-</div><p>where <img class="math" src="_images/math/d0fdd2411a0ba9823e9ef1ab94256a799bd363f1.png" alt="\mathbf{F}"/> is the local routing direction and <img class="math" src="_images/math/a91fc0075deda7aa751025e224ca9b225b67511b.png" alt="\mathbf{d_i}"/> is a unit vector pointing to neighbor <img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> from cell <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/>, and <img class="math" src="_images/math/0fa07fac5e639b4533a7931b30c81199768d9599.png" alt="\Delta_i"/> is the cellular distance to neighbor <img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> (<img class="math" src="_images/math/ec830c85a5fbb48028fe797044da6bdfb924c2fa.png" alt="1"/> for cells in main compass directions and <img class="math" src="_images/math/8db467030dc4a1799b53811c4d3e227c3511fb3f.png" alt="\sqrt{2}"/> for corner cells.
-<img class="math" src="_images/math/8d47777d070e3b1ae6a9ea0d4918309bc8c942fe.png" alt="R_i"/> is a resistance estimated as an inverse function of local water depth (<img class="math" src="_images/math/b6e2c1bc7d8a8ef8bc3878348c32e442f102d286.png" alt="h_i"/>):</p>
-<div class="math">
-<p><img src="_images/math/13c7f33eab6c0cee4f35fdec32c0f28208978dcb.png" alt="R_i = \frac{1}{{h_i}^\theta}."/></p>
-</div><p>Here, <img class="math" src="_images/math/8a87f04e7d7cca18343c084cceca5237fae62491.png" alt="\theta"/> takes the value of <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_theta_sand" title="pyDeltaRCM.model.DeltaModel.coeff_theta_sand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_theta_sand</span></code></a> for sand routing probabilities, and <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_theta_mud" title="pyDeltaRCM.model.DeltaModel.coeff_theta_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_theta_mud</span></code></a> for mud routing.</p>
+<p>Sediment routing probability for a given cell <span class="math notranslate nohighlight">\(j\)</span> to neighbor cell <span class="math notranslate nohighlight">\(i\)</span> is computed according to:</p>
+<div class="math notranslate nohighlight">
+\[w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{F}\)</span> is the local routing direction and <span class="math notranslate nohighlight">\(\mathbf{d_i}\)</span> is a unit vector pointing to neighbor <span class="math notranslate nohighlight">\(i\)</span> from cell <span class="math notranslate nohighlight">\(j\)</span>, and <span class="math notranslate nohighlight">\(\Delta_i\)</span> is the cellular distance to neighbor <span class="math notranslate nohighlight">\(i\)</span> (<span class="math notranslate nohighlight">\(1\)</span> for cells in main compass directions and <span class="math notranslate nohighlight">\(\sqrt{2}\)</span> for corner cells.
+<span class="math notranslate nohighlight">\(R_i\)</span> is a resistance estimated as an inverse function of local water depth (<span class="math notranslate nohighlight">\(h_i\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[R_i = \frac{1}{{h_i}^\theta}.\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(\theta\)</span> takes the value of <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_theta_sand" title="pyDeltaRCM.model.DeltaModel.coeff_theta_sand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_theta_sand</span></code></a> for sand routing probabilities, and <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_theta_mud" title="pyDeltaRCM.model.DeltaModel.coeff_theta_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_theta_mud</span></code></a> for mud routing.</p>
 <p>(<a class="reference external" href="../pyplots/sed_tools/sediment_weights_examples.png">png</a>, <a class="reference external" href="../pyplots/sed_tools/sediment_weights_examples.hires.png">hires.png</a>)</p>
 <figure class="align-default">
 <img alt="../_images/sediment_weights_examples.png" class="plot-directive" src="../_images/sediment_weights_examples.png" />
@@ -91,9 +92,9 @@ At each parcel step, mud is either eroded or deposited (or neither), depending o
 <p>Along the walk of a sediment parcel, the sediment parcel volume is modulated on each step, according to the sediment transport rules described above in <a class="reference internal" href="#sediment-transport"><span class="std std-ref">Sediment Transport</span></a>.
 As the volume of the sediment parcel changes, the channel bed elevation at the current parcel location is updated to reflect this volume change (<code class="xref py py-obj docutils literal notranslate"><span class="pre">_update_fields</span></code>), i.e., the bed is eroded or sediment is deposited on the bed.
 The vertical change in the channel bed is dictated by sediment mass conservation (i.e., Exner equation) and is equal to:</p>
-<div class="math">
-<p><img src="_images/math/f920a10551bf3adf4f05166c47f238d11605cde0.png" alt="\Delta \eta = \Delta V / dx^2"/></p>
-</div><p>where <img class="math" src="_images/math/f465ef3c39d3fcacdb5a0200658903bdad960cc3.png" alt="\Delta V"/> is the volume of sediment to be eroded or deposited from the bed at a given cell along the parcel walk.</p>
+<div class="math notranslate nohighlight">
+\[\Delta \eta = \Delta V / dx^2\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta V\)</span> is the volume of sediment to be eroded or deposited from the bed at a given cell along the parcel walk.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Total sediment mass is preserved during erosion, but individual categories of sand and mud are not. I.e., it is assumed that there is an infinite supply of sand and/or mud to erode and entrain at any location in the model domain.</p>
@@ -137,11 +138,11 @@ Rapid and/or abrupt bed elevation change trigger numerical instability that can 
 A number of processes are included in the DeltaRCM framework to help limit the possibility of failed runs.</p>
 <section id="reference-volume">
 <span id="id8"></span><h3>Reference Volume<a class="headerlink" href="#reference-volume" title="Permalink to this heading">¶</a></h3>
-<p>The reference volume if the foundational unit (<img class="math" src="_images/math/3b91308a0751f9601ef49963a6a62565abff8ac7.png" alt="V_0"/>) impacting model stability.
+<p>The reference volume if the foundational unit (<span class="math notranslate nohighlight">\(V_0\)</span>) impacting model stability.
 This value characterizes the volume on one inlet-channel cell, from the channel bed to the water surface:</p>
-<div class="math">
-<p><img src="_images/math/b4e91286a8f51d0b71ddf02c45157553294bd73f.png" alt="V_0 = h_0 {\delta_c}^2"/></p>
-</div><p>where <img class="math" src="_images/math/6c74a61cdf90a8a3b50f62a58910b84d0fe23678.png" alt="h_0"/> is the inlet channel depth (meters) and <img class="math" src="_images/math/81509bfb60ff6ac0869c47031aa4e06e50e7184d.png" alt="\delta_c"/> is the cell length (meters).</p>
+<div class="math notranslate nohighlight">
+\[V_0 = h_0 {\delta_c}^2\]</div>
+<p>where <span class="math notranslate nohighlight">\(h_0\)</span> is the inlet channel depth (meters) and <span class="math notranslate nohighlight">\(\delta_c\)</span> is the cell length (meters).</p>
 </section>
 <section id="time-stepping">
 <h3>Time stepping<a class="headerlink" href="#time-stepping" title="Permalink to this heading">¶</a></h3>
@@ -149,9 +150,9 @@ This value characterizes the volume on one inlet-channel cell, from the channel 
 Recall that for each iteration, the number of parcels and input sediment discharge (as <cite>h0 u0 (c0_percent)/100</cite>) are set by the user (fixed).
 Therefore, to control stability, the duration of time represented by each iteration (i.e., the timestep) is determined such that changes in bed elevation per iteration are small.
 The model timestep is determined as:</p>
-<div class="math">
-<p><img src="_images/math/7acf8c4fbc255e6ce5b6b4d738b4992ee5528dee.png" alt="dt = dV_s / N_{p,sed}"/></p>
-</div><p>where <img class="math" src="_images/math/53f1a1cb0a3875d649f49c4984cdc96d7a453280.png" alt="N_{p,sed}"/> is the number of sediment parcels, <img class="math" src="_images/math/5e2e880d7fb77e8066f35762fe3603a136537d7f.png" alt="dV_s"/> is a characteristic sediment volume, based on the reference volume and inlet width as <img class="math" src="_images/math/83a2ce3891062175714d89b9f7d6c093308c405e.png" alt="dV_s = 0.1 N_0^2 V_0"/>, where <img class="math" src="_images/math/4018e0bf31c7f82b949cdb647953fb56e75af713.png" alt="N_0"/> is the number of cells across the inlet.</p>
+<div class="math notranslate nohighlight">
+\[dt = dV_s / N_{p,sed}\]</div>
+<p>where <span class="math notranslate nohighlight">\(N_{p,sed}\)</span> is the number of sediment parcels, <span class="math notranslate nohighlight">\(dV_s\)</span> is a characteristic sediment volume, based on the reference volume and inlet width as <span class="math notranslate nohighlight">\(dV_s = 0.1 N_0^2 V_0\)</span>, where <span class="math notranslate nohighlight">\(N_0\)</span> is the number of cells across the inlet.</p>
 </section>
 <section id="limiting-bed-elevation-change">
 <h3>Limiting bed elevation change<a class="headerlink" href="#limiting-bed-elevation-change" title="Permalink to this heading">¶</a></h3>

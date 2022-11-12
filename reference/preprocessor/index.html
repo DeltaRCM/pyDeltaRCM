@@ -18,6 +18,7 @@
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pyDeltaRCM.preprocessor.PreprocessorCLI" href="../../_autosummary/pyDeltaRCM.preprocessor.PreprocessorCLI.html" />
@@ -104,10 +105,10 @@ model framework needs to assume an “intermittency factor” to convert from
 real-world time to model time.</p>
 <p>Relative sea level rise (subsidence and/or sea level rise) are scaled from
 real world dimensions of mm/yr to model input as:</p>
-<div class="math">
-<p><img src="_images/math/f5d8c1b0cba30fdcd1b9fb9e3bf33c2e359d5970.png" alt="\widehat{RSLR} = (RSLR / 1000) \cdot \dfrac{1}{I_f \cdot 365.25 \cdot 86400}"/></p>
-</div><p>This conversion makes it such that when one real-world year has elapsed
-(<img class="math" src="_images/math/5ddce203faa1abd468c10f2aa3ae1f914fd458a3.png" alt="I_f \cdot 365.25 \cdot 86400"/> seconds in model time), the relative
+<div class="math notranslate nohighlight">
+\[\widehat{RSLR} = (RSLR / 1000) \cdot \dfrac{1}{I_f \cdot 365.25 \cdot 86400}\]</div>
+<p>This conversion makes it such that when one real-world year has elapsed
+(<span class="math notranslate nohighlight">\(I_f \cdot 365.25 \cdot 86400\)</span> seconds in model time), the relative
 sea level has changed by the number of millimeters specified in the input
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">mmyr</span></code>.</p>
 <div class="admonition note">

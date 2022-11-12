@@ -18,6 +18,7 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Changing topographic diffusion to represent tree throw" href="overwrite_topo_diffusion.html" />
@@ -65,9 +66,9 @@ We’ll set this up in a function, so that it can be called from the model subcl
 </pre></div>
 </div>
 <p>The function we define takes the <cite>end_time</cite> of the model run, as well as some shape parameters, and computes according to:</p>
-<div class="math">
-<p><img src="_images/math/ed05394b56946357f821cdf9e51be7f1ec93022d.png" alt="y = a \sin \left( \frac{ \left( t - h \right) }{ b } \right) + k"/></p>
-</div><p>where <img class="math" src="_images/math/907a4add6d5db5b7f197f7924f1371b8ac404fe6.png" alt="t"/> is the time array in seconds.
+<div class="math notranslate nohighlight">
+\[y = a \sin \left( \frac{ \left( t - h \right) }{ b } \right) + k\]</div>
+<p>where <span class="math notranslate nohighlight">\(t\)</span> is the time array in seconds.
 We can inspect the result of this function, as it will be called in the model subclass below.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">end_time</span> <span class="o">=</span> <span class="mi">86400</span> <span class="o">*</span> <span class="mi">100</span>
 <span class="n">_time_array</span><span class="p">,</span> <span class="n">_velocity_array</span> <span class="o">=</span> <span class="n">create_velocity_array</span><span class="p">(</span>

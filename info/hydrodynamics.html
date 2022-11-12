@@ -18,6 +18,7 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Morphodynamics" href="morphodynamics.html" />
@@ -55,21 +56,21 @@ In this documentation, we focus on the details of <em>model implementation</em>,
 <section id="routing-individual-water-parcels">
 <h2>Routing individual water parcels<a class="headerlink" href="#routing-individual-water-parcels" title="Permalink to this heading">¶</a></h2>
 <p>Probabilities for water parcel routing <em>to all neighbors and to self</em> for <em>each cell</em> are computed <em>once</em> at the beginning of the water routing routine (<a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.get_water_weight_array" title="pyDeltaRCM.water_tools.water_tools.get_water_weight_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_water_weight_array</span></code></a> called from <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="pyDeltaRCM.water_tools.water_tools.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>).</p>
-<p>Water routing probability for a given cell <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> to neighbor cell <img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> is computed according to:</p>
-<div class="math">
-<p><img src="_images/math/e30c6e04e007a9386ee17f37a5fd4b36a49a1631.png" alt="w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},"/></p>
-</div><p>where <img class="math" src="_images/math/d0fdd2411a0ba9823e9ef1ab94256a799bd363f1.png" alt="\mathbf{F}"/> is the local routing direction and <img class="math" src="_images/math/a91fc0075deda7aa751025e224ca9b225b67511b.png" alt="\mathbf{d_i}"/> is a unit vector pointing to neighbor <img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> from cell <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/>, and <img class="math" src="_images/math/0fa07fac5e639b4533a7931b30c81199768d9599.png" alt="\Delta_i"/> is the cellular distance to neighbor <img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> (<img class="math" src="_images/math/ec830c85a5fbb48028fe797044da6bdfb924c2fa.png" alt="1"/> for cells in main compass directions and <img class="math" src="_images/math/8db467030dc4a1799b53811c4d3e227c3511fb3f.png" alt="\sqrt{2}"/> for corner cells.
-<img class="math" src="_images/math/8d47777d070e3b1ae6a9ea0d4918309bc8c942fe.png" alt="R_i"/> is a flow resistance estimated as an inverse function of local water depth (<img class="math" src="_images/math/b6e2c1bc7d8a8ef8bc3878348c32e442f102d286.png" alt="h_i"/>):</p>
-<div class="math">
-<p><img src="_images/math/9f67e70ac774d96cc50708c09038f8233e2edc33.png" alt="R_i = \frac{1}{{h_i}^\theta}"/></p>
-</div><p>The exponent <img class="math" src="_images/math/8a87f04e7d7cca18343c084cceca5237fae62491.png" alt="\theta"/> takes a value of unity by default for water routing (<code class="xref py py-attr docutils literal notranslate"><span class="pre">theta_water</span></code>, <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">Default Model Variable Values</span></a>), leading to routing weight for neighbor cell <img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/>:</p>
-<div class="math">
-<p><img src="_images/math/921cd8a3043ba48fc967ff41f3b5599dc199de5e.png" alt="w_i = \frac{h_i \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},"/></p>
-</div><p>These weights above are calculated only for wet neighbor cells; all dry neighbor cells take a weight value of 0 (<code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_weight_at_cell_water</span></code>).
-Finally, probability for routing from cell <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> to cell <img class="math" src="_images/math/5aa339d4daf45a810dda332e3c80a0698e526e04.png" alt="i"/> is calculated as:</p>
-<div class="math">
-<p><img src="_images/math/ca5d376545810cdc8ae08eb3150a6726ba16ee86.png" alt="p_i = \frac{w_i}{\sum^8_{nb=1} w_{nb}}, i=1, 2, \ldots, 8"/></p>
-</div><p>Weights are accumulated for 8 neighbors and a probability of 0 is assigned to moving from cell <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> to cell <img class="math" src="_images/math/e3fc28292267f066fee7718c64f4bbfece521f24.png" alt="j"/> (i.e., no movement).
+<p>Water routing probability for a given cell <span class="math notranslate nohighlight">\(j\)</span> to neighbor cell <span class="math notranslate nohighlight">\(i\)</span> is computed according to:</p>
+<div class="math notranslate nohighlight">
+\[w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{F}\)</span> is the local routing direction and <span class="math notranslate nohighlight">\(\mathbf{d_i}\)</span> is a unit vector pointing to neighbor <span class="math notranslate nohighlight">\(i\)</span> from cell <span class="math notranslate nohighlight">\(j\)</span>, and <span class="math notranslate nohighlight">\(\Delta_i\)</span> is the cellular distance to neighbor <span class="math notranslate nohighlight">\(i\)</span> (<span class="math notranslate nohighlight">\(1\)</span> for cells in main compass directions and <span class="math notranslate nohighlight">\(\sqrt{2}\)</span> for corner cells.
+<span class="math notranslate nohighlight">\(R_i\)</span> is a flow resistance estimated as an inverse function of local water depth (<span class="math notranslate nohighlight">\(h_i\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[R_i = \frac{1}{{h_i}^\theta}\]</div>
+<p>The exponent <span class="math notranslate nohighlight">\(\theta\)</span> takes a value of unity by default for water routing (<code class="xref py py-attr docutils literal notranslate"><span class="pre">theta_water</span></code>, <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">Default Model Variable Values</span></a>), leading to routing weight for neighbor cell <span class="math notranslate nohighlight">\(i\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[w_i = \frac{h_i \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},\]</div>
+<p>These weights above are calculated only for wet neighbor cells; all dry neighbor cells take a weight value of 0 (<code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_weight_at_cell_water</span></code>).
+Finally, probability for routing from cell <span class="math notranslate nohighlight">\(j\)</span> to cell <span class="math notranslate nohighlight">\(i\)</span> is calculated as:</p>
+<div class="math notranslate nohighlight">
+\[p_i = \frac{w_i}{\sum^8_{nb=1} w_{nb}}, i=1, 2, \ldots, 8\]</div>
+<p>Weights are accumulated for 8 neighbors and a probability of 0 is assigned to moving from cell <span class="math notranslate nohighlight">\(j\)</span> to cell <span class="math notranslate nohighlight">\(j\)</span> (i.e., no movement).
 These 9 probabilities are organized into an array <code class="docutils literal notranslate"><span class="pre">self.water_weights</span></code> with shape (<code class="xref py py-obj docutils literal notranslate"><span class="pre">L</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">W</span></code>, 9)`.</p>
 <p>The following figure shows several examples of locations within the model domain, and the corresponding water routing weights determined for that location.</p>
 <p>(<a class="reference external" href="../pyplots/water_tools/water_weights_examples.png">png</a>, <a class="reference external" href="../pyplots/water_tools/water_weights_examples.hires.png">hires.png</a>)</p>

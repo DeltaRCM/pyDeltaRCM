@@ -18,6 +18,7 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Model Information" href="../info/index.html" />
@@ -198,15 +199,15 @@ It is also possible to specify the input run duration in units of years with the
 $ pyDeltaRCM --config model_configuration.yml --time_years <span class="m">1</span>
 </pre></div>
 </div>
-<p>would each run a simulation for <img class="math" src="_images/math/e982197bf6146c4049a4a81b670f20fc7c481e96.png" alt="(86400 * 365.25)"/> seconds, or 1 year.</p>
+<p>would each run a simulation for <span class="math notranslate nohighlight">\((86400 * 365.25)\)</span> seconds, or 1 year.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Do not specify both time arguments, or specify time arguments with the timesteps argument.
 In the case of multiple argument specification, precedence is given in the order <cite>timesteps</cite> &gt; <cite>time</cite> &gt; <cite>time_years</cite>.</p>
 </div>
-<p>When specifying the time to run the simulation, an additional parameter determining the intermittency factor (<img class="math" src="_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>) may be specified <code class="docutils literal notranslate"><span class="pre">--If</span></code> at the command line (<code class="docutils literal notranslate"><span class="pre">If:</span></code> in the YAML configuration file, <code class="docutils literal notranslate"><span class="pre">If=</span></code> with the Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code>).
+<p>When specifying the time to run the simulation, an additional parameter determining the intermittency factor (<span class="math notranslate nohighlight">\(I_f\)</span>) may be specified <code class="docutils literal notranslate"><span class="pre">--If</span></code> at the command line (<code class="docutils literal notranslate"><span class="pre">If:</span></code> in the YAML configuration file, <code class="docutils literal notranslate"><span class="pre">If=</span></code> with the Python <code class="xref py py-obj docutils literal notranslate"><span class="pre">Preprocessor</span></code>).
 This argument will scale the specified time-to-model-time, such that the <em>scaled time</em> is equal to the input argument time.
-Specifying the <img class="math" src="_images/math/8ee585ce9480abcfdcc2aa9bf73f3ace0b23028f.png" alt="I_f"/>  value is essential when using the model duration run specifications.
+Specifying the <span class="math notranslate nohighlight">\(I_f\)</span>  value is essential when using the model duration run specifications.
 See <a class="reference internal" href="../info/modeltime.html"><span class="doc">Time in pyDeltaRCM</span></a> for complete information on the scaling between model time and elapsed simulation time.</p>
 </section>
 <section id="running-simulations-in-parallel">
@@ -491,8 +492,8 @@ parameters:</p>
 <h3>Gridded Variables<a class="headerlink" href="#gridded-variables" title="Permalink to this heading">¶</a></h3>
 <p>In any given run, the saving parameters “save_&lt;var&gt;_grids” control whether or
 not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file. In
-the netCDF4 file, a 3-D array with the dimensions <cite>time</cite> <img class="math" src="_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/>
-<cite>x</cite> <img class="math" src="_images/math/8ef1f282527041d7d5c4a46dd2c60a02a7a7c00b.png" alt="\times"/> <cite>y</cite> is created for each 2-D grid variable that is set to
+the netCDF4 file, a 3-D array with the dimensions <cite>time</cite> <span class="math notranslate nohighlight">\(\times\)</span>
+<cite>x</cite> <span class="math notranslate nohighlight">\(\times\)</span> <cite>y</cite> is created for each 2-D grid variable that is set to
 be saved. Note that <cite>x</cite> is the <em>downstream</em> coordinate, rather than the
 Cartesian <cite>x</cite> when displaying the grid. The appropriate units for all
 variables are stored: for example “meters per second” for the <em>velocity</em>
