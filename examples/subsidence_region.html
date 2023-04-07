@@ -13,9 +13,6 @@
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -53,7 +50,7 @@ This model configuration can be readily achieved with model subclassing.</p>
 <section id="setting-up-the-custom-subclass">
 <h2>Setting up the custom subclass<a class="headerlink" href="#setting-up-the-custom-subclass" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ConstrainedSubsidenceModel</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A simple subclass of DeltaModel with subsidence region constrained.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A simple subclass of DeltaModel with subsidence region constrained.</span>
 
 <span class="sd">    This subclass *overwrites* the `init_subsidence` method to</span>
 <span class="sd">    constrain subsidence to only one region of the model domain.</span>
@@ -64,7 +61,7 @@ This model configuration can be readily achieved with model subclassing.</p>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">init_subsidence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initialize subsidence pattern constrained to a tighter region.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize subsidence pattern constrained to a tighter region.</span>
 
 <span class="sd">        Uses theta1 and theta2 to set the angular bounds for the</span>
 <span class="sd">        subsiding region. theta1 and theta2 are set in relation to the</span>
@@ -109,7 +106,7 @@ Note that the colorscale depicts the magnitude of subsidence in the model <em>pe
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>(<a class="reference external" href="../examples/subsidence_region-3.png">png</a>, <a class="reference external" href="../examples/subsidence_region-3.hires.png">hires.png</a>)</p>
+<p>(<a class="reference download internal" download="" href="../_downloads/958d16e9ecd540bda86417b6cdb1a086/subsidence_region-3.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/772baa40d0922725c626f06bf9b3e05a/subsidence_region-3.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
 <figure class="align-default">
 <img alt="../_images/subsidence_region-3.png" class="plot-directive" src="../_images/subsidence_region-3.png" />
 </figure>
@@ -170,7 +167,7 @@ For example, in a Python script, following the definition of the subclass above,
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>(<a class="reference external" href="../examples/subsidence_region-7.png">png</a>, <a class="reference external" href="../examples/subsidence_region-7.hires.png">hires.png</a>)</p>
+<p>(<a class="reference download internal" download="" href="../_downloads/5f0e940b107a35d7fee2e923ff0097f8/subsidence_region-7.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/d47db60dc9502491bc7629c1e0130443/subsidence_region-7.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
 <figure class="align-default">
 <img alt="../_images/subsidence_region-7.png" class="plot-directive" src="../_images/subsidence_region-7.png" />
 </figure>
@@ -253,7 +250,7 @@ enough to change the morphology of river deltas?, Geophysical Research Letters, 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>

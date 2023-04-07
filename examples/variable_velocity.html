@@ -13,9 +13,6 @@
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -57,7 +54,7 @@ In this example, we set up an array of values to use for the inlet flow velocity
 <p>First, let’s set up the boundary condition array we want to use.
 We’ll set this up in a function, so that it can be called from the model subclass, as well as here for plotting.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_velocity_array</span><span class="p">(</span><span class="n">end_time</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">5e4</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mf">3.2</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create velocity timeseries.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create velocity timeseries.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 
@@ -82,7 +79,7 @@ We can inspect the result of this function, as it will be called in the model su
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>(<a class="reference external" href="../examples/variable_velocity-2.png">png</a>, <a class="reference external" href="../examples/variable_velocity-2.hires.png">hires.png</a>)</p>
+<p>(<a class="reference download internal" download="" href="../_downloads/d36db98f1b6712a27ce0048a56046c10/variable_velocity-2.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/f527081ac7b82310776bd73916446004/variable_velocity-2.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
 <figure class="align-default">
 <img alt="../_images/variable_velocity-2.png" class="plot-directive" src="../_images/variable_velocity-2.png" />
 </figure>
@@ -91,7 +88,7 @@ We can inspect the result of this function, as it will be called in the model su
 <h2>Define the model subclass<a class="headerlink" href="#define-the-model-subclass" title="Permalink to this heading">¶</a></h2>
 <p>We define a model subclass to handle the changing boundary condition:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ChangingVelocityModel</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Model with changing flow velocity.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Model with changing flow velocity.</span>
 
 <span class="sd">    Create a model that changes the inlet flow velocity throughout the run.</span>
 <span class="sd">    In this example, the velocity is changed on each timestep, and the value</span>
@@ -108,7 +105,7 @@ We can inspect the result of this function, as it will be called in the model su
             <span class="n">end_time</span><span class="p">)</span>  <span class="c1"># use default shape parameters for the array</span>
 
     <span class="k">def</span> <span class="nf">hook_solve_water_and_sediment_timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Change the velocity.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Change the velocity.&quot;&quot;&quot;</span>
 
         <span class="c1"># find the new velocity and set it to the model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_array</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocity_array</span><span class="p">)</span>
@@ -204,7 +201,7 @@ We can inspect the result of this function, as it will be called in the model su
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>
