@@ -105,3 +105,13 @@ html_theme = 'sphinxdoc'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 # html_static_path = []
+
+# -- Options for linkcheck -------------------------------------------
+
+# Some DOI links throw 403 errors but when checked they work fine
+linkcheck_ignore = [
+    r'https://doi.org/10.1029/2021GL095053',
+    r'https://doi.org/10.1029/2018GL079405',
+    r'https://doi.org/10.1029/2022JF006762',
+    r'https://doi.org/10.1086/626637'
+]
