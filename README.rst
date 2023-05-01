@@ -12,7 +12,7 @@ pyDeltaRCM
     :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
 
 .. image:: https://codecov.io/gh/DeltaRCM/pyDeltaRCM/branch/develop/graph/badge.svg
-  :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM
+    :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM
 
 .. image:: https://app.codacy.com/project/badge/Grade/1c137d0227914741a9ba09f0b00a49a7
     :target: https://www.codacy.com/gh/DeltaRCM/pyDeltaRCM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DeltaRCM/pyDeltaRCM&amp;utm_campaign=Badge_Grade
@@ -55,6 +55,31 @@ Executing the model
 We recommend you check out our `pyDeltaRCM in 10 minutes tutorial <https://deltarcm.org/pyDeltaRCM/guides/10min.html>`_, which is part of our documentation.
 
 Beyond that brief tutorial, we have a comprehensive `User Documentation <https://deltarcm.org/pyDeltaRCM/index.html#user-documentation>`_ and `Developer Documentation <https://deltarcm.org/pyDeltaRCM/index.html#developer-documentation>`_ to check out.
+
+
+Citing pyDeltaRCM
+#################
+
+When citing *pyDeltaRCM*, please cite the `JOSS paper <https://doi.org/10.21105/joss.03398>`_:
+
+	Moodie et al., (2021). pyDeltaRCM: a flexible numerical delta model. Journal of Open Source Software, 6(64), 3398, https://doi.org/10.21105/joss.03398
+	
+If you use BibTeX, you can add *pyDeltaRCM* to your `.bib` file using the following code:
+
+.. code:: console
+
+	@article{Moodie2021,
+	doi = {10.21105/joss.03398},
+	url = {https://doi.org/10.21105/joss.03398},
+	year = {2021},
+	publisher = {The Open Journal},
+	volume = {6},
+	number = {64},
+	pages = {3398},
+	author = {Andrew J. Moodie and Jayaram Hariharan and Eric Barefoot and Paola Passalacqua},
+	title = {*pyDeltaRCM*: a flexible numerical delta model},
+	journal = {Journal of Open Source Software}
+	}
 
 
 Additional notes

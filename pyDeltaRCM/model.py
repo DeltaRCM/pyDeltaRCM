@@ -51,7 +51,7 @@ class DeltaModel(
             Whether to create the output netCDF file during initialization. In
             most cases, this can be ignored and left to default value `False`.
             However, for parallel simulations it may be necessary to defer the
-            NetCDF file creation unitl the simualtion is assigned to the core
+            NetCDF file creation until the simulation is assigned to the core
             it will compute on, so that the DeltaModel object remains
             pickle-able. Note, you will need to manually trigger the
             :obj:`init_output_file`, :obj:`output_data`, and
@@ -62,7 +62,7 @@ class DeltaModel(
             be passed as a keyword argument to the instantiation of the
             DeltaModel. Keywords will override the specification of any value
             in the YAML file. This functionality is intended for advanced use
-            cases, and should not be preffered to specifying all inputs in a
+            cases, and should not be preferred to specifying all inputs in a
             YAML configuration file.
 
         Returns
