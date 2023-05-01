@@ -171,7 +171,9 @@ def get_inlet_weights(inlet):
 
 
 @njit
-def get_start_indices(inlet: np.ndarray, inlet_weights: np.ndarray, num_starts: int) -> np.ndarray:
+def get_start_indices(
+    inlet: np.ndarray, inlet_weights: np.ndarray, num_starts: int
+) -> np.ndarray:
     """Get start indices.
 
     Reutrn a randomly generated list of starting points for parcel routing.
@@ -213,7 +215,7 @@ def get_steps(new_direction: int, iwalk, jwalk) -> Tuple[float, int, int, bool]:
     istep = iwalk[new_direction]
     jstep = jwalk[new_direction]
     dist = np.sqrt(istep * istep + jstep * jstep)
-    astep = (dist != 0)
+    astep = dist != 0
 
     return dist, istep, jstep, astep
 
@@ -238,7 +240,7 @@ def random_pick(prob):
     return arr[np.searchsorted(cumprob, get_random_uniform(cumprob[-1]))]
 
 
-@njit('UniTuple(int64, 2)(int64, UniTuple(int64, 2))')
+@njit("UniTuple(int64, 2)(int64, UniTuple(int64, 2))")
 def custom_unravel(i: int, shape: Tuple[int, int]) -> Tuple[int, int]:
     """Unravel indexes for 2D array.
 
@@ -286,7 +288,7 @@ def custom_unravel(i: int, shape: Tuple[int, int]) -> Tuple[int, int]:
     return x, y
 
 
-@njit('int64(UniTuple(int64, 2), UniTuple(int64, 2))')
+@njit("int64(UniTuple(int64, 2), UniTuple(int64, 2))")
 def custom_ravel(tup: Tuple[int, int], shape: Tuple[int, int]) -> int:
     """Ravel indexes for 2D array.
 
@@ -390,7 +392,7 @@ def custom_pad(arr: np.ndarray) -> np.ndarray:
 
     """
     old_shape = arr.shape
-    new_shape = (old_shape[0]+2, old_shape[1]+2)
+    new_shape = (old_shape[0] + 2, old_shape[1] + 2)
     pad = np.zeros(new_shape, dtype=arr.dtype)
 
     # center
@@ -450,6 +452,7 @@ def _get_version() -> str:
         >>> pyDeltaRCM.shared_tools._get_version()  # doctest: +SKIP
     """
     from . import _version
+
     return _version.__version__()
 
 
@@ -473,7 +476,7 @@ def _docs_temp_directory() -> Iterator[str]:
         ...     delta = pyDeltaRCM.DeltaModel(out_dir=output_dir)
     """
     tmpdir = tempfile.TemporaryDirectory()
-    output_path = os.path.join(tmpdir.name, 'output')
+    output_path = os.path.join(tmpdir.name, "output")
     yield output_path
     tmpdir.cleanup()
 
@@ -501,18 +504,22 @@ def custom_yaml_loader() -> Type[yaml.loader.SafeLoader]:
     """
     loader = yaml.SafeLoader
     loader.add_implicit_resolver(
-        u'tag:yaml.org,2002:float',
-        re.compile(r'''^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+]?[0-9]+)?
+        "tag:yaml.org,2002:float",
+        re.compile(
+            r"""^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+]?[0-9]+)?
                        |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
                        |\.[0-9_]+(?:[eE][-+]?[0-9]+)?
                        |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*
                        |[-+]?\.(?:inf|Inf|INF)
-                       |\.(?:nan|NaN|NAN))$''', re.X),
-        list(u'-+0123456789.'))
+                       |\.(?:nan|NaN|NAN))$""",
+            re.X,
+        ),
+        list("-+0123456789."),
+    )
     return loader
 
 
-def scale_model_time(time: float, If: float = 1, units: str ='seconds') -> float:
+def scale_model_time(time: float, If: float = 1, units: str = "seconds") -> float:
     """Scale the model time to "real" time.
 
     Model time is executed as assumed flooding conditions, and executed at the
@@ -565,8 +572,7 @@ def scale_model_time(time: float, If: float = 1, units: str ='seconds') -> float
         if the value for intermittency is not ``0 < If <= 1``.
     """
     if (If <= 0) or (If > 1):
-        raise ValueError(
-            'Intermittency `If` is not 0 < If <= 1: %s' % str(If))
+        raise ValueError("Intermittency `If` is not 0 < If <= 1: %s" % str(If))
 
     return time / _scale_factor(If, units)
 
@@ -588,12 +594,12 @@ def _scale_factor(If: float, units: str) -> float:
         `['seconds', 'days', 'years']`.
 
     """
-    if units == 'seconds':
+    if units == "seconds":
         S_f = 1
-    elif units == 'days':
+    elif units == "days":
         S_f = sec_in_day
-    elif units == 'years':
+    elif units == "years":
         S_f = sec_in_day * day_in_yr
     else:
-        raise ValueError('Bad value for `units`: %s' % str(units))
-    return (If * S_f)
+        raise ValueError("Bad value for `units`: %s" % str(units))
+    return If * S_f

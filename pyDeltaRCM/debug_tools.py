@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -37,16 +36,19 @@ class debug_tools(abc.ABC):
     .. plot:: debug_tools/debug_demo.py
 
     """
+
     def _get_attribute(self, attribute):
         _attr = getattr(self, attribute)
         if not isinstance(_attr, np.ndarray):
-            raise TypeError('Attribute must be a numpy.ndarray, but was:'
-                            '%s' % str(type(_attr)))
+            raise TypeError(
+                "Attribute must be a numpy.ndarray, but was:" "%s" % str(type(_attr))
+            )
         _attr_shape = _attr.shape
         if len(_attr_shape) != 2:
-            raise ValueError('Attribute "{at}" has shape {shp}, '
-                             'but must be two-dimensional.'.format(at=attribute,
-                                                                   shp=_attr_shape))
+            raise ValueError(
+                'Attribute "{at}" has shape {shp}, '
+                "but must be two-dimensional.".format(at=attribute, shp=_attr_shape)
+            )
         return _attr
 
     def show_attribute(self, attribute: str, **kwargs) -> None:
@@ -75,8 +77,9 @@ class debug_tools(abc.ABC):
         """
 
         if not isinstance(attribute, str):
-            raise TypeError('Expected string for `attribute`, but was %s'
-                            % type(attribute))
+            raise TypeError(
+                "Expected string for `attribute`, but was %s" % type(attribute)
+            )
         _attr = self._get_attribute(attribute)
         plot_domain(_attr, **kwargs)
 
@@ -118,7 +121,9 @@ class debug_tools(abc.ABC):
         else:
             plot_ind(ind, shape=_shape, *args, **kwargs)
 
-    def show_line(self, ind, *args, multiline: bool = False, nozeros: bool = False, **kwargs):
+    def show_line(
+        self, ind, *args, multiline: bool = False, nozeros: bool = False, **kwargs
+    ):
         """Show line within the model domain.
 
         Show the location of lines (a series of connected indices) within the
@@ -169,30 +174,36 @@ class debug_tools(abc.ABC):
         _shape = self.depth.shape
         if isinstance(ind, list):
             for _, iind in enumerate(ind):
-                _l = plot_line(iind.flatten(),
-                               shape=_shape, nozeros=nozeros,
-                               *args, **kwargs)
+                _l = plot_line(
+                    iind.flatten(), shape=_shape, nozeros=nozeros, *args, **kwargs
+                )
                 lines = [_l]
         elif isinstance(ind, np.ndarray):
             if ind.ndim > 2:
-                raise NotImplementedError('Not implemented for arrays > 2d.')
+                raise NotImplementedError("Not implemented for arrays > 2d.")
             elif ind.ndim > 1:
                 if multiline:
                     # travel along axis, extracting lines
-                    cm = matplotlib.cm.get_cmap('tab10')
+                    cm = matplotlib.cm.get_cmap("tab10")
                     lines = []
                     for i in np.arange(ind.shape[1]):
-                        _l = plot_line(ind[:, i], *args, multiline=multiline,
-                                       nozeros=nozeros, shape=_shape,
-                                       color=cm(i), **kwargs)
+                        _l = plot_line(
+                            ind[:, i],
+                            *args,
+                            multiline=multiline,
+                            nozeros=nozeros,
+                            shape=_shape,
+                            color=cm(i),
+                            **kwargs
+                        )
                         lines.append(_l)
                 else:
                     _l = plot_line(ind, *args, nozeros=nozeros, **kwargs)
                     lines = [_l]
             else:
-                _l = plot_line(ind.flatten(),
-                               shape=_shape, nozeros=nozeros,
-                               *args, **kwargs)
+                _l = plot_line(
+                    ind.flatten(), shape=_shape, nozeros=nozeros, *args, **kwargs
+                )
                 lines = [_l]
 
         else:
@@ -200,7 +211,9 @@ class debug_tools(abc.ABC):
         return lines
 
 
-def plot_domain(attr, ax=None, grid: bool = True, block: bool = False, label=None, **kwargs) -> None:
+def plot_domain(
+    attr, ax=None, grid: bool = True, block: bool = False, label=None, **kwargs
+) -> None:
     """Plot the model domain.
 
     Public function to plot *any* 2d grid with helper display utils.
@@ -231,16 +244,13 @@ def plot_domain(attr, ax=None, grid: bool = True, block: bool = False, label=Non
     if not ax:
         ax = plt.gca()
 
-    cmap = kwargs.pop('cmap', None)
-    if (cmap is None):
-        cmap = plt.get_cmap('viridis')
+    cmap = kwargs.pop("cmap", None)
+    if cmap is None:
+        cmap = plt.get_cmap("viridis")
     # else:
-        # cmap = plt.get_cmap(cmap)
+    # cmap = plt.get_cmap(cmap)
 
-    cobj = ax.imshow(attr,
-                     cmap=cmap,
-                     interpolation='none',
-                     **kwargs)
+    cobj = ax.imshow(attr, cmap=cmap, interpolation="none", **kwargs)
     divider = axtk.axes_divider.make_axes_locatable(ax)
     cax = divider.append_axes("right", size="2%", pad=0.05)
     cbar = plt.colorbar(cobj, cax=cax)
@@ -251,10 +261,10 @@ def plot_domain(attr, ax=None, grid: bool = True, block: bool = False, label=Non
         shp = attr_shape
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.set_xticks(np.arange(-.5, shp[1], 1), minor=True)
-        ax.set_yticks(np.arange(-.5, shp[0], 1), minor=True)
-        ax.tick_params(which='minor', length=0)
-        ax.grid(which='minor', color='k', linestyle='-', linewidth=0.5)
+        ax.set_xticks(np.arange(-0.5, shp[1], 1), minor=True)
+        ax.set_yticks(np.arange(-0.5, shp[0], 1), minor=True)
+        ax.tick_params(which="minor", length=0)
+        ax.grid(which="minor", color="k", linestyle="-", linewidth=0.5)
 
     if label:
         cbar.ax.set_ylabel(label)
@@ -275,8 +285,8 @@ def plot_ind(_ind, *args, shape=None, **kwargs) -> None:
 
     .. todo:: add examples, pull from tests.
     """
-    ax = kwargs.pop('ax', None)
-    block = kwargs.pop('block', False)
+    ax = kwargs.pop("ax", None)
+    block = kwargs.pop("block", False)
 
     _shape = shape
 
@@ -285,17 +295,18 @@ def plot_ind(_ind, *args, shape=None, **kwargs) -> None:
 
     if len(args) == 0:
         # args = 'r.',
-        if not ('color' in kwargs.keys()):
-            kwargs['color'] = 'red'
-        if not ('marker' in kwargs.keys()):
-            kwargs['marker'] = '.'
+        if not ("color" in kwargs.keys()):
+            kwargs["color"] = "red"
+        if not ("marker" in kwargs.keys()):
+            kwargs["marker"] = "."
     if isinstance(_ind, tuple):
         if not len(_ind) == 2:
-            raise ValueError('Expected tuple length to be 2, but was %s'
-                             % str(len(_ind)))
+            raise ValueError(
+                "Expected tuple length to be 2, but was %s" % str(len(_ind))
+            )
     else:
-        if (_shape is None):
-            raise ValueError('Shape of array must be given to unravel index.')
+        if _shape is None:
+            raise ValueError("Shape of array must be given to unravel index.")
         if isinstance(_ind, np.ndarray):
             _ind = _ind[0]
         _ind = shared_tools.custom_unravel(_ind, _shape)
@@ -317,9 +328,9 @@ def plot_line(_ind, *args, shape=None, nozeros: bool = False, **kwargs):
 
     .. todo:: add examples, pull from tests.
     """
-    ax = kwargs.pop('ax', None)
-    block = kwargs.pop('block', False)
-    multiline = kwargs.pop('multiline', False)
+    ax = kwargs.pop("ax", None)
+    block = kwargs.pop("block", False)
+    multiline = kwargs.pop("multiline", False)
 
     _shape = shape
 
@@ -328,10 +339,10 @@ def plot_line(_ind, *args, shape=None, nozeros: bool = False, **kwargs):
 
     if len(args) == 0:
         # args = 'k-',
-        if not ('color' in kwargs.keys()):
-            kwargs['color'] = 'k'
-        if not ('marker' in kwargs.keys()):
-            kwargs['ls'] = '-'
+        if not ("color" in kwargs.keys()):
+            kwargs["color"] = "k"
+        if not ("marker" in kwargs.keys()):
+            kwargs["ls"] = "-"
     if isinstance(_ind, tuple):
         raise NotImplementedError
         # if not len(_ind) == 2:
@@ -340,9 +351,8 @@ def plot_line(_ind, *args, shape=None, nozeros: bool = False, **kwargs):
     else:
         if isinstance(_ind, np.ndarray):
             if multiline:
-                if (_shape is None):
-                    raise ValueError(
-                        'Shape of array must be given to unravel index.')
+                if _shape is None:
+                    raise ValueError("Shape of array must be given to unravel index.")
                 pxpys = np.zeros((_ind.shape[0], 2))
                 for i in range(_ind.shape[0]):
                     if _ind[i] == 0:
@@ -356,20 +366,23 @@ def plot_line(_ind, *args, shape=None, nozeros: bool = False, **kwargs):
                 if _ind.ndim > 1:
                     pxpys = np.fliplr(_ind)
                 else:
-                    if (_shape is None):
+                    if _shape is None:
                         raise ValueError(
-                            'Shape of array must be given to unravel index.')
+                            "Shape of array must be given to unravel index."
+                        )
                     pxpys = np.zeros((_ind.shape[0], 2))
                     for i in range(_ind.shape[0]):
                         if _ind[i] == 0:
                             if nozeros:
                                 pxpys[i, :] = np.nan, np.nan
                             else:
-                                pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
+                                pxpys[i, :] = shared_tools.custom_unravel(
+                                    _ind[i], _shape
+                                )
                         else:
                             pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
 
-    _l, = ax.plot(pxpys[:, 1], pxpys[:, 0], *args, **kwargs)
+    (_l,) = ax.plot(pxpys[:, 1], pxpys[:, 0], *args, **kwargs)
 
     if block:
         plt.show()
