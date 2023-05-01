@@ -47,11 +47,13 @@ class iteration_tools(abc.ABC):
 
     def run_one_timestep(self) -> None:
         """Deprecated, since v1.3.1. Use :obj:`solve_water_and_sediment_timestep`."""
-        _msg = ('`run_one_timestep` and `hook_run_one_timestep` are '
-                'deprecated and have been replaced with '
-                '`solve_water_and_sediment_timestep`. '
-                'Running `solve_water_and_sediment_timestep` now, but '
-                'this will be removed in future release.')
+        _msg = (
+            "`run_one_timestep` and `hook_run_one_timestep` are "
+            "deprecated and have been replaced with "
+            "`solve_water_and_sediment_timestep`. "
+            "Running `solve_water_and_sediment_timestep` now, but "
+            "this will be removed in future release."
+        )
         self.logger.warning(_msg)
         warnings.warn(UserWarning(_msg))
         self.solve_water_and_sediment_timestep()
@@ -76,10 +78,8 @@ class iteration_tools(abc.ABC):
 
         """
         if self._toggle_subsidence:
-
             if self._time >= self._start_subsidence:
-
-                _msg = 'Applying subsidence'
+                _msg = "Applying subsidence"
                 self.log_info(_msg, verbosity=1)
 
                 self.eta[:] = self.eta - self.sigma
@@ -99,7 +99,7 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        _msg = 'Finalizing timestep'
+        _msg = "Finalizing timestep"
         self.log_info(_msg, verbosity=2)
 
         self.flooding_correction()
@@ -135,18 +135,16 @@ class iteration_tools(abc.ABC):
         Reports the time to the log file, and depending on verbosity, will
         report it to stdout.
         """
-        _timemsg = 'Time: {time:.{digits}f}; timestep: {timestep:g}'.format(
-            time=self._time, timestep=self._time_iter, digits=1)
+        _timemsg = "Time: {time:.{digits}f}; timestep: {timestep:g}".format(
+            time=self._time, timestep=self._time_iter, digits=1
+        )
         self.logger.info(_timemsg)
         if self._verbose > 0:
             print(_timemsg)
 
     def output_data(self) -> None:
-        """Output grids and figures if needed.
-
-        """
+        """Output grids and figures if needed."""
         if self._save_time_since_data >= self.save_dt:
-
             self.save_grids_and_figs()
 
             self._save_iter += int(1)
@@ -166,19 +164,19 @@ class iteration_tools(abc.ABC):
 
         """
         if self._save_time_since_checkpoint >= self.checkpoint_dt:
-
             if self._save_checkpoint:
-
-                _msg = 'Saving checkpoint'
+                _msg = "Saving checkpoint"
                 self.log_info(_msg, verbosity=1)
 
                 self.save_the_checkpoint()
 
                 if self._checkpoint_dt != self._save_dt:
-                    _msg = ('Grid save interval and checkpoint interval are '
-                            'not identical, this may result in duplicate '
-                            'entries in the output NetCDF4 after resuming '
-                            'the model run.')
+                    _msg = (
+                        "Grid save interval and checkpoint interval are "
+                        "not identical, this may result in duplicate "
+                        "entries in the output NetCDF4 after resuming "
+                        "the model run."
+                    )
                     self.logger.warning(_msg)
 
                 self._save_time_since_checkpoint = 0
@@ -193,7 +191,7 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        _msg = 'Computing bed sand fraction'
+        _msg = "Computing bed sand fraction"
         self.log_info(_msg, verbosity=2)
 
         # layer attributes at time t
@@ -204,7 +202,7 @@ class iteration_tools(abc.ABC):
         deta = self.eta - self.eta0
 
         # everywhere the bed has degraded this timestep
-        whr_deg = (deta < 0)
+        whr_deg = deta < 0
         if np.any(whr_deg):
             # find where the erosion exceeded the active layer
             whr_unkwn = self.eta < actlyr_bot
@@ -219,14 +217,13 @@ class iteration_tools(abc.ABC):
             self.sand_frac[whr_actero] = self.active_layer[whr_actero]
 
         # handle aggradation/deposition
-        whr_agg = (deta > 0)
-        whr_agg = np.logical_or(
-            (self.Vp_dep_sand > 0), (self.Vp_dep_mud > 0.000001))
+        whr_agg = deta > 0
+        whr_agg = np.logical_or((self.Vp_dep_sand > 0), (self.Vp_dep_mud > 0.000001))
         if np.any(whr_agg):
             # sand_frac and active_layer becomes the mixture of the deposit
-            mixture = (self.Vp_dep_sand[whr_agg] /
-                       (self.Vp_dep_mud[whr_agg] +
-                        self.Vp_dep_sand[whr_agg]))
+            mixture = self.Vp_dep_sand[whr_agg] / (
+                self.Vp_dep_mud[whr_agg] + self.Vp_dep_sand[whr_agg]
+            )
 
             # update sand_frac in act layer to this value
             self.sand_frac[whr_agg] = mixture
@@ -253,76 +250,75 @@ class iteration_tools(abc.ABC):
         """
         save_idx = self.save_iter
 
-        _msg = ' '.join((
-            'Saving data to output file:',
-            str(save_idx).zfill(5)))
+        _msg = " ".join(("Saving data to output file:", str(save_idx).zfill(5)))
         self.log_info(_msg, verbosity=1)
 
-        if (self._save_metadata or self._save_any_grids):
-            self.output_netcdf.variables['time'][save_idx] = self._time
+        if self._save_metadata or self._save_any_grids:
+            self.output_netcdf.variables["time"][save_idx] = self._time
 
         # ------------------ Figures ------------------
         if len(self._save_fig_list) > 0:
-
-            _msg = 'Saving figures'
+            _msg = "Saving figures"
             self.log_info(_msg, verbosity=2)
 
             for f in self._save_fig_list.keys():
                 _attr = getattr(self, self._save_fig_list[f][0])
                 if isinstance(_attr, np.ndarray):
                     if _attr.shape == (self.L, self.W):
-                        _fig = self.make_figure(self._save_fig_list[f][0],
-                                                self._time)
-                        self.save_figure(_fig, directory=self.prefix,
-                                         filename_root=f+'_',
-                                         save_iter=self.save_iter)
+                        _fig = self.make_figure(self._save_fig_list[f][0], self._time)
+                        self.save_figure(
+                            _fig,
+                            directory=self.prefix,
+                            filename_root=f + "_",
+                            save_iter=self.save_iter,
+                        )
                     else:
-                        raise AttributeError('Attribute "{_k}" is not of the '
-                                             'right shape to be saved as a '
-                                             'figure using the built-in '
-                                             'methods. Expected a shape of '
-                                             '"{_expshp}", but it has a shape '
-                                             'of "{_wasshp}". Consider making '
-                                             'a custom plotting utility to '
-                                             'visualize this attribute.'
-                                             .format(_k=f,
-                                                     _expshp=(self.L, self.W),
-                                                     _wasshp=_attr.shape))
+                        raise AttributeError(
+                            'Attribute "{_k}" is not of the '
+                            "right shape to be saved as a "
+                            "figure using the built-in "
+                            "methods. Expected a shape of "
+                            '"{_expshp}", but it has a shape '
+                            'of "{_wasshp}". Consider making '
+                            "a custom plotting utility to "
+                            "visualize this attribute.".format(
+                                _k=f, _expshp=(self.L, self.W), _wasshp=_attr.shape
+                            )
+                        )
                 else:
-                    raise AttributeError('Only plotting of np.ndarray-type '
-                                         'attributes is natively supported. '
-                                         'Input "{_k}" was of type "{_wt}".'
-                                         .format(_k=f, _wt=type(_attr)))
+                    raise AttributeError(
+                        "Only plotting of np.ndarray-type "
+                        "attributes is natively supported. "
+                        'Input "{_k}" was of type "{_wt}".'.format(
+                            _k=f, _wt=type(_attr)
+                        )
+                    )
 
         # ------------------ grids ------------------
         if self._save_any_grids:
-
-            _msg = 'Saving grids'
+            _msg = "Saving grids"
             self.log_info(_msg, verbosity=2)
 
             _var_list = list(self._save_var_list.keys())
-            _var_list.remove('meta')
+            _var_list.remove("meta")
             for _val in _var_list:
-                self.save_grids(_val, getattr(self,
-                                              self._save_var_list[_val][0]),
-                                save_idx)
+                self.save_grids(
+                    _val, getattr(self, self._save_var_list[_val][0]), save_idx
+                )
 
         # ------------------ metadata ------------------
         if self._save_metadata:
-
-            _msg = 'Saving metadata'
+            _msg = "Saving metadata"
             self.log_info(_msg, verbosity=2)
 
-            for _val in self._save_var_list['meta'].keys():
+            for _val in self._save_var_list["meta"].keys():
                 # use knowledge of time-varying values to save them
-                if (self._save_var_list['meta'][_val][0] is None):
-                    self.output_netcdf['meta'][_val][save_idx] = \
-                        getattr(self, _val)
+                if self._save_var_list["meta"][_val][0] is None:
+                    self.output_netcdf["meta"][_val][save_idx] = getattr(self, _val)
 
         # -------------------- sync --------------------
-        if (self._save_metadata or self._save_any_grids):
-
-            _msg = 'Syncing data to output file'
+        if self._save_metadata or self._save_any_grids:
+            _msg = "Syncing data to output file"
             self.log_info(_msg, verbosity=2)
 
             self.output_netcdf.sync()
@@ -347,23 +343,29 @@ class iteration_tools(abc.ABC):
         _data = getattr(self, var)
 
         fig, ax = plt.subplots()
-        im = ax.pcolormesh(self.X, self.Y, _data, shading='flat')
+        im = ax.pcolormesh(self.X, self.Y, _data, shading="flat")
         ax.set_xlim((0, self._Width))
         ax.set_ylim((0, self._Length))
-        ax.set_aspect('equal', adjustable='box')
+        ax.set_aspect("equal", adjustable="box")
         divider = axtk.axes_divider.make_axes_locatable(ax)
         cax = divider.append_axes("right", size="2%", pad=0.05)
         cb = plt.colorbar(im, cax=cax)
         cb.ax.tick_params(labelsize=7)
         ax.use_sticky_edges = False
         ax.margins(y=0.2)
-        ax.set_title(str(var)+'\ntime: '+str(time), fontsize=10)
+        ax.set_title(str(var) + "\ntime: " + str(time), fontsize=10)
 
         return fig
 
-    def save_figure(self, fig, directory: str, filename_root: str,
-                    save_iter: int, ext: str = '.png',
-                    close: bool = True) -> None:
+    def save_figure(
+        self,
+        fig,
+        directory: str,
+        filename_root: str,
+        save_iter: int,
+        ext: str = ".png",
+        close: bool = True,
+    ) -> None:
         """Save a figure.
 
         Parameters
@@ -397,11 +399,11 @@ class iteration_tools(abc.ABC):
         if self._save_figs_sequential:
             # save as a padded number with the timestep
             savepath = os.path.join(
-                directory, filename_root + str(save_iter).zfill(5) + ext)
+                directory, filename_root + str(save_iter).zfill(5) + ext
+            )
         else:
             # save as "latest"
-            savepath = os.path.join(
-                directory, filename_root + 'latest' + ext)
+            savepath = os.path.join(directory, filename_root + "latest" + ext)
 
         fig.savefig(savepath)
         if close:
@@ -428,13 +430,12 @@ class iteration_tools(abc.ABC):
         -------
 
         """
-        _msg = ' '.join(['saving', str(var_name), 'grid'])
+        _msg = " ".join(["saving", str(var_name), "grid"])
         self.log_info(_msg, verbosity=2)
         try:
             self.output_netcdf.variables[var_name][save_idx, :, :] = var
         except Exception as e:
-            _msg = (f'Failed to save {var_name} grid to netCDF file, '
-                    f'Exception: {e}')
+            _msg = f"Failed to save {var_name} grid to netCDF file, " f"Exception: {e}"
             self.logger.error(_msg)
             raise Exception(e)
 
@@ -459,12 +460,13 @@ class iteration_tools(abc.ABC):
         with either a frequency of `checkpoint_dt` or `save_dt` if
         `checkpoint_dt` has not been explicitly defined.
         """
-        ckp_file = os.path.join(self.prefix, 'checkpoint.npz')
+        ckp_file = os.path.join(self.prefix, "checkpoint.npz")
 
         # get rng state
         rng_state_list = shared_tools.get_random_state()
-        rng_state = np.array(rng_state_list,
-                             dtype=object)  # convert to object before saving
+        rng_state = np.array(
+            rng_state_list, dtype=object
+        )  # convert to object before saving
 
         np.savez_compressed(
             ckp_file,
@@ -488,4 +490,4 @@ class iteration_tools(abc.ABC):
             # boundary condition / state variables
             H_SL=self._H_SL,
             rng_state=rng_state,
-            )
+        )

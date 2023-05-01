@@ -1,4 +1,3 @@
-
 import os
 import logging
 import warnings
@@ -20,7 +19,6 @@ from . import sed_tools
 
 
 class init_tools(abc.ABC):
-
     def init_output_infrastructure(self) -> None:
         """Initialize the output infrastructure (folder and save lists).
 
@@ -38,7 +36,7 @@ class init_tools(abc.ABC):
 
         self._save_fig_list = dict()  # dict of figure variables to save
         self._save_var_list = dict()  # dict of variables to save
-        self._save_var_list['meta'] = dict()  # set up meta dict
+        self._save_var_list["meta"] = dict()  # set up meta dict
 
     def init_logger(self) -> None:
         """Initialize a logger.
@@ -47,29 +45,33 @@ class init_tools(abc.ABC):
         The level of information printed to the log depends on the verbosity
         setting.
         """
-        timestamp = time_lib.strftime('%Y%m%d-%H%M%S')
+        timestamp = time_lib.strftime("%Y%m%d-%H%M%S")
         self.logger = logging.getLogger(self.prefix_abspath + timestamp)
         self.logger.setLevel(logging.INFO)
 
         # create the logging file handler
-        fh = logging.FileHandler(os.path.join(
-            self.prefix_abspath, 'pyDeltaRCM_' + timestamp + '.log'))
-        formatter = logging.Formatter(
-            '%(asctime)s - %(levelname)s - %(message)s')
+        fh = logging.FileHandler(
+            os.path.join(self.prefix_abspath, "pyDeltaRCM_" + timestamp + ".log")
+        )
+        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         fh.setFormatter(formatter)
 
         # add handler to logger object
         self.logger.addHandler(fh)
 
-        _msg = 'Output log file initialized'
+        _msg = "Output log file initialized"
         self.log_info(_msg, verbosity=0)
 
         # log attributes of the model and environment
-        self.log_info('pyDeltaRCM version {}'.format(self.__pyDeltaRCM_version__))  # log the pyDeltaRCM version
-        self.log_info('Python version {}'.format(sys.version),
-                      verbosity=0)  # log the python version
-        self.log_info('Platform: {}'.format(platform.platform()),
-                      verbosity=0)  # log the os
+        self.log_info(
+            "pyDeltaRCM version {}".format(self.__pyDeltaRCM_version__)
+        )  # log the pyDeltaRCM version
+        self.log_info(
+            "Python version {}".format(sys.version), verbosity=0
+        )  # log the python version
+        self.log_info(
+            "Platform: {}".format(platform.platform()), verbosity=0
+        )  # log the os
 
     def import_files(self, kwargs_dict={}) -> None:
         """Import the input files.
@@ -98,19 +100,19 @@ class init_tools(abc.ABC):
 
         # Open and access both yaml files --> put in dictionaries
         # parse default yaml and find expected types
-        default_file = open(self.default_file, mode='r')
+        default_file = open(self.default_file, mode="r")
         default_dict = yaml.load(default_file, Loader=loader)
         default_file.close()
         for k, v in default_dict.items():
-            if not type(v['type']) is list:
-                default_dict[k]['type'] = [eval(v['type'])]
+            if not type(v["type"]) is list:
+                default_dict[k]["type"] = [eval(v["type"])]
             else:
-                default_dict[k]['type'] = [eval(_v) for _v in v['type']]
+                default_dict[k]["type"] = [eval(_v) for _v in v["type"]]
 
         # only access the user input file if provided.
         if self.input_file:
             try:
-                user_file = open(self.input_file, mode='r')
+                user_file = open(self.input_file, mode="r")
                 user_dict = yaml.load(user_file, Loader=loader)
                 user_file.close()
             except ValueError as e:
@@ -122,89 +124,105 @@ class init_tools(abc.ABC):
         #   **kwargs input
         for kwk, kwv in kwargs_dict.items():
             if kwk in user_dict.keys():
-                warnings.warn(UserWarning(
-                    'A keyword specification was also found in the '
-                    'user specified input YAML file: %s' % kwk))
+                warnings.warn(
+                    UserWarning(
+                        "A keyword specification was also found in the "
+                        "user specified input YAML file: %s" % kwk
+                    )
+                )
             user_dict[kwk] = kwv
 
         # go through and populate input vars with user and default values,
         # checking user values for correct type.
         for k, v in default_dict.items():
             if k in user_dict:
-                expected_type = v['type']
+                expected_type = v["type"]
                 if type(user_dict[k]) in expected_type:
                     input_file_vars[k] = user_dict[k]
                 else:
-                    raise TypeError(f'Input for {str(k)} not of the '
-                                    f'right type in yaml configuration '
-                                    f'file {self.input_file}. '
-                                    f'Input type was {type(k).__name__}, '
-                                    f'but needs to be {expected_type}.')
+                    raise TypeError(
+                        f"Input for {str(k)} not of the "
+                        f"right type in yaml configuration "
+                        f"file {self.input_file}. "
+                        f"Input type was {type(k).__name__}, "
+                        f"but needs to be {expected_type}."
+                    )
             else:
-                input_file_vars[k] = default_dict[k]['default']
+                input_file_vars[k] = default_dict[k]["default"]
 
         # add custom subclass yaml parameters (yaml or defaults) to input vars
         for k, v in self.subclass_parameters.items():
             if k in input_file_vars:
-                warnings.warn(UserWarning(
-                    'Custom subclass parameter name is already a '
-                    'default yaml parameter of the model, '
-                    'custom parameter value will not be used.'
-                ))
+                warnings.warn(
+                    UserWarning(
+                        "Custom subclass parameter name is already a "
+                        "default yaml parameter of the model, "
+                        "custom parameter value will not be used."
+                    )
+                )
             elif k in user_dict:
                 # get expected types
-                if not type(v['type']) is list:
-                    expected_type = [eval(v['type'])]
+                if not type(v["type"]) is list:
+                    expected_type = [eval(v["type"])]
                 else:
-                    expected_type = [eval(_v) for _v in v['type']]
+                    expected_type = [eval(_v) for _v in v["type"]]
                 # evaluate against expected types
                 if type(user_dict[k]) in expected_type:
                     input_file_vars[k] = user_dict[k]
                 else:
-                    raise TypeError(f'Input for {str(k)} not of the '
-                                    f'right type in yaml configuration '
-                                    f'file {self.input_file}. '
-                                    f'Input type was {type(k).__name__}, '
-                                    f'but needs to be {expected_type}.')
+                    raise TypeError(
+                        f"Input for {str(k)} not of the "
+                        f"right type in yaml configuration "
+                        f"file {self.input_file}. "
+                        f"Input type was {type(k).__name__}, "
+                        f"but needs to be {expected_type}."
+                    )
             else:
                 # set using default value
-                input_file_vars[k] = v['default']
+                input_file_vars[k] = v["default"]
 
         # compare the processed inputs with the total inputs. If any unused
         # parameters exist, we warn the user that they are not being used! A
         # special warning is issued for the Preprocessor advanced config
         # keywords, which cannot be passed directly to the DeltaModel.
-        pp_only_kw = ['matrix', 'ensemble', 'set', 'parallel']
-        unused_user_keys = [k for k, v in user_dict.items() if not
-                            (k in input_file_vars.keys())]
+        pp_only_kw = ["matrix", "ensemble", "set", "parallel"]
+        unused_user_keys = [
+            k for k, v in user_dict.items() if not (k in input_file_vars.keys())
+        ]
         if len(unused_user_keys) > 0:
-            any_in_preprocessor = [k for k in unused_user_keys if
-                                   (k in pp_only_kw)]
+            any_in_preprocessor = [k for k in unused_user_keys if (k in pp_only_kw)]
             if len(any_in_preprocessor):
-                warnings.warn(UserWarning(
-                    'A Preprocessor-only keyword was specified as input in '
-                    'yaml file or kwargs: {0}. Advanced configurations '
-                    'are only supported by the Preprocessor via the '
-                    'high-level API. Any parameters specified as part of this '
-                    'advanced keyword configuration will not be used!'.format(
-                        any_in_preprocessor)))
+                warnings.warn(
+                    UserWarning(
+                        "A Preprocessor-only keyword was specified as input in "
+                        "yaml file or kwargs: {0}. Advanced configurations "
+                        "are only supported by the Preprocessor via the "
+                        "high-level API. Any parameters specified as part of this "
+                        "advanced keyword configuration will not be used!".format(
+                            any_in_preprocessor
+                        )
+                    )
+                )
             else:
-                warnings.warn(UserWarning(
-                    'One or more inputs in yaml file or kwargs were unused by '
-                    'the model during instantiation. '
-                    'The unused keys are: {0}'.format(str(unused_user_keys))))
+                warnings.warn(
+                    UserWarning(
+                        "One or more inputs in yaml file or kwargs were unused by "
+                        "the model during instantiation. "
+                        "The unused keys are: {0}".format(str(unused_user_keys))
+                    )
+                )
 
         # note, the specified parameters are assigned to the model object in
         # the following function `process_input_to_model`.
 
         # save the input file as a hidden attr and grab needed value
         self._input_file_vars = input_file_vars
-        self.out_dir = self._input_file_vars['out_dir']
-        self.verbose = self._input_file_vars['verbose']
-        if self._input_file_vars['legacy_netcdf']:
-            self._netcdf_coords = ('total_time', 'length', 'width')
+        self.out_dir = self._input_file_vars["out_dir"]
+        self.verbose = self._input_file_vars["verbose"]
+        if self._input_file_vars["legacy_netcdf"]:
+            self._netcdf_coords = ("total_time", "length", "width")
         else:
-            self._netcdf_coords = ('time', 'x', 'y')
+            self._netcdf_coords = ("time", "x", "y")
 
     def process_input_to_model(self) -> None:
         """Process input file to model variables.
@@ -218,10 +236,10 @@ class init_tools(abc.ABC):
             If ``self.resume_checkpoint == True``, then the input values are
             *not* written to the log.
         """
-        _msg = 'Setting up model configuration'
+        _msg = "Setting up model configuration"
         self.log_info(_msg, verbosity=0)
 
-        _msg = f'Model type is: {self.__class__.__name__}'
+        _msg = f"Model type is: {self.__class__.__name__}"
         self.log_info(_msg, verbosity=0)
 
         # process the input file to attributes of the model
@@ -231,8 +249,7 @@ class init_tools(abc.ABC):
         # write the input file values to the log
         if not self._resume_checkpoint:
             for k, v in list(self._input_file_vars.items()):
-                _msg = 'Configuration variable `{var}`: {val}'.format(
-                    var=k, val=v)
+                _msg = "Configuration variable `{var}`: {val}".format(var=k, val=v)
                 self.log_info(_msg, verbosity=0)
 
     def determine_random_seed(self) -> None:
@@ -244,12 +261,12 @@ class init_tools(abc.ABC):
         """
         if self._seed is None:
             # generate a random seed for reproducibility
-            self.seed = np.random.randint((2**32) - 1, dtype='u8')
+            self.seed = np.random.randint((2**32) - 1, dtype="u8")
 
         shared_tools.set_random_seed(self._seed)
 
         # always write the seed to file for record and reproducability
-        _msg = 'Random seed is: %s ' % str(self._seed)
+        _msg = "Random seed is: %s " % str(self._seed)
         self.log_info(_msg, verbosity=0)
 
     def create_other_variables(self) -> None:
@@ -266,7 +283,7 @@ class init_tools(abc.ABC):
             boundary condition variables, and instead only re-run
             :obj:`create_boundary_conditions`.
         """
-        _msg = 'Setting other variables'
+        _msg = "Setting other variables"
         self.log_info(_msg, verbosity=1)
 
         self.init_Np_water = self._Np_water
@@ -281,27 +298,29 @@ class init_tools(abc.ABC):
         self.U_ero_sand = self._coeff_U_ero_sand * self._u0
         self.U_ero_mud = self._coeff_U_ero_mud * self._u0
 
-        self.L = int(round(self._Length / self._dx))        # num cells in x
-        self.W = int(round(self._Width / self._dx))         # num cells in y
+        self.L = int(round(self._Length / self._dx))  # num cells in x
+        self.W = int(round(self._Width / self._dx))  # num cells in y
 
         # cross-stream center of domain idx
-        self.CTR = floor(self.W / 2.) - 1
+        self.CTR = floor(self.W / 2.0) - 1
         if self.CTR <= 1:
-            self.CTR = floor(self.W / 2.)
+            self.CTR = floor(self.W / 2.0)
 
         self.set_constants()
 
         self.create_boundary_conditions()
 
-        self._save_any_grids = (self._save_eta_grids or
-                                self._save_depth_grids or
-                                self._save_stage_grids or
-                                self._save_discharge_grids or
-                                self._save_velocity_grids or
-                                self._save_sedflux_grids or
-                                self._save_sandfrac_grids or
-                                self._save_discharge_components or
-                                self._save_velocity_components)
+        self._save_any_grids = (
+            self._save_eta_grids
+            or self._save_depth_grids
+            or self._save_stage_grids
+            or self._save_discharge_grids
+            or self._save_velocity_grids
+            or self._save_sedflux_grids
+            or self._save_sandfrac_grids
+            or self._save_discharge_components
+            or self._save_velocity_components
+        )
         if self._save_any_grids:  # always save metadata if saving grids
             self._save_metadata = True
 
@@ -324,30 +343,32 @@ class init_tools(abc.ABC):
         Each of these attributes also has a `self.xxxxx_flat` sibling
         attribute, which is simply the flattened version of that attribute.
         """
-        _msg = 'Setting model constants'
+        _msg = "Setting model constants"
         self.log_info(_msg, verbosity=1)
 
         # simple constants
-        self.g = 9.81   # (gravitation const.)
+        self.g = 9.81  # (gravitation const.)
         sqrt2 = np.sqrt(2)
         sqrt05 = np.sqrt(0.5)
 
         # translations arrays
-        self.distances = np.array([[sqrt2,    1,  sqrt2],
-                                   [1,        1,      1],
-                                   [sqrt2,    1,  sqrt2]], dtype=np.float32)
-        self.ivec      = np.array([[-sqrt05,  0,  sqrt05],  # noqa: E221
-                                   [-1,       0,       1],
-                                   [-sqrt05,  0,  sqrt05]], dtype=np.float32)
-        self.jvec      = np.array([[-sqrt05, -1, -sqrt05],  # noqa: E221
-                                   [0,        0,       0],
-                                   [sqrt05,   1,  sqrt05]], dtype=np.float32)
-        self.iwalk     = np.array([[-1,       0,       1],  # noqa: E221
-                                   [-1,       0,       1],
-                                   [-1,       0,       1]], dtype=np.int64)
-        self.jwalk     = np.array([[-1,      -1,      -1],  # noqa: E221
-                                   [0,        0,       0],
-                                   [1,        1,       1]], dtype=np.int64)
+        self.distances = np.array(
+            [[sqrt2, 1, sqrt2], [1, 1, 1], [sqrt2, 1, sqrt2]], dtype=np.float32
+        )
+        self.ivec = np.array(
+            [[-sqrt05, 0, sqrt05], [-1, 0, 1], [-sqrt05, 0, sqrt05]],  # noqa: E221
+            dtype=np.float32,
+        )
+        self.jvec = np.array(
+            [[-sqrt05, -1, -sqrt05], [0, 0, 0], [sqrt05, 1, sqrt05]],  # noqa: E221
+            dtype=np.float32,
+        )
+        self.iwalk = np.array(
+            [[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]], dtype=np.int64  # noqa: E221
+        )
+        self.jwalk = np.array(
+            [[-1, -1, -1], [0, 0, 0], [1, 1, 1]], dtype=np.int64  # noqa: E221
+        )
 
         # derivatives of translations
         self.distances_flat = self.distances.flatten()
@@ -359,13 +380,9 @@ class init_tools(abc.ABC):
         self.ravel_walk_flat = self.ravel_walk.flatten()
 
         # kernels for topographic smoothing
-        self.kernel1 = np.array([[1, 1, 1],
-                                 [1, -8, 1],
-                                 [1, 1, 1]]).astype(np.int64)
+        self.kernel1 = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]]).astype(np.int64)
 
-        self.kernel2 = np.array([[1, 1, 1],
-                                 [1, 0, 1],
-                                 [1, 1, 1]]).astype(np.int64)
+        self.kernel2 = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]]).astype(np.int64)
 
     def create_boundary_conditions(self) -> None:
         """Create model boundary conditions
@@ -393,23 +410,22 @@ class init_tools(abc.ABC):
             again if you modify the model boundary conditions that way.
         """
         # inlet length and width
-        self.L0 = max(
-            1, min(int(round(self._L0_meters / self._dx)), self.L // 4))
-        self.N0 = max(
-            3, min(int(round(self._N0_meters / self._dx)), self.W // 4))
+        self.L0 = max(1, min(int(round(self._L0_meters / self._dx)), self.L // 4))
+        self.N0 = max(3, min(int(round(self._N0_meters / self._dx)), self.W // 4))
 
         self.u_max = 2.0 * self._u0  # maximum allowed flow velocity
-        self.C0 = self._C0_percent * 1 / 100.  # sediment concentration
+        self.C0 = self._C0_percent * 1 / 100.0  # sediment concentration
 
         # (m) critial depth to switch to "dry" node
         self.dry_depth = min(0.1, 0.1 * self._h0)
 
-        self.gamma = (self.g * self.S0 * self._dx /
-                      (self.u0**2))  # water weighting coeff
+        self.gamma = (
+            self.g * self.S0 * self._dx / (self.u0**2)
+        )  # water weighting coeff
 
         # (m^3) reference volume, volume to fill cell to characteristic depth
         self.V0 = self.h0 * (self._dx**2)
-        self.Qw0 = self.u0 * self.h0 * self.N0 * self._dx    # const discharge
+        self.Qw0 = self.u0 * self.h0 * self.N0 * self._dx  # const discharge
 
         # at inlet
         self.qw0 = self.u0 * self.h0  # water unit input discharge
@@ -430,15 +446,16 @@ class init_tools(abc.ABC):
 
         self._dt = self.dVs / self.Qs0  # time step size
 
-        self.omega_flow_iter = 2. / self._itermax
+        self.omega_flow_iter = 2.0 / self._itermax
 
         # number of times to repeat topo diffusion
         self.N_crossdiff = int(round(self.dVs / self.V0))
 
         self._lambda = self._sed_lag  # sedimentation lag
 
-        self.diffusion_multiplier = (self._dt / self.N_crossdiff * self._alpha
-                                     * 0.5 / self._dx**2)
+        self.diffusion_multiplier = (
+            self._dt / self.N_crossdiff * self._alpha * 0.5 / self._dx**2
+        )
 
     def create_domain(self) -> None:
         """Create the model domain.
@@ -454,7 +471,7 @@ class init_tools(abc.ABC):
             it is probably safe to modify attributes directly, but take care
             to ensure any dependent fields are also approrpriately changed.
         """
-        _msg = 'Creating model domain'
+        _msg = "Creating model domain"
         self.log_info(_msg, verbosity=1)
 
         # resolve any boundary conditions
@@ -463,10 +480,10 @@ class init_tools(abc.ABC):
         # ---- coordinates ----
         self.xc = np.arange(0, self.L) * self._dx
         self.yc = np.arange(0, self.W) * self._dx
-        self.x, self.y = np.meshgrid(np.arange(0, self.W),
-                                     np.arange(0, self.L))
-        self.X, self.Y = np.meshgrid(np.arange(0, self.W+1)*self._dx,
-                                     np.arange(0, self.L+1)*self._dx)
+        self.x, self.y = np.meshgrid(np.arange(0, self.W), np.arange(0, self.L))
+        self.X, self.Y = np.meshgrid(
+            np.arange(0, self.W + 1) * self._dx, np.arange(0, self.L + 1) * self._dx
+        )
 
         # ---- empty arrays ----
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int64)
@@ -483,20 +500,23 @@ class init_tools(abc.ABC):
         self.uy = np.zeros((self.L, self.W), dtype=np.float32)
         self.uw = np.zeros((self.L, self.W), dtype=np.float32)
         self.qs = np.zeros((self.L, self.W), dtype=np.float32)
-        self.sand_frac = np.zeros((self.L, self.W), dtype=np.float32) + \
-            self.sand_frac_bc
-        self.active_layer = np.zeros((self.L, self.W), dtype=np.float32) + \
-            self.sand_frac_bc
+        self.sand_frac = (
+            np.zeros((self.L, self.W), dtype=np.float32) + self.sand_frac_bc
+        )
+        self.active_layer = (
+            np.zeros((self.L, self.W), dtype=np.float32) + self.sand_frac_bc
+        )
         self.Vp_dep_sand = np.zeros((self.L, self.W), dtype=np.float32)
         self.Vp_dep_mud = np.zeros((self.L, self.W), dtype=np.float32)
 
         # arrays for computing the free surface after water iteration
         self.free_surf_flag = np.zeros((self._Np_water,), dtype=np.int64)
         self.free_surf_walk_inds = np.zeros(
-            (self._Np_water, self.size_indices), dtype=np.int64)
+            (self._Np_water, self.size_indices), dtype=np.int64
+        )
         self.sfc_visit = np.zeros_like(self.depth)
         self.sfc_sum = np.zeros_like(self.depth)
-        
+
         # arrays acting as modifying hooks
         self.mod_water_weight = np.ones_like(self.depth)
 
@@ -506,29 +526,25 @@ class init_tools(abc.ABC):
         cell_ocean = 0
         cell_edge = -1
 
-        self.cell_type[:self.L0, :] = cell_land
+        self.cell_type[: self.L0, :] = cell_land
 
         channel_inds = int(self.CTR - round(self.N0 / 2)) + 1
         y_channel_max = channel_inds + self.N0
-        self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
+        self.cell_type[: self.L0, channel_inds:y_channel_max] = cell_channel
 
-        self.stage[:] = (np.maximum(0, self.L0 - self.y - 1) *
-                         self._dx * self._S0)
-        self.stage[self.cell_type == cell_ocean] = 0.
+        self.stage[:] = np.maximum(0, self.L0 - self.y - 1) * self._dx * self._S0
+        self.stage[self.cell_type == cell_ocean] = 0.0
 
         self.depth[self.cell_type == cell_ocean] = self.hb
         self.depth[self.cell_type == cell_channel] = self.h0
 
         self.qx[self.cell_type == cell_channel] = self.qw0
-        self.qx[self.cell_type == cell_ocean] = self.qw0 / 5.
-        self.qw = (self.qx**2 + self.qy**2)**(0.5)
+        self.qx[self.cell_type == cell_ocean] = self.qw0 / 5.0
+        self.qw = (self.qx**2 + self.qy**2) ** (0.5)
 
-        self.ux[self.depth > 0] = self.qx[
-            self.depth > 0] / self.depth[self.depth > 0]
-        self.uy[self.depth > 0] = self.qy[
-            self.depth > 0] / self.depth[self.depth > 0]
-        self.uw[self.depth > 0] = self.qw[
-            self.depth > 0] / self.depth[self.depth > 0]
+        self.ux[self.depth > 0] = self.qx[self.depth > 0] / self.depth[self.depth > 0]
+        self.uy[self.depth > 0] = self.qy[self.depth > 0] / self.depth[self.depth > 0]
+        self.uw[self.depth > 0] = self.qw[self.depth > 0] / self.depth[self.depth > 0]
 
         # reset the land cell_type to -2
         self.cell_type[self.cell_type == cell_land] = -2
@@ -536,15 +552,17 @@ class init_tools(abc.ABC):
         self.cell_type[:, 0] = cell_edge
         self.cell_type[:, -1] = cell_edge
 
-        bounds = [(np.sqrt((i - 3)**2 + (j - self.CTR)**2))
-                  for i in range(self.L)
-                  for j in range(self.W)]
+        bounds = [
+            (np.sqrt((i - 3) ** 2 + (j - self.CTR) ** 2))
+            for i in range(self.L)
+            for j in range(self.W)
+        ]
         bounds = np.reshape(bounds, (self.L, self.W))
 
         self.cell_type[bounds >= min(self.L - 5, self.W / 2 - 5)] = cell_edge
 
-        self.cell_type[:self.L0, :] = cell_land
-        self.cell_type[:self.L0, channel_inds:y_channel_max] = cell_channel
+        self.cell_type[: self.L0, :] = cell_land
+        self.cell_type[: self.L0, channel_inds:y_channel_max] = cell_channel
 
         self.inlet = np.array(np.unique(np.where(self.cell_type == 1)[1]))
         self.eta[:] = self.stage - self.depth
@@ -560,28 +578,48 @@ class init_tools(abc.ABC):
             If you change any model boundary conditions, you likely should
             reinitialize the sediment routers (i.e., rerun this method)
         """
-        _msg = 'Initializing sediment routers'
+        _msg = "Initializing sediment routers"
         self.log_info(_msg, verbosity=1)
 
         # initialize the MudRouter object
-        self._mr = sed_tools.MudRouter(self._dt, self._dx, self.Vp_sed,
-                                       self.u_max, self.U_dep_mud,
-                                       self.U_ero_mud,
-                                       self.ivec_flat, self.jvec_flat,
-                                       self.iwalk_flat, self.jwalk_flat,
-                                       self.distances_flat, self.dry_depth,
-                                       self._lambda, self._beta,  self.stepmax,
-                                       self.theta_mud)
+        self._mr = sed_tools.MudRouter(
+            self._dt,
+            self._dx,
+            self.Vp_sed,
+            self.u_max,
+            self.U_dep_mud,
+            self.U_ero_mud,
+            self.ivec_flat,
+            self.jvec_flat,
+            self.iwalk_flat,
+            self.jwalk_flat,
+            self.distances_flat,
+            self.dry_depth,
+            self._lambda,
+            self._beta,
+            self.stepmax,
+            self.theta_mud,
+        )
         # initialize the SandRouter object
-        self._sr = sed_tools.SandRouter(self._dt, self._dx, self.Vp_sed,
-                                        self.u_max, self.qs0, self._u0,
-                                        self.U_ero_sand,
-                                        self._f_bedload,
-                                        self.ivec_flat, self.jvec_flat,
-                                        self.iwalk_flat, self.jwalk_flat,
-                                        self.distances_flat, self.dry_depth,
-                                        self._beta, self.stepmax,
-                                        self.theta_sand)
+        self._sr = sed_tools.SandRouter(
+            self._dt,
+            self._dx,
+            self.Vp_sed,
+            self.u_max,
+            self.qs0,
+            self._u0,
+            self.U_ero_sand,
+            self._f_bedload,
+            self.ivec_flat,
+            self.jvec_flat,
+            self.iwalk_flat,
+            self.jwalk_flat,
+            self.distances_flat,
+            self.dry_depth,
+            self._beta,
+            self.stepmax,
+            self.theta_sand,
+        )
 
     def init_output_file(self) -> None:
         """Creates a netCDF file to store output grids.
@@ -594,44 +632,39 @@ class init_tools(abc.ABC):
             :attr:`~pyDeltaRCM.model.DeltaModel.clobber_netcdf` is `True`.
 
         """
-        _msg = 'Initializing output NetCDF4 file'
+        _msg = "Initializing output NetCDF4 file"
         self.log_info(_msg, verbosity=1)
 
         # set standard/default metadata values in the dict structure
         if self._save_metadata:
             self.init_metadata_list()
 
-        if (self._save_metadata or
-                self._save_any_grids):
-
+        if self._save_metadata or self._save_any_grids:
             directory = self.prefix
-            filename = 'pyDeltaRCM_output.nc'
+            filename = "pyDeltaRCM_output.nc"
 
             file_path = os.path.join(directory, filename)
-            _msg = 'Target output NetCDF4 file: {file}'.format(
-                file=file_path)
+            _msg = "Target output NetCDF4 file: {file}".format(file=file_path)
             self.log_info(_msg, verbosity=2)
 
-            if (os.path.exists(file_path)) and \
-                    (self._clobber_netcdf is False):
+            if (os.path.exists(file_path)) and (self._clobber_netcdf is False):
                 raise FileExistsError(
-                    'Existing NetCDF4 output file in target output location: '
-                    '{file_path}'.format(file_path=file_path))
-            elif (os.path.exists(file_path)) and \
-                    (self._clobber_netcdf is True):
-                _msg = 'Replacing existing netCDF file'
+                    "Existing NetCDF4 output file in target output location: "
+                    "{file_path}".format(file_path=file_path)
+                )
+            elif (os.path.exists(file_path)) and (self._clobber_netcdf is True):
+                _msg = "Replacing existing netCDF file"
                 self.logger.warning(_msg)
                 warnings.warn(UserWarning(_msg))
                 os.remove(file_path)
 
-            self.output_netcdf = Dataset(file_path, 'w',
-                                         format='NETCDF4')
+            self.output_netcdf = Dataset(file_path, "w", format="NETCDF4")
 
-            self.output_netcdf.description = 'Output from pyDeltaRCM'
-            self.output_netcdf.history = ('Created '
-                                          + time_lib.ctime(time_lib.time()))
-            self.output_netcdf.source = 'pyDeltaRCM v{ver}'.format(
-                ver=self.__pyDeltaRCM_version__)
+            self.output_netcdf.description = "Output from pyDeltaRCM"
+            self.output_netcdf.history = "Created " + time_lib.ctime(time_lib.time())
+            self.output_netcdf.source = "pyDeltaRCM v{ver}".format(
+                ver=self.__pyDeltaRCM_version__
+            )
 
             # create master dimensions (pulls from `self._netcdf_coords`)
             self.output_netcdf.createDimension(self._netcdf_coords[1], self.L)
@@ -640,71 +673,78 @@ class init_tools(abc.ABC):
 
             # create master coordinates (as netCDF variables)
             time = self.output_netcdf.createVariable(
-                'time', 'f4', (self._netcdf_coords[0],))
-            time.units = 'second'
+                "time", "f4", (self._netcdf_coords[0],)
+            )
+            time.units = "second"
 
             if self._legacy_netcdf:
                 # old format is 2d array x and y
                 x = self.output_netcdf.createVariable(
-                    'x', 'f4', self._netcdf_coords[1:])
+                    "x", "f4", self._netcdf_coords[1:]
+                )
                 y = self.output_netcdf.createVariable(
-                    'y', 'f4', self._netcdf_coords[1:])
+                    "y", "f4", self._netcdf_coords[1:]
+                )
                 x[:] = self.x
                 y[:] = self.y
 
             else:
                 # new output format is 1d x and y
-                x = self.output_netcdf.createVariable(
-                    'x', 'f4', ('x'))
-                y = self.output_netcdf.createVariable(
-                    'y', 'f4', ('y'))
+                x = self.output_netcdf.createVariable("x", "f4", ("x"))
+                y = self.output_netcdf.createVariable("y", "f4", ("y"))
                 x[:] = self.xc
                 y[:] = self.yc
 
-            x.units = 'meter'
-            y.units = 'meter'
+            x.units = "meter"
+            y.units = "meter"
 
             # set up variables for output data grids
-            def _create_grid_variable(varname, varunits,
-                                      vartype='f4', vardims=()):
-                _v = self.output_netcdf.createVariable(
-                    varname, vartype, vardims)
+            def _create_grid_variable(varname, varunits, vartype="f4", vardims=()):
+                _v = self.output_netcdf.createVariable(varname, vartype, vardims)
                 _v.units = varunits
 
             _var_list = list(self._save_var_list.keys())
-            _var_list.remove('meta')
+            _var_list.remove("meta")
             for _val in _var_list:
-                _create_grid_variable(_val, self._save_var_list[_val][1],
-                                      self._save_var_list[_val][2],
-                                      self._save_var_list[_val][3])
+                _create_grid_variable(
+                    _val,
+                    self._save_var_list[_val][1],
+                    self._save_var_list[_val][2],
+                    self._save_var_list[_val][3],
+                )
 
             # set up metadata group and populate variables
-            def _create_meta_variable(varname, varvalue, varunits,
-                                      vartype='f4', vardims=()):
+            def _create_meta_variable(
+                varname, varvalue, varunits, vartype="f4", vardims=()
+            ):
                 _v = self.output_netcdf.createVariable(
-                    'meta/'+varname, vartype, vardims)
+                    "meta/" + varname, vartype, vardims
+                )
                 _v.units = varunits
                 _v[:] = varvalue
 
-            self.output_netcdf.createGroup('meta')
-            for _val in self._save_var_list['meta'].keys():
+            self.output_netcdf.createGroup("meta")
+            for _val in self._save_var_list["meta"].keys():
                 # time-varying initialize w/ None value
-                if (self._save_var_list['meta'][_val][0] is None):
+                if self._save_var_list["meta"][_val][0] is None:
                     _create_meta_variable(
-                        _val, self._save_var_list['meta'][_val][0],
-                        self._save_var_list['meta'][_val][1],
-                        self._save_var_list['meta'][_val][2],
-                        self._save_var_list['meta'][_val][3])
+                        _val,
+                        self._save_var_list["meta"][_val][0],
+                        self._save_var_list["meta"][_val][1],
+                        self._save_var_list["meta"][_val][2],
+                        self._save_var_list["meta"][_val][3],
+                    )
                 # for scalars, get the attribute and store it
                 else:
                     _create_meta_variable(
-                        _val, getattr(
-                            self, self._save_var_list['meta'][_val][0]),
-                        self._save_var_list['meta'][_val][1],
-                        self._save_var_list['meta'][_val][2],
-                        self._save_var_list['meta'][_val][3])
+                        _val,
+                        getattr(self, self._save_var_list["meta"][_val][0]),
+                        self._save_var_list["meta"][_val][1],
+                        self._save_var_list["meta"][_val][2],
+                        self._save_var_list["meta"][_val][3],
+                    )
 
-            _msg = 'Output netCDF file created'
+            _msg = "Output netCDF file created"
             self.log_info(_msg, verbosity=2)
 
     def init_subsidence(self) -> None:
@@ -720,13 +760,12 @@ class init_tools(abc.ABC):
         DeltaModel class.
 
         """
-        _msg = 'Initializing subsidence'
+        _msg = "Initializing subsidence"
         self.log_info(_msg, verbosity=1)
 
         if self._toggle_subsidence:
-
             self.subsidence_mask = np.ones((self.L, self.W), dtype=bool)
-            self.subsidence_mask[:self.L0, :] = False
+            self.subsidence_mask[: self.L0, :] = False
 
             self.sigma = self.subsidence_mask * self._subsidence_rate * self.dt
 
@@ -736,36 +775,57 @@ class init_tools(abc.ABC):
         Sets up the dictionary object for the standard metadata.
         """
         # fixed metadata
-        self._save_var_list['meta']['L0'] = ['L0', 'cells', 'i8', ()]
-        self._save_var_list['meta']['N0'] = ['N0', 'cells', 'i8', ()]
-        self._save_var_list['meta']['CTR'] = ['CTR', 'cells', 'i8', ()]
-        self._save_var_list['meta']['dx'] = ['dx', 'meters', 'f4', ()]
-        self._save_var_list['meta']['h0'] = ['h0', 'meters', 'f4', ()]
-        self._save_var_list['meta']['hb'] = ['hb', 'meters', 'f4', ()]
-        self._save_var_list['meta']['cell_type'] = ['cell_type',
-                                                    'type', 'i8',
-                                                    self._netcdf_coords[1:]]
+        self._save_var_list["meta"]["L0"] = ["L0", "cells", "i8", ()]
+        self._save_var_list["meta"]["N0"] = ["N0", "cells", "i8", ()]
+        self._save_var_list["meta"]["CTR"] = ["CTR", "cells", "i8", ()]
+        self._save_var_list["meta"]["dx"] = ["dx", "meters", "f4", ()]
+        self._save_var_list["meta"]["h0"] = ["h0", "meters", "f4", ()]
+        self._save_var_list["meta"]["hb"] = ["hb", "meters", "f4", ()]
+        self._save_var_list["meta"]["cell_type"] = [
+            "cell_type",
+            "type",
+            "i8",
+            self._netcdf_coords[1:],
+        ]
         # subsidence metadata
         if self._toggle_subsidence:
-            self._save_var_list['meta']['start_subsidence'] = [
-                'start_subsidence', 'seconds', 'i8', ()
+            self._save_var_list["meta"]["start_subsidence"] = [
+                "start_subsidence",
+                "seconds",
+                "i8",
+                (),
             ]
-            self._save_var_list['meta']['sigma'] = [
-                'sigma', 'meters per timestep', 'f4',
-                self._netcdf_coords[1:]
+            self._save_var_list["meta"]["sigma"] = [
+                "sigma",
+                "meters per timestep",
+                "f4",
+                self._netcdf_coords[1:],
             ]
         # time-varying metadata
-        self._save_var_list['meta']['H_SL'] = [None, 'meters', 'f4',
-                                               (self._netcdf_coords[0])]
-        self._save_var_list['meta']['f_bedload'] = [None, 'fraction',
-                                                    'f4',
-                                                    (self._netcdf_coords[0])]
-        self._save_var_list['meta']['C0_percent'] = [None, 'percent',
-                                                     'f4',
-                                                     (self._netcdf_coords[0])]
-        self._save_var_list['meta']['u0'] = [None, 'meters per second',
-                                             'f4',
-                                             (self._netcdf_coords[0])]
+        self._save_var_list["meta"]["H_SL"] = [
+            None,
+            "meters",
+            "f4",
+            (self._netcdf_coords[0]),
+        ]
+        self._save_var_list["meta"]["f_bedload"] = [
+            None,
+            "fraction",
+            "f4",
+            (self._netcdf_coords[0]),
+        ]
+        self._save_var_list["meta"]["C0_percent"] = [
+            None,
+            "percent",
+            "f4",
+            (self._netcdf_coords[0]),
+        ]
+        self._save_var_list["meta"]["u0"] = [
+            None,
+            "meters per second",
+            "f4",
+            (self._netcdf_coords[0]),
+        ]
 
     def load_checkpoint(self, defer_output: bool = False) -> None:
         """Load the checkpoint from the .npz file.
@@ -803,54 +863,54 @@ class init_tools(abc.ABC):
             this variable is critical for parallel operations. See note above.
             Default is `False`.
         """
-        _msg = 'Loading from checkpoint.'
+        _msg = "Loading from checkpoint."
         self.log_info(_msg, verbosity=0)
 
-        _msg = 'Locating checkpoint file'
+        _msg = "Locating checkpoint file"
         self.log_info(_msg, verbosity=2)
-        ckp_file = os.path.join(self._checkpoint_folder, 'checkpoint.npz')
+        ckp_file = os.path.join(self._checkpoint_folder, "checkpoint.npz")
         checkpoint = np.load(ckp_file, allow_pickle=True)
 
         # write saved variables back to the model
-        _msg = 'Loading variables and grids into model'
+        _msg = "Loading variables and grids into model"
         self.log_info(_msg, verbosity=2)
 
         # load time and counter vars
-        self._time = float(checkpoint['time'])
-        self.H_SL = float(checkpoint['H_SL'])
-        self._time_iter = int(checkpoint['time_iter'])
-        self._save_iter = int(checkpoint['save_iter'])
-        self._save_time_since_data = int(checkpoint['save_time_since_data'])
+        self._time = float(checkpoint["time"])
+        self.H_SL = float(checkpoint["H_SL"])
+        self._time_iter = int(checkpoint["time_iter"])
+        self._save_iter = int(checkpoint["save_iter"])
+        self._save_time_since_data = int(checkpoint["save_time_since_data"])
 
         # load grids
-        self.eta = checkpoint['eta']
-        self.depth = checkpoint['depth']
-        self.stage = checkpoint['stage']
-        self.uw = checkpoint['uw']
-        self.ux = checkpoint['ux']
-        self.uy = checkpoint['uy']
-        self.qw = checkpoint['qw']
-        self.qx = checkpoint['qx']
-        self.qy = checkpoint['qy']
-        self.sand_frac = checkpoint['sand_frac']
-        self.active_layer = checkpoint['active_layer']
+        self.eta = checkpoint["eta"]
+        self.depth = checkpoint["depth"]
+        self.stage = checkpoint["stage"]
+        self.uw = checkpoint["uw"]
+        self.ux = checkpoint["ux"]
+        self.uy = checkpoint["uy"]
+        self.qw = checkpoint["qw"]
+        self.qx = checkpoint["qx"]
+        self.qy = checkpoint["qy"]
+        self.sand_frac = checkpoint["sand_frac"]
+        self.active_layer = checkpoint["active_layer"]
 
         # load and set random state to continue as if run hadn't stopped
-        _msg = 'Loading random state'
+        _msg = "Loading random state"
         self.log_info(_msg, verbosity=2)
-        rng_state = tuple(checkpoint['rng_state'])
+        rng_state = tuple(checkpoint["rng_state"])
         shared_tools.set_random_state(rng_state)
 
         # handle the case with a netcdf file
-        if ((self._save_any_grids or self._save_metadata)
-                and not defer_output):
-
+        if (self._save_any_grids or self._save_metadata) and not defer_output:
             # check if the file exists already
             #    if it does, it needs to be flushed of certain fields
-            file_path = os.path.join(self.prefix, 'pyDeltaRCM_output.nc')
+            file_path = os.path.join(self.prefix, "pyDeltaRCM_output.nc")
             if not os.path.isfile(file_path):
-                _msg = ('NetCDF4 output file not found, but was expected. '
-                        'Creating a new output file.')
+                _msg = (
+                    "NetCDF4 output file not found, but was expected. "
+                    "Creating a new output file."
+                )
                 self.logger.warning(_msg)
                 warnings.warn(UserWarning(_msg))
 
@@ -862,24 +922,24 @@ class init_tools(abc.ABC):
             else:
                 # check if file is open in another process, if so throw error
                 try:
-                    _dataset = Dataset(file_path, 'r+', format='NETCDF')
+                    _dataset = Dataset(file_path, "r+", format="NETCDF")
                     _dataset.close()  # if this worked then close it
                 except OSError:
                     raise RuntimeError(
-                        'Could not open the NetCDF file for checkpointing. '
-                        'This could be because the file is corrupt, or open '
-                        'in another interpreter. Be sure to close any '
-                        'connections to the file before proceeding.')
+                        "Could not open the NetCDF file for checkpointing. "
+                        "This could be because the file is corrupt, or open "
+                        "in another interpreter. Be sure to close any "
+                        "connections to the file before proceeding."
+                    )
                 # if not open elsewhere, then proceed
                 # rename the old netCDF4 file
-                _msg = 'Renaming old NetCDF4 output file'
+                _msg = "Renaming old NetCDF4 output file"
                 self.log_info(_msg, verbosity=2)
-                _tmp_name = os.path.join(self.prefix,
-                                         'old_pyDeltaRCM_output.nc')
+                _tmp_name = os.path.join(self.prefix, "old_pyDeltaRCM_output.nc")
                 os.rename(file_path, _tmp_name)
 
                 # write dims / attributes / variables to new netCDF file
-                _msg = 'Creating NetCDF4 output file'
+                _msg = "Creating NetCDF4 output file"
                 self.log_info(_msg, verbosity=2)
 
                 # populate default metadata list
@@ -887,8 +947,9 @@ class init_tools(abc.ABC):
                     self.init_metadata_list()
 
                 # copy data from old netCDF4 into new one
-                with Dataset(_tmp_name) as src, Dataset(file_path, 'w',
-                                                        format='NETCDF4') as dst:
+                with Dataset(_tmp_name) as src, Dataset(
+                    file_path, "w", format="NETCDF4"
+                ) as dst:
                     # copy attributes
                     for name in src.ncattrs():
                         dst.setncattr(name, src.getncattr(name))
@@ -902,19 +963,20 @@ class init_tools(abc.ABC):
                     for name in src.groups.keys():
                         dst.createGroup(name)
                         for vname, variable in src.groups[name].variables.items():
-                            _mname = name + '/' + vname
-                            dst.createVariable(_mname, variable.datatype,
-                                               variable.dimensions)
-                            dst.groups[name].variables[vname][:] = \
-                                src.groups[name].variables[vname][:]
+                            _mname = name + "/" + vname
+                            dst.createVariable(
+                                _mname, variable.datatype, variable.dimensions
+                            )
+                            dst.groups[name].variables[vname][:] = src.groups[
+                                name
+                            ].variables[vname][:]
                     # copy variables except ones to exclude
                     for name, variable in src.variables.items():
-                        dst.createVariable(name, variable.datatype,
-                                           variable.dimensions)
+                        dst.createVariable(name, variable.datatype, variable.dimensions)
                         dst.variables[name][:] = src.variables[name][:]
 
                 # set object attribute for model
-                self.output_netcdf = Dataset(file_path, 'r+', format='NETCDF4')
+                self.output_netcdf = Dataset(file_path, "r+", format="NETCDF4")
 
                 # synch netcdf file
                 self.output_netcdf.sync()
@@ -922,5 +984,5 @@ class init_tools(abc.ABC):
                 # delete old netCDF4 file
                 os.remove(_tmp_name)
 
-        _msg = 'Successfully loaded checkpoint.'
+        _msg = "Successfully loaded checkpoint."
         self.log_info(_msg, verbosity=1)

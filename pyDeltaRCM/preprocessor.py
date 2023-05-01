@@ -16,7 +16,7 @@ from . import shared_tools
 from .model import DeltaModel as BaseDeltaModel
 
 
-_ver: str = ' '.join(('pyDeltaRCM', shared_tools._get_version()))
+_ver: str = " ".join(("pyDeltaRCM", shared_tools._get_version()))
 
 
 class BasePreprocessor(abc.ABC):
@@ -34,18 +34,18 @@ class BasePreprocessor(abc.ABC):
         out the Python API.
 
     """
+
     def __init__(self) -> None:
-        """Initialize the base preprocessor.
-        """
+        """Initialize the base preprocessor."""
         self._input_file = None  # initialize empty
 
         self._has_ensemble = False
         self._has_set = False
         self._has_matrix = False
 
-        self._file_list: List[Path] = []    # list of yaml files for jobs
-        self._config_list = []              # list of dict configs for jobs
-        self._job_list = []                 # list of _Job objects
+        self._file_list: List[Path] = []  # list of yaml files for jobs
+        self._config_list = []  # list of dict configs for jobs
+        self._job_list = []  # list of _Job objects
 
         self._dryrun = False
 
@@ -103,13 +103,12 @@ class BasePreprocessor(abc.ABC):
             yaml_dict = input_file
 
         # simple cases will be string/path
-        elif (isinstance(input_file, str) or
-              isinstance(input_file, Path)):
+        elif isinstance(input_file, str) or isinstance(input_file, Path):
             yaml_dict = self._open_yaml(input_file)
 
         # something wrong with input
         else:
-            raise ValueError('Invalid input file argument.')
+            raise ValueError("Invalid input file argument.")
 
         return yaml_dict
 
@@ -158,29 +157,28 @@ class BasePreprocessor(abc.ABC):
         :meth:`_expand_matrix`.
 
         """
-        if 'set' in self.config_dict.keys():
+        if "set" in self.config_dict.keys():
             # set found
             self._has_set = True
             # can't specify matrix with set
-            if ('matrix' in self.config_dict.keys()):
-                raise ValueError(
-                    'Cannot use "matrix" and "set" expansion together.')
+            if "matrix" in self.config_dict.keys():
+                raise ValueError('Cannot use "matrix" and "set" expansion together.')
 
-        if 'ensemble' in self.config_dict.keys():
+        if "ensemble" in self.config_dict.keys():
             # ensemble found
             self._has_ensemble = True
 
-        if 'matrix' in self.config_dict.keys():
+        if "matrix" in self.config_dict.keys():
             # matrix found
             self._has_matrix = True
 
-        if 'verbose' in self.config_dict.keys():
-            self.verbose = self.config_dict['verbose']
+        if "verbose" in self.config_dict.keys():
+            self.verbose = self.config_dict["verbose"]
         else:
             self.verbose = 0
 
-        if 'dryrun' in self.config_dict.keys():
-            self._dryrun = self.config_dict['dryrun']
+        if "dryrun" in self.config_dict.keys():
+            self._dryrun = self.config_dict["dryrun"]
 
     def _open_yaml(self, input_file):
         """Safely open, read, and close a yaml file.
@@ -195,35 +193,39 @@ class BasePreprocessor(abc.ABC):
         yaml_dict
             yaml file, as a Python dict
         """
-        if (input_file is None):
+        if input_file is None:
             return {}  # return an empty dict
         else:
             # get the special loader from the shared tools
             loader = shared_tools.custom_yaml_loader()
 
             # open the file with the loader
-            user_file = open(input_file, mode='r')
+            user_file = open(input_file, mode="r")
             yaml_dict = yaml.load(user_file, Loader=loader)
             user_file.close()
             return yaml_dict
 
     def _prepare_multijob_output(self) -> None:
-        if 'out_dir' not in self.config_dict.keys():
+        if "out_dir" not in self.config_dict.keys():
             raise ValueError(
                 'You must specify "out_dir" in YAML to use any '
-                'multi-job expansion tools.')
+                "multi-job expansion tools."
+            )
 
-        self._jobs_root = self.config_dict['out_dir']
+        self._jobs_root = self.config_dict["out_dir"]
 
         # create directory at root
         p = Path(self._jobs_root)
         if p.is_dir():
-            if 'resume_checkpoint' in self.config_dict and \
-              self.config_dict['resume_checkpoint'] is True:
+            if (
+                "resume_checkpoint" in self.config_dict
+                and self.config_dict["resume_checkpoint"] is True
+            ):
                 pass
             else:
                 raise FileExistsError(
-                    'Job output directory (%s) already exists.' % str(p))
+                    "Job output directory (%s) already exists." % str(p)
+                )
         else:
             p.mkdir()
 
@@ -246,144 +248,142 @@ class BasePreprocessor(abc.ABC):
         exist (e.g., only ensemble specified), then the matrix is created.
         """
         # extract the ensemble key
-        _ensemble = self.config_dict.pop('ensemble')
+        _ensemble = self.config_dict.pop("ensemble")
 
         # ensemble must be integer - check if valid
         if not isinstance(_ensemble, int):
-            raise TypeError('Invalid ensemble type, must be an integer.')
+            raise TypeError("Invalid ensemble type, must be an integer.")
 
         if _ensemble == 1:
             # there's nothing to do here
-            warnings.warn(UserWarning(
-                    'Ensemble was set to 1. '
-                    'Remove this key from configuration.'))
+            warnings.warn(
+                UserWarning(
+                    "Ensemble was set to 1. " "Remove this key from configuration."
+                )
+            )
             self._has_ensemble = False
             return
 
         if self._has_set:
-
             # pop the set to work with it, then replace at end
-            old_set = self.config_dict.pop('set')
+            old_set = self.config_dict.pop("set")
             n_ensembles = _ensemble  # from parsing above
 
             # here we augment each set by duplicating and add seed
             new_set = []  # new set list
             for ith_old_set in old_set:
-
                 # loop through the number of ensembles
                 for _ in range(n_ensembles):
                     # make a copy of the ith
                     jth_new_set = ith_old_set.copy()
 
                     # make a new seed for jth set
-                    jth_seed = np.random.randint((2**32) - 1, dtype='u8')
+                    jth_seed = np.random.randint((2**32) - 1, dtype="u8")
 
                     # fill seed spec
-                    jth_new_set['seed'] = jth_seed
+                    jth_new_set["seed"] = jth_seed
 
                     # append to the new set list
                     new_set.append(jth_new_set)
 
-            self.config_dict['set'] = new_set
+            self.config_dict["set"] = new_set
 
         else:
             # if matrix does not exist, then it must be created
-            if 'matrix' not in self.config_dict.keys():
+            if "matrix" not in self.config_dict.keys():
                 _matrix = {}
             else:
-                _matrix = self.config_dict.pop('matrix')
+                _matrix = self.config_dict.pop("matrix")
 
             # check type of matrix
             #   is this needed here? Do earlier? Let it error naturally?
             if not isinstance(_matrix, dict):
                 raise ValueError(
-                    'Invalid matrix specification, '
-                    'was not evaluated to "dict".')
+                    "Invalid matrix specification, " 'was not evaluated to "dict".'
+                )
 
             # check for invalid specs
-            if 'seed' in _matrix.keys():
+            if "seed" in _matrix.keys():
                 raise ValueError(
-                    'Random seeds cannot be specified in the matrix, '
-                    'if an "ensemble" number is specified as well.')
+                    "Random seeds cannot be specified in the matrix, "
+                    'if an "ensemble" number is specified as well.'
+                )
 
             # generate list of random seeds
             seed_list = []
             n_ensembles = _ensemble
             for i in range(n_ensembles):
-                seed_list.append(np.random.randint((2**32) - 1, dtype='u8'))
+                seed_list.append(np.random.randint((2**32) - 1, dtype="u8"))
 
             # add list of random seeds to the matrix
-            _matrix['seed'] = seed_list
+            _matrix["seed"] = seed_list
 
             # write it back to the total configuration
-            self.config_dict['matrix'] = _matrix
+            self.config_dict["matrix"] = _matrix
 
             # change the variable to expand matrix on future step
             self._has_matrix = True
 
     def _expand_set(self) -> None:
-
         # determine the set
-        _set = self.config_dict.pop('set')
+        _set = self.config_dict.pop("set")
 
         # check that all sets are dictionaries
         if not isinstance(_set, list):
             raise TypeError(
-                'Set list must be type `list` but was {}.'.format(type(_set)))
+                "Set list must be type `list` but was {}.".format(type(_set))
+            )
         for i, d in enumerate(_set):  # check validity of keys, depth == 1
             if not isinstance(d, dict):
-                raise TypeError(
-                    'Set must specify as a list of dictionaries')
+                raise TypeError("Set must specify as a list of dictionaries")
             for k in d.keys():  # check validity of keys, depth == 1
-                if ':' in k:
-                    raise ValueError(
-                        'Colon operator found in matrix expansion key.')
+                if ":" in k:
+                    raise ValueError("Colon operator found in matrix expansion key.")
 
         # check that all sets have the same entries
         set0_set = set(_set[0].keys())
         for s in range(1, len(_set)):
             if not (set0_set == set(_set[s].keys())):
-                raise ValueError('All keys in all sets must be identical.')
+                raise ValueError("All keys in all sets must be identical.")
 
         # extract dimensionality of set
         jobs = len(_set)
         dims = len(_set[0])
 
         if self.verbose > 0:
-            print(('Set expansion:\n' +
-                   '  dims {_dims}\n' +
-                   '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
+            print(
+                ("Set expansion:\n" + "  dims {_dims}\n" + "  jobs {_jobs}").format(
+                    _dims=dims, _jobs=jobs
+                )
+            )
 
         # preallocate the matrix expansion job yamls and output table
-        self._matrix_table = np.empty(  # output table
-            (jobs, dims+1), dtype='O')
+        self._matrix_table = np.empty((jobs, dims + 1), dtype="O")  # output table
 
         _fixed_config = self.config_dict.copy()  # fixed config dict
 
         # loop through each and create a config and add to _config_list
         for i in range(jobs):
-
             # being with the fixed config
             ith_config = _fixed_config.copy()
 
             # find job id and create output file
-            ith_id = 'job_' + str(i).zfill(3)
+            ith_id = "job_" + str(i).zfill(3)
             ith_dir = os.path.join(self._jobs_root, ith_id)
 
             # write the job number into output table
             self._matrix_table[i, 0] = ith_id
 
             # get config for this job
-            ith_config['out_dir'] = ith_dir
+            ith_config["out_dir"] = ith_dir
 
             # loop through each var of this job
             for j, (key, val) in enumerate(_set[i].items()):
-
                 # write info into fixed config dict
                 ith_config[key] = val
 
                 # write info into output table
-                self._matrix_table[i, j+1] = val
+                self._matrix_table[i, j + 1] = val
 
             # add the configuration to a list to write out below
             self._config_list.append(ith_config)
@@ -391,13 +391,16 @@ class BasePreprocessor(abc.ABC):
         # store the matrix expansion
         #   this is useful for references by custom
         #   Python preprocessing / postprocessing
-        matrix_table_file = os.path.join(
-            self._jobs_root, 'jobs_parameters.txt')
-        self._matrix_table_header = ', '.join(
-            ['job_id', *[i for i in _set[0].keys()]])
-        np.savetxt(matrix_table_file, self._matrix_table,
-                   fmt='%s', delimiter=',', comments='',
-                   header=self._matrix_table_header)
+        matrix_table_file = os.path.join(self._jobs_root, "jobs_parameters.txt")
+        self._matrix_table_header = ", ".join(["job_id", *[i for i in _set[0].keys()]])
+        np.savetxt(
+            matrix_table_file,
+            self._matrix_table,
+            fmt="%s",
+            delimiter=",",
+            comments="",
+            header=self._matrix_table_header,
+        )
 
     def _expand_matrix(self) -> None:
         """Expand YAML matrix.
@@ -405,32 +408,34 @@ class BasePreprocessor(abc.ABC):
         Compute the matrix expansion of parameters listed in `matrix` key.
         """
         # extract and remove 'matrix' from config
-        _matrix = self.config_dict.pop('matrix')
+        _matrix = self.config_dict.pop("matrix")
 
         # check validity of matrix specs
         if not isinstance(_matrix, dict):
             raise ValueError(
-                'Invalid matrix specification, was not evaluated to "dict".')
-        if 'out_dir' in _matrix.keys():
-            raise ValueError(
-                'You cannot specify "out_dir" as a matrix expansion key.')
+                'Invalid matrix specification, was not evaluated to "dict".'
+            )
+        if "out_dir" in _matrix.keys():
+            raise ValueError('You cannot specify "out_dir" as a matrix expansion key.')
         for k in _matrix.keys():  # check validity of keys, depth == 1
             if len(_matrix[k]) == 1:
-                warnings.warn(UserWarning(
-                    'Length of matrix key "%s" was 1, '
-                    'remove this key from matrix configuration.' % str(k)))
+                warnings.warn(
+                    UserWarning(
+                        'Length of matrix key "%s" was 1, '
+                        "remove this key from matrix configuration." % str(k)
+                    )
+                )
             for v in _matrix[k]:
                 if isinstance(v, list):
-                    raise ValueError(
-                        'Depth of matrix expansion must not be > 1')
-            if ':' in k:
-                raise ValueError(
-                    'Colon operator found in matrix expansion key.')
+                    raise ValueError("Depth of matrix expansion must not be > 1")
+            if ":" in k:
+                raise ValueError("Colon operator found in matrix expansion key.")
             if k in self.config_dict.keys():
                 raise ValueError(
-                    'You cannot specify the same key in the matrix '
-                    'configuration and fixed configuration. '
-                    'Key "%s" was specified in both.' % str(k))
+                    "You cannot specify the same key in the matrix "
+                    "configuration and fixed configuration. "
+                    'Key "%s" was specified in both.' % str(k)
+                )
 
         # compute the expansion
         var_list = [k for k in _matrix.keys()]
@@ -442,38 +447,37 @@ class BasePreprocessor(abc.ABC):
         _fixed_config = self.config_dict.copy()  # fixed config dict
 
         if self.verbose > 0:
-            print(('Matrix expansion:\n' +
-                   '  dims {_dims}\n' +
-                   '  jobs {_jobs}').format(_dims=dims, _jobs=jobs))
+            print(
+                ("Matrix expansion:\n" + "  dims {_dims}\n" + "  jobs {_jobs}").format(
+                    _dims=dims, _jobs=jobs
+                )
+            )
 
         # preallocate the matrix expansion job yamls and output table
-        self._matrix_table = np.empty(  # output table
-            (jobs, dims+1), dtype='O')
+        self._matrix_table = np.empty((jobs, dims + 1), dtype="O")  # output table
 
         # loop through each and create a config and add to _config_list
         for i in range(jobs):
-
             # begin with the fixed config
             ith_config = _fixed_config.copy()
 
             # find job id and create output file
-            ith_id = 'job_' + str(i).zfill(3)
+            ith_id = "job_" + str(i).zfill(3)
             ith_dir = os.path.join(self._jobs_root, ith_id)
 
             # write the job number into output table
             self._matrix_table[i, 0] = ith_id
 
             # get config for this job
-            ith_config['out_dir'] = ith_dir
+            ith_config["out_dir"] = ith_dir
 
             # loop through each var of this job
             for j, val in enumerate(_combs[i]):
-
                 # write info into fixed config dict
                 ith_config[var_list[j]] = val
 
                 # write info into output table
-                self._matrix_table[i, j+1] = val
+                self._matrix_table[i, j + 1] = val
 
             # add the configuration to a list to write out below
             self._config_list.append(ith_config)
@@ -481,50 +485,55 @@ class BasePreprocessor(abc.ABC):
         # store the matrix expansion
         #   this is useful for references by custom
         #   Python preprocessing / postprocessing
-        matrix_table_file = os.path.join(
-            self._jobs_root, 'jobs_parameters.txt')
-        self._matrix_table_header = ', '.join(['job_id', *var_list])
-        np.savetxt(matrix_table_file, self._matrix_table,
-                   fmt='%s', delimiter=',', comments='',
-                   header=self._matrix_table_header)
+        matrix_table_file = os.path.join(self._jobs_root, "jobs_parameters.txt")
+        self._matrix_table_header = ", ".join(["job_id", *var_list])
+        np.savetxt(
+            matrix_table_file,
+            self._matrix_table,
+            fmt="%s",
+            delimiter=",",
+            comments="",
+            header=self._matrix_table_header,
+        )
 
     def _write_job_configs(self) -> None:
-
         if len(self._config_list) == 0:
-            raise ValueError('Config list empty!')
+            raise ValueError("Config list empty!")
 
         # do not write any time information to file
         #   this list defines the time-related keywords
-        _time_list = ['timesteps', 'time', 'time_years']
+        _time_list = ["timesteps", "time", "time_years"]
 
         # loop through each job to write out info
         for c, config in enumerate(self.config_list):
-
             # write out the job specific yaml file
             # ith_p = self._write_yaml_config(c, config)
             if self.verbose > 0:
-                print('Writing YAML file for job ' + str(int(c)))
+                print("Writing YAML file for job " + str(int(c)))
 
             # strip the time related parameters from the config
             config_write = config.copy()
             [config_write.pop(key) for key in _time_list if key in config_write.keys()]
 
-            ith_dir = Path(config['out_dir'])       # job output folder
-            ith_id = ith_dir.parts[-1]              # job id
+            ith_dir = Path(config["out_dir"])  # job output folder
+            ith_id = ith_dir.parts[-1]  # job id
 
             # create the output directory if needed
             if ith_dir.is_dir():
-                if 'resume_checkpoint' in self.config_dict and \
-                  self.config_dict['resume_checkpoint'] is True:
+                if (
+                    "resume_checkpoint" in self.config_dict
+                    and self.config_dict["resume_checkpoint"] is True
+                ):
                     pass
                 else:
                     raise FileExistsError(
-                        'Job output directory (%s) already exists.' % str(ith_dir))
+                        "Job output directory (%s) already exists." % str(ith_dir)
+                    )
             else:
                 ith_dir.mkdir()
 
             # write the file into the output directory
-            ith_p = ith_dir / (str(ith_id) + '.yml')
+            ith_p = ith_dir / (str(ith_id) + ".yml")
             _write_yaml_config_to_file(config_write, ith_p)
 
             # append to the file list
@@ -542,7 +551,7 @@ class BasePreprocessor(abc.ABC):
 
         # process the special DeltaModel argument
         #  if not None, it is a class to be used by the Jobs
-        if (DeltaModel is None):
+        if DeltaModel is None:
             DeltaModel = BaseDeltaModel
 
         # initialize empty list to maintain reference to all Job instances
@@ -551,9 +560,9 @@ class BasePreprocessor(abc.ABC):
         # NOTE: multiprocessing infrastructure is only available on linux.
         #       We only use parallel approach if the --parallel flag is given
         #       and we are running on linux.
-        if 'parallel' in self.config_dict.keys():
+        if "parallel" in self.config_dict.keys():
             # and not (self.config_dict['parallel'] is None)):
-            _parallel_flag = self.config_dict['parallel']
+            _parallel_flag = self.config_dict["parallel"]
         else:
             _parallel_flag = False
 
@@ -563,25 +572,28 @@ class BasePreprocessor(abc.ABC):
         if _parallel_flag:
             # validate that os is Linux, otherwise error
             _os = platform.system()
-            if _os != 'Linux':
+            if _os != "Linux":
                 raise NotImplementedError(
-                    'Parallel simulations only implemented on Linux.')
+                    "Parallel simulations only implemented on Linux."
+                )
 
             # determine the number of processors to use
-            if (_parallel_flag is True):
+            if _parallel_flag is True:
                 # (number cores avail - 1), or 1 and never 0
                 num_parallel_processes = (multiprocessing.cpu_count() - 1) or 1
-            elif (isinstance(_parallel_flag, int)):
+            elif isinstance(_parallel_flag, int):
                 num_parallel_processes = _parallel_flag
             else:
-                raise ValueError('Parallel flag must be boolean or integer, '
-                                 'but was {}, {}.'.format(type(_parallel_flag),
-                                                          str(_parallel_flag)))
+                raise ValueError(
+                    "Parallel flag must be boolean or integer, "
+                    "but was {}, {}.".format(type(_parallel_flag), str(_parallel_flag))
+                )
             # number of parallel processes is never greater than number of jobs
             num_parallel_processes = np.minimum(
-                num_parallel_processes, num_total_processes)
+                num_parallel_processes, num_total_processes
+            )
 
-            _msg = 'Running %g parallel jobs' % num_parallel_processes
+            _msg = "Running %g parallel jobs" % num_parallel_processes
             if self.verbose >= 1:
                 print(_msg)
 
@@ -605,10 +617,14 @@ class BasePreprocessor(abc.ABC):
                 job_config.update(job_yaml)
 
                 # instantiate the job
-                p = _ParallelJob(i=i, queue=q, sema=s,
-                                 input_file=self.file_list[i],
-                                 config_dict=job_config,
-                                 DeltaModel=DeltaModel)
+                p = _ParallelJob(
+                    i=i,
+                    queue=q,
+                    sema=s,
+                    input_file=self.file_list[i],
+                    config_dict=job_config,
+                    DeltaModel=DeltaModel,
+                )
                 self._job_list.append(p)
                 p.start()
 
@@ -620,18 +636,18 @@ class BasePreprocessor(abc.ABC):
             time.sleep(1)
             while not q.empty():
                 gotq = q.get()
-                if gotq['code'] == 1:
+                if gotq["code"] == 1:
                     print("Job {job} ended in error:\n {msg}".format_map(gotq))
                 else:
-                    print("Job {job} returned code {code} "
-                          "for stage {stage}.".format_map(gotq))
+                    print(
+                        "Job {job} returned code {code} "
+                        "for stage {stage}.".format_map(gotq)
+                    )
 
         # if the parallel flag is False (default)
-        elif (_parallel_flag is False):
-
+        elif _parallel_flag is False:
             # loop and create all jobs
             for i in range(0, num_total_processes):
-
                 # open yaml file for specific job
                 job_yaml = self._open_yaml(self.file_list[i])
 
@@ -641,10 +657,12 @@ class BasePreprocessor(abc.ABC):
                 job_config = self.config_list[i].copy()
                 job_config.update(job_yaml)
 
-                p = _SerialJob(i=i,
-                               input_file=self.file_list[i],
-                               config_dict=job_config,
-                               DeltaModel=DeltaModel)
+                p = _SerialJob(
+                    i=i,
+                    input_file=self.file_list[i],
+                    config_dict=job_config,
+                    DeltaModel=DeltaModel,
+                )
                 self._job_list.append(p)
 
             # run the job(s)
@@ -671,9 +689,14 @@ class _BaseJob(abc.ABC):
     .. note:: You probably don't need to interact with this class directly.
     """
 
-    def __init__(self, i, input_file, config_dict,
-                 DeltaModel: Optional[Type[BaseDeltaModel]]=None, 
-                 defer_output: bool=False) -> None:
+    def __init__(
+        self,
+        i,
+        input_file,
+        config_dict,
+        DeltaModel: Optional[Type[BaseDeltaModel]] = None,
+        defer_output: bool = False,
+    ) -> None:
         """Initialize a job.
 
         The `input_file` argument is passed to the DeltaModel for
@@ -687,50 +710,51 @@ class _BaseJob(abc.ABC):
         self.i = i
         self.input_file = input_file
 
-        if (DeltaModel is None):
+        if DeltaModel is None:
             DeltaModel = BaseDeltaModel
 
-        self.deltamodel = DeltaModel(input_file=input_file,
-                                     defer_output=defer_output)
+        self.deltamodel = DeltaModel(input_file=input_file, defer_output=defer_output)
         _curr_time = self.deltamodel._time
 
         # process If
-        if 'If' in config_dict.keys():
-            self._If = float(config_dict['If'])
+        if "If" in config_dict.keys():
+            self._If = float(config_dict["If"])
         else:
             self._If = 1.0
 
         # determine job end time, *in model time*
-        if ('timesteps' in config_dict.keys()):
+        if "timesteps" in config_dict.keys():
             # fill informational fields
-            self._time_type = 'timesteps'
-            self._time_config = config_dict['timesteps']
+            self._time_type = "timesteps"
+            self._time_config = config_dict["timesteps"]
 
             # compute the end time
-            self._job_end_time = _curr_time + \
-                ((config_dict['timesteps'] * self.deltamodel._dt))
+            self._job_end_time = _curr_time + (
+                (config_dict["timesteps"] * self.deltamodel._dt)
+            )
 
-        elif ('time' in config_dict.keys()):
+        elif "time" in config_dict.keys():
             # fill informational fields
-            self._time_type = 'time'
-            self._time_config = config_dict['time']
+            self._time_type = "time"
+            self._time_config = config_dict["time"]
 
             # compute the end time
-            self._job_end_time = _curr_time + \
-                (config_dict['time'] * self._If)
+            self._job_end_time = _curr_time + (config_dict["time"] * self._If)
 
-        elif ('time_years' in config_dict.keys()):
+        elif "time_years" in config_dict.keys():
             # fill informational fields
-            self._time_type = 'time_years'
-            self._time_config = config_dict['time_years']
+            self._time_type = "time_years"
+            self._time_config = config_dict["time_years"]
 
             # compute the end time
-            self._job_end_time = _curr_time + \
-                (config_dict['time_years'] * self._If * 86400 * 365.25)
+            self._job_end_time = _curr_time + (
+                config_dict["time_years"] * self._If * 86400 * 365.25
+            )
         else:
             raise ValueError(
-                'You must specify a run duration configuration in either '
-                'the input YAML file or via input arguments.')
+                "You must specify a run duration configuration in either "
+                "the input YAML file or via input arguments."
+            )
 
     @abc.abstractmethod
     def run(self):
@@ -763,9 +787,9 @@ class _SerialJob(_BaseJob):
         `config_dict` argument, and are processed into a single value for the
         run time.
         """
-        super().__init__(i, input_file, config_dict,
-                         DeltaModel=DeltaModel,
-                         defer_output=False)
+        super().__init__(
+            i, input_file, config_dict, DeltaModel=DeltaModel, defer_output=False
+        )
 
     def run(self) -> None:
         """Loop the model.
@@ -781,15 +805,20 @@ class _SerialJob(_BaseJob):
 
         # if the model run fails
         except (RuntimeError, ValueError) as e:
-            _msg = ', '.join(['job: ' + str(self.i), 'stage: ' + '1',
-                             'code: ' + '1', 'msg: ' + str(e)])
+            _msg = ", ".join(
+                [
+                    "job: " + str(self.i),
+                    "stage: " + "1",
+                    "code: " + "1",
+                    "msg: " + str(e),
+                ]
+            )
             self.deltamodel.logger.error(_msg)
             self.deltamodel.logger.exception(e)
 
         # if the model run succeeds
         else:
-            _msg = ', '.join(['job: ' + str(self.i), 'stage: ' + '1',
-                             'code: ' + '0'])
+            _msg = ", ".join(["job: " + str(self.i), "stage: " + "1", "code: " + "0"])
             self.deltamodel.logger.info(_msg)
 
         # try to finalize the model
@@ -798,15 +827,20 @@ class _SerialJob(_BaseJob):
 
         # if the model finalization fails
         except (RuntimeError, ValueError) as e:
-            _msg = ', '.join(['job: ' + str(self.i), 'stage: ' + '2',
-                             'code: ' + '1', 'msg: ' + str(e)])
+            _msg = ", ".join(
+                [
+                    "job: " + str(self.i),
+                    "stage: " + "2",
+                    "code: " + "1",
+                    "msg: " + str(e),
+                ]
+            )
             self.deltamodel.logger.error(_msg)
             self.deltamodel.logger.exception(e)
 
         # if the finalization succeeds
         else:
-            _msg = ', '.join(['job: ' + str(self.i), 'stage: ' + '2',
-                             'code: ' + '0'])
+            _msg = ", ".join(["job: " + str(self.i), "stage: " + "2", "code: " + "0"])
             self.deltamodel.logger.info(_msg)
 
 
@@ -819,8 +853,9 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
     .. note:: You probably don't need to interact with this class directly.
     """
 
-    def __init__(self, i, queue, sema,
-                 input_file, config_dict, DeltaModel=None) -> None:
+    def __init__(
+        self, i, queue, sema, input_file, config_dict, DeltaModel=None
+    ) -> None:
         """Initialize a parallel job.
 
         The `input_file` argument is passed to the DeltaModel for
@@ -831,9 +866,9 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
         run time.
         """
         # inherit with explicit method resolution order
-        _BaseJob.__init__(self, i, input_file, config_dict,
-                          DeltaModel=DeltaModel,
-                          defer_output=True)
+        _BaseJob.__init__(
+            self, i, input_file, config_dict, DeltaModel=DeltaModel, defer_output=True
+        )
         multiprocessing.Process.__init__(self)
 
         self.queue = queue
@@ -845,7 +880,7 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
         Iterate the timestep ``update`` routine for the specified number of
         iterations.
         """
-        self.queue.put({'job': self.i, 'stage': 0, 'code': 0})
+        self.queue.put({"job": self.i, "stage": 0, "code": 0})
 
         # overall wrapped in try to ensure sema is safely released
         try:
@@ -874,15 +909,13 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
 
             # if the model run fails
             except (RuntimeError, ValueError) as e:
-                self.queue.put({'job': self.i, 'stage': 1,
-                                'code': 1, 'msg': str(e)})
+                self.queue.put({"job": self.i, "stage": 1, "code": 1, "msg": str(e)})
                 self.deltamodel.logger.error(str(e))
                 self.deltamodel.logger.exception(e)
 
             # if the model run succeeds
             else:
-                self.queue.put({'job': self.i, 'stage': 1,
-                                'code': 0})
+                self.queue.put({"job": self.i, "stage": 1, "code": 0})
 
             # try to finalize the model
             try:
@@ -890,15 +923,13 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
 
             # if the model finalization fails
             except (RuntimeError, ValueError) as e:
-                self.queue.put({'job': self.i, 'stage': 2,
-                                'code': 1, 'msg': str(e)})
+                self.queue.put({"job": self.i, "stage": 2, "code": 1, "msg": str(e)})
                 self.deltamodel.logger.error(str(e))
                 self.deltamodel.logger.exception(e)
 
             # if the finalization succeeds
             else:
-                self.queue.put({'job': self.i, 'stage': 2,
-                                'code': 0})
+                self.queue.put({"job": self.i, "stage": 2, "code": 0})
 
         # ALWAYS release the semaphore, so other runs can continue
         finally:
@@ -939,8 +970,8 @@ class PreprocessorCLI(BasePreprocessor):
         cli_dict = self.process_arguments()
 
         # process the input file to a dictionary (or empty if none)
-        if cli_dict['config'] is not None:
-            input_file = cli_dict['config']
+        if cli_dict["config"] is not None:
+            input_file = cli_dict["config"]
             yaml_dict = self.open_input_file_to_dict(input_file)
             self._input_file = input_file  # fill field
         else:
@@ -964,72 +995,90 @@ class PreprocessorCLI(BasePreprocessor):
 
         """
         parser = argparse.ArgumentParser(
-            description='Arguments for running pyDeltaRCM from command line')
+            description="Arguments for running pyDeltaRCM from command line"
+        )
 
         parser.add_argument(
-            '--config', help='Path to a config file that you would like '
-            'to use.')
+            "--config", help="Path to a config file that you would like " "to use."
+        )
         parser.add_argument(
-            '--timesteps', help='Number of timesteps to run model. Optional, '
-            'and if provided, will override any value in the config file. '
-            'Is overrided by "time" options.')
+            "--timesteps",
+            help="Number of timesteps to run model. Optional, "
+            "and if provided, will override any value in the config file. "
+            'Is overrided by "time" options.',
+        )
         parser.add_argument(
-            '--time', help='Time to run the model until, in seconds.'
-            'Time is scaled due to intermittency, which is set to 1 by '
+            "--time",
+            help="Time to run the model until, in seconds."
+            "Time is scaled due to intermittency, which is set to 1 by "
             'default (i.e., no scaling). See options "If" or "time_years" '
-            'for other specification options. Optional, '
-            'and if provided, will override any value in the config file.')
+            "for other specification options. Optional, "
+            "and if provided, will override any value in the config file.",
+        )
         parser.add_argument(
-            '--time_years', help='Time to run the model until, in years.'
-            'Time is scaled due to intermittency, which is set to 1 by '
+            "--time_years",
+            help="Time to run the model until, in years."
+            "Time is scaled due to intermittency, which is set to 1 by "
             'default (i.e., no scaling). See options "If" or "time" '
-            'for other specification options. Optional, '
-            'and if provided, will override any value in the config file.')
+            "for other specification options. Optional, "
+            "and if provided, will override any value in the config file.",
+        )
         parser.add_argument(
-            '--If', help='Assumed intermittency factor for converting model '
-            'time to real-world time. This is a value in (0, 1] representing '
-            'the fraction of days per year that the delta is flooding. '
-            'Optional, default value is 1.')
+            "--If",
+            help="Assumed intermittency factor for converting model "
+            "time to real-world time. This is a value in (0, 1] representing "
+            "the fraction of days per year that the delta is flooding. "
+            "Optional, default value is 1.",
+        )
         parser.add_argument(
-            '--dryrun', action='store_true',
-            help='Boolean indicating whether to execute timestepping or only '
-            'set up the run.')
+            "--dryrun",
+            action="store_true",
+            help="Boolean indicating whether to execute timestepping or only "
+            "set up the run.",
+        )
         parser.add_argument(
-            '--parallel', type=int, nargs='?', const=True,
-            help='Run jobs in parallel, if possible. If given without any'
-            'argument, the number of parallel cores used depends '
-            'on system specs as (ncores - 1). Specify an integer value to '
-            'specify the number of cores to be used. '
-            'Optional, default value is False.')
+            "--parallel",
+            type=int,
+            nargs="?",
+            const=True,
+            help="Run jobs in parallel, if possible. If given without any"
+            "argument, the number of parallel cores used depends "
+            "on system specs as (ncores - 1). Specify an integer value to "
+            "specify the number of cores to be used. "
+            "Optional, default value is False.",
+        )
         parser.add_argument(
-            '--version', action='version',
-            version=_ver, help='Print pyDeltaRCM version.')
+            "--version",
+            action="version",
+            version=_ver,
+            help="Print pyDeltaRCM version.",
+        )
 
         # parse and convert to dict
         args = parser.parse_args()
         args_dict = vars(args)
 
         # convert arguments to valid types for preprocessor
-        if not (args_dict['timesteps'] is None):
-            args_dict['timesteps'] = int(args_dict['timesteps'])
+        if not (args_dict["timesteps"] is None):
+            args_dict["timesteps"] = int(args_dict["timesteps"])
         else:
-            args_dict.pop('timesteps')
-        if not (args_dict['time'] is None):
-            args_dict['time'] = float(args_dict['time'])
+            args_dict.pop("timesteps")
+        if not (args_dict["time"] is None):
+            args_dict["time"] = float(args_dict["time"])
         else:
-            args_dict.pop('time')
-        if not (args_dict['time_years'] is None):
-            args_dict['time_years'] = float(args_dict['time_years'])
+            args_dict.pop("time")
+        if not (args_dict["time_years"] is None):
+            args_dict["time_years"] = float(args_dict["time_years"])
         else:
-            args_dict.pop('time_years')
+            args_dict.pop("time_years")
 
         # set (or remove) defaults as needed
-        if (args_dict['parallel'] is None):
+        if args_dict["parallel"] is None:
             # if not given remove the key from cli spec
-            args_dict.pop('parallel')
-        if (args_dict['If'] is None):
+            args_dict.pop("parallel")
+        if args_dict["If"] is None:
             # if not given remove the key from cli spec
-            args_dict.pop('If')
+            args_dict.pop("If")
 
         return args_dict
 
@@ -1083,7 +1132,7 @@ class Preprocessor(BasePreprocessor):
         super().__init__()
 
         if not input_file and len(kwargs.keys()) == 0:
-            raise ValueError('Cannot use Preprocessor with no arguments.')
+            raise ValueError("Cannot use Preprocessor with no arguments.")
 
         # process "command line" to a dict (already is)
         cli_dict = kwargs
@@ -1135,12 +1184,13 @@ def _write_yaml_config_to_file(_config, _path) -> None:
         This function is utilized by the BMI implementation of pyDeltaRCM as
         well. Please do not move.
     """
+
     def _write_parameter_to_file(f, varname, varvalue):
         """Write each line, formatted."""
         if varvalue is None:
-            f.write(varname + ': ' + 'null' + '\n')
+            f.write(varname + ": " + "null" + "\n")
         else:
-            f.write(varname + ': ' + str(varvalue) + '\n')
+            f.write(varname + ": " + str(varvalue) + "\n")
 
     f = open(_path, "a")
     for k in _config.keys():
@@ -1191,11 +1241,9 @@ def scale_relative_sea_level_rise_rate(mmyr: float, If: float = 1) -> float:
     scaled : :obj:`float`
         Scaled relative sea level rise rate, in meters per second.
     """
-    return (mmyr / 1000) * (1 / (shared_tools._scale_factor(
-        If, units='years')))
+    return (mmyr / 1000) * (1 / (shared_tools._scale_factor(If, units="years")))
 
 
 # make the connection for running the preprocessor directly
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     preprocessor_wrapper()
