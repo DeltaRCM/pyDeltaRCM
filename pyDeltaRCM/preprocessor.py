@@ -688,7 +688,6 @@ class _BaseJob(abc.ABC):
 
     .. note:: You probably don't need to interact with this class directly.
     """
-
     def __init__(
         self,
         i,
@@ -799,7 +798,7 @@ class _SerialJob(_BaseJob):
         """
         # try to initialize and run the model
         try:
-            # run the simualtion
+            # run the simulation
             while self.deltamodel._time < self._job_end_time:
                 self.deltamodel.update()
 
@@ -1176,8 +1175,8 @@ def preprocessor_wrapper() -> None:
 def _write_yaml_config_to_file(_config, _path) -> None:
     """Write a config to file in output folder.
 
-    Write the entire yaml configuation for the configured job out to a
-    file in the job output foler.
+    Write the entire yaml configuration for the configured job out to a
+    file in the job output folder.
 
     .. note::
 
