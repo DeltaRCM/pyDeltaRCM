@@ -38,7 +38,7 @@ jobs:
         pip install -r requirements.txt
     - name: Install pyDeltaRCM
       run: |
-        pip install -e .
+        python setup.py install
     - name: Test with pytest
       run: |
         pytest --mpl --mpl-baseline-path=tests/imgs_baseline
@@ -70,7 +70,7 @@ jobs:
         pip install -r requirements.txt
     - name: Install pyDeltaRCM
       run: |
-        pip install -e .
+        python setup.py install
     - name: Disable jitted for coverage
       run: |
         echo "DISABLE_JIT: 1" > .numba_config.yaml
