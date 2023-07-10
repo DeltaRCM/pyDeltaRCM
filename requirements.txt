@@ -1,6 +1,6 @@
-numpy
 matplotlib>=3.6.1
 scipy>=1.5
 netCDF4
 pyyaml>=5.1
 numba
+numpy
