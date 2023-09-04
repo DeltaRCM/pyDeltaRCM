@@ -15,7 +15,7 @@ pyDeltaRCM
     :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM
 
 .. image:: https://app.codacy.com/project/badge/Grade/1c137d0227914741a9ba09f0b00a49a7
-    :target: https://www.codacy.com/gh/DeltaRCM/pyDeltaRCM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DeltaRCM/pyDeltaRCM&amp;utm_campaign=Badge_Grade
+    :target: https://app.codacy.com/gh/DeltaRCM/pyDeltaRCM/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
 
 
 
