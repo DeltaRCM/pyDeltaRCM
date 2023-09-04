@@ -2,6 +2,10 @@
 pyDeltaRCM
 **************
 
+.. image:: https://api.codacy.com/project/badge/Grade/8d29d90f76e94b91813c4be2b15af754
+   :alt: Codacy Badge
+   :target: https://app.codacy.com/gh/DeltaRCM/pyDeltaRCM?utm_source=github.com&utm_medium=referral&utm_content=DeltaRCM/pyDeltaRCM&utm_campaign=Badge_Grade
+
 .. image:: https://badge.fury.io/py/pyDeltaRCM.svg
     :target: https://badge.fury.io/py/pyDeltaRCM
 
