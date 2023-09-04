@@ -44,7 +44,7 @@ current_inds = delta.free_surf_walk_inds[:, pidx-1]
 water_weights_flat = delta.water_weights.reshape(-1, 9)
 new_direction = water_tools._choose_next_directions(
     current_inds, water_weights_flat)
-new_direction = new_direction.astype(np.int)
+new_direction = new_direction.astype(int)
 #
 #   3. use the new directions for each parcel to determine the new ind for
 #   each parcel
