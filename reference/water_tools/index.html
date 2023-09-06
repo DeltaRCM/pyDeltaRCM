@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>water_tools &#8212; pyDeltaRCM 2.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=0a676766" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=d59dc883" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=fe69f605"></script>
+    <script src="../../_static/documentation_options.js?v=dc13204d"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="sed_tools" href="../sed_tools/index.html" />
@@ -43,7 +43,7 @@
           <div class="body" role="main">
             
   <section id="water-tools">
-<h1>water_tools<a class="headerlink" href="#water-tools" title="Permalink to this heading">¶</a></h1>
+<h1>water_tools<a class="headerlink" href="#water-tools" title="Link to this heading">¶</a></h1>
 <p>The <a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.route_water" title="pyDeltaRCM.water_tools.water_tools.route_water"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_water</span></code></a> routine manages the water routing.
 During <a class="reference internal" href="#pyDeltaRCM.water_tools.water_tools.route_water" title="pyDeltaRCM.water_tools.water_tools.route_water"><code class="xref py py-obj docutils literal notranslate"><span class="pre">route_water</span></code></a>, water iteration is repeated a total of <a class="reference internal" href="../../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.itermax" title="pyDeltaRCM.model.DeltaModel.itermax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">itermax</span></code></a> times.
 During each of these iterations of the water routing, the following methods are called <em>in order</em>:</p>
@@ -64,7 +64,7 @@ During each of these iterations of the water routing, the following methods are 
 </tbody>
 </table>
 <section id="public-api-methods-attached-to-model">
-<h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Permalink to this heading">¶</a></h2>
+<h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Link to this heading">¶</a></h2>
 <p>The following methods are defined in the <code class="docutils literal notranslate"><span class="pre">water_tools</span></code> class, of the <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.water_tools</span></code> module.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -75,10 +75,10 @@ During each of these iterations of the water routing, the following methods are 
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">water_tools</span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">water_tools</span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools" title="Link to this definition">¶</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.build_weight_array">
-<span class="sig-name descname"><span class="pre">build_weight_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.build_weight_array" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">build_weight_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.build_weight_array" title="Link to this definition">¶</a></dt>
 <dd><p>Weighting array of neighbors.</p>
 <p>Create np.array((8,L,W)) of quantity a
 in each of the neighbors to a cell</p>
@@ -86,7 +86,7 @@ in each of the neighbors to a cell</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.check_for_boundary">
-<span class="sig-name descname"><span class="pre">check_for_boundary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.check_for_boundary" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_for_boundary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.check_for_boundary" title="Link to this definition">¶</a></dt>
 <dd><p>Check whether parcels have reached the boundary.</p>
 <p>Checks whether any parcels have reached the model boundaries. If they
 have, then update the information in
@@ -100,7 +100,7 @@ have, then update the information in
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.check_size_of_indices_matrix">
-<span class="sig-name descname"><span class="pre">check_size_of_indices_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">it</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.check_size_of_indices_matrix" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_size_of_indices_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">it</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.check_size_of_indices_matrix" title="Link to this definition">¶</a></dt>
 <dd><p>Check if step path matrix needs to be made larger.</p>
 <p>Initial size of self.free_surf_walk_inds is half of self.stepmax
 because the number of iterations doesn’t go beyond
@@ -111,7 +111,7 @@ self.iter for all further timesteps</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.compute_free_surface">
-<span class="sig-name descname"><span class="pre">compute_free_surface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_free_surface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.compute_free_surface" title="Link to this definition">¶</a></dt>
 <dd><p>Calculate free surface after routing all water parcels.</p>
 <p>This method uses the <cite>free_surf_walk_inds</cite> matrix accumulated
 during the routing of the water parcels (in
@@ -173,7 +173,7 @@ D. A. Edmonds, and P. Passalacqua, Earth Surf. Dynam., 3,
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.finalize_free_surface">
-<span class="sig-name descname"><span class="pre">finalize_free_surface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.finalize_free_surface" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">finalize_free_surface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.finalize_free_surface" title="Link to this definition">¶</a></dt>
 <dd><p>Finalize the water free surface.</p>
 <p>This method occurs after the initial computation of the free surface,
 and creates the new free surface by smoothing the newly computed free
@@ -184,14 +184,14 @@ underrelaxation. Finally, a <a class="reference internal" href="#pyDeltaRCM.wate
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.finalize_water_iteration">
-<span class="sig-name descname"><span class="pre">finalize_water_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iteration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.finalize_water_iteration" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">finalize_water_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iteration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.finalize_water_iteration" title="Link to this definition">¶</a></dt>
 <dd><p>Finish updating flow fields.</p>
 <p>Clean up at end of water iteration</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.flooding_correction">
-<span class="sig-name descname"><span class="pre">flooding_correction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.flooding_correction" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">flooding_correction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.flooding_correction" title="Link to this definition">¶</a></dt>
 <dd><p>Flood dry cells along the shore if necessary.</p>
 <p>Check the neighbors of all dry cells. If any dry cells have wet
 neighbors, check that their stage is not higher than the bed elevation
@@ -201,7 +201,7 @@ If it is, flood the dry cell.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water">
-<span class="sig-name descname"><span class="pre">get_inlet_weights_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_inlet_weights_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.get_inlet_weights_water" title="Link to this definition">¶</a></dt>
 <dd><p>Get weight for inlet cells for water parcels.</p>
 <p>This method determines the <em>weights</em> describing which inlet cells
 water parcels are fed into the domain (where the cells are
@@ -216,7 +216,7 @@ called, returning a balanced weighting across all inlet cells.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.get_water_weight_array">
-<span class="sig-name descname"><span class="pre">get_water_weight_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.get_water_weight_array" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_water_weight_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.get_water_weight_array" title="Link to this definition">¶</a></dt>
 <dd><p>Get step direction weights for each cell.</p>
 <p>This method is called once, before parcels are stepped, because the
 weights do not change during the stepping of parcels.</p>
@@ -242,7 +242,7 @@ for that location.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.get_wet_mask_nh">
-<span class="sig-name descname"><span class="pre">get_wet_mask_nh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.get_wet_mask_nh" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_wet_mask_nh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.get_wet_mask_nh" title="Link to this definition">¶</a></dt>
 <dd><p>Get wet mask.</p>
 <p>Returns np.array((8,L,W)), for each neighbor around a cell
 with 1 if the neighbor is wet and 0 if dry</p>
@@ -250,13 +250,13 @@ with 1 if the neighbor is wet and 0 if dry</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.init_water_iteration">
-<span class="sig-name descname"><span class="pre">init_water_iteration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.init_water_iteration" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">init_water_iteration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.init_water_iteration" title="Link to this definition">¶</a></dt>
 <dd><p>Init the water iteration routine.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.route_water">
-<span class="sig-name descname"><span class="pre">route_water</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.route_water" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">route_water</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.route_water" title="Link to this definition">¶</a></dt>
 <dd><p>Water routing main method.</p>
 <p>This is the main method for water routing in the model. It is
 called once per <cite>update()</cite> call.</p>
@@ -273,7 +273,7 @@ called once per <cite>update()</cite> call.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.run_water_iteration">
-<span class="sig-name descname"><span class="pre">run_water_iteration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run_water_iteration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="Link to this definition">¶</a></dt>
 <dd><p>Run a single iteration of travel paths for all water parcels.</p>
 <p>Runs all water  parcels (<cite>Np_water</cite> parcels) for <cite>stepmax</cite> steps, or
 until the parcels reach a boundary.</p>
@@ -289,14 +289,14 @@ of the <code class="docutils literal notranslate"><span class="pre">while</span>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.update_Q">
-<span class="sig-name descname"><span class="pre">update_Q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jstep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">istep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_current</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_next</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.update_Q" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update_Q</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jstep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">istep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_current</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_next</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.update_Q" title="Link to this definition">¶</a></dt>
 <dd><p>Update discharge field values.</p>
 <p>Method is called after one set of water parcel steps.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.update_flow_field">
-<span class="sig-name descname"><span class="pre">update_flow_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iteration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.update_flow_field" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update_flow_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iteration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.update_flow_field" title="Link to this definition">¶</a></dt>
 <dd><p>Update water discharge.</p>
 <p>Update the water discharge field after one set of water parcels
 iteration.</p>
@@ -304,7 +304,7 @@ iteration.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools.water_tools.update_velocity_field">
-<span class="sig-name descname"><span class="pre">update_velocity_field</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.update_velocity_field" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update_velocity_field</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools.water_tools.update_velocity_field" title="Link to this definition">¶</a></dt>
 <dd><p>Update flow velocity fields.</p>
 <p>Update the flow velocity fields after one set of water parcels
 iteration.</p>
@@ -314,19 +314,19 @@ iteration.</p>
 
 </section>
 <section id="water-tools-helper-functions">
-<h2>water_tools helper functions<a class="headerlink" href="#water-tools-helper-functions" title="Permalink to this heading">¶</a></h2>
+<h2>water_tools helper functions<a class="headerlink" href="#water-tools-helper-functions" title="Link to this heading">¶</a></h2>
 <p>The following routines are jitted for speed.
 They generally take a large number of arrays and constants and return a new array(s) to continue with the model progression within the methods defined above.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools._get_weight_at_cell_water">
-<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_get_weight_at_cell_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_sfc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_nbrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_water_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct_nbrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._get_weight_at_cell_water" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_get_weight_at_cell_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_sfc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_nbrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_water_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct_nbrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._get_weight_at_cell_water" title="Link to this definition">¶</a></dt>
 <dd><p>Compute water weights for a given cell.</p>
 <p>This is a jitted function called by <code class="xref py py-func docutils literal notranslate"><span class="pre">_get_water_weight_array()</span></code>.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools._choose_next_directions">
-<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_choose_next_directions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools._choose_next_directions" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_choose_next_directions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pyDeltaRCM.water_tools._choose_next_directions" title="Link to this definition">¶</a></dt>
 <dd><p>Get new cell locations, based on water weights.</p>
 <dl class="simple">
 <dt>Algorithm is to:</dt><dd><ol class="arabic simple">
@@ -362,7 +362,7 @@ going to travel in the next stage,
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools._calculate_new_inds">
-<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_calculate_new_inds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_inds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ravel_walk</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._calculate_new_inds" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_calculate_new_inds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_inds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ravel_walk</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._calculate_new_inds" title="Link to this definition">¶</a></dt>
 <dd><p>Calculate the new location (current_inds) of parcels.</p>
 <p>Use the information of the current parcel (<cite>current_inds</cite>) in conjunction
 with the D8 direction the parcel needs to travel (<cite>new_direction</cite>) to
@@ -380,7 +380,7 @@ location and then raveling the index back.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools._check_for_loops">
-<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_check_for_loops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">free_surf_walk_inds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CTR</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage_above_SL</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._check_for_loops" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_check_for_loops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">free_surf_walk_inds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CTR</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage_above_SL</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._check_for_loops" title="Link to this definition">¶</a></dt>
 <dd><p>Check for loops in water parcel pathways.</p>
 <p>Look for looping random walks. I.e., this function checks for where a
 parcel will return on its <code class="xref py py-obj docutils literal notranslate"><span class="pre">new_inds</span></code> to somewhere it has already been
@@ -432,19 +432,19 @@ artificially forced to loop, just for the sake of demonstration.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools._update_dirQfield">
-<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_update_dirQfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qfield</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirstep</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._update_dirQfield" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_update_dirQfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qfield</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirstep</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._update_dirQfield" title="Link to this definition">¶</a></dt>
 <dd><p>Update unit vector of water flux in x or y.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools._update_absQfield">
-<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_update_absQfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qfield</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Qp_water</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._update_absQfield" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_update_absQfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qfield</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">astep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Qp_water</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._update_absQfield" title="Link to this definition">¶</a></dt>
 <dd><p>Update norm of water flux vector.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools._accumulate_free_surface_walks">
-<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_accumulate_free_surface_walks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">free_surf_walk_inds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_surf_flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ux</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H_SL</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._accumulate_free_surface_walks" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_accumulate_free_surface_walks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">free_surf_walk_inds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_surf_flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ux</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H_SL</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._accumulate_free_surface_walks" title="Link to this definition">¶</a></dt>
 <dd><p>Accumulate the free surface by walking parcel paths.</p>
 <p>This routine comprises the hydrodynamic physics-based computations.</p>
 <dl class="simple">
@@ -475,7 +475,7 @@ with the resultant computed water surface.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyDeltaRCM.water_tools._smooth_free_surface">
-<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_smooth_free_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Hin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nsmooth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Csmooth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._smooth_free_surface" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.water_tools.</span></span><span class="sig-name descname"><span class="pre">_smooth_free_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Hin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nsmooth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Csmooth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.water_tools._smooth_free_surface" title="Link to this definition">¶</a></dt>
 <dd><p>Smooth the free surface.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -597,7 +597,7 @@ with the resultant computed water surface.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

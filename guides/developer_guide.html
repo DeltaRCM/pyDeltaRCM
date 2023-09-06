@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Developer Guide &#8212; pyDeltaRCM 2.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=d59dc883" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=fe69f605"></script>
+    <script src="../_static/documentation_options.js?v=dc13204d"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="API reference" href="../reference/index.html" />
@@ -42,15 +42,15 @@
           <div class="body" role="main">
             
   <section id="developer-guide">
-<h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Permalink to this heading">¶</a></h1>
+<h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Link to this heading">¶</a></h1>
 <a class="reference external image-reference" href="https://github.com/DeltaRCM/pyDeltaRCM/actions"><img alt="https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg" src="https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg" /></a>
 <p>[![build](<a class="reference external" href="https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg)](https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml">https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg)](https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml</a>)</p>
 <p>This guide provides additional details for implementation that did not make it into the user guide.
 If you have not yet read the user guide, that is the place to start, then visit and refer to this guide for details as necessary.</p>
 <section id="best-practices">
-<h2>Best Practices<a class="headerlink" href="#best-practices" title="Permalink to this heading">¶</a></h2>
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading">¶</a></h2>
 <section id="reproducibility">
-<h3>Reproducibility<a class="headerlink" href="#reproducibility" title="Permalink to this heading">¶</a></h3>
+<h3>Reproducibility<a class="headerlink" href="#reproducibility" title="Link to this heading">¶</a></h3>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>tl;dr: any random numbers must be generated within a jitted function.</p>
@@ -62,7 +62,7 @@ We encourage developers to ensure that their subclass models are also reproducib
 Out of the box, models will use the core <cite>pyDeltaRCM</cite> “seed” functionality to make models reproducible, and checkpointing should easily integrate with most use cases.
 However, models that implement processes or functions that rely on random numbers or samples from random distributions will need to take care to ensure models are reproducible.</p>
 <section id="random-numbers">
-<h4>Random numbers<a class="headerlink" href="#random-numbers" title="Permalink to this heading">¶</a></h4>
+<h4>Random numbers<a class="headerlink" href="#random-numbers" title="Link to this heading">¶</a></h4>
 <p>For <cite>pyDeltaRCM</cite>, the source of random values is a pseudo-random number generator (RNG) from <cite>numpy</cite>, which works by inputting the current state of the RNG to an algorithm, and returning a sample (an integer) that can be mapped to any probability density function.
 Each time the RNG yields a sample, the RNG state is changed, such that repeated samples from the RNG appear to be random, but are actually a deterministic sequence for a given initial RNG state (i.e., for a given seed).</p>
 <p>As a result of the deterministic RNG, model runs are <em>exactly</em> reproducible if they begin from the same initial RNG state.
@@ -84,7 +84,7 @@ Within a Python console, calls to the <cite>numba</cite> RNG will not affect the
 </div>
 </section>
 <section id="a-simple-example">
-<h4>A simple example<a class="headerlink" href="#a-simple-example" title="Permalink to this heading">¶</a></h4>
+<h4>A simple example<a class="headerlink" href="#a-simple-example" title="Link to this heading">¶</a></h4>
 <p>So why does it matter?
 Well, calling <cite>np.random.normal(100, 10)</cite> in a model subclass will give you a random value, and modify the state of the <cite>numpy</cite> RNG, but it will not affect the state of the <cite>numba</cite> RNG (the one <cite>pyDeltaRCM</cite> actually keeps track of).
 Thus, the values returned from the call to <cite>np.random.normal</cite> are not known and are not reproducible.</p>
@@ -195,9 +195,9 @@ First, run the <cite>Broken</cite> model:</p>
 </section>
 </section>
 <section id="model-development">
-<h3>Model development<a class="headerlink" href="#model-development" title="Permalink to this heading">¶</a></h3>
+<h3>Model development<a class="headerlink" href="#model-development" title="Link to this heading">¶</a></h3>
 <section id="slicing-and-neighbors">
-<h4>Slicing and neighbors<a class="headerlink" href="#slicing-and-neighbors" title="Permalink to this heading">¶</a></h4>
+<h4>Slicing and neighbors<a class="headerlink" href="#slicing-and-neighbors" title="Link to this heading">¶</a></h4>
 <p>Slicing an array to find the array values of neighbors is a common operation in the model.
 The preferred way to slice is by 1) padding the array with <a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.custom_pad" title="pyDeltaRCM.shared_tools.custom_pad"><code class="xref py py-func docutils literal notranslate"><span class="pre">custom_pad()</span></code></a>, and 2) looping through rows and columns to directly index. This approach makes for readable and reasonably fast code; for example, to find any cells that are higher than all neighbors:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pad_eta</span> <span class="o">=</span> <span class="n">shared_tools</span><span class="o">.</span><span class="n">custom_pad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">)</span>
@@ -292,7 +292,7 @@ The preferred way to slice is by 1) padding the array with <a class="reference i
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

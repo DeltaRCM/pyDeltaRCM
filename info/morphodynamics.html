@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Morphodynamics &#8212; pyDeltaRCM 2.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=d59dc883" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=fe69f605"></script>
+    <script src="../_static/documentation_options.js?v=dc13204d"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -44,14 +44,14 @@
           <div class="body" role="main">
             
   <section id="morphodynamics">
-<h1>Morphodynamics<a class="headerlink" href="#morphodynamics" title="Permalink to this heading">¶</a></h1>
+<h1>Morphodynamics<a class="headerlink" href="#morphodynamics" title="Link to this heading">¶</a></h1>
 <p>pyDeltaRCM approximates sediment dispersal through the use of a weighted random
 walk dictated by water flux.
 In turn, sediment dispersal drives bed elevation change in the model domain by mass conservation.</p>
 <p>See <a class="footnote-reference brackets" href="#id10" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> for a complete description of morphodynamic assumptions in the DeltaRCM model.
 In this documentation, we focus on the details of <em>model implementation</em>, rather than <em>model design</em>.</p>
 <section id="sediment-transport">
-<span id="id2"></span><h2>Sediment Transport<a class="headerlink" href="#sediment-transport" title="Permalink to this heading">¶</a></h2>
+<span id="id2"></span><h2>Sediment Transport<a class="headerlink" href="#sediment-transport" title="Link to this heading">¶</a></h2>
 <p>Sediment transport in the model is computed according to an excess stress approach.
 Conceptually, sand is routed as bed-material load, and mud is routed as fully suspended load.</p>
 <p>For sand parcels, the <em>transport capacity</em> is determined by the scaling between sediment flux and flow velocity, and takes the form of the Meyer-Peter and Müller (1948) <a class="footnote-reference brackets" href="#id12" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> formula:</p>
@@ -68,7 +68,7 @@ At each parcel step, mud is either eroded or deposited (or neither), depending o
 <p>A complete conceptual description of sediment erosion and deposition routing rules can be found in the original DeltaRCM reference Liang et al., 2015 <a class="footnote-reference brackets" href="#id10" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 </div>
 <section id="sediment-routing-weighting">
-<span id="id5"></span><h3>Sediment routing weighting<a class="headerlink" href="#sediment-routing-weighting" title="Permalink to this heading">¶</a></h3>
+<span id="id5"></span><h3>Sediment routing weighting<a class="headerlink" href="#sediment-routing-weighting" title="Link to this heading">¶</a></h3>
 <p>Sediment routing probability for a given cell <span class="math notranslate nohighlight">\(j\)</span> to neighbor cell <span class="math notranslate nohighlight">\(i\)</span> is computed according to:</p>
 <div class="math notranslate nohighlight">
 \[w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},\]</div>
@@ -84,7 +84,7 @@ At each parcel step, mud is either eroded or deposited (or neither), depending o
 </section>
 </section>
 <section id="changes-in-the-bed-elevation">
-<h2>Changes in the bed elevation<a class="headerlink" href="#changes-in-the-bed-elevation" title="Permalink to this heading">¶</a></h2>
+<h2>Changes in the bed elevation<a class="headerlink" href="#changes-in-the-bed-elevation" title="Link to this heading">¶</a></h2>
 <p>Along the walk of a sediment parcel, the sediment parcel volume is modulated on each step, according to the sediment transport rules described above in <a class="reference internal" href="#sediment-transport"><span class="std std-ref">Sediment Transport</span></a>.
 As the volume of the sediment parcel changes, the channel bed elevation at the current parcel location is updated to reflect this volume change (<code class="xref py py-obj docutils literal notranslate"><span class="pre">_update_fields</span></code>), i.e., the bed is eroded or sediment is deposited on the bed.
 The vertical change in the channel bed is dictated by sediment mass conservation (i.e., Exner equation) and is equal to:</p>
@@ -127,13 +127,13 @@ The impact of routing <em>all</em> sand and mud parcels on bed elevation is show
 </table>
 </section>
 <section id="model-stability">
-<span id="id7"></span><h2>Model Stability<a class="headerlink" href="#model-stability" title="Permalink to this heading">¶</a></h2>
+<span id="id7"></span><h2>Model Stability<a class="headerlink" href="#model-stability" title="Link to this heading">¶</a></h2>
 <p>Model stability depends on a number of conditions.
 At its core though, model stability depends on the bed elevation rate of change over space and time.
 Rapid and/or abrupt bed elevation change trigger numerical instability that can <em>occasionally</em> run-away and cause model runs to fail.
 A number of processes are included in the DeltaRCM framework to help limit the possibility of failed runs.</p>
 <section id="reference-volume">
-<span id="id8"></span><h3>Reference Volume<a class="headerlink" href="#reference-volume" title="Permalink to this heading">¶</a></h3>
+<span id="id8"></span><h3>Reference Volume<a class="headerlink" href="#reference-volume" title="Link to this heading">¶</a></h3>
 <p>The reference volume if the foundational unit (<span class="math notranslate nohighlight">\(V_0\)</span>) impacting model stability.
 This value characterizes the volume on one inlet-channel cell, from the channel bed to the water surface:</p>
 <div class="math notranslate nohighlight">
@@ -141,7 +141,7 @@ This value characterizes the volume on one inlet-channel cell, from the channel 
 <p>where <span class="math notranslate nohighlight">\(h_0\)</span> is the inlet channel depth (meters) and <span class="math notranslate nohighlight">\(\delta_c\)</span> is the cell length (meters).</p>
 </section>
 <section id="time-stepping">
-<h3>Time stepping<a class="headerlink" href="#time-stepping" title="Permalink to this heading">¶</a></h3>
+<h3>Time stepping<a class="headerlink" href="#time-stepping" title="Link to this heading">¶</a></h3>
 <p>Perhaps most important to model stability is the model timestep.
 Recall that for each iteration, the number of parcels and input sediment discharge (as <cite>h0 u0 (c0_percent)/100</cite>) are set by the user (fixed).
 Therefore, to control stability, the duration of time represented by each iteration (i.e., the timestep) is determined such that changes in bed elevation per iteration are small.
@@ -151,13 +151,13 @@ The model timestep is determined as:</p>
 <p>where <span class="math notranslate nohighlight">\(N_{p,sed}\)</span> is the number of sediment parcels, <span class="math notranslate nohighlight">\(dV_s\)</span> is a characteristic sediment volume, based on the reference volume and inlet width as <span class="math notranslate nohighlight">\(dV_s = 0.1 N_0^2 V_0\)</span>, where <span class="math notranslate nohighlight">\(N_0\)</span> is the number of cells across the inlet.</p>
 </section>
 <section id="limiting-bed-elevation-change">
-<h3>Limiting bed elevation change<a class="headerlink" href="#limiting-bed-elevation-change" title="Permalink to this heading">¶</a></h3>
+<h3>Limiting bed elevation change<a class="headerlink" href="#limiting-bed-elevation-change" title="Link to this heading">¶</a></h3>
 <p>At each sediment parcel step, bed elevation change is limited to 1/4 of the local flow depth.
 Additionally, an edge case where repeated channel bed deposition creates a local <cite>depth</cite> &lt; 0 is restricted by enforcing zero deposition if the <cite>depth</cite> &lt; 0.
 These regulations are implemented in the <cite>BaseRouter</cite> class, as <a class="reference internal" href="../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html#pyDeltaRCM.sed_tools.BaseRouter._limit_Vp_change" title="pyDeltaRCM.sed_tools.BaseRouter._limit_Vp_change"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_limit_Vp_change</span></code></a>.</p>
 </section>
 <section id="topographic-diffusion">
-<h3>Topographic diffusion<a class="headerlink" href="#topographic-diffusion" title="Permalink to this heading">¶</a></h3>
+<h3>Topographic diffusion<a class="headerlink" href="#topographic-diffusion" title="Link to this heading">¶</a></h3>
 <p>Abrupt change in bed elevation (i.e., steep local bed slope) may lead to numerical instability.
 To prevent this, a topographic diffusion is applied immediately following the routing of all sand parcels in the model sequence.</p>
 <div class="admonition hint">
@@ -173,7 +173,7 @@ In the following example, <code class="xref py py-obj docutils literal notransla
 </figure>
 <p>The impact of topographic diffusion is minor compared to the bed elevation change driven by parcel erosion or deposition (<a class="reference internal" href="#sand-mud-route-comparison"><span class="std std-ref">sand and mud routing effects</span></a>).</p>
 <section id="notes-for-modeling-best-practices">
-<h4>Notes for modeling best practices<a class="headerlink" href="#notes-for-modeling-best-practices" title="Permalink to this heading">¶</a></h4>
+<h4>Notes for modeling best practices<a class="headerlink" href="#notes-for-modeling-best-practices" title="Link to this heading">¶</a></h4>
 <ul class="simple">
 <li><p>Stop simulations before the delta reaches the edge of the computational domain. Delta channel dynamics are changed when a distributary channel reaches the domain edge, because sediment is conveyed to outside the computational domain where it no longer feeds back on channel development. Channels become “locked” in place in this scenario <a class="footnote-reference brackets" href="#id11" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, because the domain edge is an infinite sediment sink, and therefore rendering invalid any assumptions about stationarity of delta dynamics and/or stratigraphy. Moreover, the downstream water surface boundary condition (<cite>H_SL</cite>) will be violated if a channel reaches the domain edge. Generally, simulations that reach the edge of the domain should be discarded.</p></li>
 <li><p>Stop simulations before the delta reaches a condition where the topset slope is equal to the background slope parameter (<cite>S0</cite>). When the background slope is reached, the transport capacity of sediment through the delta is diminished such that channels “clog” up and trigger model instabilities. This is really only an issue for large domains run for long duration.</p></li>
@@ -181,7 +181,7 @@ In the following example, <code class="xref py py-obj docutils literal notransla
 </ul>
 </section>
 <section id="references">
-<h4>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h4>
+<h4>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h4>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id10" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
@@ -288,7 +288,7 @@ Proceedings of the 2nd Meeting of IAHSR, Stockholm, Sweden, 39–64, 1948.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

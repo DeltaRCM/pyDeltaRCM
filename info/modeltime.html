@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Time in pyDeltaRCM &#8212; pyDeltaRCM 2.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=d59dc883" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=fe69f605"></script>
+    <script src="../_static/documentation_options.js?v=dc13204d"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -44,7 +44,7 @@
           <div class="body" role="main">
             
   <section id="time-in-pydeltarcm">
-<h1>Time in pyDeltaRCM<a class="headerlink" href="#time-in-pydeltarcm" title="Permalink to this heading">¶</a></h1>
+<h1>Time in pyDeltaRCM<a class="headerlink" href="#time-in-pydeltarcm" title="Link to this heading">¶</a></h1>
 <p>Time in the pyDeltaRCM model is simulated in units of seconds.
 The duration of a timestep is determined during model initialization to maintain numerical stability; the calculation is based on model domain and configuration parameters.
 The model is then iterated timestep by timestep, until an end-run condition is reached</p>
@@ -87,14 +87,14 @@ A simulation of every day in the simulation duration would require 1460 days of 
 </figure>
 <p>In contrast, by condensing the simulated time down to a bankfull discharge only, the intermittency assumption allows us to simulate the same “four year” period in just under 59 days of simulated time (<span class="math notranslate nohighlight">\(5.08 \times 10^6\)</span> seconds).</p>
 <section id="see-also">
-<h2>See also<a class="headerlink" href="#see-also" title="Permalink to this heading">¶</a></h2>
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="../reference/preprocessor/index.html#pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate" title="pyDeltaRCM.preprocessor.scale_relative_sea_level_rise_rate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_relative_sea_level_rise_rate</span></code></a></p></li>
 <li><p><a class="reference internal" href="../reference/shared_tools/index.html#pyDeltaRCM.shared_tools.scale_model_time" title="pyDeltaRCM.shared_tools.scale_model_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_model_time</span></code></a></p></li>
 </ul>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h2>
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
 <div role="list" class="citation-list">
 <div class="citation" id="wm60" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">WM60</a><span class="fn-bracket">]</span></span>
@@ -172,7 +172,7 @@ A simulation of every day in the simulation duration would require 1460 days of 
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

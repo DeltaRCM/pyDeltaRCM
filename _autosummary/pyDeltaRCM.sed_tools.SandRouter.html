@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>pyDeltaRCM.sed_tools.SandRouter &#8212; pyDeltaRCM 2.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=d59dc883" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=fe69f605"></script>
+    <script src="../_static/documentation_options.js?v=dc13204d"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pyDeltaRCM.sed_tools.MudRouter" href="pyDeltaRCM.sed_tools.MudRouter.html" />
@@ -44,10 +44,10 @@
           <div class="body" role="main">
             
   <section id="pydeltarcm-sed-tools-sandrouter">
-<h1>pyDeltaRCM.sed_tools.SandRouter<a class="headerlink" href="#pydeltarcm-sed-tools-sandrouter" title="Permalink to this heading">¶</a></h1>
+<h1>pyDeltaRCM.sed_tools.SandRouter<a class="headerlink" href="#pydeltarcm-sed-tools-sandrouter" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyDeltaRCM.sed_tools.SandRouter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.sed_tools.</span></span><span class="sig-name descname"><span class="pre">SandRouter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.sed_tools.</span></span><span class="sig-name descname"><span class="pre">SandRouter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter" title="Link to this definition">¶</a></dt>
 <dd><p>Jitted class to route sand.</p>
 <p>Initialized in
 <a class="reference internal" href="../reference/init_tools/index.html#pyDeltaRCM.init_tools.init_tools.init_sediment_routers" title="pyDeltaRCM.init_tools.init_tools.init_sediment_routers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_sediment_routers</span></code></a> with a
@@ -63,7 +63,7 @@ property <cite>setter</cite>.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.sed_tools.SandRouter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Vp_sed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_ero_sand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_bedload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ivec_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jvec_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iwalk_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jwalk_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_sed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_erosion</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Vp_sed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_ero_sand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_bedload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ivec_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jvec_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iwalk_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jwalk_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_sed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_erosion</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.sed_tools.SandRouter.__init__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -160,7 +160,7 @@ property <cite>setter</cite>.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

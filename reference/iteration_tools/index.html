@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>iteration_tools &#8212; pyDeltaRCM 2.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=0a676766" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=d59dc883" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=fe69f605"></script>
+    <script src="../../_static/documentation_options.js?v=dc13204d"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="init_tools" href="../init_tools/index.html" />
@@ -43,13 +43,13 @@
           <div class="body" role="main">
             
   <section id="iteration-tools">
-<h1>iteration_tools<a class="headerlink" href="#iteration-tools" title="Permalink to this heading">¶</a></h1>
+<h1>iteration_tools<a class="headerlink" href="#iteration-tools" title="Link to this heading">¶</a></h1>
 <div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
 <p>Add paragraph description of the module. What stages are defined here generally? Make a table with the main ones like in water tools?</p>
 </div>
 <section id="public-api-methods-attached-to-model">
-<h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Permalink to this heading">¶</a></h2>
+<h2>Public API methods attached to model<a class="headerlink" href="#public-api-methods-attached-to-model" title="Link to this heading">¶</a></h2>
 <p>The following methods are defined in the <code class="docutils literal notranslate"><span class="pre">iteration_tools</span></code> class, of the <code class="docutils literal notranslate"><span class="pre">pyDeltaRCM.iteration_tools</span></code> module.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -60,7 +60,7 @@
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.iteration_tools.</span></span><span class="sig-name descname"><span class="pre">iteration_tools</span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.iteration_tools.</span></span><span class="sig-name descname"><span class="pre">iteration_tools</span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools" title="Link to this definition">¶</a></dt>
 <dd><p>Tools relating to the updating of the model and model I/O.</p>
 <p>Tools defined in this class include steps to iterate for one timestep,
 finalize timesteps, and saving output figures, grids, and checkpoints.
@@ -68,7 +68,7 @@ Additionally, most stratigraphy-related operations are defined here, since
 these operations largely occur when saving and updating the model.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence">
-<span class="sig-name descname"><span class="pre">apply_subsidence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">apply_subsidence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.apply_subsidence" title="Link to this definition">¶</a></dt>
 <dd><p>Apply subsidence pattern.</p>
 <p>Apply subsidence to domain if toggle_subsidence is True, and
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code> is <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>
@@ -82,13 +82,13 @@ is incremented, such that subsidence will begin on the step
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac">
-<span class="sig-name descname"><span class="pre">compute_sand_frac</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_sand_frac</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.compute_sand_frac" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the sand fraction as a continous updating data field.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep">
-<span class="sig-name descname"><span class="pre">finalize_timestep</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">finalize_timestep</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.finalize_timestep" title="Link to this definition">¶</a></dt>
 <dd><p>Finalize timestep.</p>
 <p>Clean up after sediment routing. This includes a correction for
 flooded cells that are not “wet” (via <code class="xref py py-meth docutils literal notranslate"><span class="pre">flooding_correction()</span></code>).</p>
@@ -97,7 +97,7 @@ flooded cells that are not “wet” (via <code class="xref py py-meth docutils 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.log_info">
-<span class="sig-name descname"><span class="pre">log_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.log_info" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">log_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.log_info" title="Link to this definition">¶</a></dt>
 <dd><p>Log message dependent on verbosity settings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -112,7 +112,7 @@ not. Default value is <cite>0</cite>, or i.e. to always log.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.log_model_time">
-<span class="sig-name descname"><span class="pre">log_model_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.log_model_time" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">log_model_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.log_model_time" title="Link to this definition">¶</a></dt>
 <dd><p>Log the time of the model.</p>
 <p>Reports the time to the log file, and depending on verbosity, will
 report it to stdout.</p>
@@ -120,7 +120,7 @@ report it to stdout.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.make_figure">
-<span class="sig-name descname"><span class="pre">make_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.make_figure" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">make_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.make_figure" title="Link to this definition">¶</a></dt>
 <dd><p>Create a figure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -141,7 +141,7 @@ looked up via <cite>getattr</cite>.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint">
-<span class="sig-name descname"><span class="pre">output_checkpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">output_checkpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_checkpoint" title="Link to this definition">¶</a></dt>
 <dd><p>Output checkpoint if needed.</p>
 <p>Save checkpoint data (including rng state) so that the model can be
 resumed from this time.</p>
@@ -149,19 +149,19 @@ resumed from this time.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.output_data">
-<span class="sig-name descname"><span class="pre">output_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">output_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.output_data" title="Link to this definition">¶</a></dt>
 <dd><p>Output grids and figures if needed.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep">
-<span class="sig-name descname"><span class="pre">run_one_timestep</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run_one_timestep</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.run_one_timestep" title="Link to this definition">¶</a></dt>
 <dd><p>Deprecated, since v1.3.1. Use <a class="reference internal" href="#pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep" title="pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve_water_and_sediment_timestep</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.save_figure">
-<span class="sig-name descname"><span class="pre">save_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_iter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_figure" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">save_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_iter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_figure" title="Link to this definition">¶</a></dt>
 <dd><p>Save a figure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -183,7 +183,7 @@ sure to include the ‘.’ before the extension.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.save_grids">
-<span class="sig-name descname"><span class="pre">save_grids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">save_grids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids" title="Link to this definition">¶</a></dt>
 <dd><p>Save a grid into an existing netCDF file.</p>
 <p>File should already be open (by <code class="xref py py-meth docutils literal notranslate"><span class="pre">init_output_grid()</span></code>) as
 <code class="docutils literal notranslate"><span class="pre">self.output_netcdf</span></code>.</p>
@@ -200,7 +200,7 @@ sure to include the ‘.’ before the extension.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs">
-<span class="sig-name descname"><span class="pre">save_grids_and_figs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">save_grids_and_figs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_grids_and_figs" title="Link to this definition">¶</a></dt>
 <dd><p>Save grids and figures.</p>
 <p>Save grids and/or plots of specified variables (<code class="docutils literal notranslate"><span class="pre">eta</span></code>, <code class="docutils literal notranslate"><span class="pre">discharge</span></code>,
 <code class="docutils literal notranslate"><span class="pre">velocity</span></code>, <code class="docutils literal notranslate"><span class="pre">depth</span></code>, and <code class="docutils literal notranslate"><span class="pre">stage</span></code>), depending on configuration of
@@ -209,7 +209,7 @@ the relevant flags in the YAML configuration file.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint">
-<span class="sig-name descname"><span class="pre">save_the_checkpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">save_the_checkpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.save_the_checkpoint" title="Link to this definition">¶</a></dt>
 <dd><p>Save checkpoint files.</p>
 <p>Saves the grids to a .npz file so that the model can be
 initiated from this point. The timestep of the checkpoint is also
@@ -232,7 +232,7 @@ with either a frequency of <cite>checkpoint_dt</cite> or <cite>save_dt</cite> if
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep">
-<span class="sig-name descname"><span class="pre">solve_water_and_sediment_timestep</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">solve_water_and_sediment_timestep</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep" title="Link to this definition">¶</a></dt>
 <dd><p>Run water and sediment operations for one timestep.</p>
 <p>The first operation called by <code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code>, this method iterates the
 water surface calculation and sediment parcel routing routines.</p>
@@ -329,7 +329,7 @@ water surface calculation and sediment parcel routing routines.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

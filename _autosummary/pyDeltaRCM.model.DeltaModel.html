@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>pyDeltaRCM.model.DeltaModel &#8212; pyDeltaRCM 2.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=0a676766" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=d59dc883" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=fe69f605"></script>
+    <script src="../_static/documentation_options.js?v=dc13204d"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,10 +45,10 @@
           <div class="body" role="main">
             
   <section id="pydeltarcm-model-deltamodel">
-<h1>pyDeltaRCM.model.DeltaModel<a class="headerlink" href="#pydeltarcm-model-deltamodel" title="Permalink to this heading">¶</a></h1>
+<h1>pyDeltaRCM.model.DeltaModel<a class="headerlink" href="#pydeltarcm-model-deltamodel" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.model.</span></span><span class="sig-name descname"><span class="pre">DeltaModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.model.</span></span><span class="sig-name descname"><span class="pre">DeltaModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel" title="Link to this definition">¶</a></dt>
 <dd><p>Main model class.</p>
 <p>Instantiating the model class is described in the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.__init__" title="pyDeltaRCM.model.DeltaModel.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a> method
 below in detail, but generally model instantiation occurs via a model run
@@ -65,7 +65,7 @@ finalized (<a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.fina
 closed and written to disk.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Creates an instance of the pyDeltaRCM model.</p>
 <p>This method handles setting up the run, including parsing input files,
 initializing arrays, and initializing output routines.</p>
@@ -596,7 +596,7 @@ YAML configuration file.</p></li>
 </table>
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.C0_percent">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">C0_percent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.C0_percent" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">C0_percent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.C0_percent" title="Link to this definition">¶</a></dt>
 <dd><p>C0_percent is the sediment concentration in the input water supply.</p>
 <p>C0_percent is the prescribed sediment concentration in the input water
 as a percentage (must be equal to or greater than 0).</p>
@@ -604,19 +604,19 @@ as a percentage (must be equal to or greater than 0).</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.Csmooth">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Csmooth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Csmooth" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Csmooth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Csmooth" title="Link to this definition">¶</a></dt>
 <dd><p>Csmooth is a free surface smoothing parameter.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.H_SL">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">H_SL</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.H_SL" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">H_SL</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.H_SL" title="Link to this definition">¶</a></dt>
 <dd><p>H_SL sets the sea level elevation in meters.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.If">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">If</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.If" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">If</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.If" title="Link to this definition">¶</a></dt>
 <dd><p>Intermittency factor converting model time to real-world time.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
@@ -627,7 +627,7 @@ determining model run duration.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.L0_meters">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">L0_meters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.L0_meters" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">L0_meters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.L0_meters" title="Link to this definition">¶</a></dt>
 <dd><p>L0_meters defines the thickness of the land along the coast.</p>
 <p>L0 meters is either an <em>integer</em> or a <em>float</em>.
 Thickness of the land adjacent to the inlet in <strong>meters</strong>.
@@ -636,7 +636,7 @@ This can also be thought of as the length of the inlet channel.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.Length">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Length</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Length" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Length</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Length" title="Link to this definition">¶</a></dt>
 <dd><p>Length sets the total length of the domain.</p>
 <p>Length is either an <em>integer</em> or a <em>float</em>.
 This is the length of the domain (dimension parallel to the inlet
@@ -645,7 +645,7 @@ channel), in <strong>meters</strong>.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.N0_meters">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">N0_meters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.N0_meters" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">N0_meters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.N0_meters" title="Link to this definition">¶</a></dt>
 <dd><p>N0_meters defines the width of the inlet channel in meters.</p>
 <p>N0_meters defines the width of the inlet channel in meters. Therefore,
 this parameter must be a positive <em>integer</em> or <em>float</em>.</p>
@@ -653,7 +653,7 @@ this parameter must be a positive <em>integer</em> or <em>float</em>.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.Np_sed">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Np_sed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Np_sed" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Np_sed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Np_sed" title="Link to this definition">¶</a></dt>
 <dd><p>Np_sed is the number of sediment parcels simulated.</p>
 <p>Np_sed represents the number of “parcels” to split the input sediment
 discharge into for the reduced-complexity sediment routing.
@@ -662,7 +662,7 @@ This parameter must be an <em>integer</em></p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.Np_water">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Np_water</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Np_water" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Np_water</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Np_water" title="Link to this definition">¶</a></dt>
 <dd><p>Np_water is the number of water parcels simulated.</p>
 <p>Np_water represents the number of “parcels” to split the input water
 discharge into for the reduced-complexity flow routing.
@@ -671,13 +671,13 @@ This parameter must be an <em>integer</em></p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.Nsmooth">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Nsmooth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Nsmooth" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Nsmooth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Nsmooth" title="Link to this definition">¶</a></dt>
 <dd><p>Nsmooth defines the number of times the water surface is smoothed.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.S0">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">S0</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.S0" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">S0</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.S0" title="Link to this definition">¶</a></dt>
 <dd><p>S0 is the characteristic slope for the delta.</p>
 <p>S0 is either an <em>integer</em> or a <em>float</em>.
 This sets the characteristic slope for the delta topset.
@@ -686,7 +686,7 @@ This parameter is dimensionless.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.SLR">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SLR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.SLR" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SLR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.SLR" title="Link to this definition">¶</a></dt>
 <dd><p>SLR is the sea level rise rate.</p>
 <p>SLR is a parameter for defining the sea level rise rate. SLR is
 specified in units of m/s. When prescribing a SLR rate, it is important
@@ -697,7 +697,7 @@ conversion from “model time” into “real time simulated” may vary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.Width">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Width</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Width" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Width</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.Width" title="Link to this definition">¶</a></dt>
 <dd><p>Width sets the total width of the domain.</p>
 <p>Width is either an <em>integer</em> or a <em>float</em>.
 This is the width of the domain (dimension perpendicular to the inlet
@@ -706,7 +706,7 @@ channel), in <strong>meters</strong>.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.active_layer_thickness">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_layer_thickness</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.active_layer_thickness" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_layer_thickness</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.active_layer_thickness" title="Link to this definition">¶</a></dt>
 <dd><p>Active layer thickness for sand fraction.</p>
 <p>The active layer thickness is the depth to which the sand fraction
 values are maintained in the event of erosion from one timestep to the
@@ -718,7 +718,7 @@ sediment content based on the active layer thickness?)</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.alpha">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.alpha" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">alpha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.alpha" title="Link to this definition">¶</a></dt>
 <dd><p>alpha is the topographic diffusion coefficient.</p>
 <p>alpha is the coefficient used for topographic diffusion. It controls
 both the cross-slope sediment flux as well as bank erodability.</p>
@@ -726,19 +726,19 @@ both the cross-slope sediment flux as well as bank erodability.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.bed_elevation">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bed_elevation</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.bed_elevation" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bed_elevation</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.bed_elevation" title="Link to this definition">¶</a></dt>
 <dd><p>Get bed elevation.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.bedload_fraction">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bedload_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.bedload_fraction" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bedload_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.bedload_fraction" title="Link to this definition">¶</a></dt>
 <dd><p>Get bedload fraction.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.beta">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">beta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.beta" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">beta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.beta" title="Link to this definition">¶</a></dt>
 <dd><p>beta is the bedload transport capacity exponent.</p>
 <p>beta is an exponent on the bedload transport terms that is applied to
 the local velocity and threshold velocity terms.</p>
@@ -746,31 +746,31 @@ the local velocity and threshold velocity terms.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.channel_flow_depth">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_flow_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.channel_flow_depth" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_flow_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.channel_flow_depth" title="Link to this definition">¶</a></dt>
 <dd><p>Get channel flow depth.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.channel_flow_velocity">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_flow_velocity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.channel_flow_velocity" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_flow_velocity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.channel_flow_velocity" title="Link to this definition">¶</a></dt>
 <dd><p>Get channel flow velocity.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.channel_width">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.channel_width" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">channel_width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.channel_width" title="Link to this definition">¶</a></dt>
 <dd><p>Get channel width.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.checkpoint_dt">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">checkpoint_dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.checkpoint_dt" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">checkpoint_dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.checkpoint_dt" title="Link to this definition">¶</a></dt>
 <dd><p>checkpoint_dt defines the interval to create checkpoint information.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.clobber_netcdf">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clobber_netcdf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.clobber_netcdf" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clobber_netcdf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.clobber_netcdf" title="Link to this definition">¶</a></dt>
 <dd><p>Allows overwriting (clobbering) of an existing netCDF output file.</p>
 <p>Default behavior, clobber_netcdf: False, is for the model to raise an
 error during initialization if a netCDF output file is found in the
@@ -781,7 +781,7 @@ in the target folder, it will be “clobbered” or overwritten.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coeff_U_dep_mud</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coeff_U_dep_mud</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud" title="Link to this definition">¶</a></dt>
 <dd><p>coeff_U_dep_mud is the threshold velocity for mud sediment deposition.</p>
 <p>coeff_U_dep_mud sets the threshold velocity for mud to be depoisted.
 The smaller this parameter is, the longer a mud parcel can travel
@@ -790,7 +790,7 @@ before losing all of its mud volume.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coeff_U_ero_mud</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coeff_U_ero_mud</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud" title="Link to this definition">¶</a></dt>
 <dd><p>coeff_U_ero_mud is the mud erosion velocity threshold coefficient.</p>
 <p>coeff_U_ero_mud sets the threshold velocity for erosion of the mud
 (suspended load) sediment. The higher this value is, the more difficult
@@ -799,7 +799,7 @@ it is to erode mud deposits.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coeff_U_ero_sand</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coeff_U_ero_sand</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand" title="Link to this definition">¶</a></dt>
 <dd><p>coeff_U_ero_sand is the sand erosion velocity threshold coefficient.</p>
 <p>coeff_U_ero_sand sets the threshold velocity for sediment erosion of
 the sand (bedload) sediment. The higher this value is, the more
@@ -808,7 +808,7 @@ difficult it is to erode the bed.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.coeff_theta_mud">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coeff_theta_mud</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.coeff_theta_mud" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coeff_theta_mud</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.coeff_theta_mud" title="Link to this definition">¶</a></dt>
 <dd><p>coeff_theta_mud is the coefficient applied to theta for mud routing.</p>
 <p>coeff_theta_mud is a coefficient applied to the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.theta_water" title="pyDeltaRCM.model.DeltaModel.theta_water"><code class="xref py py-attr docutils literal notranslate"><span class="pre">theta_water</span></code></a>
 attribute to define the value of theta for mud routing. Theta is
@@ -820,7 +820,7 @@ why the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.theta_w
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.coeff_theta_sand">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coeff_theta_sand</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.coeff_theta_sand" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coeff_theta_sand</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.coeff_theta_sand" title="Link to this definition">¶</a></dt>
 <dd><p>coeff_theta_sand is the coefficient applied to theta for sand routing.</p>
 <p>coeff_theta_sand is a coefficient applied to the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.theta_water" title="pyDeltaRCM.model.DeltaModel.theta_water"><code class="xref py py-attr docutils literal notranslate"><span class="pre">theta_water</span></code></a>
 attribute to define the value of theta for sand routing. Theta is
@@ -832,7 +832,7 @@ why the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.theta_w
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.dt">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.dt" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.dt" title="Link to this definition">¶</a></dt>
 <dd><p>The time step.</p>
 <p>The value of the timestep (<span class="math notranslate nohighlight">\(\Delta t\)</span>) is a balance between
 computation efficiency and model stability <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. The
@@ -863,7 +863,7 @@ and C. Paola, Earth Surf. Dynam., 3, 67–86, 2015.
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.dx">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.dx" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.dx" title="Link to this definition">¶</a></dt>
 <dd><p>dx is the length of the individual cell faces.</p>
 <p>dx is either an <em>integer</em> or a <em>float</em>.
 This parameter specifies the length of the cell faces in the grid in
@@ -872,7 +872,7 @@ This parameter specifies the length of the cell faces in the grid in
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.f_bedload">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">f_bedload</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.f_bedload" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">f_bedload</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.f_bedload" title="Link to this definition">¶</a></dt>
 <dd><p>f_bedload is the bedload fraction of the input sediment.</p>
 <p>f_bedload is the fraction of input sediment that is bedload material.
 In pyDeltaRCM, bedload material is coarse grained “sand”, and
@@ -882,7 +882,7 @@ a value between 0 and 1, inclusive.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.finalize">
-<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.finalize" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.finalize" title="Link to this definition">¶</a></dt>
 <dd><p>Finalize the model run.</p>
 <p>Finalization includes saving output stratigraphy, closing relevant
 files on disk and clearing variables.</p>
@@ -890,7 +890,7 @@ files on disk and clearing variables.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.h0">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">h0</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.h0" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">h0</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.h0" title="Link to this definition">¶</a></dt>
 <dd><p>h0 is the reference or characteristic water depth in meters.</p>
 <p>h0 is the reference or characteristic water depth in meters. This
 parameter must be an <em>integer</em> or <em>float</em>. h0 defines
@@ -901,7 +901,7 @@ be non-wet (dry).</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.hb">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hb</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.hb" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hb</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.hb" title="Link to this definition">¶</a></dt>
 <dd><p>hb is the basin depth in meters.</p>
 <p>hb is the basin depth in meters. This parameter must be an <em>integer</em>
 or <em>float</em>, or <em>None</em>. If no value is supplied for this parameter,
@@ -911,19 +911,19 @@ are the same).</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.influx_sediment_concentration">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">influx_sediment_concentration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.influx_sediment_concentration" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">influx_sediment_concentration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.influx_sediment_concentration" title="Link to this definition">¶</a></dt>
 <dd><p>Get influx sediment concentration.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.itermax">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">itermax</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.itermax" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">itermax</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.itermax" title="Link to this definition">¶</a></dt>
 <dd><p>itermax sets the number of flow routing/free surface iterations.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.legacy_netcdf">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">legacy_netcdf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.legacy_netcdf" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">legacy_netcdf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.legacy_netcdf" title="Link to this definition">¶</a></dt>
 <dd><p>Enable output in legacy netCDF format.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -973,19 +973,19 @@ and update scripts accordingly.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.omega_flow">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">omega_flow</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.omega_flow" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">omega_flow</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.omega_flow" title="Link to this definition">¶</a></dt>
 <dd><p>omega_flow is a flow velocity underrelaxation parameter.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.omega_sfc">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">omega_sfc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.omega_sfc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">omega_sfc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.omega_sfc" title="Link to this definition">¶</a></dt>
 <dd><p>omega_sfc is a water surface underrelaxation parameter.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.out_dir">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">out_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.out_dir" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">out_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.out_dir" title="Link to this definition">¶</a></dt>
 <dd><p>out_dir sets the output directory for the simulation results.</p>
 <p>out_dir is a <em>string</em> type parameter, specifying the name of the output
 directory in which the model outputs should be saved.</p>
@@ -993,7 +993,7 @@ directory in which the model outputs should be saved.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.resume_checkpoint">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">resume_checkpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.resume_checkpoint" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">resume_checkpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.resume_checkpoint" title="Link to this definition">¶</a></dt>
 <dd><p>resume_checkpoint controls loading of a checkpoint if run is resuming.</p>
 <p>When setting this option in the YAML or command line, you can specify
 a <cite>bool</cite> (e.g., <cite>resume_checkpoint: True</cite>) which will search in the
@@ -1005,67 +1005,67 @@ checkpoint <em>as a string</em> (e.g., <cite>resume_checkpoint:
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.sand_frac_bc">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sand_frac_bc</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sand_frac_bc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sand_frac_bc</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sand_frac_bc" title="Link to this definition">¶</a></dt>
 <dd><p>Sand fraction boundary condition.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_checkpoint">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_checkpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_checkpoint" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_checkpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_checkpoint" title="Link to this definition">¶</a></dt>
 <dd><p>save_checkpoint controls saving of model checkpoint information.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_depth_figs">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_depth_figs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_depth_figs" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_depth_figs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_depth_figs" title="Link to this definition">¶</a></dt>
 <dd><p>save_depth_figs controls saving of water depth figures.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_depth_grids">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_depth_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_depth_grids" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_depth_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_depth_grids" title="Link to this definition">¶</a></dt>
 <dd><p>save_depth_grids controls whether or not depth information is saved.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_discharge_components">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_discharge_components</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_discharge_components" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_discharge_components</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_discharge_components" title="Link to this definition">¶</a></dt>
 <dd><p>save_discharge_components controls saving of x-y discharge components.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_discharge_figs">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_discharge_figs</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_discharge_figs" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_discharge_figs</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_discharge_figs" title="Link to this definition">¶</a></dt>
 <dd><p>save_discharge_figs controls saving of water discharge figures.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_discharge_grids">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_discharge_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_discharge_grids" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_discharge_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_discharge_grids" title="Link to this definition">¶</a></dt>
 <dd><p>save_discharge_grids controls saving of water discharge information.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_dt">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_dt" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_dt" title="Link to this definition">¶</a></dt>
 <dd><p>save_dt defines the saving interval in seconds.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_eta_figs">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_eta_figs</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_eta_figs" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_eta_figs</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_eta_figs" title="Link to this definition">¶</a></dt>
 <dd><p>save_eta_figs controls whether or not figures of topography are saved.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_eta_grids">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_eta_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_eta_grids" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_eta_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_eta_grids" title="Link to this definition">¶</a></dt>
 <dd><p>save_eta_grids controls whether or not topography information is saved.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_figs_sequential">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_figs_sequential</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_figs_sequential" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_figs_sequential</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_figs_sequential" title="Link to this definition">¶</a></dt>
 <dd><p>save_figs_sequential sets how figures are to be saved.</p>
 <p>save_figs_sequential is a <em>boolean</em> parameter that can be set to True
 or False. If True, then for each figure saving parameter set to True
@@ -1079,13 +1079,13 @@ will be overwritten using the current model status.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_iter">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_iter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_iter" title="Link to this definition">¶</a></dt>
 <dd><p>Number of times data has been saved.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_metadata">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_metadata" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_metadata" title="Link to this definition">¶</a></dt>
 <dd><p>save_metadata explicit control on whether or not metadata is saved.</p>
 <p>save_metadata is a boolean that can be manually togged on (True) to
 ensure metadata is saved to disk even if no other output information is
@@ -1099,51 +1099,51 @@ run.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_sandfrac_figs">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_sandfrac_figs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_sandfrac_figs" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_sandfrac_figs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_sandfrac_figs" title="Link to this definition">¶</a></dt>
 <dd><p>save_sandfrac_figs controls whether or not figures of the sediment
 surface (i.e., the bed) sand fraction are saved.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_sandfrac_grids">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_sandfrac_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_sandfrac_grids" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_sandfrac_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_sandfrac_grids" title="Link to this definition">¶</a></dt>
 <dd><p>save_sandfrac_grids controls whether or not the sediment
 surface (i.e., the bed) sand fraction is saved.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_sedflux_figs">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_sedflux_figs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_sedflux_figs" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_sedflux_figs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_sedflux_figs" title="Link to this definition">¶</a></dt>
 <dd><p>save_sedflux_figs controls saving of sediment flux figures.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_sedflux_grids">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_sedflux_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_sedflux_grids" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_sedflux_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_sedflux_grids" title="Link to this definition">¶</a></dt>
 <dd><p>save_sedflux_grids controls saving of sediment discharge information.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_stage_figs">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_stage_figs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_stage_figs" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_stage_figs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_stage_figs" title="Link to this definition">¶</a></dt>
 <dd><p>save_stage_figs controls whether or not stage figures are saved.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_stage_grids">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_stage_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_stage_grids" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_stage_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_stage_grids" title="Link to this definition">¶</a></dt>
 <dd><p>save_stage_grids controls whether or not stage information is saved.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_time_since_checkpoint">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_time_since_checkpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_time_since_checkpoint" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_time_since_checkpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_time_since_checkpoint" title="Link to this definition">¶</a></dt>
 <dd><p>Time since last data checkpoint was saved.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_time_since_data">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_time_since_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_time_since_data" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_time_since_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_time_since_data" title="Link to this definition">¶</a></dt>
 <dd><p>Time since data last output.</p>
 <p>The elapsed time (seconds) since data was output with
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">output_data</span></code>.</p>
@@ -1151,43 +1151,43 @@ surface (i.e., the bed) sand fraction is saved.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_velocity_components">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_velocity_components</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_velocity_components" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_velocity_components</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_velocity_components" title="Link to this definition">¶</a></dt>
 <dd><p>save_velocity_components controls saving of x-y velocity components.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_velocity_figs">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_velocity_figs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_velocity_figs" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_velocity_figs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_velocity_figs" title="Link to this definition">¶</a></dt>
 <dd><p>save_velocity_figs controls saving of water velocity figures.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.save_velocity_grids">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_velocity_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_velocity_grids" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_velocity_grids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.save_velocity_grids" title="Link to this definition">¶</a></dt>
 <dd><p>save_velocity_grids controls saving of water velocity information.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.sea_surface_elevation">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sea_surface_elevation</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sea_surface_elevation" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sea_surface_elevation</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sea_surface_elevation" title="Link to this definition">¶</a></dt>
 <dd><p>Get stage.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.sea_surface_elevation_change">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sea_surface_elevation_change</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sea_surface_elevation_change" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sea_surface_elevation_change</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sea_surface_elevation_change" title="Link to this definition">¶</a></dt>
 <dd><p>Get rate of change of sea surface elevation, per timestep.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.sea_surface_mean_elevation">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sea_surface_mean_elevation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sea_surface_mean_elevation" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sea_surface_mean_elevation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sea_surface_mean_elevation" title="Link to this definition">¶</a></dt>
 <dd><p>Get sea surface mean elevation.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.sed_lag">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sed_lag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sed_lag" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sed_lag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.sed_lag" title="Link to this definition">¶</a></dt>
 <dd><p>sed_lag is a “sedimentation lag” parameter.</p>
 <p>sed_lag influences the properties of mud deposition by controlling how
 much mud is deposited when the flow velocity is below the threshold
@@ -1196,7 +1196,7 @@ for mud deposition (<a class="reference internal" href="#pyDeltaRCM.model.DeltaM
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.seed">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">seed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.seed" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">seed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.seed" title="Link to this definition">¶</a></dt>
 <dd><p>seed defines the random number seed used for the simulation.</p>
 <p>seed is an <em>integer</em> type parameter specifying the random seed value to
 be used for this model run. If unspecified, a random seed is generated
@@ -1205,13 +1205,13 @@ and used.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.start_subsidence">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_subsidence</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.start_subsidence" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_subsidence</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.start_subsidence" title="Link to this definition">¶</a></dt>
 <dd><p>start_subsidence defines the start time at which subsidence begins.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.stepmax">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stepmax</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.stepmax" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stepmax</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.stepmax" title="Link to this definition">¶</a></dt>
 <dd><p><cite>stepmax</cite> is the maximum number of jumps a parcel can make.</p>
 <p>The maximum number of jumps a parcel (water or sediment) can take is
 determined by <cite>stepmax</cite>. If the parcel reaches the oceanic boundary
@@ -1233,13 +1233,13 @@ simulation.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.subsidence_rate">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">subsidence_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.subsidence_rate" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">subsidence_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.subsidence_rate" title="Link to this definition">¶</a></dt>
 <dd><p>subsidence_rate defines the maximum rate of subsidence.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.theta_water">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">theta_water</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.theta_water" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">theta_water</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.theta_water" title="Link to this definition">¶</a></dt>
 <dd><p>theta_water is the exponent of depth dependence for weighted routing.</p>
 <p>For the routing of the water parcels, the dependence of the random walk
 on local water depth can be modulated by varying this parameter value.
@@ -1256,26 +1256,26 @@ values for the sand and mud routing respectively.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.time">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.time" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.time" title="Link to this definition">¶</a></dt>
 <dd><p>Elapsed model time in seconds.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.time_iter">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.time_iter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_iter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.time_iter" title="Link to this definition">¶</a></dt>
 <dd><p>Number of time iterations.</p>
 <p>The number of times the <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.update" title="pyDeltaRCM.model.DeltaModel.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a> method has been called.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.time_step">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_step</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.time_step" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_step</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.time_step" title="Link to this definition">¶</a></dt>
 <dd><p>Alias for <a class="reference internal" href="#pyDeltaRCM.model.DeltaModel.dt" title="pyDeltaRCM.model.DeltaModel.dt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.toggle_subsidence">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">toggle_subsidence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.toggle_subsidence" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">toggle_subsidence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.toggle_subsidence" title="Link to this definition">¶</a></dt>
 <dd><p>toggle_subsidence controls whether subsidence is turned on or off.</p>
 <p>If toggle_subsidence is set to <cite>True</cite> then subsidence is turned on.
 Otherwise if toggle_subsidence is set to <cite>False</cite> (the default) then no
@@ -1284,7 +1284,7 @@ subsidence will occur.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.u0">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u0</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.u0" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">u0</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.u0" title="Link to this definition">¶</a></dt>
 <dd><p>u0 is a reference velocity value.</p>
 <p>u0 is the characteristic or reference velocity value in units of m/s.
 u0 influences the values of other model parameters such as the maximum
@@ -1294,7 +1294,7 @@ erode. This parameter must be an <em>integer</em> or a <em>float</em>.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.update" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.update" title="Link to this definition">¶</a></dt>
 <dd><p>Run the model for one full timestep.</p>
 <p>This method handles the input/output from the model, orchestrating the
 various morphodynamic and basin-scale processes (from sub-methods),
@@ -1330,7 +1330,7 @@ the <a class="reference internal" href="../guides/user_guide.html#customize-the-
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.verbose">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">verbose</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.verbose" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">verbose</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.verbose" title="Link to this definition">¶</a></dt>
 <dd><p>verbose controls the degree of information printed to the log.</p>
 <p>verbose is an <em>integer</em> type parameter, which controls the verbosity
 of the information saved in the log file. A value of 0, the default,
@@ -1340,7 +1340,7 @@ information, and a value of 2 increases the verbosity further.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyDeltaRCM.model.DeltaModel.water_depth">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">water_depth</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.water_depth" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">water_depth</span></span><a class="headerlink" href="#pyDeltaRCM.model.DeltaModel.water_depth" title="Link to this definition">¶</a></dt>
 <dd><p>Get depth.</p>
 </dd></dl>
 
@@ -1501,7 +1501,7 @@ information, and a value of 2 increases the verbosity further.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>
