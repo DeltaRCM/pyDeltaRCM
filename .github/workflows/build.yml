@@ -33,6 +33,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements-test.txt
         pip install -r requirements.txt
+    - name: Install pyDeltaRCM
+      run: |
+        python setup.py install
     - name: Test with pytest
       run: |
         python -m pytest --mpl --mpl-baseline-path=tests/imgs_baseline
@@ -62,6 +65,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest pytest-cov pytest-mpl coveralls
         pip install -r requirements.txt
+    - name: Install pyDeltaRCM
+      run: |
+        python setup.py install
     - name: Disable jitted for coverage
       run: |
         echo "DISABLE_JIT: 1" > .numba_config.yaml
@@ -98,7 +104,7 @@ jobs:
         sudo apt update -y && sudo apt install -y latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended dvipng
     - name: Install pyDeltaRCM
       run: |
-        pip install .
+        python setup.py install
     - name: Build and test documentation
       run: |
         (cd docs && make docs)
