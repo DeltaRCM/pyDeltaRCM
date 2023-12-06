@@ -15,7 +15,7 @@ Vegetation" model presented in `Lauzon and Murray (2018) <https://doi.org/10.102
 
 MississippiFaultsModel
 ----------------------
-Link: `MississippiFaultsModel <https://github.com/amoodie/paper_resources/blob/master/Moodie_faultingsubsidence/model/scripts/mississippi_faults.py>`_
+Link: `MississippiFaultsModel <https://github.com/amoodie/paper_resources/blob/main/Moodie_faultingsubsidence/model/scripts/mississippi_faults.py>`_
 
 This implementation of the *pyDeltaRCM* model is used in the paper
 `Moodie and Passalacqua (2021) <https://doi.org/10.1029/2021GL095053>`_ to
@@ -23,7 +23,7 @@ simulate a Mississippi River-like delta.
 
 SelengaModel
 ------------
-Link: `SelengaModel <https://github.com/amoodie/paper_resources/blob/master/Moodie_faultingsubsidence/model/scripts/selenga_faults.py>`_
+Link: `SelengaModel <https://github.com/amoodie/paper_resources/blob/main/Moodie_faultingsubsidence/model/scripts/selenga_faults.py>`_
 
 This implementation of the *pyDeltaRCM* model is used in the paper
 `Moodie and Passalacqua (2021) <https://doi.org/10.1029/2021GL095053>`_ to

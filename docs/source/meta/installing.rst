@@ -15,7 +15,7 @@ We describe installation flavors for both users and developers below.
 
     If you are looking to make any modifications to the model source code, you should follow the developer instructions.
 
-We suggest using the Anaconda Python distribution, which you can obtain via `the project website <https://www.anaconda.com/products/individual>`_.
+We suggest using the Anaconda Python distribution, which you can obtain via `the project website <https://www.anaconda.com/download>`_.
 
 Before proceeding, you may wish to create a virtual environment for the *pyDeltaRCM* project.
 With Anaconda on Linux:
@@ -26,7 +26,7 @@ With Anaconda on Linux:
     $ conda activate deltarcm
 
 For more informtaion, see `this guide <https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment>`_ for help on creating and activating a virtual environment with Anaconda on other platforms.
-See `this helpful guide <https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment>`_ for creating virtual environments with `venv` if you do not use Anaconda.
+See `this helpful guide <https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/>`_ for creating virtual environments with `venv` if you do not use Anaconda.
 
 
 User installation
@@ -53,7 +53,7 @@ This will allow you to submit suggestions and contribute to *pyDeltaRCM*.
 
 .. note::
 
-    You do not *need* to create a fork if your are just testing, but it may save you time and headache down the road. If you choose not to, just use the main repository url below (https://github.com/DeltaRCM/pyDeltaRCM.git).
+    You do not *need* to create a fork if your are just testing, but it may save you time and headache down the road. If you choose not to, just use the main repository url below (https://github.com/DeltaRCM/pyDeltaRCM).
 
 First, you will need to `install git <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`_  if you do not already have it.
 Then, download or clone your fork of the project:
