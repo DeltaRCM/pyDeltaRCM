@@ -24,7 +24,7 @@ Project information
     :target: https://github.com/DeltaRCM/pyDeltaRCM
 
 .. image:: https://joss.theoj.org/papers/10.21105/joss.03398/status.svg
-   :target: https://doi.org/10.21105/joss.03398
+   :target: https://joss.theoj.org/papers/10.21105/joss.03398
 
 .. toctree::
    :maxdepth: 1

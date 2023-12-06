@@ -21,4 +21,4 @@ Presentations
 Other
 -----
 
-[1] Hariharan, Jayaram. "Exploring *pyDeltaRCM*: A Collection of Numerical Experiments." Zenodo v0.1 (2022), https://zenodo.org/record/7315646.
+[1] Hariharan, Jayaram. "Exploring *pyDeltaRCM*: A Collection of Numerical Experiments." Zenodo v0.1 (2022), https://zenodo.org/records/7315646.
