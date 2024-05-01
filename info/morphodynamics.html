@@ -7,12 +7,12 @@
 
     <title>Morphodynamics &#8212; pyDeltaRCM 2.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=d59dc883" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=87629129" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <script src="../_static/documentation_options.js?v=dc13204d"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -77,10 +77,6 @@ At each parcel step, mud is either eroded or deposited (or neither), depending o
 <div class="math notranslate nohighlight">
 \[R_i = \frac{1}{{h_i}^\theta}.\]</div>
 <p>Here, <span class="math notranslate nohighlight">\(\theta\)</span> takes the value of <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_theta_sand" title="pyDeltaRCM.model.DeltaModel.coeff_theta_sand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_theta_sand</span></code></a> for sand routing probabilities, and <a class="reference internal" href="../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.coeff_theta_mud" title="pyDeltaRCM.model.DeltaModel.coeff_theta_mud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeff_theta_mud</span></code></a> for mud routing.</p>
-<p>(<a class="reference download internal" download="" href="../_downloads/29bc6ca9fa62d46272d3e9a2214c8d97/sediment_weights_examples.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/a438b4229d08d2560758e8d248abb489/sediment_weights_examples.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
-<figure class="align-default">
-<img alt="../_images/sediment_weights_examples.png" class="plot-directive" src="../_images/sediment_weights_examples.png" />
-</figure>
 </section>
 </section>
 <section id="changes-in-the-bed-elevation">
@@ -107,21 +103,9 @@ The impact of routing <em>all</em> sand and mud parcels on bed elevation is show
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>(<a class="reference download internal" download="" href="../_downloads/45f9bc3ccc37ffef493ee42fdfc16109/_initial_bed_state.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/aab136a78affa3df31bdc1c9a5140dd5/_initial_bed_state.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
-<figure class="align-default">
-<img alt="../_images/_initial_bed_state.png" class="plot-directive" src="../_images/_initial_bed_state.png" />
-</figure>
-</td>
-<td><p>(<a class="reference download internal" download="" href="../_downloads/de3435f89f5fea66a43806434d6efd28/route_all_sand_parcels.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/2c17b7081f201546a7d68c472571cf51/route_all_sand_parcels.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
-<figure class="align-default">
-<img alt="../_images/route_all_sand_parcels.png" class="plot-directive" src="../_images/route_all_sand_parcels.png" />
-</figure>
-</td>
-<td><p>(<a class="reference download internal" download="" href="../_downloads/fe0d8a2b186bdf7a2e770c2d9e444641/route_all_mud_parcels.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/6575c0820faf7f7849d2c2576148bb85/route_all_mud_parcels.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
-<figure class="align-default">
-<img alt="../_images/route_all_mud_parcels.png" class="plot-directive" src="../_images/route_all_mud_parcels.png" />
-</figure>
-</td>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -167,10 +151,6 @@ To prevent this, a topographic diffusion is applied immediately following the ro
 <p>In implementation, topographic smoothing convolves topography with <cite>3x3</cite> cell kernels configured to a diffusive behavior.
 The diffusion is repeated over the entire model domain <code class="xref py py-obj docutils literal notranslate"><span class="pre">N_crossdiff</span></code> times.
 In the following example, <code class="xref py py-obj docutils literal notranslate"><span class="pre">N_crossdiff</span></code> takes the <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">default value</span></a>.</p>
-<p>(<a class="reference download internal" download="" href="../_downloads/f820833eb47b25a53f94ffcc202f6ac0/topo_diffusion.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/9b016a2efc49afe59a652de292d54966/topo_diffusion.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
-<figure class="align-default">
-<img alt="../_images/topo_diffusion.png" class="plot-directive" src="../_images/topo_diffusion.png" />
-</figure>
 <p>The impact of topographic diffusion is minor compared to the bed elevation change driven by parcel erosion or deposition (<a class="reference internal" href="#sand-mud-route-comparison"><span class="std std-ref">sand and mud routing effects</span></a>).</p>
 <section id="notes-for-modeling-best-practices">
 <h4>Notes for modeling best practices<a class="headerlink" href="#notes-for-modeling-best-practices" title="Link to this heading">¶</a></h4>
@@ -255,7 +235,7 @@ Proceedings of the 2nd Meeting of IAHSR, Stockholm, Sweden, 39–64, 1948.</p>
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
@@ -263,7 +243,7 @@ Proceedings of the 2nd Meeting of IAHSR, Stockholm, Sweden, 39–64, 1948.</p>
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -288,7 +268,7 @@ Proceedings of the 2nd Meeting of IAHSR, Stockholm, Sweden, 39–64, 1948.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>
