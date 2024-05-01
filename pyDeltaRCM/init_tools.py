@@ -893,6 +893,7 @@ class init_tools(abc.ABC):
 
         # load grids
         self.eta = checkpoint["eta"]
+        self.eta0 = checkpoint["eta0"]
         self.depth = checkpoint["depth"]
         self.stage = checkpoint["stage"]
         self.uw = checkpoint["uw"]

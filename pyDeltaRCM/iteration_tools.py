@@ -476,6 +476,7 @@ class iteration_tools(abc.ABC):
             save_iter=self._save_iter,
             save_time_since_data=self._save_time_since_data,
             # grids
+            eta0=self.eta0,
             eta=self.eta,
             depth=self.depth,
             stage=self.stage,
