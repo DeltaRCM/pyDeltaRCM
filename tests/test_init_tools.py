@@ -385,6 +385,7 @@ class TestLoadCheckpoint:
         # load grids
         assert np.all(_delta.eta == checkpoint["eta"])
         assert np.all(_delta.eta0 == checkpoint["eta0"])
+        assert np.all(_delta.eta_init == checkpoint["eta_init"])
         assert np.all(_delta.depth == checkpoint["depth"])
         assert np.all(_delta.stage == checkpoint["stage"])
         assert np.all(_delta.uw == checkpoint["uw"])

@@ -493,7 +493,12 @@ class init_tools(abc.ABC):
         # ---- empty arrays ----
         self.cell_type = np.zeros((self.L, self.W), dtype=np.int64)
         self.eta = np.zeros((self.L, self.W), dtype=np.float32)
-        self.eta0 = np.copy(self.eta)  # establish eta0 copy
+        self.eta0 = np.copy(
+            self.eta
+        )  # establish eta0 copy; this is the previous eta on each timestep
+        self.eta_init = np.copy(
+            self.eta
+        )  # establish eta_init copy; this is the initial eta on the whole simulation
         self.stage = np.zeros((self.L, self.W), dtype=np.float32)
         self.depth = np.zeros((self.L, self.W), dtype=np.float32)
         self.qx = np.zeros((self.L, self.W), dtype=np.float32)
@@ -894,6 +899,7 @@ class init_tools(abc.ABC):
         # load grids
         self.eta = checkpoint["eta"]
         self.eta0 = checkpoint["eta0"]
+        self.eta_init = checkpoint["eta_init"]
         self.depth = checkpoint["depth"]
         self.stage = checkpoint["stage"]
         self.uw = checkpoint["uw"]
