@@ -371,31 +371,43 @@ class TestLoadCheckpoint:
         ckp_file = os.path.join(_delta.prefix, "checkpoint.npz")
         assert os.path.isfile(ckp_file)
 
-        # now manually open the checkpoint file
+        # now manually open the checkpoint file. We will `pop` all items out
+        # of the dict so that we can verify there is nothing left in the
+        # checkpoint
         checkpoint = np.load(ckp_file, allow_pickle=True)
+        checkpoint = dict(checkpoint)
 
         # check that all fields are present in the checkpoint file
         # load time and counter vars
-        assert _delta._time == float(checkpoint["time"])
-        assert _delta.H_SL == float(checkpoint["H_SL"])
-        assert _delta._time_iter == int(checkpoint["time_iter"])
-        assert _delta._save_iter == int(checkpoint["save_iter"])
-        assert _delta._save_time_since_data == int(checkpoint["save_time_since_data"])
+        assert _delta._time == float(checkpoint.pop("time"))
+        assert _delta.H_SL == float(checkpoint.pop("H_SL"))
+        assert _delta._time_iter == int(checkpoint.pop("time_iter"))
+        assert _delta._save_iter == int(checkpoint.pop("save_iter"))
+        assert _delta._save_time_since_data == int(
+            checkpoint.pop("save_time_since_data")
+        )
 
         # load grids
-        assert np.all(_delta.eta == checkpoint["eta"])
-        assert np.all(_delta.eta0 == checkpoint["eta0"])
-        assert np.all(_delta.eta_init == checkpoint["eta_init"])
-        assert np.all(_delta.depth == checkpoint["depth"])
-        assert np.all(_delta.stage == checkpoint["stage"])
-        assert np.all(_delta.uw == checkpoint["uw"])
-        assert np.all(_delta.ux == checkpoint["ux"])
-        assert np.all(_delta.uy == checkpoint["uy"])
-        assert np.all(_delta.qw == checkpoint["qw"])
-        assert np.all(_delta.qx == checkpoint["qx"])
-        assert np.all(_delta.qy == checkpoint["qy"])
-        assert np.all(_delta.sand_frac == checkpoint["sand_frac"])
-        assert np.all(_delta.active_layer == checkpoint["active_layer"])
+        assert np.all(_delta.eta == checkpoint.pop("eta"))
+        assert np.all(_delta.eta0 == checkpoint.pop("eta0"))
+        assert np.all(_delta.eta_init == checkpoint.pop("eta_init"))
+        assert np.all(_delta.depth == checkpoint.pop("depth"))
+        assert np.all(_delta.stage == checkpoint.pop("stage"))
+        assert np.all(_delta.uw == checkpoint.pop("uw"))
+        assert np.all(_delta.ux == checkpoint.pop("ux"))
+        assert np.all(_delta.uy == checkpoint.pop("uy"))
+        assert np.all(_delta.qw == checkpoint.pop("qw"))
+        assert np.all(_delta.qx == checkpoint.pop("qx"))
+        assert np.all(_delta.qy == checkpoint.pop("qy"))
+        assert np.all(_delta.sand_frac == checkpoint.pop("sand_frac"))
+        assert np.all(_delta.active_layer == checkpoint.pop("active_layer"))
+
+        # load rng state
+        assert len(checkpoint.pop("rng_state")) > 0
+
+        # if there is anything left, something was added but not documented
+        # here in the test
+        assert len(checkpoint.keys()) == 0
 
 
 class TestSettingConstants:
