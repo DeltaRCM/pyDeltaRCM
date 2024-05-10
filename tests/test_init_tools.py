@@ -409,6 +409,57 @@ class TestLoadCheckpoint:
         # here in the test
         assert len(checkpoint.keys()) == 0
 
+    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    def test_if_new_eta_fields_absent(self, patched, tmp_path: Path) -> None:
+        """
+        Test that nans are replaced and a single warning is raised if the eta0
+        and/or eta_init fields are not present.
+        """
+        # create one delta, just to have a checkpoint file
+        p = utilities.yaml_from_dict(
+            tmp_path, "input.yaml", {"save_checkpoint": True, "save_eta_grids": True}
+        )
+        _delta = DeltaModel(input_file=p)
+
+        # make mocks
+        _delta.log_info = mock.MagicMock()
+        _delta.logger = mock.MagicMock()
+        _delta.init_output_file = mock.MagicMock()
+
+        # manually open and delete the fields from the npz file
+        import zipfile
+        import shutil
+
+        ckp_path_old = os.path.join(_delta.prefix, "checkpoint.npz")
+        ckp_path_new = os.path.join(_delta.prefix, "checkpoint_new.npz")
+        ckp_file_old = zipfile.ZipFile(ckp_path_old, "r")
+        ckp_file_new = zipfile.ZipFile(ckp_path_new, "w")
+        # f = zipfile.ZipFile(ckp_file, mode="a")  # note append mode
+        for item in ckp_file_old.infolist():
+            buffer = ckp_file_old.read(item.filename)
+            if (item.filename == "eta0.npy") or (item.filename == "eta_init.npy"):
+                print(item.filename)
+                pass
+            else:
+                ckp_file_new.writestr(item, buffer)
+        ckp_file_old.close()
+        ckp_file_new.close()
+        shutil.move(ckp_path_new, ckp_path_old)  # overwrite original npz
+
+        # load the file from path, and check that there is no eta0 present
+        checkpoint = np.load(ckp_path_old, allow_pickle=True)
+        checkpoint = dict(checkpoint)
+        assert not "eta0" in checkpoint.keys()
+
+        # now resume from the checkpoint to restore the field
+        #    check that a warning has been raised
+        with pytest.warns(UserWarning, match=r".*does not contain fields `eta0`.*"):
+            _delta.load_checkpoint()
+
+        # check that grids loaded are all nans
+        assert np.all(np.isnan(_delta.eta0))
+        assert np.all(np.isnan(_delta.eta_init))
+
 
 class TestSettingConstants:
     """
