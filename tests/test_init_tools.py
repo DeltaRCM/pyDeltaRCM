@@ -446,6 +446,9 @@ class TestLoadCheckpoint:
         ckp_file_new.close()
         shutil.move(ckp_path_new, ckp_path_old)  # overwrite original npz
 
+        # close the netcdf file so can be safely opened in load
+        _delta.output_netcdf.close()
+
         # load the file from path, and check that there is no eta0 present
         checkpoint = np.load(ckp_path_old, allow_pickle=True)
         checkpoint = dict(checkpoint)
