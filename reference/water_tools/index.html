@@ -5,13 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>water_tools &#8212; pyDeltaRCM 2.1.4 documentation</title>
+    <title>water_tools &#8212; pyDeltaRCM 2.1.5 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=649a27d8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=87629129" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
-    <script src="../../_static/documentation_options.js?v=dc13204d"></script>
+    <script src="../../_static/documentation_options.js?v=786ba454"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="../init_tools/index.html" title="init_tools"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">API reference</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">water_tools</a></li> 
       </ul>
@@ -127,6 +127,10 @@ assumptions in the DeltaRCM model.</p>
 below. The first image depicts the “input” to <cite>compute_free_surface</cite>,
 which is the current bed elevation, and the path of each water parcel
 (cyan lines in right image).</p>
+<p>(<a class="reference download internal" download="" href="../../_downloads/2da3ed2152da41197765beb93b232ee0/compute_free_surface_inputs.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../../_downloads/d8fc29af18a6d36dde7ba4ea3fd61622/compute_free_surface_inputs.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../../_images/compute_free_surface_inputs.png" class="plot-directive" src="../../_images/compute_free_surface_inputs.png" />
+</figure>
 <p>The <cite>compute_free_surface</cite> method then calls the
 <a class="reference internal" href="#pyDeltaRCM.water_tools._accumulate_free_surface_walks" title="pyDeltaRCM.water_tools._accumulate_free_surface_walks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_accumulate_free_surface_walks</span></code></a> function to determine 1) the
 number of times each cell has been visited by a water parcel
@@ -145,6 +149,10 @@ surface <cite>Hnew</cite> is used in the following operation
 combined with the previous timestep’s water surface and an
 underrelaxation coefficient
 <a class="reference internal" href="../../_autosummary/pyDeltaRCM.model.DeltaModel.html#pyDeltaRCM.model.DeltaModel.omega_sfc" title="pyDeltaRCM.model.DeltaModel.omega_sfc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">omega_sfc</span></code></a>.</p>
+<p>(<a class="reference download internal" download="" href="../../_downloads/2f7939b739d1b1a444fbb2ac72582869/compute_free_surface_outputs.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../../_downloads/2bedb5d18eea28a38564fecfece76fac/compute_free_surface_outputs.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../../_images/compute_free_surface_outputs.png" class="plot-directive" src="../../_images/compute_free_surface_outputs.png" />
+</figure>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id3" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
@@ -226,6 +234,10 @@ determines the water weight for that cell with
 <p>The following figure shows several examples of locations within the
 model domain, and the corresponding water routing weights determined
 for that location.</p>
+<p>(<a class="reference download internal" download="" href="../../_downloads/0a5b8dfa581d9939a135b4f90eb9b155/water_weights_examples.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../../_downloads/4604be7d55a677a7e881b7e5a6b99c93/water_weights_examples.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../../_images/water_weights_examples.png" class="plot-directive" src="../../_images/water_weights_examples.png" />
+</figure>
 </dd></dl>
 
 <dl class="py method">
@@ -269,6 +281,10 @@ until the parcels reach a boundary.</p>
 of the <code class="docutils literal notranslate"><span class="pre">while</span></code> loop.</p>
 <p class="rubric">Example</p>
 <p>On the initial delta surface, see how ten selected parcels are routed through the domain:</p>
+<p>(<a class="reference download internal" download="" href="../../_downloads/5d2c0bffb52e35a0245ec1b1319b90bc/run_water_iteration.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../../_downloads/b78c5531809e2b718293df8b6b53e9e4/run_water_iteration.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../../_images/run_water_iteration.png" class="plot-directive" src="../../_images/run_water_iteration.png" />
+</figure>
 </dd></dl>
 
 <dl class="py method">
@@ -408,6 +424,10 @@ computation.</p></li>
 <p>The following shows an example of how water parcels that looped along
 their paths would be relocated. Note than in this example, the parcels are
 artificially forced to loop, just for the sake of demonstration.</p>
+<p>(<a class="reference download internal" download="" href="../../_downloads/05c5e78ea55506a028eea4c21c1502c4/_check_for_loops.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../../_downloads/892ef66f65133c35cd5d0dfdbc4428f9/_check_for_loops.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../../_images/_check_for_loops.png" class="plot-directive" src="../../_images/_check_for_loops.png" />
+</figure>
 </dd></dl>
 
 <dl class="py function">
@@ -447,6 +467,10 @@ land-slope (<code class="xref py py-obj docutils literal notranslate"><span clas
 <p class="rubric">Examples</p>
 <p>The following shows an example of the walk of a few water parcels, along
 with the resultant computed water surface.</p>
+<p>(<a class="reference download internal" download="" href="../../_downloads/763e065bbf4173cde695f90a5affaeca/_accumulate_free_surface_walks.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../../_downloads/3d78abbdf48e5f598a5fa0df0863df88/_accumulate_free_surface_walks.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../../_images/_accumulate_free_surface_walks.png" class="plot-directive" src="../../_images/_accumulate_free_surface_walks.png" />
+</figure>
 </dd></dl>
 
 <dl class="py function">
@@ -465,6 +489,10 @@ with the resultant computed water surface.</p>
 </dl>
 <p class="rubric">Examples</p>
 <p>The following shows an example of the water surface smoothing process.</p>
+<p>(<a class="reference download internal" download="" href="../../_downloads/e5650bf2e62c83225ae5fcb167398fde/_smooth_free_surface.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../../_downloads/d6465f99de84c38991786bd1a73b0c4a/_smooth_free_surface.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../../_images/_smooth_free_surface.png" class="plot-directive" src="../../_images/_smooth_free_surface.png" />
+</figure>
 </dd></dl>
 
 </section>
@@ -562,7 +590,7 @@ with the resultant computed water surface.</p>
         <li class="right" >
           <a href="../init_tools/index.html" title="init_tools"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">water_tools</a></li> 
       </ul>

@@ -5,13 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>init_tools &#8212; pyDeltaRCM 2.1.4 documentation</title>
+    <title>init_tools &#8212; pyDeltaRCM 2.1.5 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=649a27d8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=87629129" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
-    <script src="../../_static/documentation_options.js?v=dc13204d"></script>
+    <script src="../../_static/documentation_options.js?v=786ba454"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="../iteration_tools/index.html" title="iteration_tools"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">API reference</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">init_tools</a></li> 
       </ul>
@@ -108,6 +108,17 @@ The major steps of initialization are:</p>
 <dt class="sig sig-object py" id="pyDeltaRCM.init_tools.init_tools">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.init_tools.</span></span><span class="sig-name descname"><span class="pre">init_tools</span></span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools" title="Link to this definition">¶</a></dt>
 <dd><dl class="py method">
+<dt class="sig sig-object py" id="pyDeltaRCM.init_tools.init_tools._load_past_etas">
+<span class="sig-name descname"><span class="pre">_load_past_etas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools._load_past_etas" title="Link to this definition">¶</a></dt>
+<dd><p>Handler for new fields in checkpoint file.</p>
+<p>This function was added to allow for old checkpoint files to be loaded
+without breaking the checkpoint functionality. If the fields are not
+found a warning is raised, and an array of nan is returned.</p>
+<p>The two fields added in version 2.1.5 are eta0 and eta_init.</p>
+<p>NOTE: This function and warnings will be removed in a future version.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.init_tools.init_tools.create_boundary_conditions">
 <span class="sig-name descname"><span class="pre">create_boundary_conditions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyDeltaRCM.init_tools.init_tools.create_boundary_conditions" title="Link to this definition">¶</a></dt>
 <dd><p>Create model boundary conditions</p>
@@ -340,6 +351,7 @@ attribute, which is simply the flattened version of that attribute.</p>
 <li><a class="reference internal" href="#">init_tools</a><ul>
 <li><a class="reference internal" href="#public-api-methods-attached-to-model">Public API methods attached to model</a><ul>
 <li><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools"><code class="docutils literal notranslate"><span class="pre">init_tools</span></code></a><ul>
+<li><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools._load_past_etas"><code class="docutils literal notranslate"><span class="pre">init_tools._load_past_etas()</span></code></a></li>
 <li><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.create_boundary_conditions"><code class="docutils literal notranslate"><span class="pre">init_tools.create_boundary_conditions()</span></code></a></li>
 <li><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.create_domain"><code class="docutils literal notranslate"><span class="pre">init_tools.create_domain()</span></code></a></li>
 <li><a class="reference internal" href="#pyDeltaRCM.init_tools.init_tools.create_other_variables"><code class="docutils literal notranslate"><span class="pre">init_tools.create_other_variables()</span></code></a></li>
@@ -406,7 +418,7 @@ attribute, which is simply the flattened version of that attribute.</p>
         <li class="right" >
           <a href="../iteration_tools/index.html" title="iteration_tools"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">init_tools</a></li> 
       </ul>
