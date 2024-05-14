@@ -841,6 +841,44 @@ class init_tools(abc.ABC):
             (self._netcdf_coords[0]),
         ]
 
+    def _load_past_etas(self, checkpoint):
+        """Handler for new fields in checkpoint file.
+
+        This function was added to allow for old checkpoint files to be loaded
+        without breaking the checkpoint functionality. If the fields are not
+        found a warning is raised, and an array of nan is returned.
+
+        The two fields added in version 2.1.5 are eta0 and eta_init.
+
+        NOTE: This function and warnings will be removed in a future version.
+        """
+        _warned = False  # only warn on the first missing field
+        _warning_msg = (
+            "Checkpoint file does not contain fields `eta0` and/or"
+            "`eta_init`, which were new in version 2.1.5. These fields have been"
+            "filled with np.nan."
+        )
+
+        # look for eta0
+        if "eta0" in checkpoint.keys():
+            _eta0 = checkpoint["eta0"]
+        else:
+            if not _warned:
+                warnings.warn(UserWarning(_warning_msg))
+                _warned = True
+            _eta0 = np.full(checkpoint["eta"].shape, np.nan)
+
+        # look for eta_init
+        if "eta_init" in checkpoint.keys():
+            _eta_init = checkpoint["eta_init"]
+        else:
+            if not _warned:
+                warnings.warn(UserWarning(_warning_msg))
+                _warned = True
+            _eta_init = np.full(checkpoint["eta"].shape, np.nan)
+
+        return _eta0, _eta_init
+
     def load_checkpoint(self, defer_output: bool = False) -> None:
         """Load the checkpoint from the .npz file.
 
@@ -898,8 +936,7 @@ class init_tools(abc.ABC):
 
         # load grids
         self.eta = checkpoint["eta"]
-        self.eta0 = checkpoint["eta0"]
-        self.eta_init = checkpoint["eta_init"]
+        self.eta0, self.eta_init = self._load_past_etas(checkpoint)
         self.depth = checkpoint["depth"]
         self.stage = checkpoint["stage"]
         self.uw = checkpoint["uw"]
