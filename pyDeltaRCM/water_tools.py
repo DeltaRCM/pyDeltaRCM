@@ -58,6 +58,12 @@ class water_tools(abc.ABC):
         self.pad_depth = np.pad(self.depth, 1, "edge")
         self.pad_cell_type = np.pad(self.cell_type, 1, "edge")
 
+        # configure the starting indices for each parcel
+        inlet_weights = self.get_inlet_weights_water()
+        self.start_indices = shared_tools.get_start_indices(
+            self.inlet, inlet_weights, self._Np_water
+        )
+
     def get_inlet_weights_water(self, **kwargs):
         """Get weight for inlet cells for water parcels.
 
@@ -91,11 +97,8 @@ class water_tools(abc.ABC):
         _msg = "Beginning stepping of water parcels"
         self.log_info(_msg, verbosity=2)
 
-        # configure the starting indices for each parcel
-        inlet_weights = self.get_inlet_weights_water()
-        start_indices = shared_tools.get_start_indices(
-            self.inlet, inlet_weights, self._Np_water
-        )
+        # grab from initialization step
+        start_indices = self.start_indices
 
         # init parcel step number counter
         _step = 0
@@ -691,7 +694,8 @@ def _get_weight_at_cell_water(
                     weight[~wall] = 1 / nnotwall
                 else:
                     raise RuntimeError(
-                        "No non-wall cells surrounding cell. " "Please report error."
+                        "No non-wall cells surrounding cell."
+                        "Please report error including logfile."
                     )
 
             weight = weight / np.sum(weight)
