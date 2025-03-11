@@ -78,7 +78,7 @@ include = [
 ]
 
 [project.scripts]
-pyDeltaRCM = "my_package.pyDeltaRCM.preprocessor:preprocessor_wrapper"
+pyDeltaRCM = "pyDeltaRCM.preprocessor:preprocessor_wrapper"
 
 [tool.coverage.run]
 relative_files = true
