@@ -24,7 +24,7 @@ Project information
     :target: https://github.com/DeltaRCM/pyDeltaRCM
 
 .. image:: https://joss.theoj.org/papers/10.21105/joss.03398/status.svg
-   :target: https://doi.org/10.21105/joss.03398
+   :target: https://joss.theoj.org/papers/10.21105/joss.03398
 
 .. toctree::
    :maxdepth: 1
@@ -33,6 +33,8 @@ Project information
    meta/contributing
    meta/license
    meta/conduct
+   meta/citing
+   meta/usedby
 
 
 .. _user_documentation:
@@ -47,6 +49,7 @@ User documentation
    guides/user_guide
    info/index
    examples/index
+   examples/modelzoo
 
 
 
@@ -58,12 +61,12 @@ Developer documentation
 
 .. image:: https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg
     :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
-    
+
 .. image:: https://codecov.io/gh/DeltaRCM/pyDeltaRCM/branch/develop/graph/badge.svg
   :target: https://codecov.io/gh/DeltaRCM/pyDeltaRCM
 
 .. image:: https://app.codacy.com/project/badge/Grade/1c137d0227914741a9ba09f0b00a49a7
-    :target: https://www.codacy.com/gh/DeltaRCM/pyDeltaRCM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=DeltaRCM/pyDeltaRCM&amp;utm_campaign=Badge_Grade   
+    :target: https://app.codacy.com/gh/DeltaRCM/pyDeltaRCM/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade
 
 .. toctree::
    :maxdepth: 3

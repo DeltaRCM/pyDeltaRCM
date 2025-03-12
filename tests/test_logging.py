@@ -1,6 +1,7 @@
 import os
 import sys
 import glob
+from pathlib import Path
 
 import unittest.mock as mock
 
@@ -11,7 +12,7 @@ from . import utilities
 
 class TestLogModelTime:
 
-    def test_records_arbitrary_time_values(self, tmp_path, capsys):
+    def test_records_arbitrary_time_values(self, tmp_path: Path, capsys) -> None:
         """
         This test should create the log, and then print nothing at all.
         """
@@ -33,7 +34,7 @@ class TestLogModelTime:
         _calls = [mock.call('Time: 3.1; timestep: 42')]
         _delta.logger.info.assert_has_calls(_calls)
 
-    def test_verbose_printing_0(self, tmp_path, capsys):
+    def test_verbose_printing_0(self, tmp_path: Path, capsys) -> None:
         """
         This test should create the log, and then print nothing at all.
         """
@@ -56,7 +57,7 @@ class TestLogModelTime:
         captd = capsys.readouterr()
         assert captd.out == ''
 
-    def test_verbose_printing_1(self, tmp_path, capsys):
+    def test_verbose_printing_1(self, tmp_path: Path, capsys) -> None:
         """
         This test should create the log, and then print nothing at all.
         """
@@ -79,7 +80,7 @@ class TestLogModelTime:
         captd = capsys.readouterr()
         assert 'Time: 0.0' in captd.out  # if verbose >= 1
 
-    def test_verbose_printing_2(self, tmp_path, capsys):
+    def test_verbose_printing_2(self, tmp_path: Path, capsys) -> None:
         """
         This test should create the log, and then print nothing at all.
         """
@@ -110,7 +111,7 @@ class TestLoggerIntegratedDuringInitialization:
     instantiation of the DeltaModel...
     """
 
-    def test_logger_has_initialization_lines(self, tmp_path):
+    def test_logger_has_initialization_lines(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
@@ -146,7 +147,7 @@ class TestLoggerIntegratedDuringInitialization:
         assert not os.path.isfile(os.path.join(
             tmp_path, 'out_dir', 'eta_0.0.png'))
 
-    def test_logger_random_seed_always_recorded(self, tmp_path):
+    def test_logger_random_seed_always_recorded(self, tmp_path: Path) -> None:
         file_name = 'user_parameters.yaml'
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')

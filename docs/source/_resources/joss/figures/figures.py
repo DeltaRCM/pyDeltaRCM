@@ -9,24 +9,25 @@ import pyDeltaRCM
 from pyDeltaRCM.shared_tools import sec_in_day, day_in_yr
 
 import netCDF4 as nc
+from typing import List
 
 # everything relative to this file
-_dir = os.path.realpath(os.path.dirname(__file__))
+_dir: str = os.path.realpath(os.path.dirname(__file__))
 
 
 if __name__ == '__main__':
 
     # get script input argument
-    _arg = sys.argv
+    _arg: List[str] = sys.argv
     if len(_arg) == 3:
-        _input_flag = sys.argv[1].strip('-')
+        _input_flag: str = sys.argv[1].strip('-')
     elif len(_arg) == 2:
-        _input_flag = sys.argv[1].strip('-')
+        _input_flag: str = sys.argv[1].strip('-')
     else:
         raise ValueError('No arguments supplied.')
 
     # parameter choices for scaling
-    If = 10 / day_in_yr  # intermittency factor for year-scaling
+    If: float = 10 / day_in_yr  # intermittency factor for year-scaling
 
     # if running the computation
     if _input_flag == 'compute':

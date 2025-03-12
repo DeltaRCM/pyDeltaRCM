@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 
 n = 1
-cm = matplotlib.cm.get_cmap('tab10')
+cm = matplotlib.colormaps['tab10']
 
 
 # init delta model

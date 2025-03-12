@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 
 n = 1
-cm = matplotlib.cm.get_cmap('tab10')
+cm = matplotlib.colormaps['tab10']
 
 
 # init delta model
@@ -28,7 +28,7 @@ delta.run_water_iteration()
 
 
 # define a function to fill in the walks of given idx
-def _plot_idxs_walks_to_step(delta_inds, _step, _idxs, _ax):
+def _plot_idxs_walks_to_step(delta_inds, _step, _idxs, _ax) -> None:
     for i in range(len(_idxs)):
         walk = delta_inds[_idxs[i], :]
         walk = walk[:_step]
@@ -48,8 +48,11 @@ pidx = 85
 
 # set up axis
 # fig, ax = plt.subplots(1, 4, figsize=(10, 5))
-fig = plt.figure(constrained_layout=True)
-gs = fig.add_gridspec(2, 2)
+fig = plt.figure()
+gs = fig.add_gridspec(
+    2, 2,
+    wspace=0.3,
+    left=0.1, right=0.9)
 
 
 # fill in axis0
@@ -80,7 +83,5 @@ for i in range(n):
 
 ax2.set_ylabel('elevation')
 ax2.set_xlabel('steps along parcel path')
-
-plt.tight_layout()
 
 plt.show()

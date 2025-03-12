@@ -1,20 +1,19 @@
 import glob
 import os
+import unittest.mock as mock
+from pathlib import Path
+
 import netCDF4
 import numpy as np
-
-import unittest.mock as mock
 
 from pyDeltaRCM.model import DeltaModel
 from .. import utilities
 
 
 class TestTimingOutputData:
-
-    def test_update_make_record(self, tmp_path):
+    def test_update_make_record(self, tmp_path: Path) -> None:
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_checkpoint': True})
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"save_checkpoint": True})
         _delta = DeltaModel(input_file=p)
 
         # modify the save interval to be twice dt
@@ -85,10 +84,10 @@ class TestTimingOutputData:
         assert _delta.save_iter == int(2)
         assert _delta._save_time_since_checkpoint == _delta._dt
 
-    def test_update_saving_intervals_on_cycle(self, tmp_path):
+    def test_update_saving_intervals_on_cycle(self, tmp_path: Path) -> None:
         """dt == 300; save_dt == 600"""
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         _delta = DeltaModel(input_file=p)
 
         # modify the timestep and save interval to be twice dt
@@ -137,10 +136,10 @@ class TestTimingOutputData:
         assert _delta.time == 3000
         assert _delta._is_finalized is False
 
-    def test_update_saving_intervals_short(self, tmp_path):
+    def test_update_saving_intervals_short(self, tmp_path: Path) -> None:
         """dt == 300; save_dt == 100"""
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         _delta = DeltaModel(input_file=p)
 
         # modify the timestep and save interval to be twice dt
@@ -181,10 +180,12 @@ class TestTimingOutputData:
         assert _delta.save_iter == 4  # once during init
         assert _delta.time == 900
 
-    def test_update_saving_intervals_offset_long_not_double(self, tmp_path):
+    def test_update_saving_intervals_offset_long_not_double(
+        self, tmp_path: Path
+    ) -> None:
         """dt == 300; save_dt == 500"""
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         _delta = DeltaModel(input_file=p)
 
         # modify the timestep and save interval to be twice dt
@@ -222,10 +223,12 @@ class TestTimingOutputData:
         assert _delta.time == 3600
         assert _delta.save_grids_and_figs.call_count == 6
 
-    def test_update_saving_intervals_offset_long_over_double(self, tmp_path):
+    def test_update_saving_intervals_offset_long_over_double(
+        self, tmp_path: Path
+    ) -> None:
         """dt == 300; save_dt == 1000"""
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         _delta = DeltaModel(input_file=p)
 
         # modify the timestep and save interval to be twice dt
@@ -278,8 +281,8 @@ class TestTimingOutputData:
         assert _delta.save_grids_and_figs.call_count == 9
         assert _delta._is_finalized is False
 
-    def test_finalize_updated(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+    def test_finalize_updated(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         _delta = DeltaModel(input_file=p)
 
         # mock the top-level
@@ -309,11 +312,10 @@ class TestTimingOutputData:
 
         assert _delta._is_finalized is True
 
-    def test_save_one_fig_no_grids(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_dt': 1,
-                                      'save_strata': False,
-                                      'save_eta_figs': True})
+    def test_save_one_fig_no_grids(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(
+            tmp_path, "input.yaml", {"save_dt": 1, "save_eta_figs": True}
+        )
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
@@ -324,8 +326,8 @@ class TestTimingOutputData:
         _delta.output_checkpoint = mock.MagicMock()
 
         # check one set images created during init
-        img_glob = glob.glob(os.path.join(_delta.prefix, '*.png'))
-        nc_glob = glob.glob(os.path.join(_delta.prefix, '*.nc'))
+        img_glob = glob.glob(os.path.join(_delta.prefix, "*.png"))
+        nc_glob = glob.glob(os.path.join(_delta.prefix, "*.nc"))
         assert len(img_glob) == 1
         assert len(nc_glob) == 0
 
@@ -337,23 +339,23 @@ class TestTimingOutputData:
         _delta.solve_water_and_sediment_timestep.call_count == 2
 
         # check for output eta files
-        exp_path_nc = os.path.join(
-            tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
-        exp_path_png0 = os.path.join(tmp_path / 'out_dir', 'eta_00000.png')
-        exp_path_png1 = os.path.join(tmp_path / 'out_dir', 'eta_00001.png')
-        exp_path_png2 = os.path.join(tmp_path / 'out_dir', 'eta_00002.png')
-        exp_path_png3 = os.path.join(tmp_path / 'out_dir', 'eta_00003.png')
+        exp_path_nc = os.path.join(tmp_path / "out_dir", "pyDeltaRCM_output.nc")
+        exp_path_png0 = os.path.join(tmp_path / "out_dir", "eta_00000.png")
+        exp_path_png1 = os.path.join(tmp_path / "out_dir", "eta_00001.png")
+        exp_path_png2 = os.path.join(tmp_path / "out_dir", "eta_00002.png")
+        exp_path_png3 = os.path.join(tmp_path / "out_dir", "eta_00003.png")
         assert not os.path.isfile(exp_path_nc)
         assert os.path.isfile(exp_path_png0)
         assert os.path.isfile(exp_path_png1)
         assert os.path.isfile(exp_path_png2)
         assert not os.path.isfile(exp_path_png3)
 
-    def test_save_one_fig_one_grid(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_dt': 1,
-                                      'save_eta_grids': True,
-                                      'save_discharge_figs': True})
+    def test_save_one_fig_one_grid(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(
+            tmp_path,
+            "input.yaml",
+            {"save_dt": 1, "save_eta_grids": True, "save_discharge_figs": True},
+        )
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
@@ -363,8 +365,7 @@ class TestTimingOutputData:
         _delta.log_model_time = mock.MagicMock()
         _delta.output_checkpoint = mock.MagicMock()
 
-        exp_path_nc = os.path.join(
-            tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+        exp_path_nc = os.path.join(tmp_path / "out_dir", "pyDeltaRCM_output.nc")
         assert os.path.isfile(exp_path_nc)
         nc_size_before = os.path.getsize(exp_path_nc)
         assert nc_size_before > 0
@@ -384,10 +385,10 @@ class TestTimingOutputData:
         assert nc_size_after == nc_size_middle
         assert nc_size_after > nc_size_before
 
-    def test_save_metadata_no_grids(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_dt': 1,
-                                      'save_metadata': True})
+    def test_save_metadata_no_grids(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(
+            tmp_path, "input.yaml", {"save_dt": 1, "save_metadata": True}
+        )
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
@@ -397,8 +398,7 @@ class TestTimingOutputData:
         _delta.log_model_time = mock.MagicMock()
         _delta.output_checkpoint = mock.MagicMock()
 
-        exp_path_nc = os.path.join(
-            tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+        exp_path_nc = os.path.join(tmp_path / "out_dir", "pyDeltaRCM_output.nc")
         assert os.path.isfile(exp_path_nc)
 
         for _ in range(0, 2):
@@ -410,17 +410,22 @@ class TestTimingOutputData:
         _delta.finalize()
 
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
-        assert not ('eta' in ds.variables)
-        assert ds['meta']['H_SL'].shape[0] == 3
-        assert ds['meta']['L0'][:] == 3
+        assert not ("eta" in ds.variables)
+        assert ds["meta"]["H_SL"].shape[0] == 3
+        assert ds["meta"]["L0"][:] == 3
 
-    def test_save_subsidence_metadata_no_grids(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_dt': 1,
-                                      'toggle_subsidence': True,
-                                      'start_subsidence': 0,
-                                      'subsidence_rate': 1,
-                                      'save_metadata': True})
+    def test_save_subsidence_metadata_no_grids(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(
+            tmp_path,
+            "input.yaml",
+            {
+                "save_dt": 1,
+                "toggle_subsidence": True,
+                "start_subsidence": 0,
+                "subsidence_rate": 1,
+                "save_metadata": True,
+            },
+        )
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
@@ -430,8 +435,7 @@ class TestTimingOutputData:
         _delta.log_model_time = mock.MagicMock()
         _delta.output_checkpoint = mock.MagicMock()
 
-        exp_path_nc = os.path.join(
-            tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+        exp_path_nc = os.path.join(tmp_path / "out_dir", "pyDeltaRCM_output.nc")
         assert os.path.isfile(exp_path_nc)
 
         for _ in range(0, 2):
@@ -443,19 +447,24 @@ class TestTimingOutputData:
         _delta.finalize()
 
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
-        assert not ('eta' in ds.variables)
-        assert ds['meta']['H_SL'].shape[0] == 3
-        assert ds['meta']['L0'][:] == 3
-        assert ds['meta']['sigma'].shape == _delta.sigma.shape
-        assert np.all(ds['meta']['sigma'] == _delta.sigma)
-        assert ds['meta']['start_subsidence'][:] == 0
+        assert not ("eta" in ds.variables)
+        assert ds["meta"]["H_SL"].shape[0] == 3
+        assert ds["meta"]["L0"][:] == 3
+        assert ds["meta"]["sigma"].shape == _delta.sigma.shape
+        assert np.all(ds["meta"]["sigma"] == _delta.sigma)
+        assert ds["meta"]["start_subsidence"][:] == 0
 
-    def test_save_one_grid_metadata_by_default(self, tmp_path):
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'save_dt': 1,
-                                      'save_metadata': False,
-                                      'save_eta_grids': True,
-                                      'C0_percent': 0.2})
+    def test_save_one_grid_metadata_by_default(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(
+            tmp_path,
+            "input.yaml",
+            {
+                "save_dt": 1,
+                "save_metadata": False,
+                "save_eta_grids": True,
+                "C0_percent": 0.2,
+            },
+        )
         _delta = DeltaModel(input_file=p)
 
         # mock the timestep computations
@@ -465,8 +474,7 @@ class TestTimingOutputData:
         _delta.log_model_time = mock.MagicMock()
         _delta.output_checkpoint = mock.MagicMock()
 
-        exp_path_nc = os.path.join(
-            tmp_path / 'out_dir', 'pyDeltaRCM_output.nc')
+        exp_path_nc = os.path.join(tmp_path / "out_dir", "pyDeltaRCM_output.nc")
         assert os.path.isfile(exp_path_nc)
 
         for _ in range(0, 6):
@@ -477,10 +485,10 @@ class TestTimingOutputData:
 
         _delta.finalize()
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
-        _arr = ds.variables['eta']
+        _arr = ds.variables["eta"]
         assert _arr.shape[1] == _delta.eta.shape[0]
         assert _arr.shape[2] == _delta.eta.shape[1]
-        assert ('meta' in ds.groups)  # if any grids, save meta too
-        assert ds.groups['meta']['H_SL'].shape[0] == _arr.shape[0]
-        assert np.all(ds.groups['meta']['C0_percent'][:] == 0.2)
-        assert np.all(ds.groups['meta']['f_bedload'][:] == 0.5)
+        assert "meta" in ds.groups  # if any grids, save meta too
+        assert ds.groups["meta"]["H_SL"].shape[0] == _arr.shape[0]
+        assert np.all(ds.groups["meta"]["C0_percent"][:].data == 0.2)
+        assert np.all(ds.groups["meta"]["f_bedload"][:].data == 0.5)

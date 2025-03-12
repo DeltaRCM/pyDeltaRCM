@@ -53,12 +53,12 @@ Here, we will change the model time value directly, so that we can verify that t
     with pyDeltaRCM.shared_tools._docs_temp_directory() as output_dir:
         mdl_muddy = VariableBedloadModel(f_bedload=0.3,
                                          out_dir=output_dir)
-        mdl_sandy = VariableBedloadModel(f_bedload=0.7)
+        mdl_sandy = VariableBedloadModel(f_bedload=0.7,
+                                         out_dir=output_dir)
 
 .. code:: python
 
-    mdl_muddy = VariableBedloadModel(f_bedload=0.3,
-                                     out_dir=output_dir)
+    mdl_muddy = VariableBedloadModel(f_bedload=0.3)
     mdl_sandy = VariableBedloadModel(f_bedload=0.7)
 
 .. important::

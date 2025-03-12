@@ -2,8 +2,10 @@
 Developer Guide
 ***************
 
-.. image:: https://github.com/DeltaRCM/pyDeltaRCM/workflows/actions/badge.svg
+.. image:: https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg
     :target: https://github.com/DeltaRCM/pyDeltaRCM/actions
+
+[![build](https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg)](https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml)
 
 This guide provides additional details for implementation that did not make it into the user guide.
 If you have not yet read the user guide, that is the place to start, then visit and refer to this guide for details as necessary.

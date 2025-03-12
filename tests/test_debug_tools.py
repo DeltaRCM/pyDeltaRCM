@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ from . import utilities
 class TestShowAttributeDomain:
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type(self, tmp_path):
+    def test_plot_domain_cell_type(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -19,7 +20,7 @@ class TestShowAttributeDomain:
         return plt.gcf()
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_iwalk(self, tmp_path):
+    def test_plot_iwalk(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -27,14 +28,14 @@ class TestShowAttributeDomain:
         _delta.show_attribute('iwalk')
         return plt.gcf()
 
-    def test_plot_attribute_bad_shape_1d(self, tmp_path):
+    def test_plot_attribute_bad_shape_1d(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
         with pytest.raises(ValueError):
             _delta.show_attribute('free_surf_flag')
 
-    def test_plot_attribute_bad_shape_3d(self, tmp_path):
+    def test_plot_attribute_bad_shape_3d(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -43,14 +44,14 @@ class TestShowAttributeDomain:
         with pytest.raises(ValueError):
             _delta.show_attribute('threedeearray')
 
-    def test_plot_attribute_missing_unknown(self, tmp_path):
+    def test_plot_attribute_missing_unknown(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
         with pytest.raises(AttributeError):
             _delta.show_attribute('FAKE_NAME_ATTRIBUTE')
 
-    def test_plot_attribute_numeric_bad_type(self, tmp_path):
+    def test_plot_attribute_numeric_bad_type(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -60,7 +61,7 @@ class TestShowAttributeDomain:
             _delta.show_attribute('CTR')
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type_no_grid(self, tmp_path):
+    def test_plot_domain_cell_type_no_grid(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -69,7 +70,7 @@ class TestShowAttributeDomain:
         return plt.gcf()
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_velocity(self, tmp_path):
+    def test_plot_domain_velocity(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -77,7 +78,7 @@ class TestShowAttributeDomain:
         _delta.show_attribute('ux')
         return plt.gcf()
 
-    def test_plot_domain_badtype(self, tmp_path):
+    def test_plot_domain_badtype(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -85,7 +86,7 @@ class TestShowAttributeDomain:
             _delta.show_attribute(42)
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_multiple_subplots(self, tmp_path):
+    def test_plot_multiple_subplots(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -96,7 +97,7 @@ class TestShowAttributeDomain:
         return plt.gcf()
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_withlabel(self, tmp_path):
+    def test_plot_domain_withlabel(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -109,7 +110,7 @@ class TestShowAttributeDomain:
 class TestShowInd:
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type_single_tuple(self, tmp_path):
+    def test_plot_domain_cell_type_single_tuple(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -119,7 +120,7 @@ class TestShowInd:
         _delta.show_ind((30, 100))
         return plt.gcf()
 
-    def test_plot_domain_cell_type_single_badtuple(self, tmp_path):
+    def test_plot_domain_cell_type_single_badtuple(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -127,7 +128,7 @@ class TestShowInd:
             _delta.show_ind((100, 1100, 2100))
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type_list_tuple(self, tmp_path):
+    def test_plot_domain_cell_type_list_tuple(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -138,7 +139,7 @@ class TestShowInd:
         return plt.gcf()
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type_single_index(self, tmp_path):
+    def test_plot_domain_cell_type_single_index(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -149,7 +150,7 @@ class TestShowInd:
         return plt.gcf()
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type_list_index(self, tmp_path):
+    def test_plot_domain_cell_type_list_index(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -160,7 +161,7 @@ class TestShowInd:
         return plt.gcf()
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type_list_mix_tuple_index(self, tmp_path):
+    def test_plot_domain_cell_type_list_mix_tuple_index(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -171,7 +172,7 @@ class TestShowInd:
         return plt.gcf()
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type_multiple_index_calls(self, tmp_path):
+    def test_plot_domain_cell_type_multiple_index_calls(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -184,7 +185,7 @@ class TestShowInd:
         return plt.gcf()
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type_multiple_diff_args(self, tmp_path):
+    def test_plot_domain_cell_type_multiple_diff_args(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -197,7 +198,7 @@ class TestShowInd:
         return plt.gcf()
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type_multiple_diff_kwargs(self, tmp_path):
+    def test_plot_domain_cell_type_multiple_diff_kwargs(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -214,7 +215,7 @@ class TestShowInd:
 class TestCombinationsOfMultipleMethods:
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_plot_domain_cell_type_no_grid(self, tmp_path):
+    def test_plot_domain_cell_type_no_grid(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -228,7 +229,7 @@ class TestCombinationsOfMultipleMethods:
 class TestShowLine:
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_show_line_pts_Nx2_array(self, tmp_path):
+    def test_show_line_pts_Nx2_array(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 
@@ -241,7 +242,7 @@ class TestShowLine:
         return plt.gcf()
 
     @pytest.mark.mpl_image_compare(remove_text=True)
-    def test_show_line_set_points(self, tmp_path):
+    def test_show_line_set_points(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
         _delta = DeltaModel(input_file=p)
 

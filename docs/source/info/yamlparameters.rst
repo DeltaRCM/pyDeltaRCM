@@ -9,6 +9,12 @@ provided below. The YAML parameters are sorted by "type", for example,
 :ref:`model-domain-parameters` are those parameters which control the
 definition of the pyDeltaRCM model domain.
 
+.. hint::
+
+    View the complete list of default values and expected types
+    here: :doc:`../reference/model/yaml_defaults`.
+
+
 Model Settings
 ==============
 
@@ -42,19 +48,15 @@ Model Domain Parameters
 
 :attr:`pyDeltaRCM.model.DeltaModel.H_SL`
 
-
-Domain Boundary Condition Parameters
-====================================
-
 :attr:`pyDeltaRCM.model.DeltaModel.seed`
 
 :attr:`pyDeltaRCM.model.DeltaModel.SLR`
 
 :attr:`pyDeltaRCM.model.DeltaModel.f_bedload`
 
-:attr:`pyDeltaRCM.model.DeltaModel.active_layer_thickness`
-
 :attr:`pyDeltaRCM.model.DeltaModel.C0_percent`
+
+:attr:`pyDeltaRCM.model.DeltaModel.active_layer_thickness`
 
 :attr:`pyDeltaRCM.model.DeltaModel.toggle_subsidence`
 

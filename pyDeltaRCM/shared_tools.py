@@ -1,11 +1,11 @@
+import contextlib
+import os
+import re
+import tempfile
+import yaml
+from typing import Iterator, Type, Tuple
 
 import numpy as np
-import yaml
-import re
-import contextlib
-import tempfile
-import os
-
 from numba import njit, _helperlib
 
 # tools shared between deltaRCM water and sediment routing
@@ -17,7 +17,7 @@ earth_grav = 9.81
 
 
 @njit
-def set_random_seed(_seed):
+def set_random_seed(_seed: int) -> None:
     """Set the random seed from an integer.
 
     Set the seed of the random number generator with a single integer.
@@ -80,7 +80,7 @@ def get_random_state():
     return _helperlib.rnd_get_state(ptr)
 
 
-def set_random_state(_state_tuple):
+def set_random_state(_state_tuple) -> None:
     """Set the random state from a tuple.
 
     Set the random state from a tuple in the form returned by
@@ -105,7 +105,7 @@ def set_random_state(_state_tuple):
 
 
 @njit
-def get_random_uniform(limit):
+def get_random_uniform(limit: float) -> float:
     """Get a random number from the uniform distribution.
 
     Get a random number from the uniform distribution, defined over the
@@ -171,7 +171,9 @@ def get_inlet_weights(inlet):
 
 
 @njit
-def get_start_indices(inlet, inlet_weights, num_starts):
+def get_start_indices(
+    inlet: np.ndarray, inlet_weights: np.ndarray, num_starts: int
+) -> np.ndarray:
     """Get start indices.
 
     Reutrn a randomly generated list of starting points for parcel routing.
@@ -193,7 +195,7 @@ def get_start_indices(inlet, inlet_weights, num_starts):
     -------
     start_indices : ndarray
         :obj:`num_starts` starting points, generated from :obj:`inlet`
-         according to weights in :obj:`inlet_weights`. 
+         according to weights in :obj:`inlet_weights`.
     """
     norm_weights = inlet_weights / np.sum(inlet_weights)
     idxs = []
@@ -204,7 +206,7 @@ def get_start_indices(inlet, inlet_weights, num_starts):
 
 
 @njit
-def get_steps(new_direction, iwalk, jwalk):
+def get_steps(new_direction: int, iwalk, jwalk) -> Tuple[float, int, int, bool]:
     """Find the values given the next step.
 
     Get the steps for updating discharge and velocity arrays based on the
@@ -213,7 +215,7 @@ def get_steps(new_direction, iwalk, jwalk):
     istep = iwalk[new_direction]
     jstep = jwalk[new_direction]
     dist = np.sqrt(istep * istep + jstep * jstep)
-    astep = (dist != 0)
+    astep = dist != 0
 
     return dist, istep, jstep, astep
 
@@ -238,8 +240,8 @@ def random_pick(prob):
     return arr[np.searchsorted(cumprob, get_random_uniform(cumprob[-1]))]
 
 
-@njit('UniTuple(int64, 2)(int64, UniTuple(int64, 2))')
-def custom_unravel(i, shape):
+@njit("UniTuple(int64, 2)(int64, UniTuple(int64, 2))")
+def custom_unravel(i: int, shape: Tuple[int, int]) -> Tuple[int, int]:
     """Unravel indexes for 2D array.
 
     This is a jitted function, equivalent to the `numpy` implementation of
@@ -270,6 +272,7 @@ def custom_unravel(i, shape):
         from pyDeltaRCM.shared_tools import custom_unravel
 
     .. doctest::
+        :skip:
 
         >>> _shape = (100, 200)  # e.g., delta.eta.shape
 
@@ -286,8 +289,8 @@ def custom_unravel(i, shape):
     return x, y
 
 
-@njit('int64(UniTuple(int64, 2), UniTuple(int64, 2))')
-def custom_ravel(tup, shape):
+@njit("int64(UniTuple(int64, 2), UniTuple(int64, 2))")
+def custom_ravel(tup: Tuple[int, int], shape: Tuple[int, int]) -> int:
     """Ravel indexes for 2D array.
 
     This is a jitted function, equivalent to the `numpy` implementation of
@@ -316,6 +319,7 @@ def custom_ravel(tup, shape):
         from pyDeltaRCM.shared_tools import custom_ravel
 
     .. doctest::
+        :skip:
 
         >>> _shape = (100, 200)  # e.g., delta.eta.shape
 
@@ -333,7 +337,7 @@ def custom_ravel(tup, shape):
 
 
 @njit
-def custom_pad(arr):
+def custom_pad(arr: np.ndarray) -> np.ndarray:
     """Pad an array.
 
     This is a jitted function, equivalent to the `numpy` implementation of
@@ -366,6 +370,7 @@ def custom_pad(arr):
     Consider a model domain of size `(4, 8)`
 
     .. doctest::
+        :skip:
 
         >>> arr = np.arange(32).reshape(4, 8)
 
@@ -380,6 +385,7 @@ def custom_pad(arr):
     sliced:
 
     .. doctest::
+        :skip:
 
         >>> for i in range(4):
         ...     for j in range(8):
@@ -390,7 +396,7 @@ def custom_pad(arr):
 
     """
     old_shape = arr.shape
-    new_shape = (old_shape[0]+2, old_shape[1]+2)
+    new_shape = (old_shape[0] + 2, old_shape[1] + 2)
     pad = np.zeros(new_shape, dtype=arr.dtype)
 
     # center
@@ -428,7 +434,7 @@ def get_weight_sfc_int(stage, stage_nbrs, qx, qy, ivec, jvec, distances):
     return weight_sfc, weight_int
 
 
-def _get_version():
+def _get_version() -> str:
     """Extract version from file.
 
     Extract version number from single file, and make it availabe everywhere.
@@ -450,11 +456,12 @@ def _get_version():
         >>> pyDeltaRCM.shared_tools._get_version()  # doctest: +SKIP
     """
     from . import _version
+
     return _version.__version__()
 
 
 @contextlib.contextmanager
-def _docs_temp_directory():
+def _docs_temp_directory() -> Iterator[str]:
     """Helper for creating and tearing down models in documentation.
 
     This function should be used as a context manager, to create a DeltaModel
@@ -473,12 +480,12 @@ def _docs_temp_directory():
         ...     delta = pyDeltaRCM.DeltaModel(out_dir=output_dir)
     """
     tmpdir = tempfile.TemporaryDirectory()
-    output_path = os.path.join(tmpdir.name, 'output')
+    output_path = os.path.join(tmpdir.name, "output")
     yield output_path
     tmpdir.cleanup()
 
 
-def custom_yaml_loader():
+def custom_yaml_loader() -> Type[yaml.loader.SafeLoader]:
     """A custom YAML loader to handle scientific notation.
 
     We are waiting for upstream fix here:
@@ -501,18 +508,22 @@ def custom_yaml_loader():
     """
     loader = yaml.SafeLoader
     loader.add_implicit_resolver(
-        u'tag:yaml.org,2002:float',
-        re.compile(r'''^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+]?[0-9]+)?
+        "tag:yaml.org,2002:float",
+        re.compile(
+            r"""^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+]?[0-9]+)?
                        |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
                        |\.[0-9_]+(?:[eE][-+]?[0-9]+)?
                        |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*
                        |[-+]?\.(?:inf|Inf|INF)
-                       |\.(?:nan|NaN|NAN))$''', re.X),
-        list(u'-+0123456789.'))
+                       |\.(?:nan|NaN|NAN))$""",
+            re.X,
+        ),
+        list("-+0123456789."),
+    )
     return loader
 
 
-def scale_model_time(time, If=1, units='seconds'):
+def scale_model_time(time: float, If: float = 1, units: str = "seconds") -> float:
     """Scale the model time to "real" time.
 
     Model time is executed as assumed flooding conditions, and executed at the
@@ -565,13 +576,12 @@ def scale_model_time(time, If=1, units='seconds'):
         if the value for intermittency is not ``0 < If <= 1``.
     """
     if (If <= 0) or (If > 1):
-        raise ValueError(
-            'Intermittency `If` is not 0 < If <= 1: %s' % str(If))
+        raise ValueError("Intermittency `If` is not 0 < If <= 1: %s" % str(If))
 
     return time / _scale_factor(If, units)
 
 
-def _scale_factor(If, units):
+def _scale_factor(If: float, units: str) -> float:
     """Scaling factor between model time and "real" time.
 
     The scaling factor relates the model time to a real worl time, by the
@@ -588,12 +598,12 @@ def _scale_factor(If, units):
         `['seconds', 'days', 'years']`.
 
     """
-    if units == 'seconds':
+    if units == "seconds":
         S_f = 1
-    elif units == 'days':
+    elif units == "days":
         S_f = sec_in_day
-    elif units == 'years':
+    elif units == "years":
         S_f = sec_in_day * day_in_yr
     else:
-        raise ValueError('Bad value for `units`: %s' % str(units))
-    return (If * S_f)
+        raise ValueError("Bad value for `units`: %s" % str(units))
+    return If * S_f
