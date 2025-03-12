@@ -22,8 +22,6 @@ Model Settings
 
 :attr:`pyDeltaRCM.model.DeltaModel.verbose`
 
-:attr:`pyDeltaRCM.model.DeltaModel.seed`
-
 
 .. _model-domain-parameters:
 
@@ -38,17 +36,19 @@ Model Domain Parameters
 
 :attr:`pyDeltaRCM.model.DeltaModel.L0_meters`
 
+:attr:`pyDeltaRCM.model.DeltaModel.N0_meters`
+
 :attr:`pyDeltaRCM.model.DeltaModel.S0`
 
 :attr:`pyDeltaRCM.model.DeltaModel.u0`
-
-:attr:`pyDeltaRCM.model.DeltaModel.N0_meters`
 
 :attr:`pyDeltaRCM.model.DeltaModel.h0`
 
 :attr:`pyDeltaRCM.model.DeltaModel.hb`
 
 :attr:`pyDeltaRCM.model.DeltaModel.H_SL`
+
+:attr:`pyDeltaRCM.model.DeltaModel.seed`
 
 :attr:`pyDeltaRCM.model.DeltaModel.SLR`
 
@@ -63,6 +63,44 @@ Model Domain Parameters
 :attr:`pyDeltaRCM.model.DeltaModel.subsidence_rate`
 
 :attr:`pyDeltaRCM.model.DeltaModel.start_subsidence`
+
+
+Reduced-Complexity Routing Parameters
+=====================================
+
+:attr:`pyDeltaRCM.model.DeltaModel.Np_water`
+
+:attr:`pyDeltaRCM.model.DeltaModel.Np_sed`
+
+:attr:`pyDeltaRCM.model.DeltaModel.omega_sfc`
+
+:attr:`pyDeltaRCM.model.DeltaModel.omega_flow`
+
+:attr:`pyDeltaRCM.model.DeltaModel.Nsmooth`
+
+:attr:`pyDeltaRCM.model.DeltaModel.Csmooth`
+
+:attr:`pyDeltaRCM.model.DeltaModel.theta_water`
+
+:attr:`pyDeltaRCM.model.DeltaModel.coeff_theta_sand`
+
+:attr:`pyDeltaRCM.model.DeltaModel.coeff_theta_mud`
+
+:attr:`pyDeltaRCM.model.DeltaModel.beta`
+
+:attr:`pyDeltaRCM.model.DeltaModel.sed_lag`
+
+:attr:`pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud`
+
+:attr:`pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud`
+
+:attr:`pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand`
+
+:attr:`pyDeltaRCM.model.DeltaModel.alpha`
+
+:attr:`pyDeltaRCM.model.DeltaModel.itermax`
+
+:attr:`pyDeltaRCM.model.DeltaModel.stepmax`
 
 
 Output Settings
@@ -113,41 +151,3 @@ Output Settings
 :attr:`pyDeltaRCM.model.DeltaModel.clobber_netcdf`
 
 :attr:`pyDeltaRCM.model.DeltaModel.legacy_netcdf`
-
-
-Reduced-Complexity Routing Parameters
-=====================================
-
-:attr:`pyDeltaRCM.model.DeltaModel.Np_sed`
-
-:attr:`pyDeltaRCM.model.DeltaModel.Np_water`
-
-:attr:`pyDeltaRCM.model.DeltaModel.omega_sfc`
-
-:attr:`pyDeltaRCM.model.DeltaModel.omega_flow`
-
-:attr:`pyDeltaRCM.model.DeltaModel.itermax`
-
-:attr:`pyDeltaRCM.model.DeltaModel.Nsmooth`
-
-:attr:`pyDeltaRCM.model.DeltaModel.Csmooth`
-
-:attr:`pyDeltaRCM.model.DeltaModel.theta_water`
-
-:attr:`pyDeltaRCM.model.DeltaModel.coeff_theta_sand`
-
-:attr:`pyDeltaRCM.model.DeltaModel.coeff_theta_mud`
-
-:attr:`pyDeltaRCM.model.DeltaModel.beta`
-
-:attr:`pyDeltaRCM.model.DeltaModel.sed_lag`
-
-:attr:`pyDeltaRCM.model.DeltaModel.coeff_U_dep_mud`
-
-:attr:`pyDeltaRCM.model.DeltaModel.coeff_U_ero_mud`
-
-:attr:`pyDeltaRCM.model.DeltaModel.coeff_U_ero_sand`
-
-:attr:`pyDeltaRCM.model.DeltaModel.alpha`
-
-:attr:`pyDeltaRCM.model.DeltaModel.stepmax`

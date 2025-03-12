@@ -5,21 +5,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>pyDeltaRCM.sed_tools.BaseRouter &#8212; pyDeltaRCM 2.1.5 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=87629129" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <title>pyDeltaRCM.sed_tools.BaseRouter &#8212; pyDeltaRCM 2.1.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script src="../_static/documentation_options.js?v=786ba454"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/documentation_options.js?v=4f932e3e"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shared_tools" href="../reference/shared_tools/index.html" />
     <link rel="prev" title="pyDeltaRCM.sed_tools.MudRouter" href="pyDeltaRCM.sed_tools.MudRouter.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="pyDeltaRCM.sed_tools.MudRouter.html" title="pyDeltaRCM.sed_tools.MudRouter"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../reference/sed_tools/index.html" accesskey="U">sed_tools</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pyDeltaRCM.sed_tools.BaseRouter</a></li> 
@@ -47,7 +47,7 @@
 <h1>pyDeltaRCM.sed_tools.BaseRouter<a class="headerlink" href="#pydeltarcm-sed-tools-baserouter" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyDeltaRCM.sed_tools.BaseRouter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.sed_tools.</span></span><span class="sig-name descname"><span class="pre">BaseRouter</span></span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyDeltaRCM.sed_tools.</span></span><span class="sig-name descname"><span class="pre">BaseRouter</span></span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter" title="Link to this definition">¶</a></dt>
 <dd><p>BaseRouter.</p>
 <p>Defines common methods for jitted routers.</p>
 <p>Subclasses need to define <cite>run</cite>, <cite>_route_one_parcel</cite>, and
@@ -108,7 +108,7 @@ U_ero depends on the pathway.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyDeltaRCM.sed_tools.BaseRouter._deposit_or_erode">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_deposit_or_erode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">px</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter._deposit_or_erode" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_deposit_or_erode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">px</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyDeltaRCM.sed_tools.BaseRouter._deposit_or_erode" title="Link to this definition">¶</a></dt>
 <dd><p>Determine whether to erode or deposit.</p>
 <p>This is the decision making component of the routine, and will be
 different for sand vs mud.</p>
@@ -163,7 +163,7 @@ should be negative.</p></li>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
@@ -213,7 +213,7 @@ should be negative.</p></li>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -225,7 +225,7 @@ should be negative.</p></li>
         <li class="right" >
           <a href="pyDeltaRCM.sed_tools.MudRouter.html" title="pyDeltaRCM.sed_tools.MudRouter"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../reference/index.html" >API reference</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../reference/sed_tools/index.html" >sed_tools</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pyDeltaRCM.sed_tools.BaseRouter</a></li> 
@@ -233,7 +233,7 @@ should be negative.</p></li>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
 </html>

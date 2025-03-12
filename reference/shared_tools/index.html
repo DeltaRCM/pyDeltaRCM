@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>shared_tools &#8212; pyDeltaRCM 2.1.5 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=87629129" />
-    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <title>shared_tools &#8212; pyDeltaRCM 2.1.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
-    <script src="../../_static/documentation_options.js?v=786ba454"></script>
-    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/documentation_options.js?v=4f932e3e"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -20,7 +20,7 @@
     <link rel="next" title="hook_tools" href="../hook_tools/index.html" />
     <link rel="prev" title="pyDeltaRCM.sed_tools.BaseRouter" href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -32,7 +32,7 @@
         <li class="right" >
           <a href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html" title="pyDeltaRCM.sed_tools.BaseRouter"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">API reference</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">shared_tools</a></li> 
       </ul>
@@ -183,15 +183,6 @@ two-dimensional array from which <code class="xref py py-obj docutils literal no
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>  <span class="c1"># e.g., delta.eta.shape</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="mi">5124</span><span class="p">,</span> <span class="n">_shape</span><span class="p">)</span>
-<span class="go">(25, 124)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_unravel</span><span class="p">(</span><span class="mi">5124</span><span class="p">,</span> <span class="n">_shape</span><span class="p">)</span>
-<span class="go">(25, 124)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py function">
@@ -218,15 +209,6 @@ two-dimensional array from which <code class="xref py py-obj docutils literal no
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>  <span class="c1"># e.g., delta.eta.shape</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">ravel_multi_index</span><span class="p">((</span><span class="mi">25</span><span class="p">,</span> <span class="mi">124</span><span class="p">),</span> <span class="n">_shape</span><span class="p">)</span>
-<span class="go">5124</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">custom_ravel</span><span class="p">((</span><span class="mi">25</span><span class="p">,</span> <span class="mi">124</span><span class="p">),</span> <span class="n">_shape</span><span class="p">)</span>
-<span class="go">5124</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py function">
@@ -254,26 +236,8 @@ guarantees that all cells will have 9 neighbors.</p>
 </dl>
 <p class="rubric">Examples</p>
 <p>Consider a model domain of size <cite>(4, 8)</cite></p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np_pad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cust_pad</span> <span class="o">=</span> <span class="n">custom_pad</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np_pad</span> <span class="o">==</span> <span class="n">cust_pad</span><span class="p">)</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cust_pad</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(6, 10)</span>
-</pre></div>
-</div>
 <p>which enables all elements of the original <cite>(4, 8)</cite> array to be safely
 sliced:</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="n">slc</span> <span class="o">=</span> <span class="n">cust_pad</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">slc</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># will always be a (3, 3) 9-cell neighborhood</span>
-<span class="go">(3, 3)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py function">
@@ -504,7 +468,7 @@ throughout documentation and version-controlled release.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">shared_tools</span><span class="o">.</span><span class="n">_get_version</span><span class="p">()</span>  
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">shared_tools</span><span class="o">.</span><span class="n">_get_version</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -517,7 +481,7 @@ throughout documentation and version-controlled release.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="../../index.html">Table of Contents</a></h3>
@@ -585,7 +549,7 @@ throughout documentation and version-controlled release.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -597,14 +561,14 @@ throughout documentation and version-controlled release.</p>
         <li class="right" >
           <a href="../../_autosummary/pyDeltaRCM.sed_tools.BaseRouter.html" title="pyDeltaRCM.sed_tools.BaseRouter"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pyDeltaRCM 2.1.6 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >API reference</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">shared_tools</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
 </html>

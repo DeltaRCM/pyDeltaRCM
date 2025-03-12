@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Initialization &#8212; pyDeltaRCM 2.1.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <script src="../_static/documentation_options.js?v=4f932e3e"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="YAML Parameters" href="yamlparameters.html" />
+    <link rel="prev" title="Model Information" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="yamlparameters.html" title="YAML Parameters"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Model Information"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Model Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Initialization</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="initialization">
+<h1>Initialization<a class="headerlink" href="#initialization" title="Link to this heading">¶</a></h1>
+<p>There are many built-in parameters for setting up pyDeltaRCM runs.</p>
+<section id="domain-configuration">
+<h2>Domain configuration<a class="headerlink" href="#domain-configuration" title="Link to this heading">¶</a></h2>
+<p>The domain configuration is controlled by a series of input configuration parameters.
+Conceptually, we can consider the domain of pyDeltaRCM to be made up of an <em>inlet</em> along the top edge of the model domain and bounded by a strip of land, and the <em>basin</em>.</p>
+<p>(<a class="reference download internal" download="" href="../_downloads/4199ca23a2199dfbbf0a89470f522ba6/domain_parameters.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/25349e9ef8d43d60cb6af4941934ec13/domain_parameters.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/domain_parameters.png" class="plot-directive" src="../_images/domain_parameters.png" />
+</figure>
+<p>By default, the basin and inlet are both flat and have the same depth. However these characteristics can be controlled by a variety of input parameters explained below.
+Moreover, any complex initial geometry can be configured by the use of hooks; see an example here <a class="reference internal" href="../examples/slight_slope.html"><span class="doc">Slightly sloping basin</span></a>.</p>
+<section id="domain-size">
+<h3>Domain size<a class="headerlink" href="#domain-size" title="Link to this heading">¶</a></h3>
+<p>The domain size is controlled by the <cite>Length</cite> and <cite>Width</cite> YAML parameters.</p>
+<p>(<a class="reference download internal" download="" href="../_downloads/a33e8c0651f7d6fcd4150a81f0bada03/domain_size_compare.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/a739f543ff71d5e5880e197236cf062d/domain_size_compare.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/domain_size_compare.png" class="plot-directive" src="../_images/domain_size_compare.png" />
+</figure>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>The size of the computational domain is determined by the size of the smallest size of the domain. The value for <cite>Width</cite> should almost always be 2 times <cite>Length</cite> to minimize unecessary calcualtions outside the valid computational domain.</p>
+</div>
+<p>Importantly, the number of cells in the domain is then a function of the domain size in meters and the grid spacing <code class="xref py py-obj docutils literal notranslate"><span class="pre">dx</span></code>.
+Because the number of grid cells is inverse nonlinearly related to the grid spacing (<span class="math notranslate nohighlight">\(numcells = 1/dx^2\)</span>), the model runtime is sensitive to the choice of <cite>dx</cite> relative to <cite>Length</cite> and <cite>Width</cite>.</p>
+</section>
+<section id="basin-depth-and-inlet-depth">
+<h3>Basin depth and inlet depth<a class="headerlink" href="#basin-depth-and-inlet-depth" title="Link to this heading">¶</a></h3>
+<p>Inlet depth is controlled by <code class="xref py py-obj docutils literal notranslate"><span class="pre">h0</span></code>.
+If no argument is given in the configuration for the parameter <code class="xref py py-obj docutils literal notranslate"><span class="pre">hb</span></code>, then the basin depth is determined to be the same as the inlet depth.
+However, these depths can be controlled independently.</p>
+<p>(<a class="reference download internal" download="" href="../_downloads/93f287ee868ff7a651f5979789cd9aca/domain_basin_inlet_depth.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/2c1328728e161758fe2b0b4e0ec9feef/domain_basin_inlet_depth.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/domain_basin_inlet_depth.png" class="plot-directive" src="../_images/domain_basin_inlet_depth.png" />
+</figure>
+</section>
+<section id="inlet-width-and-length">
+<h3>Inlet width and length<a class="headerlink" href="#inlet-width-and-length" title="Link to this heading">¶</a></h3>
+<p>The inlet length and width are controlled by an inlet length parameter <code class="xref py py-obj docutils literal notranslate"><span class="pre">L0_meters</span></code> and an inlet width parameter <code class="xref py py-obj docutils literal notranslate"><span class="pre">N0_meters</span></code>.
+In implementation, the input length and width are rounded to the nearest grid location (a function of <code class="xref py py-obj docutils literal notranslate"><span class="pre">dx</span></code>).</p>
+<p>(<a class="reference download internal" download="" href="../_downloads/b36a157a86b3157ddde65e233b905729/domain_inlet_geometry.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/2f8b9fd26e6d7e7b4594ebabadc5e22c/domain_inlet_geometry.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/domain_inlet_geometry.png" class="plot-directive" src="../_images/domain_inlet_geometry.png" />
+</figure>
+</section>
+</section>
+<section id="input-water-and-sediment">
+<h2>Input water and sediment<a class="headerlink" href="#input-water-and-sediment" title="Link to this heading">¶</a></h2>
+<p>The input flow velocity is determined by <code class="xref py py-obj docutils literal notranslate"><span class="pre">u0</span></code>.</p>
+<p>The input water discharge is thus fully constrained by the inlet geometry and the inlet flow velocity as:</p>
+<div class="math notranslate nohighlight">
+\[Q_{w0} = h_0 \times N_0 \times u_0\]</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Keep in mind that <span class="math notranslate nohighlight">\(N_0\)</span> is specified in meters as <code class="xref py py-obj docutils literal notranslate"><span class="pre">N0_meters</span></code> in the input configuration. Ditto for the inlet length (<code class="xref py py-obj docutils literal notranslate"><span class="pre">L0_meters</span></code>).</p>
+</div>
+<p>Input sediment discharge is then determined by a <strong>percentage concentration</strong> of sediment in the flow <code class="xref py py-obj docutils literal notranslate"><span class="pre">C0_percent</span></code>.</p>
+<div class="math notranslate nohighlight">
+\[Q_{s0} = Q_{w0} \times (C_{0percent}/100)\]</div>
+<p>The volume of each parcel of water to be routed is then determined by the total water discharge divided by the number of parcels <code class="xref py py-obj docutils literal notranslate"><span class="pre">Np_water</span></code>.
+The volume of each parcel of sediment to be routed is then determined by the total sediment discharge divided by the number of parcels <code class="xref py py-obj docutils literal notranslate"><span class="pre">Np_sed</span></code>.</p>
+<p>The number of sand and mud parcels are then determined as <cite>Np_sed</cite> times <code class="xref py py-obj docutils literal notranslate"><span class="pre">f_bedload</span></code> and <cite>Np_sed</cite> times (1-<code class="xref py py-obj docutils literal notranslate"><span class="pre">f_bedload</span></code>), respectively.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Initialization</a><ul>
+<li><a class="reference internal" href="#domain-configuration">Domain configuration</a><ul>
+<li><a class="reference internal" href="#domain-size">Domain size</a></li>
+<li><a class="reference internal" href="#basin-depth-and-inlet-depth">Basin depth and inlet depth</a></li>
+<li><a class="reference internal" href="#inlet-width-and-length">Inlet width and length</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#input-water-and-sediment">Input water and sediment</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Model Information</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="yamlparameters.html"
+                          title="next chapter">YAML Parameters</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/info/initialization.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="yamlparameters.html" title="YAML Parameters"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Model Information"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.6 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Model Information</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Initialization</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2020, The DeltaRCM Team.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

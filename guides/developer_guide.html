@@ -5,21 +5,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developer Guide &#8212; pyDeltaRCM 2.1.5 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=87629129" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <title>Developer Guide &#8212; pyDeltaRCM 2.1.6 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script src="../_static/documentation_options.js?v=786ba454"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/documentation_options.js?v=4f932e3e"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="API reference" href="../reference/index.html" />
     <link rel="prev" title="Customized Applications of pyDeltaRCM" href="../examples/modelzoo.html" /> 
   </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="../examples/modelzoo.html" title="Customized Applications of pyDeltaRCM"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.6 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Developer Guide</a></li> 
       </ul>
     </div>  
@@ -43,7 +43,8 @@
             
   <section id="developer-guide">
 <h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Link to this heading">¶</a></h1>
-<a class="reference external image-reference" href="https://github.com/DeltaRCM/pyDeltaRCM/actions"><img alt="https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg" src="https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg" /></a>
+<a class="reference external image-reference" href="https://github.com/DeltaRCM/pyDeltaRCM/actions"><img alt="https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg" src="https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg" />
+</a>
 <p>[![build](<a class="reference external" href="https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg)](https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml">https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml/badge.svg)](https://github.com/DeltaRCM/pyDeltaRCM/actions/workflows/build.yml</a>)</p>
 <p>This guide provides additional details for implementation that did not make it into the user guide.
 If you have not yet read the user guide, that is the place to start, then visit and refer to this guide for details as necessary.</p>
@@ -89,24 +90,24 @@ Within a Python console, calls to the <cite>numba</cite> RNG will not affect the
 Well, calling <cite>np.random.normal(100, 10)</cite> in a model subclass will give you a random value, and modify the state of the <cite>numpy</cite> RNG, but it will not affect the state of the <cite>numba</cite> RNG (the one <cite>pyDeltaRCM</cite> actually keeps track of).
 Thus, the values returned from the call to <cite>np.random.normal</cite> are not known and are not reproducible.</p>
 <p>In the following simple example, see how the reproducible model uses a random number generated from a jitted function. This ensures the <cite>numba</cite> RNG is used for random variability in the model, and runs are reproducible.</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">njit</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">njit</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="nd">@njit</span>
-<span class="gp">... </span><span class="k">def</span> <span class="nf">get_random_normal</span><span class="p">():</span>
+<span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">get_random_normal</span><span class="p">():</span>
 <span class="gp">... </span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a random number from standard normal distribution.</span>
 <span class="gp">... </span><span class="sd">    &quot;&quot;&quot;</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">BrokenAndNotReproducible</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">BrokenAndNotReproducible</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="gp">... </span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a model that can never be reproduced.</span>
 <span class="gp">... </span><span class="sd">        &quot;&quot;&quot;</span>
 <span class="gp">...</span>
 <span class="gp">... </span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="n">input_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reimplement update method for demonstration.&quot;&quot;&quot;</span>
 <span class="gp">...</span>
 <span class="gp">... </span>        <span class="c1"># the core pyDeltaRCM RNG is used in computations, e.g.,</span>
@@ -119,15 +120,15 @@ Thus, the values returned from the call to <cite>np.random.normal</cite> are not
 <span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="n">_sample0</span><span class="p">,</span> <span class="n">_sample1</span><span class="p">)</span>
 
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">BeautifulAndVeryReproducible</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">BeautifulAndVeryReproducible</span><span class="p">(</span><span class="n">pyDeltaRCM</span><span class="o">.</span><span class="n">DeltaModel</span><span class="p">):</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="gp">... </span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a reproducible model.</span>
 <span class="gp">... </span><span class="sd">        &quot;&quot;&quot;</span>
 <span class="gp">...</span>
 <span class="gp">... </span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="n">input_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="gp">... </span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reimplement update method for demonstration.&quot;&quot;&quot;</span>
 <span class="gp">...</span>
 <span class="gp">... </span>        <span class="c1"># the core pyDeltaRCM RNG is used in computations, e.g.,</span>
@@ -146,7 +147,7 @@ First, run the <cite>Broken</cite> model:</p>
 </pre></div>
 </div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">broken</span><span class="o">.</span><span class="n">update</span><span class="p">()</span> 
+<span class="gp">... </span>    <span class="n">broken</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 <span class="go">0.771320643266746 1.213653088541954</span>
 <span class="go">0.0207519493594015 -0.40009453994985783</span>
 <span class="go">0.6336482349262754 0.7719410676752912</span>
@@ -156,7 +157,7 @@ First, run the <cite>Broken</cite> model:</p>
 </pre></div>
 </div>
 <div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">broken</span><span class="o">.</span><span class="n">update</span><span class="p">()</span> 
+<span class="gp">... </span>    <span class="n">broken</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 <span class="go">0.771320643266746 -0.17926017697487434</span>
 <span class="go">0.0207519493594015 -0.4421037872728855</span>
 <span class="go">0.6336482349262754 -0.2725394596633578</span>
@@ -220,7 +221,7 @@ The preferred way to slice is by 1) padding the array with <a class="reference i
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
@@ -274,7 +275,7 @@ The preferred way to slice is by 1) padding the array with <a class="reference i
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -286,13 +287,13 @@ The preferred way to slice is by 1) padding the array with <a class="reference i
         <li class="right" >
           <a href="../examples/modelzoo.html" title="Customized Applications of pyDeltaRCM"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.6 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Developer Guide</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
 </html>
