@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 
 n = 1
-cm = matplotlib.cm.get_cmap("tab10")
+cm = matplotlib.colormaps.get_cmap("tab10")
 
 param_dict = {"timesteps": 0}
 _matrix = {"Length": [2500, 5000, 10000]}
