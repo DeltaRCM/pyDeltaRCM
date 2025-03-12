@@ -86,7 +86,6 @@ relative_files = true
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = [
-    "pyDeltaRCM",
     "tests",
 ]
 norecursedirs = [
