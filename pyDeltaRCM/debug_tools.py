@@ -184,7 +184,7 @@ class debug_tools(abc.ABC):
             elif ind.ndim > 1:
                 if multiline:
                     # travel along axis, extracting lines
-                    cm = matplotlib.colormaps["tab10"].resample(10)
+                    cm = matplotlib.colormaps["tab10"].resampled(10)
                     lines = []
                     for i in np.arange(ind.shape[1]):
                         _l = plot_line(
