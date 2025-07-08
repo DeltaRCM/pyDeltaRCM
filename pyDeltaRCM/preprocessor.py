@@ -900,7 +900,7 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
                     self.deltamodel.update()
 
             # if the model run fails
-            except (RuntimeError, ValueError) as e:
+            except Exception as e:
                 self.queue.put({"job": self.i, "stage": 1, "code": 1, "msg": str(e)})
                 self.deltamodel.logger.error(str(e))
                 self.deltamodel.logger.exception(e)
@@ -914,7 +914,7 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
                 self.deltamodel.finalize()
 
             # if the model finalization fails
-            except (RuntimeError, ValueError) as e:
+            except Exception as e:
                 self.queue.put({"job": self.i, "stage": 2, "code": 1, "msg": str(e)})
                 self.deltamodel.logger.error(str(e))
                 self.deltamodel.logger.exception(e)

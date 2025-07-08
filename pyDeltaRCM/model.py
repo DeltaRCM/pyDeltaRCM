@@ -518,6 +518,34 @@ class DeltaModel(
         self._If = If
 
     @property
+    def gamma(self):
+        """
+        gamma influences the water routing weights.
+
+        During model instantiation:
+
+        .. math::
+            \\gamma = g S_0 dx / ({u_0}^2)
+
+        Issues with numerical instability in pyDeltaRCM can often be
+        attributed to the choice of :math:`\\gamma`. For more information, see
+        the :ref:`gamma parameter <gamma-parameter>` numerical stability description.
+        """
+
+        return self._gamma
+
+    @gamma.setter
+    def gamma(self, gamma: float) -> None:
+        if gamma > 0.1:
+            _msg = (
+                "Gamma value is greater than 0.1. Consider adjusting model "
+                "configuration to lower the value of gamma. See documentation "
+                "for more information."
+            )
+            warnings.warn(UserWarning(_msg))
+        self._gamma = gamma
+
+    @property
     def Np_sed(self) -> int:
         """
         Np_sed is the number of sediment parcels simulated.
