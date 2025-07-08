@@ -188,9 +188,15 @@ This results in the calculated value of :math:`\gamma` increasing, because durin
 $\\gamma$ partitions the importance of the water surface gradient and flow inertia in setting the "average downstream direction of flow" through a cell $\\mathbfit{F}$ as:
 
 .. math::
-    \mathbfit{F*} = \gamma \mathbfit{F}_{sfc} + (-\gamma)\mathbfit{F}_{int}\quad\textrm{and}\quad \mathbfit{F} = \frac{\mathbfit{F}*}{|\mathbfit{F}*|}
+    \mathbfit{F*} = \gamma \mathbfit{F}_{sfc} + (1-\gamma)\mathbfit{F}_{int}\quad\textrm{and}\quad \mathbfit{F} = \frac{\mathbfit{F}*}{|\mathbfit{F}*|}
 
 where :math:`\mathbfit{F}_{sfc}` and :math:`\mathbfit{F}_{int}`  are unit vectors calculated from the water surface gradient and water discharge field (i.e., inertia), respectively.
+
+When :math:`\gamma` is too large, the water surface elevation exerts a significant control on the downstream flow direction, which results in a "focusing" of flow down a single-cell-wide path.
+
+.. hint:: 
+
+    The error beginning "Water sum(weight) less than 0." is commonly a result of too large of a :math:`\gamma`
 
 
 
