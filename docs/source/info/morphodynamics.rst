@@ -25,7 +25,7 @@ For sand parcels, the *transport capacity* is determined by the scaling between 
 
 .. math::
 
-      q_{s\_cap} = q_{s0} \frac{u^\beta_{loc}}{u^\beta_0},
+      q_{s\_cap} = q_{s0} \frac{{u_{loc}}^\beta}{{u_0}^\beta},
 
 where :math:`u_{loc}` is the depth averaged flow velocity in the cell, :math:`beta` is an exponent set to 3 by default (:obj:`~pyDeltaRCM.model.DeltaModel.beta`), and :math:`q_{s0}` is the unit-width upstream sand flux input at the inlet channel.
 At each step of the model domain, sand is either eroded or deposited to the bed depending on the local flow velocity :math:`u_{loc}` and local sediment transport :math:`q_{s\_loc}`. 
@@ -150,7 +150,7 @@ Additionally, an edge case where repeated channel bed deposition creates a local
 These regulations are implemented in the `BaseRouter` class, as :obj:`~pyDeltaRCM.sed_tools.BaseRouter._limit_Vp_change`.
 
 
-.. topographic-diffusion:
+.. _topographic-diffusion:
 
 Topographic diffusion
 ---------------------
@@ -169,6 +169,29 @@ In the following example, :obj:`~pyDeltaRCM.DeltaModel.N_crossdiff` takes the :d
 .. plot:: sed_tools/topo_diffusion.py
 
 The impact of topographic diffusion is minor compared to the bed elevation change driven by parcel erosion or deposition (:ref:`sand and mud routing effects <sand-mud-route-comparison>`).
+
+.. _gamma-parameter:
+
+Gamma parameter
+---------------
+
+A common source of numerical instability is with the :obj:`~pyDeltaRCM.DeltaModel.gamma` parameter. 
+The gamma parameter (:math:`\gamma`) influences water routing weights. 
+
+A common issue arises when the domain size is increased, and :math:`dx` is increased commensurately to keep overall grid count approximately constant. 
+This results in the calculated value of :math:`\gamma` increasing, because during model instantiation: 
+
+.. math::
+
+    \gamma = \frac{g ~ S_0 ~ dx}{{u_0}^2}
+
+$\\gamma$ partitions the importance of the water surface gradient and flow inertia in setting the "average downstream direction of flow" through a cell $\\mathbfit{F}$ as:
+
+.. math::
+    \mathbfit{F*} = \gamma \mathbfit{F}_{sfc} + (-\gamma)\mathbfit{F}_{int}\quad\textrm{and}\quad \mathbfit{F} = \frac{\mathbfit{F}*}{|\mathbfit{F}*|}
+
+where :math:`\mathbfit{F}_{sfc}` and :math:`\mathbfit{F}_{int}`  are unit vectors calculated from the water surface gradient and water discharge field (i.e., inertia), respectively.
+
 
 
 Notes for modeling best practices

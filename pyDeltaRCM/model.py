@@ -529,14 +529,14 @@ class DeltaModel(
 
         Issues with numerical instability in pyDeltaRCM can often be
         attributed to the choice of :math:`\\gamma`. For more information, see
-        the :ref:`gamma-parameter` numerical stability description.
+        the :ref:`gamma parameter <gamma-parameter>` numerical stability description.
         """
 
         return self._gamma
 
     @gamma.setter
     def gamma(self, gamma: float) -> None:
-        if self.gamma > 0.1:
+        if gamma > 0.1:
             _msg = (
                 "Gamma value is greater than 0.1. Consider adjusting model "
                 "configuration to lower the value of gamma. See documentation "
