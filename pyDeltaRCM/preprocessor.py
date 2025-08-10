@@ -792,8 +792,16 @@ class _SerialJob(_BaseJob):
         # try to initialize and run the model
         try:
             # run the simulation
-            while self.deltamodel._time < self._job_end_time:
+            _dt = self.deltamodel.dt
+            _rem = self._job_end_time - self.deltamodel._time
+            _whole, _rem = np.divmod(_rem, _dt)
+            for _ in range(int(_whole)):
                 self.deltamodel.update()
+
+            if _rem > 0:
+                self.deltamodel.time_step = _rem
+                self.deltamodel.update()
+                self.deltamodel.time_step = _dt
 
         # if the model run fails
         except (RuntimeError, ValueError) as e:
@@ -896,8 +904,16 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
                     self.deltamodel.output_checkpoint()
 
                 # run the simualtion
-                while self.deltamodel._time < self._job_end_time:
+                _dt = self.deltamodel.dt
+                _rem = self._job_end_time - self.deltamodel._time
+                _whole, _rem = np.divmod(_rem, _dt)
+                for _ in range(int(_whole)):
                     self.deltamodel.update()
+
+                if _rem > 0:
+                    self.deltamodel.time_step = _rem
+                    self.deltamodel.update()
+                    self.deltamodel.time_step = _dt
 
             # if the model run fails
             except Exception as e:

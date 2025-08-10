@@ -492,3 +492,26 @@ class TestTimingOutputData:
         assert ds.groups["meta"]["H_SL"].shape[0] == _arr.shape[0]
         assert np.all(ds.groups["meta"]["C0_percent"][:].data == 0.2)
         assert np.all(ds.groups["meta"]["f_bedload"][:].data == 0.5)
+
+
+class TestTimingStops:
+    def test_run_for_exact_time(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
+        _delta = DeltaModel(input_file=p)
+
+        # manually set the job end time to a non-multiple of dt
+        _job_end_time = (_delta.dt * 2.5) + _delta.time
+
+        # run the simulation
+        _dt = _delta.dt
+        _rem_time = _job_end_time - _delta._time
+        _whole, _rem = np.divmod(_rem_time, _dt)
+        for _ in range(int(_whole)):
+            _delta.update()
+
+        if _rem > 0:
+            _delta.time_step = _rem
+            _delta.update()
+            _delta.time_step = _dt
+
+        assert _delta.time == _job_end_time
