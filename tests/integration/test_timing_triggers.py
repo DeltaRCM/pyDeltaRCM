@@ -510,8 +510,20 @@ class TestTimingStops:
             _delta.update()
 
         if _rem > 0:
+            _Vp_sed = _delta.Vp_sed
+            _diff_mult = _delta.diffusion_multiplier
             _delta.time_step = _rem
+            _delta.dVs = _delta.Qs0 * _delta.dt
+            _delta.Vp_sed = _delta.dVs / _delta.Np_sed
+            _delta.diffusion_multiplier = (
+                _delta.dt / _delta.N_crossdiff * _delta.alpha * 0.5 / _delta.dx**2
+            )
+            _delta.init_sediment_routers()
             _delta.update()
             _delta.time_step = _dt
+            _delta.Vp_sed = _Vp_sed
+            _delta.diffusion_multiplier = _diff_mult
+            _delta.init_sediment_routers()
+
 
         assert _delta.time == _job_end_time
