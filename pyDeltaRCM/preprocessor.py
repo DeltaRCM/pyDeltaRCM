@@ -791,6 +791,12 @@ class _SerialJob(_BaseJob):
         """
         # try to initialize and run the model
         try:
+            # reup the rand seed
+            self.deltamodel.logger.info(
+                f"Reset seed in serial job {self.deltamodel.seed}"
+            )
+            shared_tools.set_random_seed(self.deltamodel.seed)
+
             # run the simulation
             while self.deltamodel._time < self._job_end_time:
                 self.deltamodel.update()
@@ -886,6 +892,15 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
                     self.deltamodel.load_checkpoint(defer_output=False)
                 else:
                     # infrastructure deferred, need to trigger manually
+
+                    # reset the seed to the supposed initial value in this
+                    # parallel process
+                    self.deltamodel.logger.info(
+                        f"Reset seed in parallel job {self.deltamodel.seed}"
+                    )
+                    shared_tools.set_random_seed(self.deltamodel.seed)
+
+                    # create and fill output infrastructure
                     self.deltamodel.hook_init_output_file()
                     self.deltamodel.init_output_file()
 
