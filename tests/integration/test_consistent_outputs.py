@@ -1,4 +1,5 @@
 from pathlib import Path
+import platform
 
 import pytest
 import numpy as np
@@ -407,6 +408,9 @@ class TestConsistentOutputsSameSeed:
         ModelA.close()
         ModelB.close()
 
+    @pytest.mark.skipif(
+        platform.system() != "Linux", reason="Parallel support only on Linux OS."
+    )
     def test_same_models_in_serial_or_parallel(self, tmp_path: Path) -> None:
         """Test models that have same parameters but different save_dt."""
         file_name = "user_parameters_ser.yaml"
