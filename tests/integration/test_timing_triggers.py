@@ -7,6 +7,7 @@ import netCDF4
 import numpy as np
 
 from pyDeltaRCM.model import DeltaModel
+from pyDeltaRCM.preprocessor import _SerialJob
 from .. import utilities
 
 
@@ -502,28 +503,11 @@ class TestTimingStops:
         # manually set the job end time to a non-multiple of dt
         _job_end_time = (_delta.dt * 2.5) + _delta.time
 
-        # run the simulation
-        _dt = _delta.dt
-        _rem_time = _job_end_time - _delta._time
-        _whole, _rem = np.divmod(_rem_time, _dt)
-        for _ in range(int(_whole)):
-            _delta.update()
+        # manually create and run a serial job
+        _sj = _SerialJob(
+            i=0, input_file=p, config_dict={"timesteps": 2.5}, DeltaModel=DeltaModel
+        )
+        _sj.run()
 
-        if _rem > 0:
-            _Vp_sed = _delta.Vp_sed
-            _diff_mult = _delta.diffusion_multiplier
-            _delta.time_step = _rem
-            _delta.dVs = _delta.Qs0 * _delta.dt
-            _delta.Vp_sed = _delta.dVs / _delta.Np_sed
-            _delta.diffusion_multiplier = (
-                _delta.dt / _delta.N_crossdiff * _delta.alpha * 0.5 / _delta.dx**2
-            )
-            _delta.init_sediment_routers()
-            _delta.update()
-            _delta.time_step = _dt
-            _delta.Vp_sed = _Vp_sed
-            _delta.diffusion_multiplier = _diff_mult
-            _delta.init_sediment_routers()
-
-
-        assert _delta.time == _job_end_time
+        # assert end time of simulation matches what is expected
+        assert _sj._job_end_time == _job_end_time
