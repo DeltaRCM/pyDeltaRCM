@@ -1329,10 +1329,8 @@ class DeltaModel(
     def legacy_netcdf(self) -> bool:
         """Enable output in legacy netCDF format.
 
-        .. note:: new in `v2.1.0`.
-
         Default behavior, legacy_netcdf: False, is for the model to use the
-        new `v2.1.0` output netCDF format. The updated format is configured
+        `v2.1.0` output netCDF format. The updated format is configured
         to match the input expected by `xarray`, which eases interaction with
         model outputs. The change in format is from inconsistently named
         dimensions and *coordinate variables*, to homogeneous definitions.
@@ -1341,9 +1339,13 @@ class DeltaModel(
 
         .. important::
 
-            There are no changes to the dimensionality of data such as bed
-            elevation or velocity, only the metadata specifying the location of
-            the data are changed.
+            The behavior of the legacy option, and the new format is expected
+            to change in version 2.2.0 With v2.2.0 the default output file
+            will comply with the sandsuet data specification, and the
+            `legacy_output=True` option will output the current
+            configuration. The core data will not change with v2.2, but the
+            names and attributes of components of the data output is expected
+            to change.
 
         +-------------+-------------------+---------------------------------+
         |             | default           | legacy                          |
@@ -1364,6 +1366,13 @@ class DeltaModel(
 
     @legacy_netcdf.setter
     def legacy_netcdf(self, legacy_netcdf: bool) -> None:
+        if legacy_netcdf:
+            warnings.warn(
+                "The legacy version of the NetCDF output is "
+                "expected to change with v2.2. The old `legagcy` "
+                "file format will no longer be available, and "
+                "will be replaced by the current file format."
+            )
         self._legacy_netcdf = legacy_netcdf
 
     @property
