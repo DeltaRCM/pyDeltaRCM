@@ -7,6 +7,7 @@ import netCDF4
 import numpy as np
 
 from pyDeltaRCM.model import DeltaModel
+from pyDeltaRCM.preprocessor import _SerialJob
 from .. import utilities
 
 
@@ -492,3 +493,21 @@ class TestTimingOutputData:
         assert ds.groups["meta"]["H_SL"].shape[0] == _arr.shape[0]
         assert np.all(ds.groups["meta"]["C0_percent"][:].data == 0.2)
         assert np.all(ds.groups["meta"]["f_bedload"][:].data == 0.5)
+
+
+class TestTimingStops:
+    def test_run_for_exact_time(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
+        _delta = DeltaModel(input_file=p)
+
+        # manually set the job end time to a non-multiple of dt
+        _job_end_time = (_delta.dt * 2.5) + _delta.time
+
+        # manually create and run a serial job
+        _sj = _SerialJob(
+            i=0, input_file=p, config_dict={"timesteps": 2.5}, DeltaModel=DeltaModel
+        )
+        _sj.run()
+
+        # assert end time of simulation matches what is expected
+        assert _sj._job_end_time == _job_end_time

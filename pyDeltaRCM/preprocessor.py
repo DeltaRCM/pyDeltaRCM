@@ -759,6 +759,42 @@ class _BaseJob(abc.ABC):
         """
         ...
 
+    def _final_timestep(self, rem):
+        """
+        Run a final timestep of a different duration.
+        """
+        # store original values
+        _dt = self.deltamodel.dt
+        _dVs = self.deltamodel.dVs
+        _Vp_sed = self.deltamodel.Vp_sed
+        _diff_mult = self.deltamodel.diffusion_multiplier
+        if self.deltamodel.toggle_subsidence:
+            _sigma = self.deltamodel.sigma
+
+        # set new values
+        self.deltamodel._dt = rem
+        self.deltamodel.dVs = self.deltamodel.Qs0 * self.deltamodel.dt
+        self.deltamodel.Vp_sed = self.deltamodel.dVs / self.deltamodel.Np_sed
+        self.deltamodel.diffusion_multiplier = (
+            self.deltamodel.dt / self.deltamodel.N_crossdiff * self.deltamodel.alpha * 0.5 / self.deltamodel.dx**2
+        )
+        if self.deltamodel.toggle_subsidence:
+            self.deltamodel.sigma = (self.deltamodel.subsidence_mask *
+                                     self.deltamodel.subsidence_rate * self.deltamodel.dt)
+        self.deltamodel.init_sediment_routers()
+
+        # run the update
+        self.deltamodel.update()
+
+        # restore original values
+        self.deltamodel._dt = _dt
+        self.deltamodel.dVs = _dVs
+        self.deltamodel.Vp_sed = _Vp_sed
+        self.deltamodel.diffusion_multiplier = _diff_mult
+        if self.deltamodel.toggle_subsidence:
+            self.deltamodel.sigma = _sigma
+        self.deltamodel.init_sediment_routers()
+
 
 class _SerialJob(_BaseJob):
     """Serial job run by the preprocessor.
@@ -798,8 +834,14 @@ class _SerialJob(_BaseJob):
             shared_tools.set_random_seed(self.deltamodel.seed)
 
             # run the simulation
-            while self.deltamodel._time < self._job_end_time:
+            _dt = self.deltamodel.dt
+            _rem_time = self._job_end_time - self.deltamodel._time
+            _whole, _rem = np.divmod(_rem_time, _dt)
+            for _ in range(int(_whole)):
                 self.deltamodel.update()
+
+            if _rem > 0:
+                self._final_timestep(_rem)
 
         # if the model run fails
         except (RuntimeError, ValueError) as e:
@@ -911,8 +953,14 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
                     self.deltamodel.output_checkpoint()
 
                 # run the simualtion
-                while self.deltamodel._time < self._job_end_time:
+                _dt = self.deltamodel.dt
+                _rem_time = self._job_end_time - self.deltamodel._time
+                _whole, _rem = np.divmod(_rem_time, _dt)
+                for _ in range(int(_whole)):
                     self.deltamodel.update()
+
+                if _rem > 0:
+                    self._final_timestep(_rem)
 
             # if the model run fails
             except Exception as e:
