@@ -101,7 +101,8 @@ class water_tools(abc.ABC):
         _step = 0
 
         # flux from ghost node
-        self.qxn.flat[start_indices] += 1
+        start_inlets, start_counts = np.unique(start_indices, return_counts=True)
+        self.qxn.flat[start_inlets] += start_counts
         self.qyn.flat[start_indices] += 0  # this could be omitted...
         self.qwn.flat[start_indices] += self.Qp_water / self._dx / 2
 
