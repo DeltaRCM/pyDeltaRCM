@@ -136,6 +136,7 @@
       ~DeltaModel.dt
       ~DeltaModel.dx
       ~DeltaModel.f_bedload
+      ~DeltaModel.gamma
       ~DeltaModel.h0
       ~DeltaModel.hb
       ~DeltaModel.influx_sediment_concentration

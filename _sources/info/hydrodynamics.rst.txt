@@ -20,9 +20,18 @@ Water routing probability for a given cell :math:`j` to neighbor cell :math:`i` 
 
 .. math::
 
-    w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},
+    w_i = \frac{\frac{1}{R_i} \max(0, \mathbfif{F}\cdot\mathbf{d_i})}{\Delta i},
 
-where :math:`\mathbf{F}` is the local routing direction and :math:`\mathbf{d_i}` is a unit vector pointing to neighbor :math:`i` from cell :math:`j`, and :math:`\Delta_i` is the cellular distance to neighbor :math:`i` (:math:`1` for cells in main compass directions and :math:`\sqrt{2}` for corner cells.
+where :math:`\mathbfit{F}` is the local routing direction and :math:`\mathbf{d_i}` is a unit vector pointing to neighbor :math:`i` from cell :math:`j`, and :math:`\Delta_i` is the cellular distance to neighbor :math:`i` (:math:`1` for cells in main compass directions and :math:`\sqrt{2}` for corner cells.
+
+:math:`\mathbfit{F}` the local routing weight is determined as:
+
+.. math::
+
+    \mathbfit{F*} = \gamma \mathbfit{F}_{sfc} + (1-\gamma)\mathbfit{F}_{int}\quad\textrm{and}\quad \mathbfit{F} = \frac{\mathbfit{F}*}{|\mathbfit{F}*|}
+
+where :math:`\mathbfit{F}_{sfc}` and :math:`\mathbfit{F}_{int}` are unit vectors calculated from the water surface gradient and water discharge field (i.e., inertia), respectively.
+
 :math:`R_i` is a flow resistance estimated as an inverse function of local water depth (:math:`h_i`):
 
 .. math::

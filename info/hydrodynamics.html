@@ -5,16 +5,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Hydrodynamics &#8212; pyDeltaRCM 2.1.6 documentation</title>
+    <title>Hydrodynamics &#8212; pyDeltaRCM 2.1.9 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-    <script src="../_static/documentation_options.js?v=4f932e3e"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/documentation_options.js?v=a7898dfc"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Morphodynamics" href="morphodynamics.html" />
@@ -32,7 +32,7 @@
         <li class="right" >
           <a href="modeltime.html" title="Time in pyDeltaRCM"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Model Information</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Hydrodynamics</a></li> 
       </ul>
@@ -54,9 +54,13 @@ In this documentation, we focus on the details of <em>model implementation</em>,
 <p>Probabilities for water parcel routing <em>to all neighbors and to self</em> for <em>each cell</em> are computed <em>once</em> at the beginning of the water routing routine (<a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.get_water_weight_array" title="pyDeltaRCM.water_tools.water_tools.get_water_weight_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_water_weight_array</span></code></a> called from <a class="reference internal" href="../reference/water_tools/index.html#pyDeltaRCM.water_tools.water_tools.run_water_iteration" title="pyDeltaRCM.water_tools.water_tools.run_water_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_water_iteration</span></code></a>).</p>
 <p>Water routing probability for a given cell <span class="math notranslate nohighlight">\(j\)</span> to neighbor cell <span class="math notranslate nohighlight">\(i\)</span> is computed according to:</p>
 <div class="math notranslate nohighlight">
-\[w_i = \frac{\frac{1}{R_i} \max(0, \mathbf{F}\cdot\mathbf{d_i})}{\Delta i},\]</div>
-<p>where <span class="math notranslate nohighlight">\(\mathbf{F}\)</span> is the local routing direction and <span class="math notranslate nohighlight">\(\mathbf{d_i}\)</span> is a unit vector pointing to neighbor <span class="math notranslate nohighlight">\(i\)</span> from cell <span class="math notranslate nohighlight">\(j\)</span>, and <span class="math notranslate nohighlight">\(\Delta_i\)</span> is the cellular distance to neighbor <span class="math notranslate nohighlight">\(i\)</span> (<span class="math notranslate nohighlight">\(1\)</span> for cells in main compass directions and <span class="math notranslate nohighlight">\(\sqrt{2}\)</span> for corner cells.
-<span class="math notranslate nohighlight">\(R_i\)</span> is a flow resistance estimated as an inverse function of local water depth (<span class="math notranslate nohighlight">\(h_i\)</span>):</p>
+\[w_i = \frac{\frac{1}{R_i} \max(0, \mathbfif{F}\cdot\mathbf{d_i})}{\Delta i},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbfit{F}\)</span> is the local routing direction and <span class="math notranslate nohighlight">\(\mathbf{d_i}\)</span> is a unit vector pointing to neighbor <span class="math notranslate nohighlight">\(i\)</span> from cell <span class="math notranslate nohighlight">\(j\)</span>, and <span class="math notranslate nohighlight">\(\Delta_i\)</span> is the cellular distance to neighbor <span class="math notranslate nohighlight">\(i\)</span> (<span class="math notranslate nohighlight">\(1\)</span> for cells in main compass directions and <span class="math notranslate nohighlight">\(\sqrt{2}\)</span> for corner cells.</p>
+<p><span class="math notranslate nohighlight">\(\mathbfit{F}\)</span> the local routing weight is determined as:</p>
+<div class="math notranslate nohighlight">
+\[\mathbfit{F*} = \gamma \mathbfit{F}_{sfc} + (1-\gamma)\mathbfit{F}_{int}\quad\textrm{and}\quad \mathbfit{F} = \frac{\mathbfit{F}*}{|\mathbfit{F}*|}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbfit{F}_{sfc}\)</span> and <span class="math notranslate nohighlight">\(\mathbfit{F}_{int}\)</span> are unit vectors calculated from the water surface gradient and water discharge field (i.e., inertia), respectively.</p>
+<p><span class="math notranslate nohighlight">\(R_i\)</span> is a flow resistance estimated as an inverse function of local water depth (<span class="math notranslate nohighlight">\(h_i\)</span>):</p>
 <div class="math notranslate nohighlight">
 \[R_i = \frac{1}{{h_i}^\theta}\]</div>
 <p>The exponent <span class="math notranslate nohighlight">\(\theta\)</span> takes a value of unity by default for water routing (<code class="xref py py-attr docutils literal notranslate"><span class="pre">theta_water</span></code>, <a class="reference internal" href="../reference/model/yaml_defaults.html"><span class="doc">Default Model Variable Values</span></a>), leading to routing weight for neighbor cell <span class="math notranslate nohighlight">\(i\)</span>:</p>
@@ -221,14 +225,14 @@ D. A. Edmonds, and P. Passalacqua, Earth Surf. Dynam., 3, 87–104, 2015.
         <li class="right" >
           <a href="modeltime.html" title="Time in pyDeltaRCM"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.6 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyDeltaRCM 2.1.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Model Information</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Hydrodynamics</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2020, The DeltaRCM Team.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
     </div>
   </body>
 </html>
