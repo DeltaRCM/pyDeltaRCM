@@ -839,7 +839,13 @@ class DeltaModel(
     @save_eta_grids.setter
     def save_eta_grids(self, save_eta_grids: bool) -> None:
         if (save_eta_grids is True) and ("eta" not in self._save_var_list.keys()):
-            self._save_var_list["eta"] = ["eta", "meters", "f4", self._netcdf_coords]
+            self._save_var_list["eta"] = [
+                "eta",
+                "meters",
+                "f4",
+                self._netcdf_coords,
+                "channel_bottom__elevation",
+            ]
         elif (save_eta_grids is False) and ("eta" in self._save_var_list.keys()):
             del self._save_var_list["eta"]
         self._save_eta_grids = save_eta_grids
@@ -859,6 +865,7 @@ class DeltaModel(
                 "meters",
                 "f4",
                 self._netcdf_coords,
+                "channel_water_surface__elevation",
             ]
         elif (save_stage_grids is False) and ("stage" in self._save_var_list.keys()):
             del self._save_var_list["stage"]
@@ -879,6 +886,7 @@ class DeltaModel(
                 "meters",
                 "f4",
                 self._netcdf_coords,
+                "channel_water__thickness",
             ]
         elif (save_depth_grids is False) and ("depth" in self._save_var_list.keys()):
             del self._save_var_list["depth"]
@@ -901,6 +909,7 @@ class DeltaModel(
                 "cubic meters per second",
                 "f4",
                 self._netcdf_coords,
+                "channel_water_flowing__volume_rate",
             ]
         elif (save_discharge_grids is False) and (
             "discharge" in self._save_var_list.keys()
@@ -925,6 +934,7 @@ class DeltaModel(
                 "meters per second",
                 "f4",
                 self._netcdf_coords,
+                "channel_water_flowing__speed",
             ]
         elif (save_velocity_grids is False) and (
             "velocity" in self._save_var_list.keys()
@@ -949,6 +959,7 @@ class DeltaModel(
                 "cubic meters per second",
                 "f4",
                 self._netcdf_coords,
+                "channel_water_sediment_flowing__volume_rate",
             ]
         elif (save_sedflux_grids is False) and (
             "sedflux" in self._save_var_list.keys()
@@ -974,6 +985,7 @@ class DeltaModel(
                 "fraction",
                 "f4",
                 self._netcdf_coords,
+                "channel_bottom_sediment_sand__volume_fraction",
             ]
         elif (save_sandfrac_grids is False) and (
             "sandfrac" in self._save_var_list.keys()

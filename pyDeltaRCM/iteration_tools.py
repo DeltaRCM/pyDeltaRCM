@@ -254,7 +254,10 @@ class iteration_tools(abc.ABC):
         self.log_info(_msg, verbosity=1)
 
         if self._save_metadata or self._save_any_grids:
-            self.output_netcdf.variables["time"][save_idx] = self._time
+            if self._legacy_netcdf:
+                self.output_netcdf.variables["time"][save_idx] = self._time
+            else:
+                self.output_netcdf.variables["seconds"][save_idx] = self._time
 
         # ------------------ Figures ------------------
         if len(self._save_fig_list) > 0:
@@ -314,7 +317,9 @@ class iteration_tools(abc.ABC):
             for _val in self._save_var_list["meta"].keys():
                 # use knowledge of time-varying values to save them
                 if self._save_var_list["meta"][_val][0] is None:
-                    self.output_netcdf["meta"][_val][save_idx] = getattr(self, _val)
+                    self.output_netcdf[self._subgroup_name][_val][save_idx] = getattr(
+                        self, _val
+                    )
 
         # -------------------- sync --------------------
         if self._save_metadata or self._save_any_grids:
