@@ -225,9 +225,9 @@ class init_tools(abc.ABC):
         self.out_dir = self._input_file_vars["out_dir"]
         self.verbose = self._input_file_vars["verbose"]
         if self._input_file_vars["legacy_netcdf"]:
-            self._netcdf_coords = ("total_time", "length", "width")
-        else:
             self._netcdf_coords = ("time", "x", "y")
+        else:
+            self._netcdf_coords = ("seconds", "x", "y")
 
     def process_input_to_model(self) -> None:
         """Process input file to model variables.
