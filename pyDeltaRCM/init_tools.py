@@ -725,13 +725,13 @@ class init_tools(abc.ABC):
 
             # set up variables for output data grids
             def _create_grid_variable(
-                varname, varunits, vartype="f4", vardims=(), long_name=None
+                varname, varunits, vartype="f4", vardims=(), varlong=None
             ):
                 _v = self.output_netcdf.createVariable(varname, vartype, vardims)
                 _v.units = varunits
-                if long_name is not None:
+                if varlong is not None:
                     # long_name is provided, record it
-                    _v.long_name = long_name
+                    _v.long_name = varlong
                 else:
                     if not self._legacy_netcdf:
                         raise ValueError(
@@ -739,9 +739,6 @@ class init_tools(abc.ABC):
                             f"sandsuet compliant data output, "
                             f"but was not provided for variable '{varname}'."
                         )
-                    else:
-                        # if not legacy netcdf, long_name not required
-                        pass
 
             _var_list = list(self._save_var_list.keys())
             # remove group from list
@@ -752,7 +749,7 @@ class init_tools(abc.ABC):
                     self._save_var_list[_val][1],  # units
                     self._save_var_list[_val][2],  # vartype
                     self._save_var_list[_val][3],  # vardims
-                    self._save_var_list[_val][4],  # long_name
+                    self._save_var_list[_val][4],  # varlong (long_name)
                 )
 
             # find name of group for auxiliary data
@@ -765,13 +762,23 @@ class init_tools(abc.ABC):
 
             # set up metadata group and populate variables
             def _create_meta_variable(
-                varname, varvalue, varunits, vartype="f4", vardims=()
+                varname, varvalue, varunits, vartype="f4", vardims=(), varlong=None
             ):
                 _v = self.output_netcdf.createVariable(
                     f"{self._subgroup_name}/" + varname, vartype, vardims
                 )
                 _v.units = varunits
                 _v[:] = varvalue
+                if varlong is not None:
+                    # long_name is provided, record it
+                    _v.long_name = varlong
+                else:
+                    if not self._legacy_netcdf:
+                        raise ValueError(
+                            f"long name must be provided for all variables to create a "
+                            f"sandsuet compliant data output, "
+                            f"but was not provided for variable '{varname}'."
+                        )
 
             for _val in self._save_var_list["meta"].keys():
                 # time-varying initialize w/ None value
@@ -782,6 +789,7 @@ class init_tools(abc.ABC):
                         self._save_var_list["meta"][_val][1],
                         self._save_var_list["meta"][_val][2],
                         self._save_var_list["meta"][_val][3],
+                        self._save_var_list["meta"][_val][4],
                     )
                 # for scalars, get the attribute and store it
                 else:
@@ -791,6 +799,7 @@ class init_tools(abc.ABC):
                         self._save_var_list["meta"][_val][1],
                         self._save_var_list["meta"][_val][2],
                         self._save_var_list["meta"][_val][3],
+                        self._save_var_list["meta"][_val][4],
                     )
 
             _msg = "Output netCDF file created"
