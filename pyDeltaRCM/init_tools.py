@@ -723,7 +723,7 @@ class init_tools(abc.ABC):
             x.units = "meter"
             y.units = "meter"
 
-            # set up variables for output data grids
+            # set up function to output data grids
             def _create_grid_variable(
                 varname, varunits, vartype="f4", vardims=(), varlong=None
             ):
@@ -740,27 +740,46 @@ class init_tools(abc.ABC):
                             f"but was not provided for variable '{varname}'."
                         )
 
+            # loop through main output data grids
             _var_list = list(self._save_var_list.keys())
-            # remove group from list
-            _var_list.remove("meta")
+            _var_list.remove("meta")  # remove group from list
             for _val in _var_list:
+                if isinstance(self._save_var_list[_val], list):
+                    # inputs should be specified as a dictionary
+                    warnings.warn(
+                        f"Specification format for output data should be `dict`, "
+                        f"but was `list`. Converting `list` for one or more variables "
+                        f"to `dict` based on item order. This compatability will "
+                        f"be removed in a future version."
+                    )
+                    # do the conversion
+                    __inlist = self._save_var_list[_val]
+                    __varlong = __inlist[4] if len(__inlist) > 3 else None
+                    _vardict = dict(
+                        varname=__inlist[0],
+                        varunits=__inlist[1],
+                        vartype=__inlist[2],
+                        vardims=__inlist[3],
+                        varlong=__varlong,
+                    )
+                else:
+                    _vardict = self._save_var_list[_val]
                 _create_grid_variable(
-                    _val,  # name
-                    self._save_var_list[_val][1],  # units
-                    self._save_var_list[_val][2],  # vartype
-                    self._save_var_list[_val][3],  # vardims
-                    self._save_var_list[_val][4],  # varlong (long_name)
+                    varname=_vardict["varname"],
+                    varunits=_vardict["varunits"],
+                    vartype=_vardict["vartype"],
+                    vardims=_vardict["vardims"],
+                    varlong=_vardict["varlong"],
                 )
 
-            # find name of group for auxiliary data
-            # set up the list of variables to save in sub group
+            # find name for subgroup data and make list
             if self._legacy_netcdf:
                 self._subgroup_name = "meta"
             else:
                 self._subgroup_name = "auxdata"
             self.output_netcdf.createGroup(self._subgroup_name)
 
-            # set up metadata group and populate variables
+            # set up function to output additional data in subgroup
             def _create_meta_variable(
                 varname, varvalue, varunits, vartype="f4", vardims=(), varlong=None
             ):
@@ -780,27 +799,61 @@ class init_tools(abc.ABC):
                             f"but was not provided for variable '{varname}'."
                         )
 
+            # loop through additional data in subgroup
             for _val in self._save_var_list["meta"].keys():
-                # time-varying initialize w/ None value
-                if self._save_var_list["meta"][_val][0] is None:
-                    _create_meta_variable(
-                        _val,
-                        self._save_var_list["meta"][_val][0],
-                        self._save_var_list["meta"][_val][1],
-                        self._save_var_list["meta"][_val][2],
-                        self._save_var_list["meta"][_val][3],
-                        self._save_var_list["meta"][_val][4],
+                if isinstance(self._save_var_list["meta"][_val], list):
+                    # inputs should be specified as a dictionary
+                    warnings.warn(
+                        f"Specification format for output subgroup data should be `dict`, "
+                        f"but was `list`. Converting `list` for one or more subgroup variables "
+                        f"to `dict` based on item order. This compatability will "
+                        f"be removed in a future version."
                     )
-                # for scalars, get the attribute and store it
+                    # do the conversion
+                    __inlist = self._save_var_list["meta"][_val]
+                    __varname = _val if __inlist[0] is None else __inlist[0]
+                    __varvalue = (
+                        getattr(self, __inlist[0]) if __inlist[0] is not None else None
+                    )
+                    __varlong = __inlist[4] if len(__inlist) > 3 else None
+                    _vardict = dict(
+                        varname=__varname,
+                        varvalue=__varvalue,
+                        varunits=__inlist[1],
+                        vartype=__inlist[2],
+                        vardims=__inlist[3],
+                        varlong=__varlong,
+                    )
                 else:
-                    _create_meta_variable(
-                        _val,
-                        getattr(self, self._save_var_list["meta"][_val][0]),
-                        self._save_var_list["meta"][_val][1],
-                        self._save_var_list["meta"][_val][2],
-                        self._save_var_list["meta"][_val][3],
-                        self._save_var_list["meta"][_val][4],
-                    )
+                    _vardict = self._save_var_list["meta"][_val]
+                # # time-varying initialize w/ None value
+                # if self._save_var_list["meta"][_val][0] is None:
+                #     _create_meta_variable(
+                #         varname=_vardict["varname"],
+                #         varvalue=_vardict["varvalue"],
+                #         varunits=_vardict["varunits"],
+                #         vartype=_vardict["vartype"],
+                #         vardims=_vardict["vardims"],
+                #         varlong=_vardict["varlong"],
+                #     )
+                # # for scalars, get the attribute and store it
+                # else:
+                #     _create_meta_variable(
+                #         _val,
+                #         getattr(self, self._save_var_list["meta"][_val][0]),
+                #         self._save_var_list["meta"][_val][1],
+                #         self._save_var_list["meta"][_val][2],
+                #         self._save_var_list["meta"][_val][3],
+                #         self._save_var_list["meta"][_val][4],
+                #     )
+                _create_meta_variable(
+                    varname=_vardict["varname"],
+                    varvalue=_vardict["varvalue"],
+                    varunits=_vardict["varunits"],
+                    vartype=_vardict["vartype"],
+                    vardims=_vardict["vardims"],
+                    varlong=_vardict["varlong"],
+                )
 
             _msg = "Output netCDF file created"
             self.log_info(_msg, verbosity=2)
