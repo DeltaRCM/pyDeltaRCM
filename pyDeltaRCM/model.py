@@ -1346,49 +1346,36 @@ class DeltaModel(
         """Enable output in legacy netCDF format.
 
         Default behavior, legacy_netcdf: False, is for the model to use the
-        `v2.1.0` output netCDF format. The updated format is configured
-        to match the input expected by `xarray`, which eases interaction with
-        model outputs. The change in format is from inconsistently named
-        dimensions and *coordinate variables*, to homogeneous definitions.
-        Also, the legacy format specified the variables `x` and `y` as 2d
-        grids, whereas the updated format uses 1d coordinate arrays.
+        `v2.2.0` output netCDF format.
 
-        .. important::
+        The `v2.2.0` format is configured to match the input expected by
+        `xarray` and in compliance with the *sandsuet* data specification.
+        The legacy format(`legacy_netcdf=True`) now matches the `v2.1.x`
+        specification. The major differences are in the naming of output
+        dimensions, and the requirment that the file must meet sandsuet
+        specifications if `legacy_netcdf=True`, which requires specifying a
+        description of fields for the `long_name` attribute of all saved
+        variables and metadata.
 
-            The behavior of the legacy option, and the new format is expected
-            to change in version 2.2.0 With v2.2.0 the default output file
-            will comply with the sandsuet data specification, and the
-            `legacy_output=True` option will output the current
-            configuration. The core data will not change with v2.2, but the
-            names and attributes of components of the data output is expected
-            to change.
-
-        +-------------+-------------------+---------------------------------+
-        |             | default           | legacy                          |
-        +=============+===================+=================================+
-        | dimensions  | `time`, `x`, `y`  | `total_time`, `length`, `width` |
-        +-------------+-------------------+---------------------------------+
-        | variables   | `time`, `x`, `y`  | `time`, `y`, `x`; x, y as 2D    |
-        +-------------+-------------------+---------------------------------+
-        | data        | `t-x-y` array     | `t-y-x` array                   |
-        +-------------+-------------------+---------------------------------+
+        +-------------+-------------------+------------------+
+        |             | default           | legacy           |
+        +=============+===================+==================+
+        | dimensions  | `time`, `x`, `y`  | `time`, `x`, `y` |
+        +-------------+-------------------+------------------+
+        | variables   | `time`, `x`, `y`  | `time`, `x`, `y` |
+        +-------------+-------------------+------------------+
+        | data        | `t-x-y` array     | `t-x-y` arrays   |
+        +-------------+-------------------+------------------+
 
         .. hint::
 
             If you are beginning a new project, use `legacy_netcdf == False`,
-            and update scripts accordingly.
+            and update any old scripts or model classes accordingly.
         """
         return self._legacy_netcdf
 
     @legacy_netcdf.setter
     def legacy_netcdf(self, legacy_netcdf: bool) -> None:
-        if legacy_netcdf:
-            warnings.warn(
-                "The legacy version of the NetCDF output is "
-                "expected to change with v2.2. The old `legagcy` "
-                "file format will no longer be available, and "
-                "will be replaced by the current file format."
-            )
         self._legacy_netcdf = legacy_netcdf
 
     @property

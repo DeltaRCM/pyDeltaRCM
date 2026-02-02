@@ -745,13 +745,15 @@ class init_tools(abc.ABC):
             _var_list.remove("meta")  # remove group from list
             for _val in _var_list:
                 if isinstance(self._save_var_list[_val], list):
-                    # inputs should be specified as a dictionary
-                    warnings.warn(
-                        f"Specification format for output data should be `dict`, "
-                        f"but was `list`. Converting `list` for one or more variables "
-                        f"to `dict` based on item order. This compatability will "
-                        f"be removed in a future version."
-                    )
+                    ### for now, we silently convert to dictionary format
+                    # # inputs should be specified as a dictionary
+                    # warnings.warn(
+                    #     f"Specification format for output data should be `dict`, "
+                    #     f"but was `list`. Converting `list` for one or more variables "
+                    #     f"to `dict` based on item order. This compatability will "
+                    #     f"be removed in a future version."
+                    # )
+                    ###
                     # do the conversion
                     __inlist = self._save_var_list[_val]
                     __varname = _val
@@ -803,13 +805,15 @@ class init_tools(abc.ABC):
             # loop through additional data in subgroup
             for _val in self._save_var_list["meta"].keys():
                 if isinstance(self._save_var_list["meta"][_val], list):
+                    ### for now, we silently convert to dictionary format
                     # inputs should be specified as a dictionary
-                    warnings.warn(
-                        f"Specification format for output subgroup data should be `dict`, "
-                        f"but was `list`. Converting `list` for one or more subgroup variables "
-                        f"to `dict` based on item order. This compatability will "
-                        f"be removed in a future version."
-                    )
+                    # warnings.warn(
+                    #     f"Specification format for output subgroup data should be `dict`, "
+                    #     f"but was `list`. Converting `list` for one or more subgroup variables "
+                    #     f"to `dict` based on item order. This compatability will "
+                    #     f"be removed in a future version."
+                    # )
+                    ###
                     # do the conversion
                     __inlist = self._save_var_list["meta"][_val]
                     __varname = _val if __inlist[0] is None else __inlist[0]
@@ -828,26 +832,6 @@ class init_tools(abc.ABC):
 
                 else:
                     _vardict = self._save_var_list["meta"][_val]
-                # # time-varying initialize w/ None value
-                # if self._save_var_list["meta"][_val][0] is None:
-                #     _create_meta_variable(
-                #         varname=_vardict["varname"],
-                #         varvalue=_vardict["varvalue"],
-                #         varunits=_vardict["varunits"],
-                #         vartype=_vardict["vartype"],
-                #         vardims=_vardict["vardims"],
-                #         varlong=_vardict["varlong"],
-                #     )
-                # # for scalars, get the attribute and store it
-                # else:
-                #     _create_meta_variable(
-                #         _val,
-                #         getattr(self, self._save_var_list["meta"][_val][0]),
-                #         self._save_var_list["meta"][_val][1],
-                #         self._save_var_list["meta"][_val][2],
-                #         self._save_var_list["meta"][_val][3],
-                #         self._save_var_list["meta"][_val][4],
-                #     )
                 _create_meta_variable(
                     varname=_vardict["varname"],
                     varvalue=_vardict["varvalue"],

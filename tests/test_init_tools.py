@@ -833,17 +833,17 @@ class TestSettingOtherParametersFromYAMLSettings:
 
     def test_L0(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(
-            tmp_path, "input.yaml", {"L0_meters": 100, "Length": 6000, "dx": 5}
+            tmp_path, "input.yaml", {"L0_meters": 100, "Length": 500, "dx": 5}
         )
         _delta = DeltaModel(input_file=p)
         assert _delta.L0 == 20
 
     def test_N0(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(
-            tmp_path, "input.yaml", {"N0_meters": 500, "Width": 6000, "dx": 5}
+            tmp_path, "input.yaml", {"N0_meters": 30, "Width": 100, "dx": 5}
         )
         _delta = DeltaModel(input_file=p)
-        assert _delta.N0 == 100
+        assert _delta.N0 == 5
 
     def test_L(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"Length": 1600, "dx": 20})
@@ -894,7 +894,8 @@ class TestSettingOtherParametersFromYAMLSettings:
         p = utilities.yaml_from_dict(
             tmp_path, "input.yaml", {"S0": 0.01, "dx": 10, "u0": 3}
         )
-        _delta = DeltaModel(input_file=p)
+        with pytest.warns(UserWarning, match=r"Gamma.*greater than.*"):
+            _delta = DeltaModel(input_file=p)
         assert _delta.gamma == pytest.approx(0.10900000)
 
     def test_V0(self, tmp_path: Path) -> None:
@@ -913,9 +914,9 @@ class TestSettingOtherParametersFromYAMLSettings:
         assert _delta.Qw0 == 800
 
     def test_qw0(self, tmp_path: Path) -> None:
-        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"u0": 0.8, "h0": 3})
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"u0": 3, "h0": 5})
         _delta = DeltaModel(input_file=p)
-        assert _delta.qw0 == pytest.approx(2.4)
+        assert _delta.qw0 == pytest.approx(15)
 
     def test_Qp_water(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(
@@ -1195,7 +1196,7 @@ class TestInitMetadataList:
         utilities.write_parameter_to_file(f, "save_metadata", True)
         utilities.write_parameter_to_file(f, "legacy_netcdf", True)
         f.close()
-        with pytest.warns(UserWarning, match=r".* netcdf file in legacy schema .*"):
+        with pytest.warns(UserWarning, match=r".*netcdf file in legacy schema.*"):
             delta = DeltaModel(input_file=p)
         # check things about the metadata
         assert hasattr(delta, "_save_var_list")
@@ -1291,7 +1292,7 @@ class TestInitMetadataList:
         utilities.write_parameter_to_file(f, "save_metadata", True)
         utilities.write_parameter_to_file(f, "legacy_netcdf", True)
         f.close()
-        with pytest.warns(UserWarning, match=r".* netcdf file in legacy schema .*"):
+        with pytest.warns(UserWarning, match=r".*netcdf file in legacy schema.*"):
             delta = DeltaModel(input_file=p)
         # check things about the metadata
         assert hasattr(delta, "_save_var_list")
