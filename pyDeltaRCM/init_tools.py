@@ -1157,6 +1157,14 @@ class init_tools(abc.ABC):
                 # set object attribute for model
                 self.output_netcdf = Dataset(file_path, "r+", format="NETCDF4")
 
+                # find subgroup name, supporting legacy file format
+                if "meta" in self.output_netcdf.groups.keys():
+                    self._subgroup_name = "meta"
+                elif "auxdata" in self.output_netcdf.groups.keys():
+                    self._subgroup_name = "auxdata"
+                else:
+                    self._subgroup_name = self.output_netcdf.groups.keys()[0]
+
                 # synch netcdf file
                 self.output_netcdf.sync()
 

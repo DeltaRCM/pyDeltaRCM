@@ -1372,6 +1372,8 @@ class DeltaModel(
             If you are beginning a new project, use `legacy_netcdf=False`,
             and update any old scripts or model classes accordingly.
         """
+        # DEV NOTE: do not change legacy output behavior prior to v2.3.0,
+        #    after which it can deprecated or changed again.
         return self._legacy_netcdf
 
     @legacy_netcdf.setter
