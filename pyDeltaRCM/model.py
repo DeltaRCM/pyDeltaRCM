@@ -1009,6 +1009,7 @@ class DeltaModel(
                     "cubic meters per second",
                     "f4",
                     self._netcdf_coords,
+                    "channel_water_flowing__x_component_of_volume_rate",
                 ]
             if "discharge_y" not in self._save_var_list.keys():
                 self._save_var_list["discharge_y"] = [
@@ -1016,6 +1017,7 @@ class DeltaModel(
                     "cubic meters per second",
                     "f4",
                     self._netcdf_coords,
+                    "channel_water_flowing__y_component_of_volume_rate",
                 ]
         elif save_discharge_components is False:
             if "discharge_x" in self._save_var_list.keys():
@@ -1040,6 +1042,7 @@ class DeltaModel(
                     "meters per second",
                     "f4",
                     self._netcdf_coords,
+                    "channel_water_flowing__x_component_of_speed",
                 ]
             if "velocity_y" not in self._save_var_list.keys():
                 self._save_var_list["velocity_y"] = [
@@ -1047,6 +1050,7 @@ class DeltaModel(
                     "meters per second",
                     "f4",
                     self._netcdf_coords,
+                    "channel_water_flowing__y_component_of_speed",
                 ]
         elif save_velocity_components is False:
             if "velocity_x" in self._save_var_list.keys():

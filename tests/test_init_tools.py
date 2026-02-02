@@ -1172,9 +1172,21 @@ class TestInitMetadataList:
         assert "meta" in delta._save_var_list.keys()
         # save meta on, so check that some expected values are there
         assert "L0" in delta._save_var_list["meta"].keys()
-        assert delta._save_var_list["meta"]["L0"] == ["L0", "cells", "i8", ()]
+        assert delta._save_var_list["meta"]["L0"] == [
+            "L0",
+            "cells",
+            "i8",
+            (),
+            "channel_entrance__length",
+        ]
         assert "H_SL" in delta._save_var_list["meta"].keys()
-        assert delta._save_var_list["meta"]["H_SL"] == [None, "meters", "f4", "time"]
+        assert delta._save_var_list["meta"]["H_SL"] == [
+            None,
+            "meters",
+            "f4",
+            "seconds",
+            "basin_water_surface__elevation",
+        ]
 
     def test_default_meta_list_legacy(self, tmp_path: Path) -> None:
         file_name = "user_parameters.yaml"
@@ -1183,20 +1195,28 @@ class TestInitMetadataList:
         utilities.write_parameter_to_file(f, "save_metadata", True)
         utilities.write_parameter_to_file(f, "legacy_netcdf", True)
         f.close()
-        delta = DeltaModel(input_file=p)
+        with pytest.warns(UserWarning, match=r".* netcdf file in legacy schema .*"):
+            delta = DeltaModel(input_file=p)
         # check things about the metadata
         assert hasattr(delta, "_save_var_list")
         assert type(delta._save_var_list) == dict
         assert "meta" in delta._save_var_list.keys()
         # save meta on, so check that some expected values are there
         assert "L0" in delta._save_var_list["meta"].keys()
-        assert delta._save_var_list["meta"]["L0"] == ["L0", "cells", "i8", ()]
+        assert delta._save_var_list["meta"]["L0"] == [
+            "L0",
+            "cells",
+            "i8",
+            (),
+            "channel_entrance__length",
+        ]
         assert "H_SL" in delta._save_var_list["meta"].keys()
         assert delta._save_var_list["meta"]["H_SL"] == [
             None,
             "meters",
             "f4",
-            "total_time",
+            "time",
+            "basin_water_surface__elevation",
         ]
 
     def test_netcdf_vars(self, tmp_path: Path) -> None:
@@ -1215,9 +1235,85 @@ class TestInitMetadataList:
         assert "meta" in delta._save_var_list.keys()
         # save meta on, so check that some expected values are there
         assert "L0" in delta._save_var_list["meta"].keys()
-        assert delta._save_var_list["meta"]["L0"] == ["L0", "cells", "i8", ()]
+        assert delta._save_var_list["meta"]["L0"] == [
+            "L0",
+            "cells",
+            "i8",
+            (),
+            "channel_entrance__length",
+        ]
         assert "H_SL" in delta._save_var_list["meta"].keys()
-        assert delta._save_var_list["meta"]["H_SL"] == [None, "meters", "f4", "time"]
+        assert delta._save_var_list["meta"]["H_SL"] == [
+            None,
+            "meters",
+            "f4",
+            "seconds",
+            "basin_water_surface__elevation",
+        ]
+        # check save var list for eta
+        assert "eta" in delta._save_var_list.keys()
+        assert delta._save_var_list["eta"] == [
+            "eta",
+            "meters",
+            "f4",
+            ("seconds", "x", "y"),
+            "channel_bottom__elevation",
+        ]
+        # force save to netcdf
+        delta.save_grids_and_figs()
+        # close netcdf
+        delta.output_netcdf.close()
+        # check out the netcdf
+        data = Dataset(
+            os.path.join(delta.prefix, "pyDeltaRCM_output.nc"), "r+", format="NETCDF4"
+        )
+        # check for meta group
+        assert "auxdata" in data.groups
+        # check for L0 a single value metadata
+        assert "L0" in data["auxdata"].variables
+        assert data["auxdata"]["L0"][0].data == delta.L0
+        # check H_SL a vector of metadata
+        assert "H_SL" in data["auxdata"].variables
+        assert data["auxdata"]["H_SL"].dimensions == ("seconds",)
+        assert data["seconds"].shape == data["auxdata"]["H_SL"].shape
+        # check on the eta grid
+        assert "eta" in data.variables
+        assert data["eta"].shape[0] == data["seconds"].shape[0]
+        assert data["eta"].shape[1] == delta.L
+        assert data["eta"].shape[2] == delta.W
+
+    def test_netcdf_vars_legacy(self, tmp_path: Path) -> None:
+        # test that stuff makes it to the netcdf file as expected
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "save_eta_grids", True)
+        utilities.write_parameter_to_file(f, "save_metadata", True)
+        utilities.write_parameter_to_file(f, "legacy_netcdf", True)
+        f.close()
+        with pytest.warns(UserWarning, match=r".* netcdf file in legacy schema .*"):
+            delta = DeltaModel(input_file=p)
+        # check things about the metadata
+        assert hasattr(delta, "_save_var_list")
+        assert type(delta._save_var_list) == dict
+        assert "meta" in delta._save_var_list.keys()
+        # save meta on, so check that some expected values are there
+        assert "L0" in delta._save_var_list["meta"].keys()
+        assert delta._save_var_list["meta"]["L0"] == [
+            "L0",
+            "cells",
+            "i8",
+            (),
+            "channel_entrance__length",
+        ]
+        assert "H_SL" in delta._save_var_list["meta"].keys()
+        assert delta._save_var_list["meta"]["H_SL"] == [
+            None,
+            "meters",
+            "f4",
+            "time",
+            "basin_water_surface__elevation",
+        ]
         # check save var list for eta
         assert "eta" in delta._save_var_list.keys()
         assert delta._save_var_list["eta"] == [
@@ -1225,6 +1321,7 @@ class TestInitMetadataList:
             "meters",
             "f4",
             ("time", "x", "y"),
+            "channel_bottom__elevation",
         ]
         # force save to netcdf
         delta.save_grids_and_figs()
@@ -1242,61 +1339,6 @@ class TestInitMetadataList:
         # check H_SL a vector of metadata
         assert "H_SL" in data["meta"].variables
         assert data["meta"]["H_SL"].dimensions == ("time",)
-        assert data["time"].shape == data["meta"]["H_SL"].shape
-        # check on the eta grid
-        assert "eta" in data.variables
-        assert data["eta"].shape[0] == data["time"].shape[0]
-        assert data["eta"].shape[1] == delta.L
-        assert data["eta"].shape[2] == delta.W
-
-    def test_netcdf_vars_legacy(self, tmp_path: Path) -> None:
-        # test that stuff makes it to the netcdf file as expected
-        file_name = "user_parameters.yaml"
-        p, f = utilities.create_temporary_file(tmp_path, file_name)
-        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
-        utilities.write_parameter_to_file(f, "save_eta_grids", True)
-        utilities.write_parameter_to_file(f, "save_metadata", True)
-        utilities.write_parameter_to_file(f, "legacy_netcdf", True)
-        f.close()
-        delta = DeltaModel(input_file=p)
-        # check things about the metadata
-        assert hasattr(delta, "_save_var_list")
-        assert type(delta._save_var_list) == dict
-        assert "meta" in delta._save_var_list.keys()
-        # save meta on, so check that some expected values are there
-        assert "L0" in delta._save_var_list["meta"].keys()
-        assert delta._save_var_list["meta"]["L0"] == ["L0", "cells", "i8", ()]
-        assert "H_SL" in delta._save_var_list["meta"].keys()
-        assert delta._save_var_list["meta"]["H_SL"] == [
-            None,
-            "meters",
-            "f4",
-            "total_time",
-        ]
-        # check save var list for eta
-        assert "eta" in delta._save_var_list.keys()
-        assert delta._save_var_list["eta"] == [
-            "eta",
-            "meters",
-            "f4",
-            ("total_time", "length", "width"),
-        ]
-        # force save to netcdf
-        delta.save_grids_and_figs()
-        # close netcdf
-        delta.output_netcdf.close()
-        # check out the netcdf
-        data = Dataset(
-            os.path.join(delta.prefix, "pyDeltaRCM_output.nc"), "r+", format="NETCDF4"
-        )
-        # check for meta group
-        assert "meta" in data.groups
-        # check for L0 a single value metadata
-        assert "L0" in data["meta"].variables
-        assert data["meta"]["L0"][0].data == delta.L0
-        # check H_SL a vector of metadata
-        assert "H_SL" in data["meta"].variables
-        assert data["meta"]["H_SL"].dimensions == ("total_time",)
         assert data["time"].shape == data["meta"]["H_SL"].shape
         # check on the eta grid
         assert "eta" in data.variables

@@ -754,7 +754,7 @@ class init_tools(abc.ABC):
                     )
                     # do the conversion
                     __inlist = self._save_var_list[_val]
-                    __varname = _val if self._legacy_netcdf else __inlist[0]
+                    __varname = _val
                     __varlong = __inlist[4] if len(__inlist) > 4 else None
                     _vardict = dict(
                         varname=__varname,  # use dict key as varname
@@ -763,8 +763,6 @@ class init_tools(abc.ABC):
                         vardims=__inlist[3],
                         varlong=__varlong,
                     )
-                    if _vardict["varname"] == "active_layer":
-                        breakpoint()
                 else:
                     _vardict = self._save_var_list[_val]
                 _create_grid_variable(
