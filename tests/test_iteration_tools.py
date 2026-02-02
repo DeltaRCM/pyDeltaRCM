@@ -432,7 +432,8 @@ class TestSaveGridsAndFigs:
             "input.yaml",
             {"save_dt": 1, "save_metadata": True, "legacy_netcdf": True},
         )
-        _delta = DeltaModel(input_file=p)
+        with pytest.warns(UserWarning, match=r".*netcdf file in legacy schema.*"):
+            _delta = DeltaModel(input_file=p)
 
         # mock the log_info
         _delta.log_info = mock.MagicMock()
@@ -548,9 +549,11 @@ class TestSaveGridsAndFigs:
                 "save_metadata": False,
                 "save_eta_grids": True,
                 "C0_percent": 0.2,
+                "legacy_netcdf": True,
             },
         )
-        _delta = DeltaModel(input_file=p)
+        with pytest.warns(UserWarning, match=r".*netcdf file in legacy schema.*"):
+            _delta = DeltaModel(input_file=p)
 
         # mock the log_info
         _delta.log_info = mock.MagicMock()
