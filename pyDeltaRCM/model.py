@@ -1350,7 +1350,7 @@ class DeltaModel(
 
         The `v2.2.0` format is configured to match the input expected by
         `xarray` and in compliance with the *sandsuet* data specification.
-        The legacy format(`legacy_netcdf=True`) now matches the `v2.1.x`
+        The legacy format(`legacy_netcdf=True`) now matches the `v2.1.9`
         specification. The major differences are in the naming of output
         dimensions, and the requirment that the file must meet sandsuet
         specifications if `legacy_netcdf=True`, which requires specifying a
@@ -1369,7 +1369,7 @@ class DeltaModel(
 
         .. hint::
 
-            If you are beginning a new project, use `legacy_netcdf == False`,
+            If you are beginning a new project, use `legacy_netcdf=False`,
             and update any old scripts or model classes accordingly.
         """
         return self._legacy_netcdf

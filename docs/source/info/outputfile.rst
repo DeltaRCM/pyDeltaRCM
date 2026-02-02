@@ -10,30 +10,31 @@ Gridded Variables
 
 In any given run, the saving parameters "save_<var>_grids" control whether or
 not that 2-D grid variable (e.g. velocity) is saved to the netCDF4 file. In
-the netCDF4 file, a 3-D array with the dimensions `time` :math:`\times`
+the netCDF4 file, a 3-D array with the dimensions `seconds` :math:`\times`
 `x` :math:`\times` `y` is created for each 2-D grid variable that is set to
 be saved. Note that `x` is the *downstream* coordinate, rather than the
 Cartesian `x` when displaying the grid. The appropriate units for all
 variables are stored: for example "meters per second" for the *velocity*
-grid.
+grid. All variables include a description via the `long_name` attribute.
 
 .. note::
    
-   The format of the output netCDF file coordinate changed in `v2.1.0`. The
-   old format is documented
+   The format of the output netCDF file coordinate changed in `v2.2.0`. The
+   old format (up to v2.1.9) is documented
    in :attr:`~pyDeltaRCM.model.DeltaModel.legacy_netcdf`, and that input
    parameter `legacy_netcdf` can be used to create on output netcdf file with
-   the old coordinate configuration.
+   the old coordinate configuration. The output format for pyDeltaRCM v2.1.0
+   and earlier is deprecated and has been removed.
 
 
 Grid Coordinates
 ================
 
-Grid coordinates are specified in the variables `time`, `x`, and `y` in the output netCDF4 file.
+Grid coordinates are specified in the variables `seconds`, `x`, and `y` in the output netCDF4 file.
 These arrays are 1D arrays, which specify the location of each cell in the domain in *dimensional* coordinates (e.g., meters).
 In the downstream direction,  the distance of each cell from the inlet boundary is specified in `x` in meters.
 Similarly, the cross-domain distance is specified in `y` in meters.
-Lastly, the `time` variable is stored as a 1D array with model `time` in seconds.
+Lastly, the `seconds` variable is stored as a 1D array recording model elapsed time in seconds.
 
 
 Model Metadata
@@ -66,7 +67,7 @@ library. These libraries range from the
 to higher-level libraries such as
 `xarray <https://github.com/pydata/xarray>`_. For deltas, and specifically
 *pyDeltaRCM*, there is also a package under development called
-`DeltaMetrics <https://github.com/DeltaRCM/DeltaMetrics>`_,
+`sandplover <https://github.com/sandpiper-toolchain/sandplover>`_,
 that is being designed to help post-process and analyze *pyDeltaRCM* outputs.
 
 
