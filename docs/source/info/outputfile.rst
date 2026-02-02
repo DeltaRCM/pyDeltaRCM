@@ -17,24 +17,28 @@ Cartesian `x` when displaying the grid. The appropriate units for all
 variables are stored: for example "meters per second" for the *velocity*
 grid. All variables include a description via the `long_name` attribute.
 
-.. note::
+.. important::
    
-   The format of the output netCDF file coordinate changed in `v2.2.0`. The
+   The format of the output netCDF file coordinates changed in `v2.2.0`. The
    old format (up to v2.1.9) is documented
-   in :attr:`~pyDeltaRCM.model.DeltaModel.legacy_netcdf`, and that input
-   parameter `legacy_netcdf` can be used to create on output netcdf file with
+   in :attr:`~pyDeltaRCM.model.DeltaModel.legacy_netcdf`, and the input
+   parameter `legacy_netcdf` can be used to create an output netcdf file with
    the old coordinate configuration. The output format for pyDeltaRCM v2.1.0
-   and earlier is deprecated and has been removed.
+   and earlier is deprecated and has been removed. Changing to the new output
+   format should be a small change for most users, with only the name of the
+   temporal dimension and the metadata subgroup changing in the new output.
 
 
 Grid Coordinates
 ================
 
-Grid coordinates are specified in the variables `seconds`, `x`, and `y` in the output netCDF4 file.
-These arrays are 1D arrays, which specify the location of each cell in the domain in *dimensional* coordinates (e.g., meters).
-In the downstream direction,  the distance of each cell from the inlet boundary is specified in `x` in meters.
-Similarly, the cross-domain distance is specified in `y` in meters.
-Lastly, the `seconds` variable is stored as a 1D array recording model elapsed time in seconds.
+Grid coordinates are specified in the variables `seconds`, `x`, and `y` in the
+output netCDF4 file. These arrays are 1D arrays, which specify the location
+of each cell in the domain in *dimensional* coordinates (e.g., meters). In
+the downstream direction,  the distance of each cell from the inlet boundary
+is specified in `x` in meters. Similarly, the cross-domain distance is
+specified in `y` in meters. Lastly, the `seconds` variable is stored as a 1D
+array recording model elapsed time in seconds.
 
 
 Model Metadata
@@ -54,6 +58,7 @@ saved as metadata are the following:
 - Sediment concentration: `C0_percent`
 - Characteristic Velocity: `u0`
 - If subsidence is enabled:
+
   - Subsidence start time: `start_subsidence`
   - Subsidence rate: `sigma`
 
