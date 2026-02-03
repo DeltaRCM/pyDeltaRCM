@@ -1346,31 +1346,34 @@ class DeltaModel(
         """Enable output in legacy netCDF format.
 
         Default behavior, legacy_netcdf: False, is for the model to use the
-        `v2.2.0` output netCDF format.
+        output netCDF format established in `v2.2.0`.
 
         The `v2.2.0` format is configured to match the input expected by
         `xarray` and in compliance with the *sandsuet* data specification.
-        The legacy format(`legacy_netcdf=True`) now matches the `v2.1.9`
-        specification. The major differences are in the naming of output
-        dimensions, and the requirment that the file must meet sandsuet
-        specifications if `legacy_netcdf=True`, which requires specifying a
-        description of fields for the `long_name` attribute of all saved
-        variables and metadata.
+        The legacy format(`legacy_netcdf=True`) provides the `v2.1.9`
+        and earlier specification.
 
-        +-------------+-------------------+------------------+
-        |             | default           | legacy           |
-        +=============+===================+==================+
-        | dimensions  | `time`, `x`, `y`  | `time`, `x`, `y` |
-        +-------------+-------------------+------------------+
-        | variables   | `time`, `x`, `y`  | `time`, `x`, `y` |
-        +-------------+-------------------+------------------+
-        | data        | `t-x-y` array     | `t-x-y` arrays   |
-        +-------------+-------------------+------------------+
+        +-------------+----------------------+---------------------+
+        |             | default              | legacy              |
+        +=============+======================+=====================+
+        | dimensions  | `seconds`, `x`, `y`  | `time`, `x`, `y`    |
+        +-------------+----------------------+---------------------+
+        | variables   | `seconds`, `x`, `y`  | `time`, `x`, `y`    |
+        +-------------+----------------------+---------------------+
+        | data        | `t-x-y` array        | `t-x-y` arrays      |
+        +-------------+----------------------+---------------------+
+
+        The major differences are in the naming of output dimensions, and the
+        requirment that the file **must** meet sandsuet specifications if
+        `legacy_netcdf=True`. This requires that all variables include in
+        metadata a description of the variable, which is saved in the
+        `long_name` attribute of the netCDF variable.
 
         .. hint::
 
-            If you are beginning a new project, use `legacy_netcdf=False`,
-            and update any old scripts or model classes accordingly.
+            If you are beginning a new project, use `legacy_netcdf=False`, and
+            update any old scripts or model classes accordingly. The old
+            behavior is likely to be deprecated in the future!
         """
         # DEV NOTE: do not change legacy output behavior prior to v2.3.0,
         #    after which it can deprecated or changed again.
