@@ -767,6 +767,7 @@ class init_tools(abc.ABC):
                     )
                 else:
                     _vardict = self._save_var_list[_val]
+
                 _create_grid_variable(
                     varname=_vardict["varname"],
                     varunits=_vardict["varunits"],
@@ -790,6 +791,10 @@ class init_tools(abc.ABC):
                     f"{self._subgroup_name}/" + varname, vartype, vardims
                 )
                 _v.units = varunits
+                # convert string to value from model attrs
+                if isinstance(varvalue, str):
+                    varvalue = getattr(self, varvalue)
+                # fill variable
                 _v[:] = varvalue
                 if varlong is not None:
                     # long_name is provided, record it
@@ -832,6 +837,7 @@ class init_tools(abc.ABC):
 
                 else:
                     _vardict = self._save_var_list["meta"][_val]
+
                 _create_meta_variable(
                     varname=_vardict["varname"],
                     varvalue=_vardict["varvalue"],

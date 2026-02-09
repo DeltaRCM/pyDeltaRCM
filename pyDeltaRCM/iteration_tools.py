@@ -305,9 +305,16 @@ class iteration_tools(abc.ABC):
             _var_list = list(self._save_var_list.keys())
             _var_list.remove("meta")
             for _val in _var_list:
-                self.save_grids(
-                    _val, getattr(self, self._save_var_list[_val][0]), save_idx
-                )
+                if isinstance(self._save_var_list[_val], list):
+                    self.save_grids(
+                        _val, getattr(self, self._save_var_list[_val][0]), save_idx
+                    )
+                else:
+                    self.save_grids(
+                        _val,
+                        getattr(self, self._save_var_list[_val]["varname"]),
+                        save_idx,
+                    )
 
         # ------------------ metadata ------------------
         if self._save_metadata:
@@ -315,11 +322,18 @@ class iteration_tools(abc.ABC):
             self.log_info(_msg, verbosity=2)
 
             for _val in self._save_var_list["meta"].keys():
+                # get the inital value from either list or dict
+                if isinstance(self._save_var_list["meta"][_val], list):
+                    _init_value = self._save_var_list["meta"][_val][0]
+                else:
+                    _init_value = self._save_var_list["meta"][_val]["varvalue"]
                 # use knowledge of time-varying values to save them
-                if self._save_var_list["meta"][_val][0] is None:
+                if _init_value is None:
                     self.output_netcdf[self._subgroup_name][_val][save_idx] = getattr(
                         self, _val
                     )
+                else:
+                    pass  # do not re-save values that do not change over time
 
         # -------------------- sync --------------------
         if self._save_metadata or self._save_any_grids:
