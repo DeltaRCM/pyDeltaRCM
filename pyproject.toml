@@ -1,0 +1,109 @@
+[project]
+name = "pyDeltaRCM"
+requires-python = ">=3.11"
+description = "Python version of original Matlab DeltaRCM."
+keywords = []
+authors = [
+    { name = "Andrew Moodie", email = "amoodie@tamu.edu" },
+]
+maintainers = [
+    { name = "Andrew Moodie", email = "amoodie@tamu.edu" },
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Hydrology",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "importlib-resources; python_version < '3.12'",
+    "matplotlib",
+    "scipy",
+    "netCDF4",
+    "pyyaml",
+    "numba",
+    "numpy"
+]
+dynamic = [
+    "version",
+    "readme",
+]
+
+[project.license]
+text = "MIT"
+
+[project.urls]
+documentation = "https://deltarcm.org/pyDeltaRCM"
+homepage = "https://deltarcm.org/pyDeltaRCM"
+repository = "https://github.com/DeltaRCM/pyDeltaRCM"
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+]
+testing = [
+    "coveralls",
+    "pytest",
+    "pytest-cov",
+    "pytest-mpl"
+]
+
+[build-system]
+requires = [
+    "setuptools >=61",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic.readme]
+file = "README.rst"
+content-type = "text/x-rst"
+
+[tool.setuptools.dynamic.version]
+attr = "pyDeltaRCM._version.__version__"
+
+[tool.setuptools.packages.find]
+where = [
+    ".",
+]
+include = [
+    "pyDeltaRCM*",
+]
+
+[project.scripts]
+pyDeltaRCM = "pyDeltaRCM.preprocessor:preprocessor_wrapper"
+
+[tool.coverage.run]
+relative_files = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
+norecursedirs = [
+    ".*",
+    "*.egg*",
+    "build",
+    "dist",
+]
+addopts = [
+    "--ignore=setup.py",
+    "--tb=native",
+    "--durations=16",
+    "--strict-markers",
+    "--doctest-modules",
+    "-vvv",
+]
+doctest_optionflags = [
+    "NORMALIZE_WHITESPACE",
+    "IGNORE_EXCEPTION_DETAIL",
+    "ELLIPSIS",
+]

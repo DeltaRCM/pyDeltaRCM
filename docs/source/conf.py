@@ -113,5 +113,7 @@ linkcheck_ignore = [
     r'https://doi.org/10.1029/2021GL095053',
     r'https://doi.org/10.1029/2018GL079405',
     r'https://doi.org/10.1029/2022JF006762',
-    r'https://doi.org/10.1086/626637'
+    r'https://doi.org/10.1086/626637',
+    r'https://doi.org/10.1029/2023JE008183',
+    r'https://doi.org/10.1029/2023je008183'
 ]

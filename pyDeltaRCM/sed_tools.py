@@ -126,7 +126,6 @@ class sed_tools(abc.ABC):
 
         _msg = "Supplying model state to SandRouter for iteration"
         self.log_info(_msg, verbosity=2)
-
         self._sr.run(
             start_indices,
             self.eta,
@@ -691,13 +690,14 @@ class SandRouter(BaseRouter):
         self.qx = qx
         self.qy = qy
         self.qs = qs
+        _shape = self.eta.shape
 
         num_starts = start_indices.shape[0]
         for np_sed in range(num_starts):
             self.Vp_res = self.Vp_sed
 
-            px = 0
-            py = start_indices[np_sed]
+            # get initial location based on flat index
+            px, py = shared_tools.custom_unravel(start_indices[np_sed], _shape)
 
             self.qs[px, py] = self.qs[px, py] + self.Vp_res / 2.0 / self._dt / self._dx
             self._route_one_parcel(px, py)
@@ -912,13 +912,14 @@ class MudRouter(BaseRouter):
         self.qw = qw
         self.qx = qx
         self.qy = qy
+        _shape = self.eta.shape
 
         num_starts = start_indices.shape[0]
         for np_sed in range(num_starts):
             self.Vp_res = self.Vp_sed
 
-            px = 0
-            py = start_indices[np_sed]
+            # get initial location based on flat index
+            px, py = shared_tools.custom_unravel(start_indices[np_sed], _shape)
 
             self._route_one_parcel(px, py)
 

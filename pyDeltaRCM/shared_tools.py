@@ -272,6 +272,7 @@ def custom_unravel(i: int, shape: Tuple[int, int]) -> Tuple[int, int]:
         from pyDeltaRCM.shared_tools import custom_unravel
 
     .. doctest::
+        :skip:
 
         >>> _shape = (100, 200)  # e.g., delta.eta.shape
 
@@ -318,6 +319,7 @@ def custom_ravel(tup: Tuple[int, int], shape: Tuple[int, int]) -> int:
         from pyDeltaRCM.shared_tools import custom_ravel
 
     .. doctest::
+        :skip:
 
         >>> _shape = (100, 200)  # e.g., delta.eta.shape
 
@@ -368,6 +370,7 @@ def custom_pad(arr: np.ndarray) -> np.ndarray:
     Consider a model domain of size `(4, 8)`
 
     .. doctest::
+        :skip:
 
         >>> arr = np.arange(32).reshape(4, 8)
 
@@ -382,6 +385,7 @@ def custom_pad(arr: np.ndarray) -> np.ndarray:
     sliced:
 
     .. doctest::
+        :skip:
 
         >>> for i in range(4):
         ...     for j in range(8):

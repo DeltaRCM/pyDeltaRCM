@@ -104,7 +104,8 @@ class water_tools(abc.ABC):
         _step = 0
 
         # flux from ghost node
-        self.qxn.flat[start_indices] += 1
+        start_inlets, start_counts = np.unique(start_indices, return_counts=True)
+        self.qxn.flat[start_inlets] += start_counts
         self.qyn.flat[start_indices] += 0  # this could be omitted...
         self.qwn.flat[start_indices] += self.Qp_water / self._dx / 2
 
@@ -409,7 +410,7 @@ class water_tools(abc.ABC):
             self.jvec_flat,
             self.distances_flat,
             self.dry_depth,
-            self.gamma,
+            self._gamma,
             self._theta_water,
         )
 
@@ -489,6 +490,8 @@ class water_tools(abc.ABC):
         self.qyn *= qwn_div
 
         if self._time_iter > 0:
+            # On first iteration, use the set omega_flow parameter to combine
+            #   old qs with new qs. Then, use a factor based on total number of iterations
             omega = self.omega_flow_iter
             if iteration == 0:
                 omega = self._omega_flow
@@ -701,7 +704,10 @@ def _get_weight_at_cell_water(
             weight = weight / np.sum(weight)
 
     else:
-        raise RuntimeError("Water sum(weight) less than 0. " "Please report error.")
+        raise RuntimeError(
+            "Water sum(weight) less than 0. This is common when the value of gamma is "
+            "too large. See documentation for complete explanation."
+        )
 
     # final sanity check
     if np.any(np.isnan(weight)):

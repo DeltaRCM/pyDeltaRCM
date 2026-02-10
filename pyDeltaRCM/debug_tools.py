@@ -184,7 +184,7 @@ class debug_tools(abc.ABC):
             elif ind.ndim > 1:
                 if multiline:
                     # travel along axis, extracting lines
-                    cm = matplotlib.cm.get_cmap("tab10")
+                    cm = matplotlib.colormaps["tab10"].resampled(10)
                     lines = []
                     for i in np.arange(ind.shape[1]):
                         _l = plot_line(
@@ -246,9 +246,7 @@ def plot_domain(
 
     cmap = kwargs.pop("cmap", None)
     if cmap is None:
-        cmap = plt.get_cmap("viridis")
-    # else:
-    # cmap = plt.get_cmap(cmap)
+        cmap = matplotlib.colormaps.get_cmap("viridis")
 
     cobj = ax.imshow(attr, cmap=cmap, interpolation="none", **kwargs)
     divider = axtk.axes_divider.make_axes_locatable(ax)
