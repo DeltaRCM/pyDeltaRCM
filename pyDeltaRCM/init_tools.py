@@ -821,10 +821,20 @@ class init_tools(abc.ABC):
                     ###
                     # do the conversion
                     __inlist = self._save_var_list["meta"][_val]
-                    __varname = _val  # if __inlist[0] is None else __inlist[0]
-                    __varvalue = (
-                        getattr(self, __inlist[0]) if __inlist[0] is not None else None
-                    )
+                    __varname = _val
+                    if __inlist[0] is None:
+                        warnings.warn(
+                            UserWarning(
+                                "Specifying `None` for time varying dimensions "
+                                "of model outputs will soon be deprecated. "
+                                "Change to specifying the name of the "
+                                "variable to save a string, and/or convert to "
+                                "dictionary inputs."
+                            )
+                        )
+                        __varvalue = None
+                    else:
+                        __varvalue = getattr(self, __inlist[0])
                     __varlong = __inlist[4] if len(__inlist) > 4 else None
                     _vardict = dict(
                         varname=__varname,
@@ -945,28 +955,28 @@ class init_tools(abc.ABC):
             ]
         # time-varying metadata
         self._save_var_list["meta"]["H_SL"] = [
-            None,
+            "H_SL",
             "meters",
             "f4",
             (self._netcdf_coords[0]),
             "basin_water_surface__elevation",
         ]
         self._save_var_list["meta"]["f_bedload"] = [
-            None,
+            "f_bedload",
             "fraction",
             "f4",
             (self._netcdf_coords[0]),
             "channel_entrance_water_sediment_sand__volume_fraction",
         ]
         self._save_var_list["meta"]["C0_percent"] = [
-            None,
+            "C0_percent",
             "percent",
             "f4",
             (self._netcdf_coords[0]),
             "channel_entrance__water_sediment__volume_percent",
         ]
         self._save_var_list["meta"]["u0"] = [
-            None,
+            "u0",
             "meters per second",
             "f4",
             (self._netcdf_coords[0]),

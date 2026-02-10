@@ -1182,7 +1182,7 @@ class TestInitMetadataList:
         ]
         assert "H_SL" in delta._save_var_list["meta"].keys()
         assert delta._save_var_list["meta"]["H_SL"] == [
-            None,
+            "H_SL",
             "meters",
             "f4",
             "seconds",
@@ -1213,7 +1213,7 @@ class TestInitMetadataList:
         ]
         assert "H_SL" in delta._save_var_list["meta"].keys()
         assert delta._save_var_list["meta"]["H_SL"] == [
-            None,
+            "H_SL",
             "meters",
             "f4",
             "time",
@@ -1245,7 +1245,7 @@ class TestInitMetadataList:
         ]
         assert "H_SL" in delta._save_var_list["meta"].keys()
         assert delta._save_var_list["meta"]["H_SL"] == [
-            None,
+            "H_SL",
             "meters",
             "f4",
             "seconds",
@@ -1309,7 +1309,7 @@ class TestInitMetadataList:
         ]
         assert "H_SL" in delta._save_var_list["meta"].keys()
         assert delta._save_var_list["meta"]["H_SL"] == [
-            None,
+            "H_SL",
             "meters",
             "f4",
             "time",
@@ -1359,28 +1359,13 @@ class TestCustomOutputs:
         f.close()
 
         class MSCustomSaveModel(DeltaModel):
-            """
-            PER DOCS:
-
-            FOR LIST:
-                The key added to self._save_var_list is the name of the variable
-                as it will be recorded in the netCDF file, this does not have to
-                correspond to the name of an attribute in the model.
-
-            FOR DICT:
-                The key added to self._save_var_list is ignored. Specify the
-                variable to record in the netcdf as key in dict "varvalue".
-                Whether the variable has temporal qualities is inferred from
-                the dimensions of the data.
-            """
-
             def __init__(self, input_file=None, **kwargs):
                 # inherit base DeltaModel methods
                 super().__init__(input_file, **kwargs)
 
             def hook_init_output_file(self):
                 # save number of water parcels w/ a long name AS DICT
-                self._save_var_list["meta"]["Np_water"] = dict(
+                self._save_var_list["meta"]["Np_water"] = dict(  # key ignored
                     varname="number_water_parcels",  # name in the netcdf file
                     varvalue="Np_water",  # name in the model
                     varunits="parcels",
@@ -1424,21 +1409,6 @@ class TestCustomOutputs:
         f.close()
 
         class MTCustomSaveModel(DeltaModel):
-            """
-            PER DOCS:
-
-            FOR LIST:
-                The key added to self._save_var_list is the name of the variable
-                as it will be recorded in the netCDF file, this does not have to
-                correspond to the name of an attribute in the model.
-
-            FOR DICT:
-                The key added to self._save_var_list is ignored. Specify the
-                variable to record in the netcdf as key in dict "varvalue".
-                Whether the variable has temporal qualities is inferred from
-                the dimensions of the data.
-            """
-
             def __init__(self, input_file=None, **kwargs):
                 self.input_timevaryingvar_list = 10
                 self.input_timevaryingvar_dict = np.zeros(
@@ -1450,7 +1420,7 @@ class TestCustomOutputs:
             def hook_init_output_file(self):
                 # save one as a list with None as arg (slated to deprecate!)
                 self._save_var_list["meta"]["input_timevaryingvar_list"] = [
-                    None,
+                    "input_timevaryingvar_list",
                     "meters",
                     "f4",
                     (self._netcdf_coords[0]),
@@ -1487,6 +1457,40 @@ class TestCustomOutputs:
         assert np.all(
             data["auxdata"]["timevaryingnc"][0].data == delta.input_timevaryingvar_dict
         )
+
+    def test_custom_model_output__meta_timeseries_None_warning(
+        self, tmp_path: Path
+    ) -> None:
+        # test that input metadata can be a dict
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "save_eta_grids", True)
+        utilities.write_parameter_to_file(f, "save_metadata", True)
+        f.close()
+
+        class MTNWCustomSaveModel(DeltaModel):
+            def __init__(self, input_file=None, **kwargs):
+                self.input_timevaryingvar_list = 10
+                self.input_timevaryingvar_dict = np.zeros(
+                    (100, 200)
+                )  # HARDCODED TO DEFAULT DIMS!!
+                # inherit base DeltaModel methods
+                super().__init__(input_file, **kwargs)
+
+            def hook_init_output_file(self):
+                # save one as a list with None as arg (slated to deprecate!)
+                self._save_var_list["meta"]["input_timevaryingvar_list"] = [
+                    None,
+                    "meters",
+                    "f4",
+                    (self._netcdf_coords[0]),
+                    "basin_water_surface__elevation",
+                ]
+
+        with pytest.warns(UserWarning, match=r"Specifying `None`.*"):
+            delta = MTNWCustomSaveModel(input_file=p)
+        # force save to netcdf
 
     def test_custom_model_output__base_timeseries(self, tmp_path: Path) -> None:
         # test that input metadata can be a dict
