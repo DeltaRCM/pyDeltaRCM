@@ -821,7 +821,7 @@ class init_tools(abc.ABC):
                     ###
                     # do the conversion
                     __inlist = self._save_var_list["meta"][_val]
-                    __varname = _val if __inlist[0] is None else __inlist[0]
+                    __varname = _val  # if __inlist[0] is None else __inlist[0]
                     __varvalue = (
                         getattr(self, __inlist[0]) if __inlist[0] is not None else None
                     )

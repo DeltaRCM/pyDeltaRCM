@@ -305,16 +305,19 @@ class iteration_tools(abc.ABC):
             _var_list = list(self._save_var_list.keys())
             _var_list.remove("meta")
             for _val in _var_list:
+                # get the inital value from either list or dict
                 if isinstance(self._save_var_list[_val], list):
-                    self.save_grids(
-                        _val, getattr(self, self._save_var_list[_val][0]), save_idx
-                    )
+                    _modelvar = self._save_var_list[_val][0]
+                    _ncvar = _val
                 else:
-                    self.save_grids(
-                        _val,
-                        getattr(self, self._save_var_list[_val]["varname"]),
-                        save_idx,
-                    )
+                    _modelvar = self._save_var_list[_val]["varvalue"]
+                    _ncvar = self._save_var_list[_val]["varname"]
+
+                self.save_grids(
+                    var_name=_ncvar,
+                    var=getattr(self, _modelvar),
+                    save_idx=save_idx,
+                )
 
         # ------------------ metadata ------------------
         if self._save_metadata:
@@ -322,15 +325,24 @@ class iteration_tools(abc.ABC):
             self.log_info(_msg, verbosity=2)
 
             for _val in self._save_var_list["meta"].keys():
-                # get the inital value from either list or dict
+                # get the values from either list or dict
                 if isinstance(self._save_var_list["meta"][_val], list):
-                    _init_value = self._save_var_list["meta"][_val][0]
+                    _dims = len(self._save_var_list["meta"][_val][3])
+                    _modelvar = self._save_var_list["meta"][_val][0]
+                    _ncvar = _val
                 else:
-                    _init_value = self._save_var_list["meta"][_val]["varvalue"]
+                    _dims = len(self._save_var_list["meta"][_val]["vardims"])
+                    _modelvar = self._save_var_list["meta"][_val]["varvalue"]
+                    _ncvar = self._save_var_list["meta"][_val]["varname"]
+
+                # safety check, if None, replace with name of key (_val)
+                if _modelvar is None:
+                    _modelvar = _val
+
                 # use knowledge of time-varying values to save them
-                if _init_value is None:
-                    self.output_netcdf[self._subgroup_name][_val][save_idx] = getattr(
-                        self, _val
+                if _dims > 2:
+                    self.output_netcdf[self._subgroup_name][_ncvar][save_idx] = getattr(
+                        self, _modelvar
                     )
                 else:
                     pass  # do not re-save values that do not change over time
