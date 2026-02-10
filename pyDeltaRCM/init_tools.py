@@ -386,7 +386,6 @@ class init_tools(abc.ABC):
 
         # kernels for topographic smoothing
         self.kernel1 = np.array([[1, 1, 1], [1, -8, 1], [1, 1, 1]]).astype(np.int64)
-
         self.kernel2 = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]]).astype(np.int64)
 
     def create_boundary_conditions(self) -> None:
@@ -434,7 +433,7 @@ class init_tools(abc.ABC):
 
         # at inlet
         self.qw0 = self.u0 * self.h0  # water unit input discharge
-        self.Qp_water = self.Qw0 / self._Np_water  # volume each water parcel
+        self.Qp_water = self.Qw0 / self._Np_water  # discharge each water parcel
         self.qs0 = self.qw0 * self.C0  # sed unit discharge
         self.dVs = 0.1 * self.N0**2 * self.V0  # total sed added per timestep
         self.Qs0 = self.Qw0 * self.C0  # sediment total input discharge
