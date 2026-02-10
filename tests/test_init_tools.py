@@ -1346,3 +1346,194 @@ class TestInitMetadataList:
         assert data["eta"].shape[0] == data["time"].shape[0]
         assert data["eta"].shape[1] == delta.L
         assert data["eta"].shape[2] == delta.W
+
+
+class TestCustomOutputs:
+    def test_custom_model_output__meta_scalar(self, tmp_path: Path) -> None:
+        # test that input metadata can be a dict
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "save_eta_grids", True)
+        utilities.write_parameter_to_file(f, "save_metadata", True)
+        f.close()
+
+        class MSCustomSaveModel(DeltaModel):
+            """
+            PER DOCS:
+
+            FOR LIST:
+                The key added to self._save_var_list is the name of the variable
+                as it will be recorded in the netCDF file, this does not have to
+                correspond to the name of an attribute in the model.
+
+            FOR DICT:
+                The key added to self._save_var_list is ignored. Specify the
+                variable to record in the netcdf as key in dict "varvalue".
+                Whether the variable has temporal qualities is inferred from
+                the dimensions of the data.
+            """
+
+            def __init__(self, input_file=None, **kwargs):
+                # inherit base DeltaModel methods
+                super().__init__(input_file, **kwargs)
+
+            def hook_init_output_file(self):
+                # save number of water parcels w/ a long name AS DICT
+                self._save_var_list["meta"]["Np_water"] = dict(
+                    varname="number_water_parcels",  # name in the netcdf file
+                    varvalue="Np_water",  # name in the model
+                    varunits="parcels",
+                    vartype="i8",
+                    vardims=(),
+                    varlong="testname",
+                )
+                # save number of sed parcels with long name AS LIST
+                self._save_var_list["meta"]["sed_parcels"] = [  # key is name in netcdf
+                    "Np_sed",  # model var
+                    "parcels",
+                    "i8",
+                    (),
+                    "longname",
+                ]
+
+        delta = MSCustomSaveModel(input_file=p)
+        # force save to netcdf
+        delta.save_grids_and_figs()
+        # close netcdf
+        delta.output_netcdf.close()
+        # check out the netcdf
+        data = Dataset(
+            os.path.join(delta.prefix, "pyDeltaRCM_output.nc"), "r+", format="NETCDF4"
+        )
+        # check for custom outputs
+        assert "meta" in delta._save_var_list.keys()  # internal list still called meta
+        assert "number_water_parcels" in data["auxdata"].variables
+        assert data["auxdata"]["number_water_parcels"][0].data == delta.Np_water
+
+        assert "sed_parcels" in data["auxdata"].variables
+        assert data["auxdata"]["sed_parcels"][0].data == delta.Np_sed
+
+    def test_custom_model_output__meta_timeseries(self, tmp_path: Path) -> None:
+        # test that input metadata can be a dict
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "save_eta_grids", True)
+        utilities.write_parameter_to_file(f, "save_metadata", True)
+        f.close()
+
+        class MTCustomSaveModel(DeltaModel):
+            """
+            PER DOCS:
+
+            FOR LIST:
+                The key added to self._save_var_list is the name of the variable
+                as it will be recorded in the netCDF file, this does not have to
+                correspond to the name of an attribute in the model.
+
+            FOR DICT:
+                The key added to self._save_var_list is ignored. Specify the
+                variable to record in the netcdf as key in dict "varvalue".
+                Whether the variable has temporal qualities is inferred from
+                the dimensions of the data.
+            """
+
+            def __init__(self, input_file=None, **kwargs):
+                self.input_timevaryingvar_list = 10
+                self.input_timevaryingvar_dict = np.zeros(
+                    (100, 200)
+                )  # HARDCODED TO DEFAULT DIMS!!
+                # inherit base DeltaModel methods
+                super().__init__(input_file, **kwargs)
+
+            def hook_init_output_file(self):
+                # save one as a list with None as arg (slated to deprecate!)
+                self._save_var_list["meta"]["input_timevaryingvar_list"] = [
+                    None,
+                    "meters",
+                    "f4",
+                    (self._netcdf_coords[0]),
+                    "basin_water_surface__elevation",
+                ]
+
+                self._save_var_list["meta"]["ignored"] = dict(  # name should be ignored
+                    varname="timevaryingnc",  # name in the netcdf file
+                    varvalue="input_timevaryingvar_dict",  # name in the model
+                    varunits="parcels",
+                    vartype="i8",
+                    vardims=self._netcdf_coords,
+                    varlong="testname",
+                )
+
+        delta = MTCustomSaveModel(input_file=p)
+        # force save to netcdf
+        delta.save_grids_and_figs()
+        # close netcdf
+        delta.output_netcdf.close()
+        # check out the netcdf
+        data = Dataset(
+            os.path.join(delta.prefix, "pyDeltaRCM_output.nc"), "r+", format="NETCDF4"
+        )
+        # check for custom outputs
+        assert "meta" in delta._save_var_list.keys()  # internal list still called meta
+        assert "input_timevaryingvar_list" in data["auxdata"].variables
+        assert np.all(
+            data["auxdata"]["input_timevaryingvar_list"][0].data
+            == delta.input_timevaryingvar_list
+        )
+
+        assert "timevaryingnc" in data["auxdata"].variables
+        assert np.all(
+            data["auxdata"]["timevaryingnc"][0].data == delta.input_timevaryingvar_dict
+        )
+
+    def test_custom_model_output__base_timeseries(self, tmp_path: Path) -> None:
+        # test that input metadata can be a dict
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "save_eta_grids", True)
+        utilities.write_parameter_to_file(f, "save_metadata", True)
+        f.close()
+
+        class BTCustomSaveModel(DeltaModel):
+            def __init__(self, input_file=None, **kwargs):
+                # inherit base DeltaModel methods
+                super().__init__(input_file, **kwargs)
+
+            def hook_init_output_file(self):
+                # save the active layer grid each save_dt w/ a short name
+                self._save_var_list["actlay"] = dict(  # should be ignored
+                    varname="saved_active_layer",  # name in the netcdf file
+                    varvalue="active_layer",  # name in the model
+                    varunits="fraction",
+                    vartype="f4",
+                    vardims=("seconds", "x", "y"),
+                    varlong="testname",
+                )
+
+                # save one as a list
+                self._save_var_list["normalized_discharge_x"] = [  # name in netcdf
+                    "qxn",  # name in the model
+                    "",
+                    "f4",
+                    ("seconds", "x", "y"),
+                    "normalized discharge in x",
+                ]
+
+        delta = BTCustomSaveModel(input_file=p)
+        # force save to netcdf
+        delta.save_grids_and_figs()
+        # close netcdf
+        delta.output_netcdf.close()
+        # check out the netcdf
+        data = Dataset(
+            os.path.join(delta.prefix, "pyDeltaRCM_output.nc"), "r+", format="NETCDF4"
+        )
+        # check for vars
+        assert "saved_active_layer" in data.variables
+        assert np.all(data["saved_active_layer"][0].data == delta.active_layer)
+
+        assert "normalized_discharge_x" in data.variables
+        assert np.all(data["normalized_discharge_x"][0].data == delta.qxn)
