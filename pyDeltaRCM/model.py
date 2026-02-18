@@ -839,7 +839,13 @@ class DeltaModel(
     @save_eta_grids.setter
     def save_eta_grids(self, save_eta_grids: bool) -> None:
         if (save_eta_grids is True) and ("eta" not in self._save_var_list.keys()):
-            self._save_var_list["eta"] = ["eta", "meters", "f4", self._netcdf_coords]
+            self._save_var_list["eta"] = [
+                "eta",
+                "meters",
+                "f4",
+                self._netcdf_coords,
+                "channel_bottom__elevation",
+            ]
         elif (save_eta_grids is False) and ("eta" in self._save_var_list.keys()):
             del self._save_var_list["eta"]
         self._save_eta_grids = save_eta_grids
@@ -859,6 +865,7 @@ class DeltaModel(
                 "meters",
                 "f4",
                 self._netcdf_coords,
+                "channel_water_surface__elevation",
             ]
         elif (save_stage_grids is False) and ("stage" in self._save_var_list.keys()):
             del self._save_var_list["stage"]
@@ -879,6 +886,7 @@ class DeltaModel(
                 "meters",
                 "f4",
                 self._netcdf_coords,
+                "channel_water__thickness",
             ]
         elif (save_depth_grids is False) and ("depth" in self._save_var_list.keys()):
             del self._save_var_list["depth"]
@@ -901,6 +909,7 @@ class DeltaModel(
                 "cubic meters per second",
                 "f4",
                 self._netcdf_coords,
+                "channel_water_flowing__volume_rate",
             ]
         elif (save_discharge_grids is False) and (
             "discharge" in self._save_var_list.keys()
@@ -925,6 +934,7 @@ class DeltaModel(
                 "meters per second",
                 "f4",
                 self._netcdf_coords,
+                "channel_water_flowing__speed",
             ]
         elif (save_velocity_grids is False) and (
             "velocity" in self._save_var_list.keys()
@@ -949,6 +959,7 @@ class DeltaModel(
                 "cubic meters per second",
                 "f4",
                 self._netcdf_coords,
+                "channel_water_sediment_flowing__volume_rate",
             ]
         elif (save_sedflux_grids is False) and (
             "sedflux" in self._save_var_list.keys()
@@ -974,6 +985,7 @@ class DeltaModel(
                 "fraction",
                 "f4",
                 self._netcdf_coords,
+                "channel_bottom_sediment_sand__volume_fraction",
             ]
         elif (save_sandfrac_grids is False) and (
             "sandfrac" in self._save_var_list.keys()
@@ -997,6 +1009,7 @@ class DeltaModel(
                     "cubic meters per second",
                     "f4",
                     self._netcdf_coords,
+                    "channel_water_flowing__x_component_of_volume_rate",
                 ]
             if "discharge_y" not in self._save_var_list.keys():
                 self._save_var_list["discharge_y"] = [
@@ -1004,6 +1017,7 @@ class DeltaModel(
                     "cubic meters per second",
                     "f4",
                     self._netcdf_coords,
+                    "channel_water_flowing__y_component_of_volume_rate",
                 ]
         elif save_discharge_components is False:
             if "discharge_x" in self._save_var_list.keys():
@@ -1028,6 +1042,7 @@ class DeltaModel(
                     "meters per second",
                     "f4",
                     self._netcdf_coords,
+                    "channel_water_flowing__x_component_of_speed",
                 ]
             if "velocity_y" not in self._save_var_list.keys():
                 self._save_var_list["velocity_y"] = [
@@ -1035,6 +1050,7 @@ class DeltaModel(
                     "meters per second",
                     "f4",
                     self._netcdf_coords,
+                    "channel_water_flowing__y_component_of_speed",
                 ]
         elif save_velocity_components is False:
             if "velocity_x" in self._save_var_list.keys():
@@ -1330,49 +1346,41 @@ class DeltaModel(
         """Enable output in legacy netCDF format.
 
         Default behavior, legacy_netcdf: False, is for the model to use the
-        `v2.1.0` output netCDF format. The updated format is configured
-        to match the input expected by `xarray`, which eases interaction with
-        model outputs. The change in format is from inconsistently named
-        dimensions and *coordinate variables*, to homogeneous definitions.
-        Also, the legacy format specified the variables `x` and `y` as 2d
-        grids, whereas the updated format uses 1d coordinate arrays.
+        output netCDF format established in `v2.2.0`.
 
-        .. important::
+        The `v2.2.0` format is configured to match the input expected by
+        `xarray` and in compliance with the *sandsuet* data specification.
+        The legacy format(`legacy_netcdf=True`) provides the `v2.1.9`
+        and earlier specification.
 
-            The behavior of the legacy option, and the new format is expected
-            to change in version 2.2.0 With v2.2.0 the default output file
-            will comply with the sandsuet data specification, and the
-            `legacy_output=True` option will output the current
-            configuration. The core data will not change with v2.2, but the
-            names and attributes of components of the data output is expected
-            to change.
+        +-------------+----------------------+---------------------+
+        |             | default              | legacy              |
+        +=============+======================+=====================+
+        | dimensions  | `seconds`, `x`, `y`  | `time`, `x`, `y`    |
+        +-------------+----------------------+---------------------+
+        | variables   | `seconds`, `x`, `y`  | `time`, `x`, `y`    |
+        +-------------+----------------------+---------------------+
+        | data        | `t-x-y` array        | `t-x-y` arrays      |
+        +-------------+----------------------+---------------------+
 
-        +-------------+-------------------+---------------------------------+
-        |             | default           | legacy                          |
-        +=============+===================+=================================+
-        | dimensions  | `time`, `x`, `y`  | `total_time`, `length`, `width` |
-        +-------------+-------------------+---------------------------------+
-        | variables   | `time`, `x`, `y`  | `time`, `y`, `x`; x, y as 2D    |
-        +-------------+-------------------+---------------------------------+
-        | data        | `t-x-y` array     | `t-y-x` array                   |
-        +-------------+-------------------+---------------------------------+
+        The major differences are in the naming of output dimensions, and the
+        requirment that the file **must** meet sandsuet specifications if
+        `legacy_netcdf=True`. This requires that all variables include in
+        metadata a description of the variable, which is saved in the
+        `long_name` attribute of the netCDF variable.
 
         .. hint::
 
-            If you are beginning a new project, use `legacy_netcdf == False`,
-            and update scripts accordingly.
+            If you are beginning a new project, use `legacy_netcdf=False`, and
+            update any old scripts or model classes accordingly. The old
+            behavior is likely to be deprecated in the future!
         """
+        # DEV NOTE: do not change legacy output behavior prior to v2.3.0,
+        #    after which it can deprecated or changed again.
         return self._legacy_netcdf
 
     @legacy_netcdf.setter
     def legacy_netcdf(self, legacy_netcdf: bool) -> None:
-        if legacy_netcdf:
-            warnings.warn(
-                "The legacy version of the NetCDF output is "
-                "expected to change with v2.2. The old `legagcy` "
-                "file format will no longer be available, and "
-                "will be replaced by the current file format."
-            )
         self._legacy_netcdf = legacy_netcdf
 
     @property

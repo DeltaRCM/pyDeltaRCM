@@ -225,9 +225,9 @@ class init_tools(abc.ABC):
         self.out_dir = self._input_file_vars["out_dir"]
         self.verbose = self._input_file_vars["verbose"]
         if self._input_file_vars["legacy_netcdf"]:
-            self._netcdf_coords = ("total_time", "length", "width")
-        else:
             self._netcdf_coords = ("time", "x", "y")
+        else:
+            self._netcdf_coords = ("seconds", "x", "y")
 
     def process_input_to_model(self) -> None:
         """Process input file to model variables.
@@ -659,6 +659,22 @@ class init_tools(abc.ABC):
             file_path = os.path.join(directory, filename)
             _msg = "Target output NetCDF4 file: {file}".format(file=file_path)
             self.log_info(_msg, verbosity=2)
+            if not self._legacy_netcdf:
+                _sandsuet_version = "1.0.0"
+                _msg = "Output file in sandsuet version {ver} schema".format(
+                    ver=_sandsuet_version
+                )
+            else:
+                _msg = "Output file in legacy schema"
+                warnings.warn(
+                    "Creating output netcdf file in legacy schema. This format is "
+                    "provided as a convenience for users who are currently "
+                    "relying on workflows that use an old format of netcdf file. "
+                    "It will be removed in the future. Any new workflows should "
+                    "leverage the sandsuet formatted data specification "
+                    "(i.e., `legacy_netcdf=False`)."
+                )
+            self.log_info(_msg, verbosity=1)
 
             if (os.path.exists(file_path)) and (self._clobber_netcdf is False):
                 raise FileExistsError(
@@ -678,6 +694,8 @@ class init_tools(abc.ABC):
             self.output_netcdf.source = "pyDeltaRCM v{ver}".format(
                 ver=self.__pyDeltaRCM_version__
             )
+            if not self._legacy_netcdf:
+                self.output_netcdf.sandsuet_version = _sandsuet_version
 
             # create master dimensions (pulls from `self._netcdf_coords`)
             self.output_netcdf.createDimension(self._netcdf_coords[1], self.L)
@@ -685,77 +703,158 @@ class init_tools(abc.ABC):
             self.output_netcdf.createDimension(self._netcdf_coords[0], None)
 
             # create master coordinates (as netCDF variables)
-            time = self.output_netcdf.createVariable(
-                "time", "f4", (self._netcdf_coords[0],)
-            )
-            time.units = "second"
-
             if self._legacy_netcdf:
-                # old format is 2d array x and y
-                x = self.output_netcdf.createVariable(
-                    "x", "f4", self._netcdf_coords[1:]
+                time = self.output_netcdf.createVariable(
+                    "time", "f4", (self._netcdf_coords[0],)
                 )
-                y = self.output_netcdf.createVariable(
-                    "y", "f4", self._netcdf_coords[1:]
-                )
-                x[:] = self.x
-                y[:] = self.y
 
             else:
-                # new output format is 1d x and y
-                x = self.output_netcdf.createVariable("x", "f4", ("x"))
-                y = self.output_netcdf.createVariable("y", "f4", ("y"))
-                x[:] = self.xc
-                y[:] = self.yc
+                time = self.output_netcdf.createVariable(
+                    "seconds", "f4", (self._netcdf_coords[0],)
+                )
+            time.units = "second"
 
+            # new output format is 1d x and y
+            x = self.output_netcdf.createVariable("x", "f4", ("x"))
+            y = self.output_netcdf.createVariable("y", "f4", ("y"))
+            x[:] = self.xc
+            y[:] = self.yc
             x.units = "meter"
             y.units = "meter"
 
-            # set up variables for output data grids
-            def _create_grid_variable(varname, varunits, vartype="f4", vardims=()):
+            # set up function to output data grids
+            def _create_grid_variable(
+                varname, varunits, vartype="f4", vardims=(), varlong=None
+            ):
                 _v = self.output_netcdf.createVariable(varname, vartype, vardims)
                 _v.units = varunits
+                if varlong is not None:
+                    # long_name is provided, record it
+                    _v.long_name = varlong
+                else:
+                    if not self._legacy_netcdf:
+                        raise ValueError(
+                            f"long name must be provided for all variables to create a "
+                            f"sandsuet compliant data output, "
+                            f"but was not provided for variable '{varname}'."
+                        )
 
+            # loop through main output data grids
             _var_list = list(self._save_var_list.keys())
-            _var_list.remove("meta")
+            _var_list.remove("meta")  # remove group from list
             for _val in _var_list:
+                if isinstance(self._save_var_list[_val], list):
+                    ### for now, we silently convert to dictionary format
+                    # # inputs should be specified as a dictionary
+                    # warnings.warn(
+                    #     f"Specification format for output data should be `dict`, "
+                    #     f"but was `list`. Converting `list` for one or more variables "
+                    #     f"to `dict` based on item order. This compatability will "
+                    #     f"be removed in a future version."
+                    # )
+                    ###
+                    # do the conversion
+                    __inlist = self._save_var_list[_val]
+                    __varname = _val
+                    __varlong = __inlist[4] if len(__inlist) > 4 else None
+                    _vardict = dict(
+                        varname=__varname,  # use dict key as varname
+                        varunits=__inlist[1],
+                        vartype=__inlist[2],
+                        vardims=__inlist[3],
+                        varlong=__varlong,
+                    )
+                else:
+                    _vardict = self._save_var_list[_val]
+
                 _create_grid_variable(
-                    _val,
-                    self._save_var_list[_val][1],
-                    self._save_var_list[_val][2],
-                    self._save_var_list[_val][3],
+                    varname=_vardict["varname"],
+                    varunits=_vardict["varunits"],
+                    vartype=_vardict["vartype"],
+                    vardims=_vardict["vardims"],
+                    varlong=_vardict["varlong"],
                 )
 
-            # set up metadata group and populate variables
+            # find name for subgroup data and make list
+            if self._legacy_netcdf:
+                self._subgroup_name = "meta"
+            else:
+                self._subgroup_name = "auxdata"
+            self.output_netcdf.createGroup(self._subgroup_name)
+
+            # set up function to output additional data in subgroup
             def _create_meta_variable(
-                varname, varvalue, varunits, vartype="f4", vardims=()
+                varname, varvalue, varunits, vartype="f4", vardims=(), varlong=None
             ):
                 _v = self.output_netcdf.createVariable(
-                    "meta/" + varname, vartype, vardims
+                    f"{self._subgroup_name}/" + varname, vartype, vardims
                 )
                 _v.units = varunits
+                # convert string to value from model attrs
+                if isinstance(varvalue, str):
+                    varvalue = getattr(self, varvalue)
+                # fill variable
                 _v[:] = varvalue
-
-            self.output_netcdf.createGroup("meta")
-            for _val in self._save_var_list["meta"].keys():
-                # time-varying initialize w/ None value
-                if self._save_var_list["meta"][_val][0] is None:
-                    _create_meta_variable(
-                        _val,
-                        self._save_var_list["meta"][_val][0],
-                        self._save_var_list["meta"][_val][1],
-                        self._save_var_list["meta"][_val][2],
-                        self._save_var_list["meta"][_val][3],
-                    )
-                # for scalars, get the attribute and store it
+                if varlong is not None:
+                    # long_name is provided, record it
+                    _v.long_name = varlong
                 else:
-                    _create_meta_variable(
-                        _val,
-                        getattr(self, self._save_var_list["meta"][_val][0]),
-                        self._save_var_list["meta"][_val][1],
-                        self._save_var_list["meta"][_val][2],
-                        self._save_var_list["meta"][_val][3],
+                    if not self._legacy_netcdf:
+                        raise ValueError(
+                            f"long name must be provided for all variables to create a "
+                            f"sandsuet compliant data output, "
+                            f"but was not provided for variable '{varname}'."
+                        )
+
+            # loop through additional data in subgroup
+            for _val in self._save_var_list["meta"].keys():
+                if isinstance(self._save_var_list["meta"][_val], list):
+                    ### for now, we silently convert to dictionary format
+                    # inputs should be specified as a dictionary
+                    # warnings.warn(
+                    #     f"Specification format for output subgroup data should be `dict`, "
+                    #     f"but was `list`. Converting `list` for one or more subgroup variables "
+                    #     f"to `dict` based on item order. This compatability will "
+                    #     f"be removed in a future version."
+                    # )
+                    ###
+                    # do the conversion
+                    __inlist = self._save_var_list["meta"][_val]
+                    __varname = _val
+                    if __inlist[0] is None:
+                        warnings.warn(
+                            UserWarning(
+                                "Specifying `None` for time varying dimensions "
+                                "of model outputs will soon be deprecated. "
+                                "Change to specifying the name of the "
+                                "variable to save a string, and/or convert to "
+                                "dictionary inputs."
+                            )
+                        )
+                        __varvalue = None
+                    else:
+                        __varvalue = getattr(self, __inlist[0])
+                    __varlong = __inlist[4] if len(__inlist) > 4 else None
+                    _vardict = dict(
+                        varname=__varname,
+                        varvalue=__varvalue,
+                        varunits=__inlist[1],
+                        vartype=__inlist[2],
+                        vardims=__inlist[3],
+                        varlong=__varlong,
                     )
+
+                else:
+                    _vardict = self._save_var_list["meta"][_val]
+
+                _create_meta_variable(
+                    varname=_vardict["varname"],
+                    varvalue=_vardict["varvalue"],
+                    varunits=_vardict["varunits"],
+                    vartype=_vardict["vartype"],
+                    vardims=_vardict["vardims"],
+                    varlong=_vardict["varlong"],
+                )
 
             _msg = "Output netCDF file created"
             self.log_info(_msg, verbosity=2)
@@ -788,17 +887,54 @@ class init_tools(abc.ABC):
         Sets up the dictionary object for the standard metadata.
         """
         # fixed metadata
-        self._save_var_list["meta"]["L0"] = ["L0", "cells", "i8", ()]
-        self._save_var_list["meta"]["N0"] = ["N0", "cells", "i8", ()]
-        self._save_var_list["meta"]["CTR"] = ["CTR", "cells", "i8", ()]
-        self._save_var_list["meta"]["dx"] = ["dx", "meters", "f4", ()]
-        self._save_var_list["meta"]["h0"] = ["h0", "meters", "f4", ()]
-        self._save_var_list["meta"]["hb"] = ["hb", "meters", "f4", ()]
+        self._save_var_list["meta"]["L0"] = [
+            "L0",
+            "cells",
+            "i8",
+            (),
+            "channel_entrance__length",
+        ]
+        self._save_var_list["meta"]["N0"] = [
+            "N0",
+            "cells",
+            "i8",
+            (),
+            "channel_entrance__width",
+        ]
+        self._save_var_list["meta"]["CTR"] = [
+            "CTR",
+            "cells",
+            "i8",
+            (),
+            "channel_entrance__y_position",
+        ]
+        self._save_var_list["meta"]["dx"] = [
+            "dx",
+            "meters",
+            "f4",
+            (),
+            "model_grid_cell_edge__length",
+        ]
+        self._save_var_list["meta"]["h0"] = [
+            "h0",
+            "meters",
+            "f4",
+            (),
+            "channel_entrance__depth",
+        ]
+        self._save_var_list["meta"]["hb"] = [
+            "hb",
+            "meters",
+            "f4",
+            (),
+            "basin_bottom_initial__depth",
+        ]
         self._save_var_list["meta"]["cell_type"] = [
             "cell_type",
             "type",
             "i8",
             self._netcdf_coords[1:],
+            "model_grid_cell__type",
         ]
         # subsidence metadata
         if self._toggle_subsidence:
@@ -807,37 +943,43 @@ class init_tools(abc.ABC):
                 "seconds",
                 "i8",
                 (),
+                "basin_bottom_vertical_rate_of_change__start_time",
             ]
             self._save_var_list["meta"]["sigma"] = [
                 "sigma",
                 "meters per timestep",
                 "f4",
                 self._netcdf_coords[1:],
+                "basin_bottom__vertical_rate_of_change",
             ]
         # time-varying metadata
         self._save_var_list["meta"]["H_SL"] = [
-            None,
+            "H_SL",
             "meters",
             "f4",
             (self._netcdf_coords[0]),
+            "basin_water_surface__elevation",
         ]
         self._save_var_list["meta"]["f_bedload"] = [
-            None,
+            "f_bedload",
             "fraction",
             "f4",
             (self._netcdf_coords[0]),
+            "channel_entrance_water_sediment_sand__volume_fraction",
         ]
         self._save_var_list["meta"]["C0_percent"] = [
-            None,
+            "C0_percent",
             "percent",
             "f4",
             (self._netcdf_coords[0]),
+            "channel_entrance__water_sediment__volume_percent",
         ]
         self._save_var_list["meta"]["u0"] = [
-            None,
+            "u0",
             "meters per second",
             "f4",
             (self._netcdf_coords[0]),
+            "channel_entrance__speed",
         ]
 
     def _load_past_etas(self, checkpoint):
@@ -1029,6 +1171,14 @@ class init_tools(abc.ABC):
 
                 # set object attribute for model
                 self.output_netcdf = Dataset(file_path, "r+", format="NETCDF4")
+
+                # find subgroup name, supporting legacy file format
+                if "meta" in self.output_netcdf.groups.keys():
+                    self._subgroup_name = "meta"
+                elif "auxdata" in self.output_netcdf.groups.keys():
+                    self._subgroup_name = "auxdata"
+                else:
+                    self._subgroup_name = self.output_netcdf.groups.keys()[0]
 
                 # synch netcdf file
                 self.output_netcdf.sync()

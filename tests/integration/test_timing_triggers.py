@@ -412,8 +412,8 @@ class TestTimingOutputData:
 
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
         assert not ("eta" in ds.variables)
-        assert ds["meta"]["H_SL"].shape[0] == 3
-        assert ds["meta"]["L0"][:] == 3
+        assert ds["auxdata"]["H_SL"].shape[0] == 3
+        assert ds["auxdata"]["L0"][:] == 3
 
     def test_save_subsidence_metadata_no_grids(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(
@@ -449,11 +449,11 @@ class TestTimingOutputData:
 
         ds = netCDF4.Dataset(exp_path_nc, "r", format="NETCDF4")
         assert not ("eta" in ds.variables)
-        assert ds["meta"]["H_SL"].shape[0] == 3
-        assert ds["meta"]["L0"][:] == 3
-        assert ds["meta"]["sigma"].shape == _delta.sigma.shape
-        assert np.all(ds["meta"]["sigma"] == _delta.sigma)
-        assert ds["meta"]["start_subsidence"][:] == 0
+        assert ds["auxdata"]["H_SL"].shape[0] == 3
+        assert ds["auxdata"]["L0"][:] == 3
+        assert ds["auxdata"]["sigma"].shape == _delta.sigma.shape
+        assert np.all(ds["auxdata"]["sigma"] == _delta.sigma)
+        assert ds["auxdata"]["start_subsidence"][:] == 0
 
     def test_save_one_grid_metadata_by_default(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(
@@ -489,10 +489,10 @@ class TestTimingOutputData:
         _arr = ds.variables["eta"]
         assert _arr.shape[1] == _delta.eta.shape[0]
         assert _arr.shape[2] == _delta.eta.shape[1]
-        assert "meta" in ds.groups  # if any grids, save meta too
-        assert ds.groups["meta"]["H_SL"].shape[0] == _arr.shape[0]
-        assert np.all(ds.groups["meta"]["C0_percent"][:].data == 0.2)
-        assert np.all(ds.groups["meta"]["f_bedload"][:].data == 0.5)
+        assert "auxdata" in ds.groups  # if any grids, save meta too
+        assert ds.groups["auxdata"]["H_SL"].shape[0] == _arr.shape[0]
+        assert np.all(ds.groups["auxdata"]["C0_percent"][:].data == 0.2)
+        assert np.all(ds.groups["auxdata"]["f_bedload"][:].data == 0.5)
 
 
 class TestTimingStops:

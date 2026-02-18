@@ -237,7 +237,7 @@ class hook_tools(abc.ABC):
         .. note::
 
             For a vector of time-varying metadata, the dimension
-            should be specified as ('total_time').
+            should be specified as ('time').
 
         Expected format for time varying grid entries as keys within the
         `self._save_var_list` dictionary:
