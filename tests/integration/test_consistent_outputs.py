@@ -341,10 +341,10 @@ class TestConsistentOutputsSameSeed:
         assert ModelA["eta"][-1, :, :].shape == ModelB["eta"][-1, :, :].shape
         assert ModelA.variables.keys() == ModelB.variables.keys()
         # check a few pieces of metadata
-        assert ModelA["meta"]["L0"][:] == ModelB["meta"]["L0"][:]
-        assert ModelA["meta"].variables.keys() == ModelB["meta"].variables.keys()
+        assert ModelA["auxdata"]["L0"][:] == ModelB["auxdata"]["L0"][:]
+        assert ModelA["auxdata"].variables.keys() == ModelB["auxdata"].variables.keys()
         # final time should NOT be the same (because only initial time is saved in ModelB)
-        assert ModelA["time"][-1].data > ModelB["time"][-1].data
+        assert ModelA["seconds"][-1].data > ModelB["seconds"][-1].data
         # final eta grids should NOT be the same (because only initial eta is saved in ModelB)
         assert np.any(ModelA["eta"][-1, :, :].data != ModelB["eta"][-1, :, :].data)
         # this is seen in the difference in shape of the eta variable
@@ -396,10 +396,10 @@ class TestConsistentOutputsSameSeed:
         assert ModelA["eta"].shape == ModelB["eta"].shape
         assert ModelA.variables.keys() == ModelB.variables.keys()
         # check a few pieces of metadata
-        assert ModelA["meta"]["L0"][:] == ModelB["meta"]["L0"][:]
-        assert ModelA["meta"].variables.keys() == ModelB["meta"].variables.keys()
+        assert ModelA["auxdata"]["L0"][:] == ModelB["auxdata"]["L0"][:]
+        assert ModelA["auxdata"].variables.keys() == ModelB["auxdata"].variables.keys()
         # final time should be the same
-        assert ModelA["time"][-1].data == ModelB["time"][-1].data
+        assert ModelA["seconds"][-1].data == ModelB["seconds"][-1].data
         # final eta grids should be the same (because both initial eta is save in ModelB)
         assert np.all(ModelA["eta"][-1, :, :].data == ModelB["eta"][-1, :, :].data)
         # first eta grids should be the same (because both initial eta is the same)
@@ -475,9 +475,9 @@ class TestConsistentOutputsSameSeed:
         assert ModelA_ser["eta"][-1, :, :].shape == ModelB_par["eta"][-1, :, :].shape
 
         # final time should be the same
-        assert ModelA_ser["time"][-1].data == ModelA_par["time"][-1].data
-        assert ModelB_par["time"][-1].data == ModelA_par["time"][-1].data
-        assert ModelB_par["time"][-1].data == ModelA_ser["time"][-1].data
+        assert ModelA_ser["seconds"][-1].data == ModelA_par["seconds"][-1].data
+        assert ModelB_par["seconds"][-1].data == ModelA_par["seconds"][-1].data
+        assert ModelB_par["seconds"][-1].data == ModelA_ser["seconds"][-1].data
         # final eta grids should be the same (because both initial eta is save in ModelB)
         assert np.all(
             ModelA_ser["eta"][-1, :, :].data == ModelA_par["eta"][-1, :, :].data
