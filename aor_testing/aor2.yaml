@@ -1,18 +1,18 @@
-Length: 4000.
+Length: 8000.
 Width: 8000.
 dx: 20
-S0: 0.00015
+S0: 0.000
 verbose: 1
 N0_meters: 500
 L0_meters: 300
 Np_water: 500
 Np_sed: 500
 u0: 0.9
-h0: 4
-hb: 4
-itermax: 2
-stepmax: 500
+h0: 2
+hb: 20
 seed: 20
-#save_eta_grids: True
+
+
+save_eta_grids: True
 #save_velocity_grids: True
 #save_sandfrac_grids: True

@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-import mpl_toolkits.axes_grid1 as axtk
 
 import os
 import shutil
@@ -13,52 +12,65 @@ import scipy as sp
 import pyDeltaRCM
 from pyDeltaRCM.shared_tools import sec_in_day, day_in_yr, custom_pad
 
-
 class aor180Model(pyDeltaRCM.DeltaModel):
     def __init__(self, input_file, **kwargs):
         # inherit from base model
         super().__init__(input_file, **kwargs)
-
         # hook_after_create_domain is called here
+        pass
 
-        # overwrite the initial data with this new basin shape
-        self.output_data()
+    def hook_import_files(self):
+        """Define the custom YAML parameters."""
+        # custom numeric parameter
+        self.subclass_parameters['fail_deg_crit'] = {
+            'type': ['float'], 'default': 30.
+        }
+       
+        self.subclass_parameters['dep_deg_crit'] = {
+            'type': ['float'], 'default': 14.
+        }
+        self.total_failure_volume = 0.0
 
-    """
-    def __init__(self, input_file, **kwargs):
-        # inherit from base model
-        super().__init__(input_file, **kwargs)
-        #self.fail_deg_crit = self.fail_deg_crit
-        #self.dep_deg_crit = self.dep_deg_crit
-        # hook_after_create_domain is called here
-        #fail_deg_crit = 30, dep_deg_crit = 14
-        slope = 0.0005  # cross basin slope
-        eta_line = slope * np.arange(0, self.length,
-                                      step=self.dx)
-        eta_grid = np.tile(eta_line, (self.L - self.L0, 1))
-        eta_grid = eta_grid - ((slope * self.Width)/2)  # center at inlet
-        self.eta[self.L0:, :] += eta_grid
+        pass
 
-        # overwrite the initial data with this new basin shape
-        self.output_data()
-"""
+    def init_output_file(self):
+        super().init_output_file()
+        """Add non-standard grids, figures and metadata to be saved."""
+        if self._save_metadata or self._save_any_grids:
+
+            if 'total_failure_volume' not in self.output_netcdf.variables:
+                var = self.output_netcdf.createVariable('total_failure_volume', 'f8', ('time',))
+                var.units = 'm^3/t'
+
+       
+        # save the slopes at which deposition and failure occur in degrees as metadata
+        self._save_var_list['meta']['dep_deg_crit'] = ['dep_deg_crit',
+                                                        'degrees',
+                                                        'f8', ()]
+        self._save_var_list['meta']['fail_deg_crit'] = ['fail_deg_crit',
+                                                        'degrees',
+                                                        'f8', ()]
+        pass
+
+    def hook_output_data(self):
+        if self._save_metadata or self._save_any_grids:
+            # `self.save_iter` tracks the current NetCDF time index (0, 1, 2...)
+            self.output_netcdf.variables['total_failure_volume'][self.save_iter] = self.total_failure_volume
+        pass
+
     def hook_topo_diffusion(self, **kwargs):
-        if self._time_iter % 1 == 0:
-            
-            self.angle_of_repose()
-            pass
+       # if self._time_iter % 1 == 0: 
+        self.angle_of_repose()
+        pass
 
     def angle_of_repose(self):
         """Routine for foreset processes with given dimensions."""
         """
         Code block 1, here we calculate the local slope maxima and their indices
         """
-        # get distances from each cell and flattened into one dimesion
-        distances = self.distances_flat
-        #pad cells to add guarantee all cells have neighbors
-        pad_eta = custom_pad(self.eta)
-        #Construct an array with basin dimesions filled with vectors of 9 zeros
-        slope = np.zeros((self.L, self.W, 9))
+        distances = self.distances_flat # distances between each cell
+        pad_eta = custom_pad(self.eta) #pad cells with nearby neighbors
+        slope = np.zeros((self.L, self.W, 9)) #Construct an array with basin dimesions filled with vectors of 9 zeros
         #Calculate slope of each cell and surrounding neighbors and fill into vectors at each cells
         for i in np.arange(self.L):
             for j in np.arange(self.W):
@@ -66,13 +78,10 @@ class aor180Model(pyDeltaRCM.DeltaModel):
                 slope[i, j, :] = np.tan(
                     (self.eta[i, j] - eta_nbrs.ravel()) / (distances * self.dx)
                 )  # units are radians
-        #find local slope maxima in each set of surrounding cells
-        dirmax = np.argmax(slope, axis=2)
-        #find coordinates of local slope maxima
-        m, n = dirmax.shape
-        #
-        I, J = np.ogrid[:m, :n]
-        slopemax = slope[I, J, dirmax]
+        dirmax = np.argmax(slope, axis=2) #find local slope maxima in each set of neighbor cells
+        m, n = dirmax.shape #find coordinates of local slope maxima in each set of neighbor cells
+        I, J = np.ogrid[:m, :n] #make boolean grid of which neighbor cell is local slope maxima at cell
+        slopemax = slope[I, J, dirmax] #
 
         """
         Code block 2
@@ -83,24 +92,22 @@ class aor180Model(pyDeltaRCM.DeltaModel):
           calculate the thickness at that cell that is unstable (i.e., how much removed would lower the slope to below threshold)
           move that volume of sediment down the slope in the max direction
           in the future, could implement complex routing rules to approx diff turbidity currents?
-        """
-        eta_before = np.copy(self.eta)
-        
+        """        
 
-        # parameters to be moved out to YAML config difference between these
-        #   critical slope controls the size of the failure and therefore the
-        #   coherence of the mass moving down the slope, and how far (indirectly) the mass moves before depositing.
-        fail_deg_crit = 30  # critical slope for failure in degrees
-        dep_deg_crit = 14  # critical slope for deposition in degrees
-        #eventually have those as yaml parameters?
+        # critical slope controls the size of the failure and therefore the
+        # coherence of the mass moving down the slope, and how far (indirectly) the mass moves before depositing.
+        fail_deg_crit = self.fail_deg_crit  # critical slope for failure in degrees
+        dep_deg_crit = self.dep_deg_crit  # critical slope for deposition in degrees
+        # eventually have those as yaml parameters if we want have degrees set up already?
         fail_slope_crit = np.radians(fail_deg_crit)  # units as radians
         dep_slope_crit = np.radians(dep_deg_crit)
 
         steep = slopemax > fail_slope_crit
         cell = self.cell_type == 0
         whr_steep = np.where(np.logical_and(steep, cell))
-
-
+        # reset total failure volume from proceeding timestep
+        self.total_failure_volume = 0
+        # compute failure where it's steep
         for i, (ix, iy) in enumerate(zip(*whr_steep)):
             pad_eta = custom_pad(self.eta)  # recompute on each transport
 
@@ -118,8 +125,9 @@ class aor180Model(pyDeltaRCM.DeltaModel):
 
             #calculate the failure volume 
             failure_volume = failure_thickness * self.dx * self.dx
+            self.total_failure_volume += failure_volume
             self.eta[ix, iy] = self.eta[ix, iy] - failure_thickness
-
+            
             # TODO: break failure volume up into a bunch of smaller parcels for serial routing
             # print(
             #     "sed parcel volume, and curent failure volume:",
@@ -147,6 +155,8 @@ class aor180Model(pyDeltaRCM.DeltaModel):
                     (potential_eta - eta_nbrs.ravel()) / (distances * self.dx)
                 )
                 local_slope = np.max(local_slopes)
+                
+                ### to play around with. Failure code from Andrew. 
                 # if local_slope < dep_slope_crit:
                 #     # deposit
                 #     # breakpoint()
@@ -191,59 +201,6 @@ class aor180Model(pyDeltaRCM.DeltaModel):
                     _continue = False
                 if _iter == max_step:
                     _continue = False
-
-            # print("steps taken:", _iter)
-
-        # fig, ax = plt.subplots(1, 3, sharex=True, sharey=True)
-        # ax[0].imshow(self.eta, cmap="cividis")
-        # ax[1].imshow(slopemax)
-        # ax[2].imshow(self.eta - eta_before, cmap="RdBu", vmin=-2, vmax=2)
-        # plt.show(block=False)
-
-        # breakpoint()
-        # assert np.sum((self.eta - eta_before)) == 0
-
-if __name__ == "__main__":
-    # parameter choices for scaling
-    If = 7 / 365.25  # intermittency factor for year-scaling
-
-    # base yaml configuration
-    base_output = "/Users/lucillebaker-stahl/Documents/pyDeltaRCM/aor_testing/aor_testing_outputs"
-    base_yaml = "/Users/lucillebaker-stahl/Documents/pyDeltaRCM/pyDeltaRCM/default.yml"
-
-    checkpoint_src = "./foreset_output_testing"
-    # copy the spinup checkpoint to each of the folders
-    # shutil.copy(
-    #     src=os.path.join(checkpoint_src, "checkpoint.npz"),
-    #     dst=os.path.join(base_output),
-    # )
-
-    _mdl = aor180Model(
-        input_file=base_yaml,
-        out_dir=base_output,
-        save_checkpoint=True,
-        resume_checkpoint=False,  # os.path.join(checkpoint_src),
-        save_dt=864000,
-        save_eta_figs=True,
-        save_velocity_figs=False,
-        clobber_netcdf=True,
-    )
-
-    # solve for how many timesteps
-    # targ_dur = 1000  # target run duration (years)
-    # targ_dur_mdl = (targ_dur * sec_in_day * day_in_yr) * If
-    # tsteps = int((targ_dur_mdl // _mdl.time_step) + 1)
-
-    tsteps = 1000
-
-    for i in range(tsteps):
-        _mdl.update()
-    # try:
-    #     for i in range(tsteps):
-    #         _mdl.update()
-    # except Exception as e:
-    #     print("ERROR!")
-    #     _mdl.logger.exception(e)
-
-    # finalize
-    _mdl.finalize()
+        # save output of total failure volume during this timestep
+        #self.total_failure_volume.append(total_failure_volume)
+        pass
