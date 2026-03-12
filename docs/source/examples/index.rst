@@ -11,6 +11,14 @@ Running the model
    basic_runs
    resume_from_checkpoint
 
+Common "gotchas"
+----------------
+
+.. toctree::
+   :maxdepth: 1
+
+   gotcha_simulataneous_models
+
 
 Modifying initial conditions
 ----------------------------

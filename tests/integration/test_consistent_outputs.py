@@ -490,3 +490,64 @@ class TestConsistentOutputsSameSeed:
         ModelB_par.close()
         ModelA_ser.close()
         ModelB_ser.close()
+
+    @pytest.mark.xfail(reason="Numba random number generator not class-based")
+    def test_same_models_simulataneous_not_parallel(self, tmp_path: Path) -> None:
+        """two models managed manually and 'simultaneously'.
+
+        In an ideal world, two models with same seed should give same result,
+        regardless of how they are run. But if two models are called
+        intermittently, then the result is not reproducible (at least on a
+        per-model basis) because the random-number generator is thrown out of
+        sync with respect to the single model and seed.
+
+        As of 03/2026, numba does not implement random number generation as an
+        object, and so cannot fix this.
+        """
+        file_name = "parameters1.yaml"
+        p1, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "one")
+        utilities.write_parameter_to_file(f, "Length", 10.0)
+        utilities.write_parameter_to_file(f, "Width", 20.0)
+        utilities.write_parameter_to_file(f, "seed", 1)
+        utilities.write_parameter_to_file(f, "verbose", 2)
+        utilities.write_parameter_to_file(f, "dx", 1.0)
+        utilities.write_parameter_to_file(f, "L0_meters", 1.0)
+        f.close()
+
+        file_name = "parameters2.yaml"
+        p2, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "two")
+        utilities.write_parameter_to_file(f, "Length", 10.0)
+        utilities.write_parameter_to_file(f, "Width", 20.0)
+        utilities.write_parameter_to_file(f, "seed", 1)
+        utilities.write_parameter_to_file(f, "verbose", 2)
+        utilities.write_parameter_to_file(f, "dx", 1.0)
+        utilities.write_parameter_to_file(f, "L0_meters", 1.0)
+        f.close()
+
+        # initialize model
+        test1 = DeltaModel(input_file=p1)
+        test2 = DeltaModel(input_file=p2)
+
+        for _ in range(0, 5):
+            test1.update()
+            test2.update()
+
+        test1.finalize()
+        test2.finalize()
+
+        ## NOTE THAT THE FOLLOWING DOES WORK
+        # test1 = DeltaModel(input_file=p1)
+        # for _ in range(0, 5):
+        #     test1.update()
+        # test1.finalize()
+
+        # test2 = DeltaModel(input_file=p2)
+        # for _ in range(0, 5):
+        #     test2.update()
+        # test2.finalize()
+
+        # test that gives same result (WILL FAIL)
+        difference = test1.eta - test2.eta
+        assert np.all(difference == 0)
