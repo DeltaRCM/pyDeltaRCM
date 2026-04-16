@@ -1,0 +1,186 @@
+out_dir:
+  type: 'str'
+  default: 'deltaRCM_Output'
+verbose:
+  type: 'int'
+  default: 0
+seed:
+  type: ['int', 'None']
+  default: null
+Length:
+  type: ['float', 'int']
+  default: 5000.
+Width:
+  type: ['float', 'int']
+  default: 10000.
+dx:
+  type: ['float', 'int']
+  default: 50.
+L0_meters:
+  type: ['float', 'int']
+  default: 150.0
+S0:
+  type: ['float', 'int']
+  default: 0.00015
+itermax:
+  type: 'int'
+  default: 3
+Np_water:
+  type: 'int'
+  default: 2000
+u0:
+  type: ['float', 'int']
+  default: 1.0
+N0_meters:
+  type: ['float', 'int']
+  default: 250.0
+h0:
+  type: ['float', 'int']
+  default: 5.0
+hb:
+  type: ['float', 'int', 'None']
+  default: null
+H_SL:
+  type: ['float', 'int']
+  default: 0.0
+SLR:
+  type: ['float', 'int']
+  default: 0.0
+Np_sed:
+  type: 'int'
+  default: 2000
+f_bedload:
+  type: ['float', 'int']
+  default: 0.5
+active_layer_thickness:
+  type: ['float', 'int', 'None']
+  default: null
+C0_percent:
+  type: ['float', 'int']
+  default: 0.1
+Csmooth:
+  type: ['float', 'int']
+  default: 0.9
+toggle_subsidence:
+  type: 'bool'
+  default: False
+subsidence_rate:
+  type: ['float', 'int']
+  default: 2e-9
+start_subsidence:
+  type: ['float', 'int']
+  default: 216000
+save_eta_figs:
+  type: 'bool'
+  default: False
+save_stage_figs:
+  type: 'bool'
+  default: False
+save_depth_figs:
+  type: 'bool'
+  default: False
+save_discharge_figs:
+  type: 'bool'
+  default: False
+save_velocity_figs:
+  type: 'bool'
+  default: False
+save_sedflux_figs:
+  type: 'bool'
+  default: False
+save_sandfrac_figs:
+  type: 'bool'
+  default: False
+save_figs_sequential:
+  type: 'bool'
+  default: True
+save_metadata:
+  type: 'bool'
+  default: False
+save_eta_grids:
+  type: 'bool'
+  default: False
+save_stage_grids:
+  type: 'bool'
+  default: False
+save_depth_grids:
+  type: 'bool'
+  default: False
+save_discharge_grids:
+  type: 'bool'
+  default: False
+save_velocity_grids:
+  type: 'bool'
+  default: False
+save_sedflux_grids:
+  type: 'bool'
+  default: False
+save_sandfrac_grids:
+  type: 'bool'
+  default: False
+save_discharge_components:
+  type: 'bool'
+  default: False
+save_velocity_components:
+  type: 'bool'
+  default: False
+save_dt:
+  type: 'int'
+  default: 86400
+checkpoint_dt:
+  type: ['int', 'None']
+  default: null
+save_checkpoint:
+  type: 'bool'
+  default: False
+resume_checkpoint:
+  type: ['bool', 'str']
+  default: False
+omega_sfc:
+  type: ['float', 'int']
+  default: 0.1
+omega_flow:
+  type: ['float', 'int']
+  default: 0.9
+Nsmooth:
+  type: 'int'
+  default: 10
+theta_water:
+  type: ['float', 'int']
+  default: 1.0
+coeff_theta_sand:
+  type: ['float', 'int']
+  default: 2.0
+coeff_theta_mud:
+  type: ['float', 'int']
+  default: 1.0
+beta:
+  type: 'int'
+  default: 3
+sed_lag:
+  type: ['float', 'int']
+  default: 1.0
+coeff_U_dep_mud:
+  type: ['float', 'int']
+  default: 0.3
+coeff_U_ero_mud:
+  type: ['float', 'int']
+  default: 1.5
+coeff_U_ero_sand:
+  type: ['float', 'int']
+  default: 1.05
+alpha:
+  type: ['float', 'int']
+  default: 0.1
+stepmax:
+  type: ['float', 'int', 'None']
+  default: null
+sand_frac_bc:
+  type: ['float', 'int']
+  default: 0
+clobber_netcdf:
+  type: 'bool'
+  default: False
+legacy_netcdf:
+  type: 'bool'
+  default: False
