@@ -142,6 +142,7 @@ class sed_tools(abc.ABC):
             self.qy,
             self.qs,
             self.mod_sed_weight,
+            self.mod_stable_weight,
         )
 
         # These are the variables updated at the end of the `SandRouter`. If
@@ -209,6 +210,7 @@ class sed_tools(abc.ABC):
             self.qx,
             self.qy,
             self.mod_sed_weight,
+            self.mod_stable_weight,
         )
 
         # These are the variables updated at the end of the `MudRouter`. If
@@ -356,6 +358,7 @@ r_spec = [
     ("mod_erosion", float32[:, :]),
     ("mod_sed_weight", float32[:, :]),
     ("pad_mod_sed_weight", float32[:, :]),
+    ("mod_stable_weight", float32[:, :]),
 ]
 
 
@@ -540,7 +543,7 @@ class BaseRouter:
         """
         return mod_erosion * Vp_sed * (U_loc**beta - U_ero**beta) / U_ero**beta
 
-    def _limit_Vp_change(self, Vp, stage, eta, dx: float, dep_ero: int):
+    def _limit_Vp_change(self, Vp, stage, eta, dx: float, dep_ero: int, mod_stable_weight: float):
         """Limit change in volume to 1/4 of a cell volume.
 
         Function is used by multiple pathways in `mud_dep_ero` and `sand_dep_ero`
@@ -553,10 +556,10 @@ class BaseRouter:
             if dep_ero == 0:
                 return 0
             else:
-                fourth = np.abs(depth) / 4 * (dx * dx)
+                fourth = mod_stable_weight*np.abs(depth) / 4 * (dx * dx)
                 return np.minimum(Vp, fourth)
         else:
-            fourth = depth / 4 * (dx * dx)
+            fourth = mod_stable_weight*depth / 4 * (dx * dx)
             return np.minimum(Vp, fourth)
 
 
@@ -642,6 +645,7 @@ class SandRouter(BaseRouter):
         qy,
         qs,
         mod_sed_weight,
+        mod_stable_weight
     ) -> None:
         """The main function to route and deposit/erode sand parcels.
 
@@ -684,6 +688,7 @@ class SandRouter(BaseRouter):
         self.pad_depth = shared_tools.custom_pad(depth)
         self.pad_cell_type = shared_tools.custom_pad(cell_type)
         self.pad_mod_sed_weight = shared_tools.custom_pad(mod_sed_weight)
+        self.mod_stable_weight = mod_stable_weight
         self.Vp_dep_mud = Vp_dep_mud
         self.Vp_dep_sand = Vp_dep_sand
         self.qw = qw
@@ -790,7 +795,7 @@ class SandRouter(BaseRouter):
             #     transport capacity of the cell (`qs_cap`), sediment needs to
             #     deposit on the bed.
             Vp_change = self._limit_Vp_change(
-                self.Vp_res, self.stage[px, py], self.eta[px, py], self._dx, 0
+                self.Vp_res, self.stage[px, py], self.eta[px, py], self._dx, 0, self.mod_stable_weight[px, py]
             )
 
         elif (U_loc > self.U_ero_sand) and (qs_loc < qs_cap):
@@ -802,7 +807,7 @@ class SandRouter(BaseRouter):
                 self.Vp_sed, U_loc, self.U_ero_sand, self._beta, ero_mod_loc
             )
             Vp_change = self._limit_Vp_change(
-                Vp_change, self.stage[px, py], self.eta[px, py], self._dx, 1
+                Vp_change, self.stage[px, py], self.eta[px, py], self._dx, 1, self.mod_stable_weight[px, py]
             )
             Vp_change = Vp_change * -1
 
@@ -893,6 +898,7 @@ class MudRouter(BaseRouter):
         qx,
         qy,
         mod_sed_weight,
+        mod_stable_weight
     ) -> None:
         """The main function to route and deposit/erode mud parcels."""
 
@@ -907,6 +913,7 @@ class MudRouter(BaseRouter):
         self.pad_depth = shared_tools.custom_pad(depth)
         self.pad_cell_type = shared_tools.custom_pad(cell_type)
         self.pad_mod_sed_weight = shared_tools.custom_pad(mod_sed_weight)
+        self.mod_stable_weight = mod_stable_weight
         self.Vp_dep_mud = Vp_dep_mud
         self.Vp_dep_sand = Vp_dep_sand
         self.qw = qw
@@ -962,7 +969,7 @@ class MudRouter(BaseRouter):
                 / (self.U_dep_mud**self._beta)
             )
             Vp_change = self._limit_Vp_change(
-                Vp_change, self.stage[px, py], self.eta[px, py], self._dx, 0
+                Vp_change, self.stage[px, py], self.eta[px, py], self._dx, 0, self.mod_stable_weight[px, py]
             )
 
         if U_loc > self.U_ero_mud:
@@ -970,7 +977,7 @@ class MudRouter(BaseRouter):
                 self.Vp_sed, U_loc, self.U_ero_mud, self._beta, ero_mod_loc
             )
             Vp_change = self._limit_Vp_change(
-                Vp_change, self.stage[px, py], self.eta[px, py], self._dx, 1
+                Vp_change, self.stage[px, py], self.eta[px, py], self._dx, 1, self.mod_stable_weight[px, py]
             )
             Vp_change = Vp_change * -1
 
