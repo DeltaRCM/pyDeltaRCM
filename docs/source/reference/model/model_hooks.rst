@@ -61,4 +61,5 @@ A complete list of behavior-modifying arrays in the model follows:
     `mod_water_weight`, modifies the neighbor-weighting of water parcels during routing according to ``(depth * mod_water_weight)**theta_water``, 1
     `mod_sed_weight`, modifies the neighbor-weighting of the sediment parcel routing according to ``(depth * mod_sed_weight)**theta_sed``, 1
     `mod_erosion`, linearly modifies the "erodibility" of cells according to ``mod_erosion * Vp_sed * (U_loc**beta - U_ero**beta) / U_ero**beta``, 1
+    `mod_stable_weight`, linearly modifies the maximum change in volume of a cell during erosion and deposition (default = 1 / 4) according to ``mod_stable_weight * depth / 4 * (dx * dx)``, 1
 
