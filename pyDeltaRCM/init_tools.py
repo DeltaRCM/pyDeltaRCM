@@ -530,6 +530,8 @@ class init_tools(abc.ABC):
         self.mod_water_weight = np.ones_like(self.depth)
         self.mod_sed_weight = np.ones_like(self.depth)
         self.mod_erosion = np.ones_like(self.depth)
+        #add array of ones to make stability parameter weighting mutable
+        self.mod_stable_weight = np.ones_like(self.depth)
 
         # ---- domain ----
         cell_land = -2
