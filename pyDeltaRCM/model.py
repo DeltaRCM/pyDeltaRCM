@@ -580,7 +580,7 @@ class DeltaModel(
             raise ValueError(
                 "Value for f_bedload must be between 0 and 1," " inclusive."
             )
-        self._f_bedload = f_bedload
+        self._f_bedload = float(f_bedload)
 
     @property
     def active_layer_thickness(self) -> float:
