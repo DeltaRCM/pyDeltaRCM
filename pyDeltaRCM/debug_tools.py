@@ -252,6 +252,7 @@ def plot_domain(
     divider = axtk.axes_divider.make_axes_locatable(ax)
     cax = divider.append_axes("right", size="2%", pad=0.05)
     cbar = plt.colorbar(cobj, cax=cax)
+    cbar.ax.tick_params(labelsize=8)
     ax.autoscale(False)
     plt.sca(ax)
 
