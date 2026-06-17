@@ -1,3 +1,5 @@
+Verifying sediment mass conservation 
+====================================
 
 Here, we check the model for sediment mass conservation. The DeltaRCM
 formulation is not conservative of mass by default; that is, sediment parcels
@@ -15,4 +17,4 @@ the model under these relevant parameters.
 .. literalinclude:: verify_mass_conservation.py
    :language: python
 
-.. program-output:: python verify_mass_conservation.py
+.. program-output:: python examples/verify_mass_conservation.py
