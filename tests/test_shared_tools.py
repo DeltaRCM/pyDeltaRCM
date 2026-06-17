@@ -11,7 +11,6 @@ from . import utilities
 
 
 class TestGetAndSetRandom:
-
     def test_set_random_get_expected(self, tmp_path: Path) -> None:
         """
         Test for function shared_tools.get_random_uniform and
@@ -29,23 +28,22 @@ class TestGetAndSetRandom:
 
 
 class TestGetSteps:
-
     def test_get_steps(self, tmp_path: Path) -> None:
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         delta = DeltaModel(input_file=p)
 
         new_cells = np.arange(9)
         iwalk = delta.iwalk
         jwalk = delta.jwalk
 
-        d, i, j, a = shared_tools.get_steps(
-            new_cells, iwalk.flatten(), jwalk.flatten())
+        d, i, j, a = shared_tools.get_steps(new_cells, iwalk.flatten(), jwalk.flatten())
 
-        d_exp = np.array([1.41421356, 1., 1.41421356, 1., 0.,
-                          1., 1.41421356, 1., 1.41421356])
-        i_exp = np.array([-1,  0,  1, -1,  0,  1, -1,  0,  1])
-        j_exp = np.array([-1, -1, -1,  0,  0,  0,  1,  1,  1])
+        d_exp = np.array(
+            [1.41421356, 1.0, 1.41421356, 1.0, 0.0, 1.0, 1.41421356, 1.0, 1.41421356]
+        )
+        i_exp = np.array([-1, 0, 1, -1, 0, 1, -1, 0, 1])
+        j_exp = np.array([-1, -1, -1, 0, 0, 0, 1, 1, 1])
 
         # assertions
         assert np.all(np.delete(a, 4))
@@ -55,8 +53,45 @@ class TestGetSteps:
         assert d == pytest.approx(d_exp)
 
 
-class TestRandomPick:
+class TestGetStarts:
+    def test_starts_mixed(self):
+        _Np_sed = 100
+        _f_bedload = 0.5
+        inlet_weights = (1 / 5) * np.ones((5,))  # mock weights
+        inlet = np.arange(5)  # mock inlet locations
 
+        num_starts = int(_Np_sed * _f_bedload)
+        start_indices = shared_tools.get_start_indices(inlet, inlet_weights, num_starts)
+
+        num_starts = int(_Np_sed * (1 - _f_bedload))
+        start_indices = shared_tools.get_start_indices(inlet, inlet_weights, num_starts)
+
+    def test_starts_allmud(self):
+        _Np_sed = 100
+        _f_bedload = 0
+        inlet_weights = (1 / 5) * np.ones((5,))  # mock weights
+        inlet = np.arange(5)  # mock inlet locations
+
+        num_starts = int(_Np_sed * _f_bedload)
+        start_indices = shared_tools.get_start_indices(inlet, inlet_weights, num_starts)
+
+        num_starts = int(_Np_sed * (1 - _f_bedload))
+        start_indices = shared_tools.get_start_indices(inlet, inlet_weights, num_starts)
+
+    def test_starts_allsand(self):
+        _Np_sed = 100
+        _f_bedload = 1
+        inlet_weights = (1 / 5) * np.ones((5,))  # mock weights
+        inlet = np.arange(5)  # mock inlet locations
+
+        num_starts = int(_Np_sed * _f_bedload)
+        start_indices = shared_tools.get_start_indices(inlet, inlet_weights, num_starts)
+
+        num_starts = int(_Np_sed * (1 - _f_bedload))
+        start_indices = shared_tools.get_start_indices(inlet, inlet_weights, num_starts)
+
+
+class TestRandomPick:
     def test_random_pick(self) -> None:
         """
         Test for function shared_tools.random_pick
@@ -83,7 +118,7 @@ class TestRandomPick:
         """
         # define probs array of zeros with a single 1 value
         probs = np.zeros((9,))
-        probs[:] = 1/6
+        probs[:] = 1 / 6
         probs[4] = 0
         probs[5] = 0
         probs[8] = 0
@@ -101,9 +136,7 @@ class TestRandomPick:
         Test for function shared_tools.random_pick
         """
         # define probs array of zeros with a single 1 value
-        probs = np.array([1/6, 1/3, 0,
-                          1/12, 1/12, 1/6,
-                          0, 0, 1/6])
+        probs = np.array([1 / 6, 1 / 3, 0, 1 / 12, 1 / 12, 1 / 6, 0, 0, 1 / 6])
         assert np.sum(probs) == 1
         _rets = np.zeros((10000,))
         for i in range(10000):
@@ -142,7 +175,6 @@ class TestRandomPick:
 
 
 class TestCustomUnravel:
-
     def test_custom_unravel_square(self) -> None:
         arr = np.arange(9).reshape((3, 3))
         # test upper left corner
@@ -180,7 +212,6 @@ class TestCustomUnravel:
 
 
 class TestCustomRavel:
-
     def test_custom_ravel_square(self) -> None:
         arr = np.arange(9).reshape((3, 3))
         # test upper left corner
@@ -218,9 +249,8 @@ class TestCustomRavel:
 
 
 class TestGetWeightSfcInt:
-
     def test_get_weight_sfc_int(self, tmp_path: Path) -> None:
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         delta = DeltaModel(input_file=p)
 
         stage = np.random.uniform(0.5, 1, 9)
@@ -231,7 +261,8 @@ class TestGetWeightSfcInt:
         dists = delta.distances_flat
 
         weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
-            stage[4], stage, qx, qy, ivec, jvec, dists)
+            stage[4], stage, qx, qy, ivec, jvec, dists
+        )
         # assert np.all(weight_sfc == np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]))
         # assert np.all(weight_int == np.array([0, 0, 0, 0, 0, 1, 0, 1, 1]))
         assert np.all(weight_sfc <= 1)
@@ -241,16 +272,14 @@ class TestGetWeightSfcInt:
 
 
 class TestVerisonSpecifications:
-
     def test_version_is_valid(self) -> None:
         v = shared_tools._get_version()
         assert type(v) is str
-        dots = [i for i, c in enumerate(v) if c == '.']
+        dots = [i for i, c in enumerate(v) if c == "."]
         assert len(dots) == 2
 
 
-class TestScaleModelTime():
-
+class TestScaleModelTime:
     def test_defaults(self) -> None:
         scaled = shared_tools.scale_model_time(86400)
         assert scaled == 86400
@@ -266,29 +295,27 @@ class TestScaleModelTime():
         assert scaled == 86400
         scaled = shared_tools.scale_model_time(86400, 1e-15)
         assert scaled == 86400 / 1e-15
-        with pytest.raises(ValueError, match='Intermittency `If` .*'):
+        with pytest.raises(ValueError, match="Intermittency `If` .*"):
             scaled = shared_tools.scale_model_time(86400, 0)
-        with pytest.raises(ValueError, match='Intermittency `If` .*'):
+        with pytest.raises(ValueError, match="Intermittency `If` .*"):
             scaled = shared_tools.scale_model_time(86400, 1.01)
 
     def test_units(self) -> None:
-        scaled = shared_tools.scale_model_time(86400, units='seconds')
+        scaled = shared_tools.scale_model_time(86400, units="seconds")
         assert scaled == 86400
-        scaled = shared_tools.scale_model_time(86400, units='days')
+        scaled = shared_tools.scale_model_time(86400, units="days")
         assert scaled == 1
-        scaled = shared_tools.scale_model_time(86400, units='years')
+        scaled = shared_tools.scale_model_time(86400, units="years")
         assert scaled == (1 / 365.25)
         with pytest.raises(ValueError):
-            scaled = shared_tools.scale_model_time(86400, units='badstr')
+            scaled = shared_tools.scale_model_time(86400, units="badstr")
 
     def test_combinations(self) -> None:
-        scaled = shared_tools.scale_model_time(86400, If=0.1, units='days')
+        scaled = shared_tools.scale_model_time(86400, If=0.1, units="days")
         assert scaled == 10
-        scaled = shared_tools.scale_model_time(2 * 86400, If=0.1, units='days')
+        scaled = shared_tools.scale_model_time(2 * 86400, If=0.1, units="days")
         assert scaled == 20
-        scaled = shared_tools.scale_model_time(
-            365.25 * 86400, If=1, units='years')
+        scaled = shared_tools.scale_model_time(365.25 * 86400, If=1, units="years")
         assert scaled == 1
-        scaled = shared_tools.scale_model_time(
-            365.25 * 86400, If=0.1, units='years')
+        scaled = shared_tools.scale_model_time(365.25 * 86400, If=0.1, units="years")
         assert scaled == 10
