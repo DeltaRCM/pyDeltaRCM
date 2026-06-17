@@ -1114,44 +1114,56 @@ class TestInputParameterResolution:
 
     def test_parameter_timesteps_unused_no_warning(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"timesteps": 1})
-        # ensure no warnings are emitted
+        # ensure no warnings are emitted (beyond rounding warnings)
         with warnings.catch_warnings():
             warnings.simplefilter("error")
+            warnings.filterwarnings("ignore", message=".*was rounded.*")
+            warnings.filterwarnings("ignore", message="N_crossdiff.*")
             _ = DeltaModel(input_file=p)
 
     def test_parameter_time_unused_no_warning(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"time": 1})
-        # ensure no warnings are emitted
+        # ensure no warnings are emitted (beyond rounding warnings)
         with warnings.catch_warnings():
             warnings.simplefilter("error")
+            warnings.filterwarnings("ignore", message=".*was rounded.*")
+            warnings.filterwarnings("ignore", message="N_crossdiff.*")
             _ = DeltaModel(input_file=p)
 
     def test_parameter_time_years_unused_no_warning(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"time_years": 1})
-        # ensure no warnings are emitted
+        # ensure no warnings are emitted (beyond rounding warnings)
         with warnings.catch_warnings():
             warnings.simplefilter("error")
+            warnings.filterwarnings("ignore", message=".*was rounded.*")
+            warnings.filterwarnings("ignore", message="N_crossdiff.*")
             _ = DeltaModel(input_file=p)
 
     def test_parameter_config_unused_no_warning(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"config": 1})
-        # ensure no warnings are emitted
+        # ensure no warnings are emitted (beyond rounding warnings)
         with warnings.catch_warnings():
             warnings.simplefilter("error")
+            warnings.filterwarnings("ignore", message=".*was rounded.*")
+            warnings.filterwarnings("ignore", message="N_crossdiff.*")
             _ = DeltaModel(input_file=p)
 
     def test_parameter_dryrun_unused_no_warning(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"dryrun": False})
-        # ensure no warnings are emitted
+        # ensure no warnings are emitted (beyond rounding warnings)
         with warnings.catch_warnings():
             warnings.simplefilter("error")
+            warnings.filterwarnings("ignore", message=".*was rounded.*")
+            warnings.filterwarnings("ignore", message="N_crossdiff.*")
             _ = DeltaModel(input_file=p)
 
     def test_parameter_parallel_unused_no_warning(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"parallel": False})
-        # ensure no warnings are emitted
+        # ensure no warnings are emitted (beyond rounding warnings)
         with warnings.catch_warnings():
             warnings.simplefilter("error")
+            warnings.filterwarnings("ignore", message=".*was rounded.*")
+            warnings.filterwarnings("ignore", message="N_crossdiff.*")
             _ = DeltaModel(input_file=p)
 
 

@@ -303,8 +303,24 @@ class init_tools(abc.ABC):
         self.U_ero_sand = self._coeff_U_ero_sand * self._u0
         self.U_ero_mud = self._coeff_U_ero_mud * self._u0
 
-        self.L = int(round(self._Length / self._dx))  # num cells in x
-        self.W = int(round(self._Width / self._dx))  # num cells in y
+        _L_raw = self._Length / self._dx
+        self.L = int(round(_L_raw))
+        if self.L != _L_raw:
+            warnings.warn(
+                UserWarning(
+                    f"Domain Length ({self._Length}) was rounded to "
+                    f"{self.L} cells at dx={self._dx}."
+                )
+            )
+        _W_raw = self._Width / self._dx
+        self.W = int(round(_W_raw))
+        if self.W != _W_raw:
+            warnings.warn(
+                UserWarning(
+                    f"Domain Width ({self._Width}) was rounded to "
+                    f"{self.W} cells at dx={self._dx}."
+                )
+            )
 
         # cross-stream center of domain idx
         self.CTR = floor(self.W / 2.0) - 1
@@ -414,8 +430,26 @@ class init_tools(abc.ABC):
             again if you modify the model boundary conditions that way.
         """
         # inlet length and width
-        self.L0 = max(1, min(int(round(self._L0_meters / self._dx)), self.L // 4))
-        self.N0 = max(3, min(int(round(self._N0_meters / self._dx)), self.W // 4))
+        _L0_raw = self._L0_meters / self._dx
+        _L0_val = int(round(_L0_raw))
+        if _L0_val != _L0_raw:
+            warnings.warn(
+                UserWarning(
+                    f"Inlet length (L0_meters={self._L0_meters}) was rounded to "
+                    f"{_L0_val} cells at dx={self._dx}."
+                )
+            )
+        self.L0 = max(1, min(_L0_val, self.L // 4))
+        _N0_raw = self._N0_meters / self._dx
+        _N0_val = int(round(_N0_raw))
+        if _N0_val != _N0_raw:
+            warnings.warn(
+                UserWarning(
+                    f"Inlet width (N0_meters={self._N0_meters}) was rounded to "
+                    f"{_N0_val} cells at dx={self._dx}."
+                )
+            )
+        self.N0 = max(3, min(_N0_val, self.W // 4))
 
         self.u_max = 2.0 * self._u0  # maximum allowed flow velocity
         self.C0 = self._C0_percent * 1 / 100.0  # sediment concentration
@@ -453,7 +487,15 @@ class init_tools(abc.ABC):
         self.omega_flow_iter = 2.0 / self._itermax
 
         # number of times to repeat topo diffusion
-        self.N_crossdiff = int(round(self.dVs / self.V0))
+        _N_crossdiff_raw = self.dVs / self.V0
+        self.N_crossdiff = int(round(_N_crossdiff_raw))
+        if self.N_crossdiff != _N_crossdiff_raw:
+            warnings.warn(
+                UserWarning(
+                    f"N_crossdiff ({self.dVs} / {self.V0}) was rounded "
+                    f"to {self.N_crossdiff}."
+                )
+            )
 
         self._lambda = self._sed_lag  # sedimentation lag
 
