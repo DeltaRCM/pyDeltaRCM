@@ -201,7 +201,7 @@ def get_start_indices(
     idxs = []
     for _ in np.arange(num_starts):
         idxs.append(random_pick(norm_weights))
-    idxs = np.array(idxs)
+    idxs = np.array(idxs, dtype=np.int32)
     return inlet.take(idxs)
 
 
