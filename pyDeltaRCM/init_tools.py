@@ -580,6 +580,10 @@ class init_tools(abc.ABC):
         self.inlet = np.array(np.unique(np.where(self.cell_type == 1)[1]))
         self.eta[:] = self.stage - self.depth
 
+        # update eta trackers with initial bed elevation
+        self.eta0[:] = self.eta[:]
+        self.eta_init[:] = self.eta[:]
+
     def init_sediment_routers(self) -> None:
         """Initialize the sediment router object here.
 

@@ -150,6 +150,16 @@ class TestModelDomainSetup:
         delta = DeltaModel(input_file=p)
         assert np.any(delta.sfc_sum) == 0
 
+    def test_eta_init(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
+        delta = DeltaModel(input_file=p)
+        assert np.all(delta.eta_init == delta.eta)
+
+    def test_eta0(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
+        delta = DeltaModel(input_file=p)
+        assert np.all(delta.eta0 == delta.eta)
+
 
 class TestCreateBoundaryConditions:
     # base case during init is covered by tests elsewhere!
