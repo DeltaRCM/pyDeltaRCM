@@ -423,9 +423,7 @@ class init_tools(abc.ABC):
         # (m) critial depth to switch to "dry" node
         self.dry_depth = min(0.1, 0.1 * self._h0)
 
-        self.gamma = (
-            self.g * self.S0 * self._dx / (self.u0**2)
-        )  # water weighting coeff
+        self.gamma = self.g * self.S0 * self._dx / (self.u0**2)  # water weighting coeff
 
         # (m^3) reference volume, volume to fill cell to characteristic depth
         self.V0 = self.h0 * (self._dx**2)
@@ -530,7 +528,7 @@ class init_tools(abc.ABC):
         self.mod_water_weight = np.ones_like(self.depth)
         self.mod_sed_weight = np.ones_like(self.depth)
         self.mod_erosion = np.ones_like(self.depth)
-        #add array of ones to make stability parameter weighting mutable
+        # add array of ones to make stability parameter weighting mutable
         self.mod_stable_weight = np.ones_like(self.depth)
 
         # ---- domain ----
@@ -615,6 +613,7 @@ class init_tools(abc.ABC):
             self._lambda,
             self._beta,
             self.stepmax,
+            self.force_deposit,
             self.theta_mud,
             self.mod_erosion,
         )
@@ -636,6 +635,7 @@ class init_tools(abc.ABC):
             self.dry_depth,
             self._beta,
             self.stepmax,
+            self.force_deposit,
             self.theta_sand,
             self.mod_erosion,
         )
@@ -1147,9 +1147,10 @@ class init_tools(abc.ABC):
                     self.init_metadata_list()
 
                 # copy data from old netCDF4 into new one
-                with Dataset(_tmp_name) as src, Dataset(
-                    file_path, "w", format="NETCDF4"
-                ) as dst:
+                with (
+                    Dataset(_tmp_name) as src,
+                    Dataset(file_path, "w", format="NETCDF4") as dst,
+                ):
                     # copy attributes
                     for name in src.ncattrs():
                         dst.setncattr(name, src.getncattr(name))

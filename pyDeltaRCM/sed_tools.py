@@ -3,7 +3,7 @@ from typing import Any, Tuple
 
 import numpy as np
 from numba import njit
-from numba import float32, int64
+from numba import float32, int64, boolean
 from numba.experimental import jitclass
 from scipy import ndimage
 
@@ -319,6 +319,7 @@ r_spec = [
     ("num_starts", int64),
     ("start_indices", int64[:]),
     ("stepmax", float32),
+    ("force_deposit", boolean),
     ("px", int64),
     ("py", int64),
     ("eta", float32[:, :]),
@@ -601,6 +602,7 @@ class SandRouter(BaseRouter):
         dry_depth: float,
         beta: float,
         stepmax,
+        force_deposit,
         theta_sed: float,
         mod_erosion,
     ) -> None:
@@ -627,6 +629,7 @@ class SandRouter(BaseRouter):
         self.dry_depth = dry_depth
         self._beta = beta
         self.stepmax = stepmax
+        self.force_deposit = force_deposit
         self.theta_sed = theta_sed
         self.mod_erosion = mod_erosion
 
@@ -744,8 +747,6 @@ class SandRouter(BaseRouter):
         it = 0
         sed_continue = True
 
-        force_mc = False
-
         while sed_continue:
             px0 = px
             py0 = py
@@ -768,7 +769,7 @@ class SandRouter(BaseRouter):
                 )  # add remaining volume to exported
             if it == self.stepmax:
                 sed_continue = False
-                if force_mc:
+                if self.force_deposit:
                     # force parcel to drop all sediment in place
                     Vp_change = self.Vp_res
                     self.Vp_dep_sand[px, py] = self.Vp_dep_sand[px, py] + Vp_change
@@ -885,6 +886,7 @@ class MudRouter(BaseRouter):
         _lambda,
         beta: float,
         stepmax,
+        force_deposit,
         theta_sed: float,
         mod_erosion,
     ) -> None:
@@ -906,6 +908,7 @@ class MudRouter(BaseRouter):
         self._lambda = _lambda
         self._beta = beta
         self.stepmax = stepmax
+        self.force_deposit = force_deposit
         self.theta_sed = theta_sed
         self.mod_erosion = mod_erosion
 
@@ -965,7 +968,6 @@ class MudRouter(BaseRouter):
         """Route one parcel."""
         it = 0
         sed_continue = True
-        force_mc = False
 
         while sed_continue:
             # Choose the next location for the parcel to travel
@@ -985,7 +987,7 @@ class MudRouter(BaseRouter):
                 )  # add remaining volume to exported
             if it == self.stepmax:
                 sed_continue = False
-                if force_mc:
+                if self.force_deposit:
                     Vp_change = self.Vp_res
                     self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change
                     self.Vp_res = self.Vp_res - Vp_change  # update sed volume in parcel
