@@ -4,6 +4,7 @@ import re
 import tempfile
 import yaml
 from typing import Iterator, Type, Tuple
+import warnings
 
 import numpy as np
 from numba import njit, _helperlib
@@ -430,6 +431,22 @@ def get_weight_sfc_int(stage, stage_nbrs, qx, qy, ivec, jvec, distances):
     weight_sfc = np.maximum(0, (stage - stage_nbrs) / distances)
     weight_int = np.maximum(0, (qx * jvec + qy * ivec) / distances)
     return weight_sfc, weight_int
+
+
+class ParameterChangedWarning(UserWarning):
+    """Warning when model changing user-specified parameters.
+
+    This warning is to be raised when a user-specified model parameter is
+    automatically modified during model instantiation or model runtime.
+
+    For example, during initialization, parameters like `Length`, `Width`,
+    `L0_meters` and `N0_meters` are rounded to the nearest integer to prevent
+    any partial cells in the domain.
+    """
+
+    def __init__(self, param_name, original_value, new_value):
+        message = f"Parameter '{param_name}' was changed from {original_value} to {new_value}."
+        super().__init__(message)
 
 
 def _get_version() -> str:
