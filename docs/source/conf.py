@@ -17,9 +17,9 @@ import pyDeltaRCM
 
 # -- Project information -----------------------------------------------------
 
-project = 'pyDeltaRCM'
-copyright = '2020, The DeltaRCM Team'
-author = 'The DeltaRCM Team'
+project = "pyDeltaRCM"
+copyright = "2020, The DeltaRCM Team"
+author = "The DeltaRCM Team"
 
 # The full version, including alpha/beta/rc tags
 release = pyDeltaRCM.__version__
@@ -31,18 +31,21 @@ version = pyDeltaRCM.__version__
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.doctest',
-              'sphinx.ext.autosummary',
-              'sphinx.ext.napoleon',
-              'sphinx.ext.graphviz',
-              'sphinx.ext.mathjax',
-              'sphinx.ext.githubpages',
-              'matplotlib.sphinxext.plot_directive',
-              'sphinx.ext.todo']
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.graphviz",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.githubpages",
+    "matplotlib.sphinxext.plot_directive",
+    "sphinx.ext.todo",
+    "sphinxcontrib.programoutput",
+]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # toggle todo items
 todo_include_todos = True
@@ -68,26 +71,31 @@ napoleon_use_rtype = True
 # Autosummary / Automodapi settings
 autosummary_generate = True
 automodapi_inheritance_diagram = False
-autodoc_default_options = {'members': True, 'inherited-members': False,
-                           'private-members': True}
+autodoc_default_options = {
+    "members": True,
+    "inherited-members": False,
+    "private-members": True,
+}
 
 # doctest
-doctest_global_setup = '''
+doctest_global_setup = """
 import pyDeltaRCM
 import numpy as np
 from matplotlib import pyplot as plt
-'''
-doctest_test_doctest_blocks = ''  # empty string disables testing all code in any docstring
+"""
+doctest_test_doctest_blocks = (
+    ""  # empty string disables testing all code in any docstring
+)
 
 ## mpl plots
-plot_basedir = 'pyplots'
+plot_basedir = "pyplots"
 plot_html_show_source_link = False
-plot_formats = ['png', ('hires.png', 300)]
-plot_pre_code = '''
+plot_formats = ["png", ("hires.png", 300)]
+plot_pre_code = """
 import numpy as np
 from matplotlib import pyplot as plt
 import pyDeltaRCM
-'''
+"""
 
 
 # img math
@@ -98,22 +106,22 @@ import pyDeltaRCM
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinxdoc'
+html_theme = "sphinxdoc"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 # html_static_path = []
 
 # -- Options for linkcheck -------------------------------------------
 
 # Some DOI links throw 403 errors but when checked they work fine
 linkcheck_ignore = [
-    r'https://doi.org/10.1029/2021GL095053',
-    r'https://doi.org/10.1029/2018GL079405',
-    r'https://doi.org/10.1029/2022JF006762',
-    r'https://doi.org/10.1086/626637',
-    r'https://doi.org/10.1029/2023JE008183',
-    r'https://doi.org/10.1029/2023je008183'
+    r"https://doi.org/10.1029/2021GL095053",
+    r"https://doi.org/10.1029/2018GL079405",
+    r"https://doi.org/10.1029/2022JF006762",
+    r"https://doi.org/10.1086/626637",
+    r"https://doi.org/10.1029/2023JE008183",
+    r"https://doi.org/10.1029/2023je008183",
 ]

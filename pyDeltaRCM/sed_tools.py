@@ -352,6 +352,8 @@ r_spec = [
     ("Vp_res", float32),
     ("Vp_dep_mud", float32[:, :]),
     ("Vp_dep_sand", float32[:, :]),
+    ("Vp_exported", float32),
+    ("Vp_lost", float32),
     ("U_dep_mud", float32),
     ("U_ero_mud", float32),
     ("U_ero_sand", float32),
@@ -382,12 +384,10 @@ class BaseRouter:
     """
 
     @abc.abstractmethod
-    def run(self, *args: Any, **kwargs: Any):
-        ...
+    def run(self, *args: Any, **kwargs: Any): ...
 
     @abc.abstractmethod
-    def _route_one_parcel(self):
-        ...
+    def _route_one_parcel(self): ...
 
     def _choose_next_location(self, px: int, py: int) -> Tuple[int, int, float]:
         # choose next location with weights
@@ -543,8 +543,9 @@ class BaseRouter:
         """
         return mod_erosion * Vp_sed * (U_loc**beta - U_ero**beta) / U_ero**beta
 
-    def _limit_Vp_change(self, Vp, stage, eta, dx: float, dep_ero: int, 
-                         mod_stable_weight: float):
+    def _limit_Vp_change(
+        self, Vp, stage, eta, dx: float, dep_ero: int, mod_stable_weight: float
+    ):
         """Limit change in volume to 1/4 of a cell volume.
 
         Function is used by multiple pathways in `mud_dep_ero` and `sand_dep_ero`
@@ -698,6 +699,10 @@ class SandRouter(BaseRouter):
         self.qs = qs
         _shape = self.eta.shape
 
+        # set up volume trackers
+        self.Vp_exported = 0  # exported from domain at computational edge
+        self.Vp_lost = 0  # in a parcel at stepmax (vanished)
+
         num_starts = start_indices.shape[0]
         for np_sed in range(num_starts):
             self.Vp_res = self.Vp_sed
@@ -752,11 +757,18 @@ class SandRouter(BaseRouter):
             self._partition_sediment(px0, py0, px, py, dist)
             self._deposit_or_erode(px, py)
 
+            # update iteration count and check for stopping criteria
             it += 1
             if self.cell_type[px, py] == -1:  # check for "edge" cell
                 sed_continue = False  # kill the `while` loop
+                self.Vp_exported = (
+                    self.Vp_exported + self.Vp_res
+                )  # add remaining volume to exported
             if it == self.stepmax:
                 sed_continue = False
+                self.Vp_lost = (
+                    self.Vp_lost + self.Vp_res
+                )  # add remaining volume to lost
 
     def _partition_sediment(
         self, px0: int, py0: int, px: int, py: int, dist: float
@@ -783,9 +795,7 @@ class SandRouter(BaseRouter):
             transport capacity is not yet reached (`qs_loc < qs_cap`).
         """
         U_loc = self.uw[px, py]
-        qs_cap = (
-            self.qs0 * self._f_bedload / self._u0**self._beta * U_loc**self._beta
-        )
+        qs_cap = self.qs0 * self._f_bedload / self._u0**self._beta * U_loc**self._beta
         qs_loc = self.qs[px, py]
         ero_mod_loc = self.mod_erosion[px, py]
 
@@ -796,8 +806,12 @@ class SandRouter(BaseRouter):
             #     transport capacity of the cell (`qs_cap`), sediment needs to
             #     deposit on the bed.
             Vp_change = self._limit_Vp_change(
-                self.Vp_res, self.stage[px, py], self.eta[px, py], self._dx, 0, 
-                self.mod_stable_weight[px, py]
+                self.Vp_res,
+                self.stage[px, py],
+                self.eta[px, py],
+                self._dx,
+                0,
+                self.mod_stable_weight[px, py],
             )
 
         elif (U_loc > self.U_ero_sand) and (qs_loc < qs_cap):
@@ -809,8 +823,12 @@ class SandRouter(BaseRouter):
                 self.Vp_sed, U_loc, self.U_ero_sand, self._beta, ero_mod_loc
             )
             Vp_change = self._limit_Vp_change(
-                Vp_change, self.stage[px, py], self.eta[px, py], self._dx, 1, 
-                self.mod_stable_weight[px, py]
+                Vp_change,
+                self.stage[px, py],
+                self.eta[px, py],
+                self._dx,
+                1,
+                self.mod_stable_weight[px, py],
             )
             Vp_change = Vp_change * -1
 
@@ -868,14 +886,10 @@ class MudRouter(BaseRouter):
         self.U_dep_mud = U_dep_mud
         self.U_ero_mud = U_ero_mud
 
-        (
-            self.ivec_flat,
-            self.jvec_flat,
-        ) = (
-            ivec_flat,
-            jvec_flat,
-        )
-        self.iwalk_flat, self.jwalk_flat = iwalk_flat, jwalk_flat
+        self.ivec_flat = ivec_flat
+        self.jvec_flat = jvec_flat
+        self.iwalk_flat = iwalk_flat
+        self.jwalk_flat = jwalk_flat
         self.distances_flat = distances_flat
 
         self.dry_depth = dry_depth
@@ -924,6 +938,10 @@ class MudRouter(BaseRouter):
         self.qy = qy
         _shape = self.eta.shape
 
+        # set up volume trackers
+        self.Vp_exported = 0  # exported from domain at computational edge
+        self.Vp_lost = 0  # in a parcel at stepmax (vanished)
+
         num_starts = start_indices.shape[0]
         for np_sed in range(num_starts):
             self.Vp_res = self.Vp_sed
@@ -947,11 +965,18 @@ class MudRouter(BaseRouter):
 
             self._deposit_or_erode(px, py)
 
+            # update iteration count and check for stopping criteria
             it += 1
             if self.cell_type[px, py] == -1:  # check for "edge" cell
                 sed_continue = False  # kill the `while` loop
+                self.Vp_exported = (
+                    self.Vp_exported + self.Vp_res
+                )  # add remaining volume to exported
             if it == self.stepmax:
                 sed_continue = False
+                self.Vp_lost = (
+                    self.Vp_lost + self.Vp_res
+                )  # add remaining volume to lost
 
     def _deposit_or_erode(self, px: int, py: int) -> None:
         """Decide if deposit or erode mud.
@@ -972,8 +997,12 @@ class MudRouter(BaseRouter):
                 / (self.U_dep_mud**self._beta)
             )
             Vp_change = self._limit_Vp_change(
-                Vp_change, self.stage[px, py], self.eta[px, py], self._dx, 0, 
-                self.mod_stable_weight[px, py]
+                Vp_change,
+                self.stage[px, py],
+                self.eta[px, py],
+                self._dx,
+                0,
+                self.mod_stable_weight[px, py],
             )
 
         if U_loc > self.U_ero_mud:
@@ -981,8 +1010,12 @@ class MudRouter(BaseRouter):
                 self.Vp_sed, U_loc, self.U_ero_mud, self._beta, ero_mod_loc
             )
             Vp_change = self._limit_Vp_change(
-                Vp_change, self.stage[px, py], self.eta[px, py], self._dx, 1, 
-                self.mod_stable_weight[px, py]
+                Vp_change,
+                self.stage[px, py],
+                self.eta[px, py],
+                self._dx,
+                1,
+                self.mod_stable_weight[px, py],
             )
             Vp_change = Vp_change * -1
 
