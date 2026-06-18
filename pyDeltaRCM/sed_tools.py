@@ -744,6 +744,8 @@ class SandRouter(BaseRouter):
         it = 0
         sed_continue = True
 
+        force_mc = False
+
         while sed_continue:
             px0 = px
             py0 = py
@@ -766,6 +768,14 @@ class SandRouter(BaseRouter):
                 )  # add remaining volume to exported
             if it == self.stepmax:
                 sed_continue = False
+                if force_mc:
+                    # force parcel to drop all sediment in place
+                    Vp_change = self.Vp_res
+                    self.Vp_dep_sand[px, py] = self.Vp_dep_sand[px, py] + Vp_change
+                    self.Vp_res = self.Vp_res - Vp_change  # update sed volume in parcel
+                    self._update_fields(
+                        Vp_change, px, py
+                    )  # update other fields as needed
                 self.Vp_lost = (
                     self.Vp_lost + self.Vp_res
                 )  # add remaining volume to lost
@@ -955,6 +965,7 @@ class MudRouter(BaseRouter):
         """Route one parcel."""
         it = 0
         sed_continue = True
+        force_mc = False
 
         while sed_continue:
             # Choose the next location for the parcel to travel
@@ -974,6 +985,13 @@ class MudRouter(BaseRouter):
                 )  # add remaining volume to exported
             if it == self.stepmax:
                 sed_continue = False
+                if force_mc:
+                    Vp_change = self.Vp_res
+                    self.Vp_dep_mud[px, py] = self.Vp_dep_mud[px, py] + Vp_change
+                    self.Vp_res = self.Vp_res - Vp_change  # update sed volume in parcel
+                    self._update_fields(
+                        Vp_change, px, py
+                    )  # update other fields as needed
                 self.Vp_lost = (
                     self.Vp_lost + self.Vp_res
                 )  # add remaining volume to lost
