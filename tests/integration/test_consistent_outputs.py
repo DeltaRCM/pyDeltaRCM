@@ -198,6 +198,7 @@ class TestModelIsReproducible:
                 "Width": 10.0,
                 "dx": 1.0,
                 "L0_meters": 1.0,
+                "N0_meters": 3.0,
             },
         )
 
