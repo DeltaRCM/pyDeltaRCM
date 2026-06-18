@@ -201,7 +201,7 @@ def get_start_indices(
     idxs = []
     for _ in np.arange(num_starts):
         idxs.append(random_pick(norm_weights))
-    idxs = np.array(idxs)
+    idxs = np.array(idxs, dtype=np.int32)
     return inlet.take(idxs)
 
 
@@ -270,9 +270,9 @@ def custom_unravel(i: int, shape: Tuple[int, int]) -> Tuple[int, int]:
     .. testsetup::
 
         from pyDeltaRCM.shared_tools import custom_unravel
+        np.set_printoptions(legacy='1.13')
 
     .. doctest::
-        :skip:
 
         >>> _shape = (100, 200)  # e.g., delta.eta.shape
 
@@ -319,7 +319,6 @@ def custom_ravel(tup: Tuple[int, int], shape: Tuple[int, int]) -> int:
         from pyDeltaRCM.shared_tools import custom_ravel
 
     .. doctest::
-        :skip:
 
         >>> _shape = (100, 200)  # e.g., delta.eta.shape
 
@@ -366,11 +365,11 @@ def custom_pad(arr: np.ndarray) -> np.ndarray:
     .. testsetup::
 
         from pyDeltaRCM.shared_tools import custom_pad
+        np.set_printoptions(legacy='1.13')
 
     Consider a model domain of size `(4, 8)`
 
     .. doctest::
-        :skip:
 
         >>> arr = np.arange(32).reshape(4, 8)
 
@@ -385,7 +384,6 @@ def custom_pad(arr: np.ndarray) -> np.ndarray:
     sliced:
 
     .. doctest::
-        :skip:
 
         >>> for i in range(4):
         ...     for j in range(8):
@@ -541,7 +539,7 @@ def scale_model_time(time: float, If: float = 1, units: str = "seconds") -> floa
 
     .. math::
 
-        t_r = \dfrac{t}{I_f \cdot S_f}
+        t_r = \\dfrac{t}{I_f \cdot S_f}
 
     where :math:`t` is the model time (:obj:`~pyDeltaRCM.DeltaModel.time`),
     :math:`t_r` is the "real" scaled time, :math:`I_f` is the
