@@ -560,7 +560,7 @@ def scale_model_time(time: float, If: float = 1, units: str = "seconds") -> floa
 
     .. math::
 
-        t_r = \\dfrac{t}{I_f \cdot S_f}
+        t_r = \\dfrac{t}{I_f \\cdot S_f}
 
     where :math:`t` is the model time (:obj:`~pyDeltaRCM.DeltaModel.time`),
     :math:`t_r` is the "real" scaled time, :math:`I_f` is the
