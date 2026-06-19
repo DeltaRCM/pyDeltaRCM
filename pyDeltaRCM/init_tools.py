@@ -28,6 +28,55 @@ from pyDeltaRCM.sed_tools import (
 
 
 class init_tools(abc.ABC):
+    def import_files(self, kwargs_dict={}) -> None:
+        """Import the input files.
+
+        This method handles the parsing of any options supplied via the
+        configuration.
+
+        Parameters
+        ----------
+        kwargs_dict : :obj:`dict`, optional
+
+            A dictionary with keys matching valid model parameter names that can
+            be specified in a configuration YAML file. Keys given in this
+            dictionary will supercede values specified in the YAML
+            configuration.
+
+        Returns
+        -------
+        """
+
+        # get the special loader from the shared tools
+        loader = custom_yaml_loader()
+
+        # Open and access both yaml files --> put in dictionaries
+        # parse default yaml and find expected types
+        default_file = open(self.default_file, mode="r")
+        default_dict = yaml.load(default_file, Loader=loader)
+        default_file.close()
+        for k, v in default_dict.items():
+            if not type(v["type"]) is list:
+                default_dict[k]["type"] = [eval(v["type"])]
+            else:
+                default_dict[k]["type"] = [eval(_v) for _v in v["type"]]
+
+        # only access the user input file if provided.
+        if self.input_file:
+            try:
+                user_file = open(self.input_file, mode="r")
+                user_dict = yaml.load(user_file, Loader=loader)
+                user_file.close()
+            except ValueError as e:
+                raise e
+        else:
+            user_dict = dict()
+
+        self._default_dict = default_dict
+        self._user_dict = user_dict
+        self._kwargs_dict = kwargs_dict
+
+
     def init_output_infrastructure(self) -> None:
         """Initialize the output infrastructure (folder and save lists).
 
@@ -94,53 +143,6 @@ class init_tools(abc.ABC):
             "Platform: {}".format(platform.platform()), verbosity=0
         )  # log the os
 
-    def import_files(self, kwargs_dict={}) -> None:
-        """Import the input files.
-
-        This method handles the parsing of any options supplied via the
-        configuration.
-
-        Parameters
-        ----------
-        kwargs_dict : :obj:`dict`, optional
-
-            A dictionary with keys matching valid model parameter names that can
-            be specified in a configuration YAML file. Keys given in this
-            dictionary will supercede values specified in the YAML
-            configuration.
-
-        Returns
-        -------
-        """
-
-        # get the special loader from the shared tools
-        loader = custom_yaml_loader()
-
-        # Open and access both yaml files --> put in dictionaries
-        # parse default yaml and find expected types
-        default_file = open(self.default_file, mode="r")
-        default_dict = yaml.load(default_file, Loader=loader)
-        default_file.close()
-        for k, v in default_dict.items():
-            if not type(v["type"]) is list:
-                default_dict[k]["type"] = [eval(v["type"])]
-            else:
-                default_dict[k]["type"] = [eval(_v) for _v in v["type"]]
-
-        # only access the user input file if provided.
-        if self.input_file:
-            try:
-                user_file = open(self.input_file, mode="r")
-                user_dict = yaml.load(user_file, Loader=loader)
-                user_file.close()
-            except ValueError as e:
-                raise e
-        else:
-            user_dict = dict()
-
-        self._default_dict = default_dict
-        self._user_dict = user_dict
-        self._kwargs_dict = kwargs_dict
 
 
     def process_input_to_model(self) -> None:
