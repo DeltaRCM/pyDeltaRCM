@@ -22,7 +22,7 @@ class TestConsistentOutputsBetweenMerges:
         utilities.write_parameter_to_file(f, "itermax", 1)
         utilities.write_parameter_to_file(f, "Np_water", 10)
         utilities.write_parameter_to_file(f, "u0", 1.0)
-        utilities.write_parameter_to_file(f, "N0_meters", 2.0)
+        utilities.write_parameter_to_file(f, "N0_meters", 3.0)
         utilities.write_parameter_to_file(f, "h0", 1.0)
         utilities.write_parameter_to_file(f, "H_SL", 0.0)
         utilities.write_parameter_to_file(f, "SLR", 0.001)
@@ -64,7 +64,7 @@ class TestConsistentOutputsBetweenMerges:
         utilities.write_parameter_to_file(f, "itermax", 1)
         utilities.write_parameter_to_file(f, "Np_water", 10)
         utilities.write_parameter_to_file(f, "u0", 1.0)
-        utilities.write_parameter_to_file(f, "N0_meters", 2.0)
+        utilities.write_parameter_to_file(f, "N0_meters", 3.0)
         utilities.write_parameter_to_file(f, "h0", 1.0)
         utilities.write_parameter_to_file(f, "H_SL", 0.0)
         utilities.write_parameter_to_file(f, "SLR", 0.001)
@@ -103,6 +103,7 @@ class TestConsistentOutputsBetweenMerges:
         utilities.write_parameter_to_file(f, "Length", 600.0)
         utilities.write_parameter_to_file(f, "Width", 600.0)
         utilities.write_parameter_to_file(f, "dx", 5)
+        utilities.write_parameter_to_file(f, "N0_meters", 150.0)
         utilities.write_parameter_to_file(f, "Np_water", 10)
         utilities.write_parameter_to_file(f, "Np_sed", 10)
         utilities.write_parameter_to_file(f, "f_bedload", 0.05)
@@ -182,6 +183,7 @@ class TestModelIsReproducible:
                 "Width": 10.0,
                 "dx": 1.0,
                 "L0_meters": 1.0,
+                "N0_meters": 3.0,
             },
         )
         p2 = utilities.yaml_from_dict(
@@ -196,6 +198,7 @@ class TestModelIsReproducible:
                 "Width": 10.0,
                 "dx": 1.0,
                 "L0_meters": 1.0,
+                "N0_meters": 3.0,
             },
         )
 
@@ -316,6 +319,7 @@ class TestConsistentOutputsSameSeed:
         utilities.write_parameter_to_file(f, "verbose", 1)
         utilities.write_parameter_to_file(f, "dx", 1.0)
         utilities.write_parameter_to_file(f, "L0_meters", 1.0)
+        utilities.write_parameter_to_file(f, "N0_meters", 5.0)
         utilities.write_parameter_to_file(f, "save_eta_grids", True)
         utilities.write_matrix_to_file(f, ["save_dt"], [[0, 50000]])
         f.close()
@@ -370,6 +374,7 @@ class TestConsistentOutputsSameSeed:
         utilities.write_parameter_to_file(f, "verbose", 2)
         utilities.write_parameter_to_file(f, "dx", 1.0)
         utilities.write_parameter_to_file(f, "L0_meters", 1.0)
+        utilities.write_parameter_to_file(f, "N0_meters", 5.0)
         utilities.write_parameter_to_file(f, "save_eta_grids", True)
         utilities.write_matrix_to_file(f, ["save_dt"], [[0, 2]])
         f.close()
@@ -422,6 +427,7 @@ class TestConsistentOutputsSameSeed:
         utilities.write_parameter_to_file(f, "verbose", 2)
         utilities.write_parameter_to_file(f, "dx", 1.0)
         utilities.write_parameter_to_file(f, "L0_meters", 1.0)
+        utilities.write_parameter_to_file(f, "N0_meters", 5.0)
         utilities.write_parameter_to_file(f, "save_eta_grids", True)
         utilities.write_parameter_to_file(f, "parallel", False)
         utilities.write_matrix_to_file(f, ["save_dt"], [[0, 2]])
@@ -436,6 +442,7 @@ class TestConsistentOutputsSameSeed:
         utilities.write_parameter_to_file(f, "verbose", 2)
         utilities.write_parameter_to_file(f, "dx", 1.0)
         utilities.write_parameter_to_file(f, "L0_meters", 1.0)
+        utilities.write_parameter_to_file(f, "N0_meters", 5.0)
         utilities.write_parameter_to_file(f, "save_eta_grids", True)
         utilities.write_parameter_to_file(f, "parallel", True)
         utilities.write_matrix_to_file(f, ["save_dt"], [[0, 2]])
@@ -513,6 +520,7 @@ class TestConsistentOutputsSameSeed:
         utilities.write_parameter_to_file(f, "verbose", 2)
         utilities.write_parameter_to_file(f, "dx", 1.0)
         utilities.write_parameter_to_file(f, "L0_meters", 1.0)
+        utilities.write_parameter_to_file(f, "N0_meters", 5.0)
         f.close()
 
         file_name = "parameters2.yaml"
@@ -524,6 +532,7 @@ class TestConsistentOutputsSameSeed:
         utilities.write_parameter_to_file(f, "verbose", 2)
         utilities.write_parameter_to_file(f, "dx", 1.0)
         utilities.write_parameter_to_file(f, "L0_meters", 1.0)
+        utilities.write_parameter_to_file(f, "N0_meters", 5.0)
         f.close()
 
         # initialize model

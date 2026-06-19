@@ -8,7 +8,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.axes_grid1 as axtk
 
-from . import shared_tools
+from pyDeltaRCM.shared_tools import (
+    get_random_state
+)
 
 
 class iteration_tools(abc.ABC):
@@ -494,7 +496,7 @@ class iteration_tools(abc.ABC):
         ckp_file = os.path.join(self.prefix, "checkpoint.npz")
 
         # get rng state
-        rng_state_list = shared_tools.get_random_state()
+        rng_state_list = get_random_state()
         rng_state = np.array(
             rng_state_list, dtype=object
         )  # convert to object before saving

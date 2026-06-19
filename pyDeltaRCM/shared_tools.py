@@ -432,6 +432,27 @@ def get_weight_sfc_int(stage, stage_nbrs, qx, qy, ivec, jvec, distances):
     return weight_sfc, weight_int
 
 
+class ParameterChangedWarning(UserWarning):
+    """Warning for change in user-specified parameters.
+
+    This warning is to be raised when a user-specified model parameter is
+    automatically modified during model instantiation or model runtime.
+
+    For example, during initialization, parameters like `Length`, `Width`,
+    `L0_meters` and `N0_meters` are rounded to the nearest integer to prevent
+    any partial cells in the domain.
+
+    .. note::
+
+        This warning should only be used in model class development.
+    """
+
+    def __init__(self, param_name, original_value, new_value):
+        """initialize the warning based on name and value changes."""
+        message = f"Parameter '{param_name}' was changed from {original_value} to {new_value}."
+        super().__init__(message)
+
+
 def _get_version() -> str:
     """Extract version from file.
 
@@ -539,7 +560,7 @@ def scale_model_time(time: float, If: float = 1, units: str = "seconds") -> floa
 
     .. math::
 
-        t_r = \\dfrac{t}{I_f \cdot S_f}
+        t_r = \\dfrac{t}{I_f \\cdot S_f}
 
     where :math:`t` is the model time (:obj:`~pyDeltaRCM.DeltaModel.time`),
     :math:`t_r` is the "real" scaled time, :math:`I_f` is the

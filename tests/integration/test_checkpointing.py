@@ -207,7 +207,8 @@ class TestCheckpointingIntegrations:
         utilities.write_parameter_to_file(base_f, "legacy_netcdf", True)
         utilities.write_parameter_to_file(base_f, "save_checkpoint", True)
         base_f.close()
-        baseModel = DeltaModel(input_file=base_p)
+        with pytest.warns(UserWarning, match=r"Creating output"):
+            baseModel = DeltaModel(input_file=base_p)
 
         # run for some base number of steps
         nt_base = 50

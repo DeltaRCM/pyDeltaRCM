@@ -10,11 +10,34 @@ import os
 from netCDF4 import Dataset
 
 from pyDeltaRCM.model import DeltaModel
+from pyDeltaRCM.shared_tools import ParameterChangedWarning
 
 from . import utilities
 
 
 class TestModelDomainSetup:
+    def test_Length(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"Length": 6000})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.Length == 6000
+
+    def test_Width(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"Width": 9000})
+        _delta = DeltaModel(input_file=p)
+        assert _delta.Width == 9000
+
+    def test_Length_changed_warning(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"Length": 5001})
+        with pytest.warns(ParameterChangedWarning):
+            _delta = DeltaModel(input_file=p)
+        assert _delta.Length == 5000
+
+    def test_Width_changed_warning(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"Width": 10001})
+        with pytest.warns(ParameterChangedWarning):
+            _delta = DeltaModel(input_file=p)
+        assert _delta.Width == 10000
+
     def test_inlet_size_specified(self, tmp_path: Path) -> None:
         file_name = "user_parameters.yaml"
         p, f = utilities.create_temporary_file(tmp_path, file_name)
@@ -22,14 +45,14 @@ class TestModelDomainSetup:
         utilities.write_parameter_to_file(f, "Length", 4000.0)
         utilities.write_parameter_to_file(f, "Width", 8000.0)
         utilities.write_parameter_to_file(f, "dx", 20)
-        utilities.write_parameter_to_file(f, "N0_meters", 150)
+        utilities.write_parameter_to_file(f, "N0_meters", 160)
         utilities.write_parameter_to_file(f, "L0_meters", 200)
         f.close()
         delta = DeltaModel(input_file=p)
         assert delta.N0 == 8
         assert delta.L0 == 10
 
-    def test_inlet_size_set_to_one_fourth_domain(self, tmp_path: Path) -> None:
+    def test_inlet_size_set_width_to_one_fourth_domain(self, tmp_path: Path) -> None:
         file_name = "user_parameters.yaml"
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
@@ -37,11 +60,25 @@ class TestModelDomainSetup:
         utilities.write_parameter_to_file(f, "Width", 8000.0)
         utilities.write_parameter_to_file(f, "dx", 20)
         utilities.write_parameter_to_file(f, "N0_meters", 5500)
+        f.close()
+        with pytest.warns(ParameterChangedWarning):
+            delta = DeltaModel(input_file=p)
+        assert delta.N0 == 100
+        assert delta.N0_meters == 2000
+
+    def test_inlet_size_set_length_to_one_fourth_domain(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "Length", 4000.0)
+        utilities.write_parameter_to_file(f, "Width", 8000.0)
+        utilities.write_parameter_to_file(f, "dx", 20)
         utilities.write_parameter_to_file(f, "L0_meters", 3300)
         f.close()
-        delta = DeltaModel(input_file=p)
-        assert delta.N0 == 100
+        with pytest.warns(ParameterChangedWarning):
+            delta = DeltaModel(input_file=p)
         assert delta.L0 == 50
+        assert delta.L0_meters == 1000
 
     def test_x(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, "input.yaml")
@@ -190,9 +227,6 @@ class TestInitSubsidence:
 
         file_name = "user_parameters.yaml"
         p, f = utilities.create_temporary_file(tmp_path, file_name)
-        utilities.write_parameter_to_file(f, "Length", 600.0)
-        utilities.write_parameter_to_file(f, "Width", 600.0)
-        utilities.write_parameter_to_file(f, "dx", 5)
         utilities.write_parameter_to_file(f, "toggle_subsidence", True)
         f.close()
 
@@ -205,7 +239,7 @@ class TestInitSubsidence:
 
 
 class TestLoadCheckpoint:
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_load_standard_grid(self, patched, tmp_path: Path) -> None:
         """Test that a run can be resumed when there are outputs."""
         # create one delta, just to have a checkpoint file
@@ -245,7 +279,7 @@ class TestLoadCheckpoint:
         _delta.init_output_file.assert_not_called()
         patched.assert_called()
 
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_load_wo_netcdf_not_expected(self, patched, tmp_path: Path) -> None:
         """
         Test that a checkpoint can be loaded when the load does not expect
@@ -281,7 +315,7 @@ class TestLoadCheckpoint:
         _delta.init_output_file.assert_not_called()
         patched.assert_called()
 
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_load_wo_netcdf_expected(self, patched, tmp_path: Path) -> None:
         """
         Test that a checkpoint can be loaded when the load expects there to be
@@ -327,12 +361,10 @@ class TestLoadCheckpoint:
         _delta.init_output_file.assert_called()
         patched.assert_called()
 
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_load_already_open_netcdf_error(self, patched, tmp_path: Path) -> None:
         """
-        Test that a checkpoint can be loaded when the load expects there to be
-        a netcdf file. This will create a new netcdf file and raise a
-        warning.
+        Test that a checkpoint cannot be loaded when the netcdf is already open.
         """
         # define a yaml with an output, and checkpoint
         p = utilities.yaml_from_dict(
@@ -357,7 +389,7 @@ class TestLoadCheckpoint:
         with pytest.raises(RuntimeError):
             _delta.load_checkpoint()
 
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_check_all_fields_present(self, patched, tmp_path: Path) -> None:
         """
         Test that all fields defined in the save checkpoint file are indeed
@@ -419,7 +451,7 @@ class TestLoadCheckpoint:
         # here in the test
         assert len(checkpoint.keys()) == 0
 
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_if_new_eta_fields_absent(self, patched, tmp_path: Path) -> None:
         """
         Test that nans are replaced and a single warning is raised if the eta0
@@ -563,7 +595,10 @@ class TestSettingParametersFromYAMLFile:
         assert _delta.init_Np_sed == 60
 
     def test_dx(self, tmp_path: Path) -> None:
-        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"dx": 20})
+        # spec L0_meters and N0_meters to avoid an unrelated warning
+        p = utilities.yaml_from_dict(
+            tmp_path, "input.yaml", {"dx": 20, "L0_meters": 80, "N0_meters": 240}
+        )
         _delta = DeltaModel(input_file=p)
         assert _delta.dx == 20
 
@@ -848,22 +883,52 @@ class TestSettingOtherParametersFromYAMLSettings:
         _delta = DeltaModel(input_file=p)
         assert _delta.L0 == 20
 
-    def test_N0(self, tmp_path: Path) -> None:
+    def test_L0_changed_warning_rounded(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(
-            tmp_path, "input.yaml", {"N0_meters": 30, "Width": 100, "dx": 5}
+            tmp_path, "input.yaml", {"L0_meters": 101, "dx": 50}
         )
+        with pytest.warns(ParameterChangedWarning):
+            _delta = DeltaModel(input_file=p)
+        assert _delta.L0 == 2
+
+    def test_L0_changed_warning_minimum(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(
+            tmp_path, "input.yaml", {"L0_meters": 20, "dx": 50}
+        )
+        with pytest.warns(ParameterChangedWarning):
+            _delta = DeltaModel(input_file=p)
+        assert _delta.L0 == 1
+
+    def test_N0(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"N0_meters": 30, "dx": 5})
         _delta = DeltaModel(input_file=p)
-        assert _delta.N0 == 5
+        assert _delta.N0 == 6
+
+    def test_N0_changed_warning_rounded(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(
+            tmp_path, "input.yaml", {"N0_meters": 301, "dx": 50}
+        )
+        with pytest.warns(ParameterChangedWarning):
+            _delta = DeltaModel(input_file=p)
+        assert _delta.N0 == 6
+
+    def test_N0_changed_warning_minimum(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(
+            tmp_path, "input.yaml", {"N0_meters": 51, "dx": 50}
+        )
+        with pytest.warns(ParameterChangedWarning):
+            _delta = DeltaModel(input_file=p)
+        assert _delta.N0 == 3
 
     def test_L(self, tmp_path: Path) -> None:
-        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"Length": 1600, "dx": 20})
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"Length": 1200, "dx": 50})
         _delta = DeltaModel(input_file=p)
-        assert _delta.L == 80
+        assert _delta.L == 24
 
     def test_W(self, tmp_path: Path) -> None:
-        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"Width": 1200, "dx": 20})
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"Width": 1200, "dx": 50})
         _delta = DeltaModel(input_file=p)
-        assert _delta.W == 60
+        assert _delta.W == 24
 
     def test_u_max(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"u0": 2.3})
@@ -894,7 +959,9 @@ class TestSettingOtherParametersFromYAMLSettings:
 
     def test_CTR_small(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(
-            tmp_path, "input.yaml", {"Length": 40, "Width": 40, "dx": 10}
+            tmp_path,
+            "input.yaml",
+            {"Length": 40, "Width": 40, "dx": 10, "N0_meters": 30, "L0_meters": 10},
         )
         _delta = DeltaModel(input_file=p)
         # small case, instead of 4/2-1=1 it is 4/2=2
@@ -909,9 +976,10 @@ class TestSettingOtherParametersFromYAMLSettings:
         assert _delta.gamma == pytest.approx(0.10900000)
 
     def test_V0(self, tmp_path: Path) -> None:
-        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"h0": 3, "dx": 15})
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"h0": 3, "dx": 50})
         _delta = DeltaModel(input_file=p)
-        assert _delta.V0 == 675
+        # V0 = h0 * dx**2
+        assert _delta.V0 == 7500
 
     def test_Qw0(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(
@@ -994,13 +1062,13 @@ class TestSettingOtherParametersFromYAMLSettings:
 
     def test_stepmax_and_size_indices(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(
-            tmp_path, "input.yaml", {"Length": 1600, "Width": 1200, "dx": 20}
+            tmp_path, "input.yaml", {"Length": 1600, "Width": 1200}
         )
         _delta = DeltaModel(input_file=p)
-        assert _delta.L == 80
-        assert _delta.W == 60
-        assert _delta.stepmax == (80 + 60) * 2
-        assert _delta.size_indices == (80 + 60)
+        assert _delta.L == 32
+        assert _delta.W == 24
+        assert _delta.stepmax == (32 + 24) * 2
+        assert _delta.size_indices == (32 + 24)
 
     def test_dt(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(

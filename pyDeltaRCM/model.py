@@ -3,13 +3,13 @@ import os
 import warnings
 from typing import Any, Union
 
-from .iteration_tools import iteration_tools
-from .sed_tools import sed_tools
-from .water_tools import water_tools
-from .init_tools import init_tools
-from .hook_tools import hook_tools
-from .debug_tools import debug_tools
-from .shared_tools import _get_version
+from pyDeltaRCM.iteration_tools import iteration_tools
+from pyDeltaRCM.sed_tools import sed_tools
+from pyDeltaRCM.water_tools import water_tools
+from pyDeltaRCM.init_tools import init_tools
+from pyDeltaRCM.hook_tools import hook_tools
+from pyDeltaRCM.debug_tools import debug_tools
+from pyDeltaRCM.shared_tools import _get_version
 
 
 class DeltaModel(
@@ -527,9 +527,10 @@ class DeltaModel(
         .. math::
             \\gamma = g S_0 dx / ({u_0}^2)
 
-        Issues with numerical instability in pyDeltaRCM can often be
-        attributed to the choice of :math:`\\gamma`. For more information, see
-        the :ref:`gamma parameter <gamma-parameter>` numerical stability description.
+        Issues with numerical instability in pyDeltaRCM can often be attributed
+        to the choice of :math:`\\gamma`. For more information, see the
+        :ref:`gamma parameter <gamma-parameter>` numerical stability
+        description.
         """
 
         return self._gamma
@@ -538,9 +539,10 @@ class DeltaModel(
     def gamma(self, gamma: float) -> None:
         if gamma > 0.1:
             _msg = (
-                "Gamma value is greater than 0.1. Consider adjusting model "
-                "configuration to lower the value of gamma. See documentation "
-                "for more information."
+                f"Gamma value is {gamma}, which is greater than the recommended "
+                f"maximum of 0.1. Consider adjusting model configuration to "
+                f"lower the value of gamma. See documentation for "
+                f"more information."
             )
             warnings.warn(UserWarning(_msg))
         self._gamma = gamma
