@@ -34,6 +34,12 @@ class init_tools(abc.ABC):
         This method is the first called in the initialization of the
         `DeltaModel`, after the configuration variables have been imported.
         """
+        # must identify out_dir manually, because input file not yet processed to model
+        if "out_dir" in self._user_dict.keys():
+            self.out_dir = self._user_dict["out_dir"]
+        else:
+            self.out_dir = self._default_dict["out_dir"]
+
         # output directory config
         self.prefix = self.out_dir
         self.prefix_abspath = os.path.abspath(self.prefix)
@@ -71,6 +77,9 @@ class init_tools(abc.ABC):
         # add handler to logger object
         self.logger.addHandler(fh)
 
+        # initialize verbosity as full, will get overwritten later
+        self._verbose = 2
+
         _msg = "Output log file initialized"
         self.log_info(_msg, verbosity=0)
 
@@ -88,24 +97,21 @@ class init_tools(abc.ABC):
     def import_files(self, kwargs_dict={}) -> None:
         """Import the input files.
 
-        This method handles the parsing and validation of any options supplied
-        via the configuration.
+        This method handles the parsing of any options supplied via the
+        configuration.
 
         Parameters
         ----------
         kwargs_dict : :obj:`dict`, optional
 
-            A dictionary with keys matching valid model parameter names that
-            can be specified in a configuration YAML file. Keys given in this
+            A dictionary with keys matching valid model parameter names that can
+            be specified in a configuration YAML file. Keys given in this
             dictionary will supercede values specified in the YAML
             configuration.
 
         Returns
         -------
         """
-        # This dictionary serves as a container to hold values for both the
-        # user-specified file and the internal defaults.
-        input_file_vars = dict()
 
         # get the special loader from the shared tools
         loader = custom_yaml_loader()
@@ -132,22 +138,51 @@ class init_tools(abc.ABC):
         else:
             user_dict = dict()
 
+        self._default_dict = default_dict
+        self._user_dict = user_dict
+        self._kwargs_dict = kwargs_dict
+
+
+    def process_input_to_model(self) -> None:
+        """Process input file to model variables.
+
+        Loop through the items specified in the model configuration and
+        determine what configuration to use, then apply them to the model (i.e.,
+        ``self``). Additionally, write the input values specified into the log
+        file.
+
+        .. note::
+
+            If ``self.resume_checkpoint == True``, then the input values are
+            *not* written to the log.
+        """
+        _msg = "Setting up model configuration"
+        self.log_info(_msg, verbosity=0)
+
+        _msg = f"Model type is: {self.__class__.__name__}"
+        self.log_info(_msg, verbosity=0)
+
+        # This dictionary serves as a container to hold values for both the
+        # user-specified file and the internal defaults.
+        input_file_vars = dict()
+
         # replace values in the user yaml file with anything specifed in the
         #   **kwargs input
-        for kwk, kwv in kwargs_dict.items():
-            if kwk in user_dict.keys():
-                _msg = ("A keyword specification was also found in the user specified input YAML file: %s" % kwk)
+        for kwk, kwv in self._kwargs_dict.items():
+            if kwk in self._user_dict.keys():
+                _msg = ("A keyword specification was also found "
+                        "in the user specified input YAML file: %s" % kwk)
                 self.log_warning(_msg)
                 warnings.warn(UserWarning(_msg))
-            user_dict[kwk] = kwv
+            self._user_dict[kwk] = kwv
 
         # go through and populate input vars with user and default values,
         # checking user values for correct type.
-        for k, v in default_dict.items():
-            if k in user_dict:
+        for k, v in self._default_dict.items():
+            if k in self._user_dict:
                 expected_type = v["type"]
-                if type(user_dict[k]) in expected_type:
-                    input_file_vars[k] = user_dict[k]
+                if type(self._user_dict[k]) in expected_type:
+                    input_file_vars[k] = self._user_dict[k]
                 else:
                     raise TypeError(
                         f"Input for {str(k)} not of the "
@@ -157,7 +192,7 @@ class init_tools(abc.ABC):
                         f"but needs to be {expected_type}."
                     )
             else:
-                input_file_vars[k] = default_dict[k]["default"]
+                input_file_vars[k] = self._default_dict[k]["default"]
 
         # add custom subclass yaml parameters (yaml or defaults) to input vars
         for k, v in self.subclass_parameters.items():
@@ -167,15 +202,15 @@ class init_tools(abc.ABC):
                         "custom parameter value will not be used.")
                 self.log_warning(_msg)
                 warnings.warn(UserWarning(_msg))
-            elif k in user_dict:
+            elif k in self._user_dict:
                 # get expected types
                 if not type(v["type"]) is list:
                     expected_type = [eval(v["type"])]
                 else:
                     expected_type = [eval(_v) for _v in v["type"]]
                 # evaluate against expected types
-                if type(user_dict[k]) in expected_type:
-                    input_file_vars[k] = user_dict[k]
+                if type(self._user_dict[k]) in expected_type:
+                    input_file_vars[k] = self._user_dict[k]
                 else:
                     raise TypeError(
                         f"Input for {str(k)} not of the "
@@ -188,6 +223,14 @@ class init_tools(abc.ABC):
                 # set using default value
                 input_file_vars[k] = v["default"]
 
+        # save the input file as a hidden attr and grab needed value
+        self._input_file_vars = input_file_vars
+        self.verbose = self._input_file_vars["verbose"]
+        if self._input_file_vars["legacy_netcdf"]:
+            self._netcdf_coords = ("time", "x", "y")
+        else:
+            self._netcdf_coords = ("seconds", "x", "y")
+
         # compare the processed inputs with the total inputs. If any unused
         # parameters exist, we warn the user that they are not being used! A
         # special warning is issued for the Preprocessor advanced config
@@ -196,10 +239,10 @@ class init_tools(abc.ABC):
         # remove special keywords from the dict of user YAML parameters
         # these are keywords related to time or matrix/set expansion
         _no_list = ["timesteps", "time", "time_years", "config", "dryrun", "parallel"]
-        _ = [user_dict.pop(key) for key in _no_list if key in user_dict.keys()]
+        _ = [self._user_dict.pop(key) for key in _no_list if key in self._user_dict.keys()]
         # identify unused parameters
         unused_user_keys = [
-            k for k, v in user_dict.items() if not (k in input_file_vars.keys())
+            k for k, v in self._user_dict.items() if not (k in input_file_vars.keys())
         ]
         if len(unused_user_keys) > 0:
             any_in_preprocessor = [k for k in unused_user_keys if (k in pp_only_kw)]
@@ -220,32 +263,6 @@ class init_tools(abc.ABC):
                 self.log_warning(_msg)
                 warnings.warn(UserWarning(_msg))
 
-        # save the input file as a hidden attr and grab needed value
-        self._input_file_vars = input_file_vars
-        self.out_dir = self._input_file_vars["out_dir"]
-        self.verbose = self._input_file_vars["verbose"]
-        if self._input_file_vars["legacy_netcdf"]:
-            self._netcdf_coords = ("time", "x", "y")
-        else:
-            self._netcdf_coords = ("seconds", "x", "y")
-
-    def process_input_to_model(self) -> None:
-        """Process input file to model variables.
-
-        Loop through the items specified in the model configuration and apply
-        them to the model (i.e., ``self``). Additionally, write the input
-        values specified into the log file.
-
-        .. note::
-
-            If ``self.resume_checkpoint == True``, then the input values are
-            *not* written to the log.
-        """
-        _msg = "Setting up model configuration"
-        self.log_info(_msg, verbosity=0)
-
-        _msg = f"Model type is: {self.__class__.__name__}"
-        self.log_info(_msg, verbosity=0)
 
         # process the input file to attributes of the model
         for k, v in list(self._input_file_vars.items()):
