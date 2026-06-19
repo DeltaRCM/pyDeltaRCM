@@ -239,7 +239,7 @@ class TestInitSubsidence:
 
 
 class TestLoadCheckpoint:
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_load_standard_grid(self, patched, tmp_path: Path) -> None:
         """Test that a run can be resumed when there are outputs."""
         # create one delta, just to have a checkpoint file
@@ -279,7 +279,7 @@ class TestLoadCheckpoint:
         _delta.init_output_file.assert_not_called()
         patched.assert_called()
 
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_load_wo_netcdf_not_expected(self, patched, tmp_path: Path) -> None:
         """
         Test that a checkpoint can be loaded when the load does not expect
@@ -315,7 +315,7 @@ class TestLoadCheckpoint:
         _delta.init_output_file.assert_not_called()
         patched.assert_called()
 
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_load_wo_netcdf_expected(self, patched, tmp_path: Path) -> None:
         """
         Test that a checkpoint can be loaded when the load expects there to be
@@ -361,12 +361,10 @@ class TestLoadCheckpoint:
         _delta.init_output_file.assert_called()
         patched.assert_called()
 
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_load_already_open_netcdf_error(self, patched, tmp_path: Path) -> None:
         """
-        Test that a checkpoint can be loaded when the load expects there to be
-        a netcdf file. This will create a new netcdf file and raise a
-        warning.
+        Test that a checkpoint cannot be loaded when the netcdf is already open.
         """
         # define a yaml with an output, and checkpoint
         p = utilities.yaml_from_dict(
@@ -391,7 +389,7 @@ class TestLoadCheckpoint:
         with pytest.raises(RuntimeError):
             _delta.load_checkpoint()
 
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_check_all_fields_present(self, patched, tmp_path: Path) -> None:
         """
         Test that all fields defined in the save checkpoint file are indeed
@@ -453,7 +451,7 @@ class TestLoadCheckpoint:
         # here in the test
         assert len(checkpoint.keys()) == 0
 
-    @mock.patch("pyDeltaRCM.shared_tools.set_random_state")
+    @mock.patch("pyDeltaRCM.init_tools.set_random_state")
     def test_if_new_eta_fields_absent(self, patched, tmp_path: Path) -> None:
         """
         Test that nans are replaced and a single warning is raised if the eta0
