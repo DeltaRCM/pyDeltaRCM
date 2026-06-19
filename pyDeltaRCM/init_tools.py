@@ -12,8 +12,17 @@ import time as time_lib
 import yaml
 import abc
 
-from . import shared_tools
-from . import sed_tools
+
+from pyDeltaRCM.shared_tools import (
+    custom_yaml_loader,
+    set_random_seed,
+    set_random_state,
+    ParameterChangedWarning
+)
+from pyDeltaRCM.sed_tools import (
+    MudRouter,
+    SandRouter
+)
 
 # tools for initiating deltaRCM model domain
 
@@ -96,7 +105,7 @@ class init_tools(abc.ABC):
         input_file_vars = dict()
 
         # get the special loader from the shared tools
-        loader = shared_tools.custom_yaml_loader()
+        loader = custom_yaml_loader()
 
         # Open and access both yaml files --> put in dictionaries
         # parse default yaml and find expected types
@@ -268,7 +277,7 @@ class init_tools(abc.ABC):
             # generate a random seed for reproducibility
             self.seed = np.random.randint((2**32) - 1, dtype="u8")
 
-        shared_tools.set_random_seed(self._seed)
+        set_random_seed(self._seed)
 
         # always write the seed to file for record and reproducability
         _msg = "Random seed is: %s " % str(self._seed)
@@ -307,13 +316,13 @@ class init_tools(abc.ABC):
         if self._Length % self._dx != 0:
             _new = int(round(self._Length / self._dx)) * self._dx
             warnings.warn(
-                shared_tools.ParameterChangedWarning("Length", self._Length, _new)
+                ParameterChangedWarning("Length", self._Length, _new)
             )
             self._Length = _new
         if self._Width % self._dx != 0:
             _new = int(round(self._Width / self._dx)) * self._dx
             warnings.warn(
-                shared_tools.ParameterChangedWarning("Width", self._Width, _new)
+                ParameterChangedWarning("Width", self._Width, _new)
             )
             self._Width = _new
         # now guarenteed to be divisible
@@ -434,14 +443,14 @@ class init_tools(abc.ABC):
         self.N0 = max(3, min(int(round(self._N0_meters / self._dx)), self.W // 4))
         if self.L0 * self._dx != _input_L0_meters:
             warnings.warn(
-                shared_tools.ParameterChangedWarning(
+                ParameterChangedWarning(
                     "L0_meters", _input_L0_meters, self.L0 * self._dx
                 )
             )
             self.L0_meters = self.L0 * self._dx
         if self.N0 * self._dx != _input_N0_meters:
             warnings.warn(
-                shared_tools.ParameterChangedWarning(
+                ParameterChangedWarning(
                     "N0_meters", _input_N0_meters, self.N0 * self._dx
                 )
             )
@@ -627,7 +636,7 @@ class init_tools(abc.ABC):
         self.log_info(_msg, verbosity=1)
 
         # initialize the MudRouter object
-        self._mr = sed_tools.MudRouter(
+        self._mr = MudRouter(
             self._dt,
             self._dx,
             self.Vp_sed,
@@ -647,7 +656,7 @@ class init_tools(abc.ABC):
             self.mod_erosion,
         )
         # initialize the SandRouter object
-        self._sr = sed_tools.SandRouter(
+        self._sr = SandRouter(
             self._dt,
             self._dx,
             self.Vp_sed,
@@ -1127,7 +1136,7 @@ class init_tools(abc.ABC):
         _msg = "Loading random state"
         self.log_info(_msg, verbosity=2)
         rng_state = tuple(checkpoint["rng_state"])
-        shared_tools.set_random_state(rng_state)
+        set_random_state(rng_state)
 
         # handle the case with a netcdf file
         if (self._save_any_grids or self._save_metadata) and not defer_output:

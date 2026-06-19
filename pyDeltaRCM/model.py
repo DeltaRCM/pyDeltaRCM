@@ -3,13 +3,13 @@ import os
 import warnings
 from typing import Any, Union
 
-from .iteration_tools import iteration_tools
-from .sed_tools import sed_tools
-from .water_tools import water_tools
-from .init_tools import init_tools
-from .hook_tools import hook_tools
-from .debug_tools import debug_tools
-from .shared_tools import _get_version
+from pyDeltaRCM.iteration_tools import iteration_tools
+from pyDeltaRCM.sed_tools import sed_tools
+from pyDeltaRCM.water_tools import water_tools
+from pyDeltaRCM.init_tools import init_tools
+from pyDeltaRCM.hook_tools import hook_tools
+from pyDeltaRCM.debug_tools import debug_tools
+from pyDeltaRCM.shared_tools import _get_version
 
 
 class DeltaModel(

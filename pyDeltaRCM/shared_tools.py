@@ -4,7 +4,6 @@ import re
 import tempfile
 import yaml
 from typing import Iterator, Type, Tuple
-import warnings
 
 import numpy as np
 from numba import njit, _helperlib

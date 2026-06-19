@@ -5,7 +5,9 @@ from matplotlib.ticker import MaxNLocator
 import mpl_toolkits.axes_grid1 as axtk
 import abc
 
-from . import shared_tools
+from pyDeltaRCM.shared_tools import (
+    custom_unravel
+)
 
 # tools for water routing algorithms
 
@@ -308,7 +310,7 @@ def plot_ind(_ind, *args, shape=None, **kwargs) -> None:
             raise ValueError("Shape of array must be given to unravel index.")
         if isinstance(_ind, np.ndarray):
             _ind = _ind[0]
-        _ind = shared_tools.custom_unravel(_ind, _shape)
+        _ind = custom_unravel(_ind, _shape)
     ax.plot(_ind[1], _ind[0], *args, **kwargs)
 
     if block:
@@ -358,9 +360,9 @@ def plot_line(_ind, *args, shape=None, nozeros: bool = False, **kwargs):
                         if nozeros:
                             pxpys[i, :] = np.nan, np.nan
                         else:
-                            pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
+                            pxpys[i, :] = custom_unravel(_ind[i], _shape)
                     else:
-                        pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
+                        pxpys[i, :] = custom_unravel(_ind[i], _shape)
             else:
                 if _ind.ndim > 1:
                     pxpys = np.fliplr(_ind)
@@ -375,11 +377,11 @@ def plot_line(_ind, *args, shape=None, nozeros: bool = False, **kwargs):
                             if nozeros:
                                 pxpys[i, :] = np.nan, np.nan
                             else:
-                                pxpys[i, :] = shared_tools.custom_unravel(
+                                pxpys[i, :] = custom_unravel(
                                     _ind[i], _shape
                                 )
                         else:
-                            pxpys[i, :] = shared_tools.custom_unravel(_ind[i], _shape)
+                            pxpys[i, :] = custom_unravel(_ind[i], _shape)
 
     (_l,) = ax.plot(pxpys[:, 1], pxpys[:, 0], *args, **kwargs)
 

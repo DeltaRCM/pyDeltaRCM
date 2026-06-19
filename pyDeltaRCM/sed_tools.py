@@ -9,7 +9,17 @@ from scipy import ndimage
 
 import warnings
 
-from . import shared_tools
+# from . import shared_tools
+
+from pyDeltaRCM.shared_tools import (
+    get_inlet_weights,
+    get_start_indices,
+    get_weight_sfc_int,
+    random_pick,
+    get_steps,
+    custom_pad,
+    custom_unravel,
+)
 
 # tools for sediment routing algorithms and deposition/erosion
 
@@ -91,7 +101,7 @@ class sed_tools(abc.ABC):
             is passed a string argument `parcel_type`, with information about
             the parcel being routed for convenience.
         """
-        return shared_tools.get_inlet_weights(self.inlet)
+        return get_inlet_weights(self.inlet)
 
     def route_all_sand_parcels(self) -> None:
         """Route sand parcels; topo diffusion.
@@ -120,7 +130,7 @@ class sed_tools(abc.ABC):
 
         num_starts = int(self._Np_sed * self._f_bedload)
         inlet_weights = self.get_inlet_weights_sediment(parcel_type="sand")
-        start_indices = shared_tools.get_start_indices(
+        start_indices = get_start_indices(
             self.inlet, inlet_weights, num_starts
         )
 
@@ -188,7 +198,7 @@ class sed_tools(abc.ABC):
 
         num_starts = int(self._Np_sed * (1 - self._f_bedload))
         inlet_weights = self.get_inlet_weights_sediment(parcel_type="mud")
-        start_indices = shared_tools.get_start_indices(
+        start_indices = get_start_indices(
             self.inlet, inlet_weights, num_starts
         )
 
@@ -396,7 +406,7 @@ class BaseRouter:
         cell_type_ind = self.pad_cell_type[px : px + 3, py : py + 3]
         sed_weight_nbrs = self.pad_mod_sed_weight[px : px + 3, py : py + 3]
 
-        _, weight_int = shared_tools.get_weight_sfc_int(
+        _, weight_int = get_weight_sfc_int(
             self.stage[px, py],
             stage_nbrs.ravel(),
             self.qx[px, py],
@@ -423,9 +433,9 @@ class BaseRouter:
             sed_weight_nbrs.ravel(),
         )
 
-        new_cell = shared_tools.random_pick(weights)
+        new_cell = random_pick(weights)
 
-        dist, istep, jstep, _ = shared_tools.get_steps(
+        dist, istep, jstep, _ = get_steps(
             new_cell, self.iwalk_flat, self.jwalk_flat
         )
 
@@ -686,10 +696,10 @@ class SandRouter(BaseRouter):
         self.uw = uw
         self.ux = ux
         self.uy = uy
-        self.pad_stage = shared_tools.custom_pad(stage)
-        self.pad_depth = shared_tools.custom_pad(depth)
-        self.pad_cell_type = shared_tools.custom_pad(cell_type)
-        self.pad_mod_sed_weight = shared_tools.custom_pad(mod_sed_weight)
+        self.pad_stage = custom_pad(stage)
+        self.pad_depth = custom_pad(depth)
+        self.pad_cell_type = custom_pad(cell_type)
+        self.pad_mod_sed_weight = custom_pad(mod_sed_weight)
         self.mod_stable_weight = mod_stable_weight
         self.Vp_dep_mud = Vp_dep_mud
         self.Vp_dep_sand = Vp_dep_sand
@@ -708,7 +718,7 @@ class SandRouter(BaseRouter):
             self.Vp_res = self.Vp_sed
 
             # get initial location based on flat index
-            px, py = shared_tools.custom_unravel(start_indices[np_sed], _shape)
+            px, py = custom_unravel(start_indices[np_sed], _shape)
 
             self.qs[px, py] = self.qs[px, py] + self.Vp_res / 2.0 / self._dt / self._dx
             self._route_one_parcel(px, py)
@@ -926,10 +936,10 @@ class MudRouter(BaseRouter):
         self.uw = uw
         self.ux = ux
         self.uy = uy
-        self.pad_stage = shared_tools.custom_pad(stage)
-        self.pad_depth = shared_tools.custom_pad(depth)
-        self.pad_cell_type = shared_tools.custom_pad(cell_type)
-        self.pad_mod_sed_weight = shared_tools.custom_pad(mod_sed_weight)
+        self.pad_stage = custom_pad(stage)
+        self.pad_depth = custom_pad(depth)
+        self.pad_cell_type = custom_pad(cell_type)
+        self.pad_mod_sed_weight = custom_pad(mod_sed_weight)
         self.mod_stable_weight = mod_stable_weight
         self.Vp_dep_mud = Vp_dep_mud
         self.Vp_dep_sand = Vp_dep_sand
@@ -947,7 +957,7 @@ class MudRouter(BaseRouter):
             self.Vp_res = self.Vp_sed
 
             # get initial location based on flat index
-            px, py = shared_tools.custom_unravel(start_indices[np_sed], _shape)
+            px, py = custom_unravel(start_indices[np_sed], _shape)
 
             self._route_one_parcel(px, py)
 

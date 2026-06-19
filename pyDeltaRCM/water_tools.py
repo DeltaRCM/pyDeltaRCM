@@ -2,7 +2,16 @@ import numpy as np
 from numba import njit
 import abc
 
-from . import shared_tools
+from pyDeltaRCM.shared_tools import (
+    get_inlet_weights,
+    get_start_indices,
+    get_weight_sfc_int,
+    random_pick,
+    get_steps,
+    custom_pad,
+    custom_ravel,
+    custom_unravel,
+)
 
 # tools for water routing algorithms
 
@@ -60,7 +69,7 @@ class water_tools(abc.ABC):
 
         # configure the starting indices for each parcel
         inlet_weights = self.get_inlet_weights_water()
-        self.start_indices = shared_tools.get_start_indices(
+        self.start_indices = get_start_indices(
             self.inlet, inlet_weights, self._Np_water
         )
 
@@ -77,7 +86,7 @@ class water_tools(abc.ABC):
 
             Reimplement this method in custom subclasses as needed.
         """
-        return shared_tools.get_inlet_weights(self.inlet)
+        return get_inlet_weights(self.inlet)
 
     def run_water_iteration(self) -> None:
         """Run a single iteration of travel paths for all water parcels.
@@ -135,7 +144,7 @@ class water_tools(abc.ABC):
             )
 
             # determine the step of each parcel made based on the new direction
-            dist, istep, jstep, astep = shared_tools.get_steps(
+            dist, istep, jstep, astep = get_steps(
                 new_direction, self.iwalk_flat, self.jwalk_flat
             )
 
@@ -751,10 +760,10 @@ def _get_water_weight_array(
         :func:`_get_weight_at_cell_water`.
     """
     L, W = depth.shape
-    pad_stage = shared_tools.custom_pad(stage)
-    pad_depth = shared_tools.custom_pad(depth)
-    mod_pad_water_weight = shared_tools.custom_pad(mod_water_weight)
-    pad_cell_type = shared_tools.custom_pad(cell_type)
+    pad_stage = custom_pad(stage)
+    pad_depth = custom_pad(depth)
+    mod_pad_water_weight = custom_pad(mod_water_weight)
+    pad_cell_type = custom_pad(cell_type)
 
     water_weights = np.zeros((L, W, 9))
 
@@ -767,7 +776,7 @@ def _get_water_weight_array(
             ]
             ct_nbrs = pad_cell_type[i - 1 + 1 : i + 2 + 1, j - 1 + 1 : j + 2 + 1]
 
-            weight_sfc, weight_int = shared_tools.get_weight_sfc_int(
+            weight_sfc, weight_int = get_weight_sfc_int(
                 stage[i, j],
                 stage_nbrs.ravel(),
                 qx[i, j],
@@ -827,7 +836,7 @@ def _choose_next_directions(inds: np.ndarray, water_weights: np.ndarray) -> np.n
         ind = inds[p]
         if ind != 0:
             weight = water_weights[ind, :]
-            next_direction[p] = shared_tools.random_pick(weight)
+            next_direction[p] = random_pick(weight)
         else:
             next_direction[p] = 4
 
@@ -975,7 +984,7 @@ def _check_for_loops(
 
                 if has_repeat_ind:
                     # handle when a loop is detected
-                    px0, py0 = shared_tools.custom_unravel(new_ind, domain_shape)
+                    px0, py0 = custom_unravel(new_ind, domain_shape)
 
                     # compute a new location for the parcel along the
                     #   mean-transport vector
@@ -994,7 +1003,7 @@ def _check_for_loops(
                     py = np.minimum(domain_min_y, np.maximum(1, py))
 
                     # ravel the index for return
-                    nind = shared_tools.custom_ravel((px, py), domain_shape)
+                    nind = custom_ravel((px, py), domain_shape)
                     new_inds[p] = nind
 
                     # only disqualify the parcel if it has not reached sea
@@ -1081,7 +1090,7 @@ def _accumulate_free_surface_walks(
         xs = np.zeros_like(inds_whr)  # x coordinates
         ys = np.zeros_like(inds_whr)  # x coordinates
         for pp, ind_whr in np.ndenumerate(inds_whr):
-            xs[pp], ys[pp] = shared_tools.custom_unravel(ind_whr, _shape)
+            xs[pp], ys[pp] = custom_unravel(ind_whr, _shape)
 
         # determine whether the pathway contributes to the free surface
         Hnew[:] = 0
@@ -1158,14 +1167,14 @@ def _smooth_free_surface(Hin, cell_type, Nsmooth: int, Csmooth: int):
     L, W = Hin.shape
 
     # pad the input stage and cell type arrays
-    cell_type_pad = shared_tools.custom_pad(cell_type)
+    cell_type_pad = custom_pad(cell_type)
 
     # create copy of H which is modified in following smoothing
     Htemp = np.copy(Hin)
     for _ in range(Nsmooth):
         # create another copy to refernce as base in Nsmooth iteration
         Hsmth = np.copy(Htemp)
-        Hsmth_pad = np.copy(shared_tools.custom_pad(Hsmth))
+        Hsmth_pad = np.copy(custom_pad(Hsmth))
 
         # loop through all cells and determine a smoothed index
         for i in range(L):

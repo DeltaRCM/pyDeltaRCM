@@ -12,11 +12,16 @@ from typing import Dict, Optional, Type, List, Union
 
 import numpy as np
 
-from . import shared_tools
-from .model import DeltaModel as BaseDeltaModel
+from pyDeltaRCM.shared_tools import (
+    _get_version,
+    custom_yaml_loader,
+    set_random_seed,
+    _scale_factor
+)
+from pyDeltaRCM.model import DeltaModel as BaseDeltaModel
 
 
-_ver: str = " ".join(("pyDeltaRCM", shared_tools._get_version()))
+_ver: str = " ".join(("pyDeltaRCM", _get_version()))
 
 
 class BasePreprocessor(abc.ABC):
@@ -197,7 +202,7 @@ class BasePreprocessor(abc.ABC):
             return {}  # return an empty dict
         else:
             # get the special loader from the shared tools
-            loader = shared_tools.custom_yaml_loader()
+            loader = custom_yaml_loader()
 
             # open the file with the loader
             user_file = open(input_file, mode="r")
@@ -831,7 +836,7 @@ class _SerialJob(_BaseJob):
             self.deltamodel.logger.info(
                 f"Reset seed in serial job {self.deltamodel.seed}"
             )
-            shared_tools.set_random_seed(self.deltamodel.seed)
+            set_random_seed(self.deltamodel.seed)
 
             # run the simulation
             _dt = self.deltamodel.dt
@@ -940,7 +945,7 @@ class _ParallelJob(_BaseJob, multiprocessing.Process):
                     self.deltamodel.logger.info(
                         f"Reset seed in parallel job {self.deltamodel.seed}"
                     )
-                    shared_tools.set_random_seed(self.deltamodel.seed)
+                    set_random_seed(self.deltamodel.seed)
 
                     # create and fill output infrastructure
                     self.deltamodel.hook_init_output_file()
@@ -1296,7 +1301,7 @@ def scale_relative_sea_level_rise_rate(mmyr: float, If: float = 1) -> float:
     scaled : :obj:`float`
         Scaled relative sea level rise rate, in meters per second.
     """
-    return (mmyr / 1000) * (1 / (shared_tools._scale_factor(If, units="years")))
+    return (mmyr / 1000) * (1 / (_scale_factor(If, units="years")))
 
 
 # make the connection for running the preprocessor directly
