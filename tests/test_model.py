@@ -8,7 +8,9 @@ from pathlib import Path
 import unittest.mock as mock
 
 from pyDeltaRCM.model import DeltaModel
-from pyDeltaRCM import shared_tools
+from pyDeltaRCM.shared_tools import (
+    ParameterChangedWarning
+)
 from . import utilities
 
 
@@ -506,15 +508,32 @@ class TestPublicSettersAndGetters:
 
         # change value
         #  the channel width is then changed internally with `N0`, according
-        #  to the `create_boundary_conditions` so no change is actually made
-        #  here.
-        with pytest.warns(UserWarning):
-            _delta.channel_width = 300
-        assert _delta.channel_width == 250  # not changed!
+        #  to the `create_boundary_conditions`
+        _delta.channel_width = 300
+        assert _delta.channel_width == 250  # not changed bc mocked!!
 
         # assert reinitializers called
         assert _delta.create_boundary_conditions.called is True
         assert _delta.init_sediment_routers.called is True
+
+    def test_setting_getting_channel_width_changed_warning(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
+        _delta = DeltaModel(input_file=p)
+
+        # check initials
+        assert _delta.channel_width == 250
+
+        # change value
+        #  the channel width is then changed internally with `N0`, according
+        #  to the `create_boundary_conditions`
+        _delta.channel_width = 300
+        assert _delta.channel_width == 300  # changed!
+
+        # check that value rounding and warning works
+        with pytest.warns(ParameterChangedWarning):
+            _delta.channel_width = 501
+        assert _delta.channel_width == 500  # changed!
+
 
     def test_setting_getting_flow_depth(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, "input.yaml")

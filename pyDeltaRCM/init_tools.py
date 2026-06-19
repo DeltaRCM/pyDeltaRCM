@@ -87,7 +87,7 @@ class init_tools(abc.ABC):
         if "out_dir" in self._user_dict.keys():
             self.out_dir = self._user_dict["out_dir"]
         else:
-            self.out_dir = self._default_dict["out_dir"]
+            self.out_dir = self._default_dict["out_dir"]["default"]
 
         # output directory config
         self.prefix = self.out_dir
