@@ -175,3 +175,18 @@ class TestLoggerIntegratedDuringInitialization:
                 raise ValueError('Could not convert the seed to int')
 
             assert _intseed >= 0
+
+    def test_logger_capture_changed_parameters_warnings(self, tmp_path: Path) -> None:
+        file_name = 'user_parameters.yaml'
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'out_dir')
+        utilities.write_parameter_to_file(f, 'verbose', 1)
+        # utilities.write_parameter_to_file(f, 'Width', 10001)
+        f.close()
+        delta = DeltaModel(input_file=p)
+        _logs = glob.glob(os.path.join(delta.prefix, '*.log'))
+        assert len(_logs) == 1  # log file exists
+        with open(_logs[0], 'r') as _logfile:
+            _lines = _logfile.readlines()
+            _joinedlines = ' '.join(_lines)  # collapse to a single string
+        assert "Parameter 'Width' was changed from 10001 to 10000." in _joinedlines

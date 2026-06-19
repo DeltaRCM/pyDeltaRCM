@@ -544,6 +544,7 @@ class DeltaModel(
                 f"lower the value of gamma. See documentation for "
                 f"more information."
             )
+            self.log_warning(_msg)
             warnings.warn(UserWarning(_msg))
         self._gamma = gamma
 
@@ -1429,11 +1430,9 @@ class DeltaModel(
     @time_step.setter
     def time_step(self, new_time_step: float) -> None:
         if new_time_step * self.init_Np_sed < 100:
-            warnings.warn(
-                UserWarning(
-                    "Using a very small time step, " "Delta might evolve very slowly."
-                )
-            )
+            _msg = "Using a very small time step, so the delta might evolve very slowly."
+            self.log_warning(_msg)
+            warnings.warn(UserWarning(_msg))
 
         if self.toggle_subsidence:
             self.sigma = (self.sigma / self._dt) * new_time_step
@@ -1489,14 +1488,6 @@ class DeltaModel(
         self.N0_meters = new_N0_meters
         self.create_boundary_conditions()
         self.init_sediment_routers()
-        if self.channel_width != new_N0_meters:
-            warnings.warn(
-                UserWarning(
-                    "Channel width was updated to {0} m, rather than input {1},"
-                    "due to grid resolution or imposed domain "
-                    "restrictions.".format(self.channel_width, new_N0_meters)
-                )
-            )
 
     @property
     def channel_flow_depth(self) -> float:

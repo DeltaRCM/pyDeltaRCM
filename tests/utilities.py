@@ -8,7 +8,7 @@ import numpy as np
 
 import pytest
 from pyDeltaRCM.model import DeltaModel
-from pyDeltaRCM import shared_tools
+from pyDeltaRCM.shared_tools import get_random_uniform
 
 # utilities for file writing
 
@@ -118,7 +118,7 @@ class FastIteratingDeltaModel:
             field = np.zeros(shp, dtype=np.float32)
             for i in range(shp[0]):
                 for j in range(shp[1]):
-                    field[i, j] = shared_tools.get_random_uniform(1)
+                    field[i, j] = get_random_uniform(1)
             return field
 
         shp = self.eta.shape

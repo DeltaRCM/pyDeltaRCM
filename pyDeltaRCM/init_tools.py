@@ -54,16 +54,19 @@ class init_tools(abc.ABC):
         The level of information printed to the log depends on the verbosity
         setting.
         """
-        timestamp = time_lib.strftime("%Y%m%d-%H%M%S")
-        self.logger = logging.getLogger(self.prefix_abspath + timestamp)
-        self.logger.setLevel(logging.INFO)
-
         # create the logging file handler
+        timestamp = time_lib.strftime("%Y%m%d-%H%M%S")
         fh = logging.FileHandler(
             os.path.join(self.prefix_abspath, "pyDeltaRCM_" + timestamp + ".log")
         )
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         fh.setFormatter(formatter)
+
+        timestamp = time_lib.strftime("%Y%m%d-%H%M%S")
+        self.logger = logging.getLogger(self.prefix_abspath + timestamp)
+        self.logger.setLevel(logging.INFO)
+
+        self.logger.setLevel(logging.DEBUG)
 
         # add handler to logger object
         self.logger.addHandler(fh)
@@ -133,12 +136,9 @@ class init_tools(abc.ABC):
         #   **kwargs input
         for kwk, kwv in kwargs_dict.items():
             if kwk in user_dict.keys():
-                warnings.warn(
-                    UserWarning(
-                        "A keyword specification was also found in the "
-                        "user specified input YAML file: %s" % kwk
-                    )
-                )
+                _msg = ("A keyword specification was also found in the user specified input YAML file: %s" % kwk)
+                self.log_warning(_msg)
+                warnings.warn(UserWarning(_msg))
             user_dict[kwk] = kwv
 
         # go through and populate input vars with user and default values,
@@ -162,13 +162,11 @@ class init_tools(abc.ABC):
         # add custom subclass yaml parameters (yaml or defaults) to input vars
         for k, v in self.subclass_parameters.items():
             if k in input_file_vars:
-                warnings.warn(
-                    UserWarning(
-                        "Custom subclass parameter name is already a "
+                _msg = ("Custom subclass parameter name is already a "
                         "default yaml parameter of the model, "
-                        "custom parameter value will not be used."
-                    )
-                )
+                        "custom parameter value will not be used.")
+                self.log_warning(_msg)
+                warnings.warn(UserWarning(_msg))
             elif k in user_dict:
                 # get expected types
                 if not type(v["type"]) is list:
@@ -206,28 +204,21 @@ class init_tools(abc.ABC):
         if len(unused_user_keys) > 0:
             any_in_preprocessor = [k for k in unused_user_keys if (k in pp_only_kw)]
             if len(any_in_preprocessor):
-                warnings.warn(
-                    UserWarning(
-                        "A Preprocessor-only keyword was specified as input in "
+                _msg = ("A Preprocessor-only keyword was specified as input in "
                         "yaml file or kwargs: {0}. Advanced configurations "
                         "are only supported by the Preprocessor via the "
                         "high-level API. Any parameters specified as part of this "
                         "advanced keyword configuration will not be used!".format(
                             any_in_preprocessor
-                        )
-                    )
-                )
+                        ))
+                self.log_warning(_msg)
+                warnings.warn(UserWarning(_msg))
             else:
-                warnings.warn(
-                    UserWarning(
-                        "One or more inputs in yaml file or kwargs were unused by "
+                _msg = ("One or more inputs in yaml file or kwargs were unused by "
                         "the model during instantiation. "
-                        "The unused keys are: {0}".format(str(unused_user_keys))
-                    )
-                )
-
-        # note, the specified parameters are assigned to the model object in
-        # the following function `process_input_to_model`.
+                        "The unused keys are: {0}".format(str(unused_user_keys)))
+                self.log_warning(_msg)
+                warnings.warn(UserWarning(_msg))
 
         # save the input file as a hidden attr and grab needed value
         self._input_file_vars = input_file_vars
@@ -313,19 +304,21 @@ class init_tools(abc.ABC):
         self.U_ero_mud = self._coeff_U_ero_mud * self._u0
 
         # Length and Width are rounded so domain is integer number of cells
+        #   check if need to round length, then log and warn and change
         if self._Length % self._dx != 0:
             _new = int(round(self._Length / self._dx)) * self._dx
-            warnings.warn(
-                ParameterChangedWarning("Length", self._Length, _new)
-            )
+            pcw = ParameterChangedWarning("Length", self._Length, _new)
+            self.log_warning(format(pcw))
+            warnings.warn(pcw)
             self._Length = _new
+        #   check if need to round width, then log and warn and change
         if self._Width % self._dx != 0:
             _new = int(round(self._Width / self._dx)) * self._dx
-            warnings.warn(
-                ParameterChangedWarning("Width", self._Width, _new)
-            )
+            pcw = ParameterChangedWarning("Width", self._Width, _new)
+            self.log_warning(format(pcw))
+            warnings.warn(pcw)
             self._Width = _new
-        # now guarenteed to be divisible
+        # now guaranteed to be divisible
         self.L = int(self._Length / self._dx)  # num cells in x
         self.W = int(self._Width / self._dx)  # num cells in y
 
@@ -442,18 +435,14 @@ class init_tools(abc.ABC):
         self.L0 = max(1, min(int(round(self._L0_meters / self._dx)), self.L // 4))
         self.N0 = max(3, min(int(round(self._N0_meters / self._dx)), self.W // 4))
         if self.L0 * self._dx != _input_L0_meters:
-            warnings.warn(
-                ParameterChangedWarning(
-                    "L0_meters", _input_L0_meters, self.L0 * self._dx
-                )
-            )
+            pcw = ParameterChangedWarning("L0_meters", _input_L0_meters, self.L0 * self._dx)
+            self.log_warning(format(pcw))
+            warnings.warn(pcw)
             self.L0_meters = self.L0 * self._dx
         if self.N0 * self._dx != _input_N0_meters:
-            warnings.warn(
-                ParameterChangedWarning(
-                    "N0_meters", _input_N0_meters, self.N0 * self._dx
-                )
-            )
+            pcw = ParameterChangedWarning("N0_meters", _input_N0_meters, self.N0 * self._dx)
+            self.log_warning(format(pcw))
+            warnings.warn(pcw)
             self.N0_meters = self.N0 * self._dx
 
         self.u_max = 2.0 * self._u0  # maximum allowed flow velocity
@@ -709,7 +698,7 @@ class init_tools(abc.ABC):
                 )
             else:
                 _msg = "Output file in legacy schema"
-                warnings.warn(
+                _wmsg = (
                     "Creating output netcdf file in legacy schema. This format is "
                     "provided as a convenience for users who are currently "
                     "relying on workflows that use an old format of netcdf file. "
@@ -717,6 +706,9 @@ class init_tools(abc.ABC):
                     "leverage the sandsuet formatted data specification "
                     "(i.e., `legacy_netcdf=False`)."
                 )
+                self.log_warning(_wmsg)
+                warnings.warn(_wmsg)
+
             self.log_info(_msg, verbosity=1)
 
             if (os.path.exists(file_path)) and (self._clobber_netcdf is False):
@@ -726,7 +718,7 @@ class init_tools(abc.ABC):
                 )
             elif (os.path.exists(file_path)) and (self._clobber_netcdf is True):
                 _msg = "Replacing existing netCDF file"
-                self.logger.warning(_msg)
+                self.log_warning(_msg)
                 warnings.warn(UserWarning(_msg))
                 os.remove(file_path)
 
@@ -865,15 +857,13 @@ class init_tools(abc.ABC):
                     __inlist = self._save_var_list["meta"][_val]
                     __varname = _val
                     if __inlist[0] is None:
-                        warnings.warn(
-                            UserWarning(
-                                "Specifying `None` for time varying dimensions "
+                        _msg = ("Specifying `None` for time varying dimensions "
                                 "of model outputs will soon be deprecated. "
                                 "Change to specifying the name of the "
                                 "variable to save a string, and/or convert to "
-                                "dictionary inputs."
-                            )
-                        )
+                                "dictionary inputs.")
+                        self.log_warning(_msg)
+                        warnings.warn(UserWarning(_msg))
                         __varvalue = None
                     else:
                         __varvalue = getattr(self, __inlist[0])
@@ -1048,6 +1038,7 @@ class init_tools(abc.ABC):
             _eta0 = checkpoint["eta0"]
         else:
             if not _warned:
+                self.log_warning(_warning_msg)
                 warnings.warn(UserWarning(_warning_msg))
                 _warned = True
             _eta0 = np.full(checkpoint["eta"].shape, np.nan)
@@ -1057,6 +1048,7 @@ class init_tools(abc.ABC):
             _eta_init = checkpoint["eta_init"]
         else:
             if not _warned:
+                self.log_warning(_warning_msg)
                 warnings.warn(UserWarning(_warning_msg))
                 _warned = True
             _eta_init = np.full(checkpoint["eta"].shape, np.nan)
@@ -1148,7 +1140,7 @@ class init_tools(abc.ABC):
                     "NetCDF4 output file not found, but was expected. "
                     "Creating a new output file."
                 )
-                self.logger.warning(_msg)
+                self.log_warning(_msg)
                 warnings.warn(UserWarning(_msg))
 
                 # create a new file
