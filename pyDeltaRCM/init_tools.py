@@ -102,6 +102,7 @@ class init_tools(abc.ABC):
         self._save_var_list = dict()  # dict of variables to save
         self._save_var_list["meta"] = dict()  # set up meta dict
 
+
     def init_logger(self) -> None:
         """Initialize a logger.
 
@@ -142,7 +143,6 @@ class init_tools(abc.ABC):
         self.log_info(
             "Platform: {}".format(platform.platform()), verbosity=0
         )  # log the os
-
 
 
     def process_input_to_model(self) -> None:
