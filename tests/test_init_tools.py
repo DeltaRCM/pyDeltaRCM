@@ -1619,3 +1619,60 @@ class TestCustomOutputs:
 
         assert "normalized_discharge_x" in data.variables
         assert np.all(data["normalized_discharge_x"][0].data == delta.qxn)
+
+
+class TestCustomInputs:
+    def test_custom_model_inputs(self, tmp_path: Path) -> None:
+        # test that input metadata can be a dict
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "custom_bool", True) # change from default below
+        utilities.write_parameter_to_file(f, "custom_list", [1, 2, 3]) # change from default below
+        f.close()
+
+        class CustomInputs(DeltaModel):
+            def __init__(self, input_file=None, **kwargs):
+                # inherit base DeltaModel methods
+                super().__init__(input_file, **kwargs)
+
+            def hook_import_files(self):
+                """Define the custom YAML parameters."""
+                # custom boolean parameter
+                self.subclass_parameters['custom_bool'] = {
+                    'type': 'bool', 'default': False
+                }
+
+                # custom numeric parameter
+                self.subclass_parameters['custom_number'] = {
+                    'type': ['int', 'float'], 'default': 42
+                }
+
+                # custom list parameter
+                self.subclass_parameters['custom_list'] = {
+                    'type': ['list'], 'default': []
+                }
+
+        delta = CustomInputs(input_file=p)
+
+        assert delta.custom_bool == True
+        assert delta.custom_number == 42  # default
+        assert delta.custom_list == [1, 2, 3]  # default
+
+    def test_custom_inputs_not_defined_warning(self, tmp_path: Path) -> None:
+        # test that input metadata can be a dict
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "not_defined_parameter", True) # change from default below
+        f.close()
+
+        class CustomInputs(DeltaModel):
+            def __init__(self, input_file=None, **kwargs):
+                # inherit base DeltaModel methods
+                super().__init__(input_file, **kwargs)
+
+        with pytest.warns(UserWarning, match=r"not_defined_parameter"):
+            delta = CustomInputs(input_file=p)
+
+        assert not hasattr(delta, "not_defined_parameter")

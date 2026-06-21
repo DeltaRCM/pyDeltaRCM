@@ -9,6 +9,8 @@ import unittest.mock as mock
 
 from pyDeltaRCM.model import DeltaModel
 from pyDeltaRCM.shared_tools import (
+    set_random_seed,
+    get_random_uniform,
     ParameterChangedWarning
 )
 from . import utilities
@@ -122,13 +124,13 @@ class Test__init__:
         utilities.write_parameter_to_file(f, "seed", 9999)
         utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
         f.close()
-        shared_tools.set_random_seed(9999)
-        _preval_same = shared_tools.get_random_uniform(1)
-        shared_tools.set_random_seed(5)
-        _preval_diff = shared_tools.get_random_uniform(1)
+        set_random_seed(9999)
+        _preval_same = get_random_uniform(1)
+        set_random_seed(5)
+        _preval_diff = get_random_uniform(1)
         delta = DeltaModel(input_file=p)
         assert delta.seed == 9999
-        _postval_same = shared_tools.get_random_uniform(1)
+        _postval_same = get_random_uniform(1)
         assert _preval_same == _postval_same
         assert delta.seed == 9999
 

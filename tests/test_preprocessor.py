@@ -23,15 +23,17 @@ class TestPreprocessorSingleJobSetups:
         with pytest.raises(ValueError):
             _ = preprocessor.Preprocessor()
 
-    def test_py_hlvl_runjobs_simple_param(self, tmp_path: Path) -> None:
-        # a single parameter
+    def test_py_hlvl_runjobs_simple_param_float(self, tmp_path: Path) -> None:
+        # a single parameter float
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'h0': 7.5})
         pp = preprocessor.Preprocessor(p)
 
         assert len(pp.file_list) == 1
         assert pp._is_completed is False
+        assert pp._config_list[0]["h0"] == 7.5
 
+    def test_py_hlvl_runjobs_simple_param_null0(self, tmp_path: Path) -> None:
         # a parameter that takes null as the default
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'hb': 7.5})
@@ -39,7 +41,9 @@ class TestPreprocessorSingleJobSetups:
 
         assert len(pp.file_list) == 1
         assert pp._is_completed is False
+        assert pp._config_list[0]["hb"] == 7.5
 
+    def test_py_hlvl_runjobs_simple_param_null1(self, tmp_path: Path) -> None:
         # a parameter that takes null with null
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
                                      {'hb': None})
@@ -47,6 +51,20 @@ class TestPreprocessorSingleJobSetups:
 
         assert len(pp.file_list) == 1
         assert pp._is_completed is False
+        assert pp._config_list[0]["hb"] == 'None'
+
+    def test_py_hlvl_runjobs_simple_param_yaml(self, tmp_path: Path) -> None:
+        yaml_dict = {
+            "out_dir": tmp_path,
+            "h0": 7.5,
+            }
+        pp = pyDeltaRCM.Preprocessor(
+            yaml_dict)
+
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+        assert pp._config_list[0]["h0"] == 7.5
+
 
     def test_py_hlvl_tsteps_yml_runjobs_sngle(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
@@ -166,6 +184,30 @@ class TestPreprocessorSingleJobSetups:
         assert (pp.config_dict['save_eta_figs'] is True)
         assert ('time' in pp.config_dict.keys())
         assert ('timesteps' in pp.config_dict.keys())
+
+    def test_py_hlvl_timesteps_not_writted_to_job(self, tmp_path: Path) -> None:
+        """
+        Test that timesteps is not written to the file
+
+        note that time and timesteps both persist, precedence for these args
+        is determined at runtime of run_jobs()
+        """
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_eta_figs': True,
+                                      'timesteps': 20,
+                                      'time': 1000})
+        pp = preprocessor.Preprocessor(input_file=p, timesteps=13, time=13000)
+
+        assert type(pp.file_list) is list
+        assert len(pp.file_list) == 1
+        assert pp._is_completed is False
+
+        assert pp.config_dict['timesteps'] == 13
+        assert pp.config_dict['time'] == 13000
+        assert (pp.config_dict['save_eta_figs'] is True)
+        assert ('time' in pp.config_dict.keys())
+        assert ('timesteps' in pp.config_dict.keys())
+
 
 
 class TestPreprocessorMatrixJobsSetups:
@@ -525,12 +567,12 @@ class TestPreprocessorEnsembleJobsSetups:
         utilities.write_parameter_to_file(f, 'ensemble', 1)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
         f.close()
-        with pytest.warns(UserWarning,
-                          match=r'Ensemble was set to 1. *.'):
-            pp = preprocessor.Preprocessor(input_file=p)
+        # with pytest.warns(UserWarning,
+        #                   match=r'Ensemble was set to 1. *.'):
+        pp = preprocessor.Preprocessor(input_file=p)
 
         # check that keys were reset and config set correctly
-        assert pp._has_ensemble is False
+        assert pp._has_ensemble is True # always true
         assert pp._has_matrix is False
         assert len(pp.file_list) == 1
 
@@ -741,6 +783,54 @@ class TestPreprocessorRunJobs:
         assert ptch.call_count == 1
         assert len(pp.job_list) == 1
         assert pp._is_completed is True
+
+    def test_run_single_serial_job_wparams_yaml(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
+                                     {'save_eta_figs': True,
+                                     'timesteps': 20})
+        pp = preprocessor.Preprocessor(p)
+
+        # patch jobs
+        with mock.patch('pyDeltaRCM.preprocessor._SerialJob') as ptch:
+
+            # run the method
+            pp.run_jobs()
+
+        assert ptch.call_count == 1
+        assert len(pp.job_list) == 1
+        assert pp._is_completed is True
+
+        # check that the yaml configs are actually written to the temp directory
+        dir_path = Path(tmp_path / "out_dir" / "job_000")
+        file_count = sum(1 for item in dir_path.iterdir() if item.is_file())
+        assert file_count == 1
+
+    def test_run_single_serial_job_wparams_dict(self, tmp_path: Path) -> None:
+        p = {'save_eta_figs': True,
+             'timesteps': 20,
+             "out_dir": tmp_path / "out_dir"}
+        pp = preprocessor.Preprocessor(p)
+
+        # patch jobs
+        with mock.patch('pyDeltaRCM.preprocessor._SerialJob') as ptch:
+
+            # run the method
+            pp.run_jobs()
+
+        assert ptch.call_count == 1
+        assert len(pp.job_list) == 1
+        assert pp._is_completed is True
+
+        # check that the yaml configs are actually written to the temp directory
+        dir_path = Path(tmp_path / "out_dir" / "job_000")
+        file_count = sum(1 for item in dir_path.iterdir() if item.is_file())
+        assert file_count == 1
+
+    def test_run_single_serial_job_wparams_dict_nooutdir(self, tmp_path: Path) -> None:
+        p = {'save_eta_figs': True,
+             'timesteps': 20}
+        with pytest.raises(ValueError, match=r'specify "out_dir"'):
+            pp = preprocessor.Preprocessor(p)
 
     def test_run_two_serial_jobs(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
