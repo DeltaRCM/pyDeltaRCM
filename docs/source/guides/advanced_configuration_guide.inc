@@ -242,7 +242,17 @@ However, for stability and forwards-compatibility, you should try to minimize co
 If you identify a location in the model framework where you think adding a hook (for example, another `hook_after_` method), please file an issue on the GitHub and we will be happy to consider.
 
 
+Subclass inputs and outputs
+---------------------------
+
+It is easy to specify additional YAML-based inputs to a custom subclass, and specify additional fields to be added to the output netCDF file.
+
+* :doc:`Adding YAML-based inputs to custom subclasses </examples/custom_yaml>`
+* :doc:`Adding arrays and scalars tot output NetCDF file </examples/custom_saving>`
+
+
 Subclassing examples
 --------------------
 
-We maintain a number of :doc:`examples of pyDeltaRCM use</examples/index>`, which show  DeltaModel subclasses implementing various hooks, and reimplementing existing methods, to achieve complex behavior.
+We maintain a number of additional :doc:`examples of pyDeltaRCM use </examples/index>`, which show  DeltaModel subclasses implementing various hooks, and reimplementing existing methods, to achieve complex behavior.
+We also have the :doc:`Model Zoo </examples/modelzoo>`, which links to examples of the model used in the wild (i.e., in peer-reviewed publications).
