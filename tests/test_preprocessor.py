@@ -55,7 +55,7 @@ class TestPreprocessorSingleJobSetups:
 
     def test_py_hlvl_runjobs_simple_param_yaml(self, tmp_path: Path) -> None:
         yaml_dict = {
-            "out_dir": tmp_path,
+            "out_dir": tmp_path / "out_dir",
             "h0": 7.5,
             }
         pp = pyDeltaRCM.Preprocessor(
@@ -567,12 +567,11 @@ class TestPreprocessorEnsembleJobsSetups:
         utilities.write_parameter_to_file(f, 'ensemble', 1)
         utilities.write_parameter_to_file(f, 'out_dir', tmp_path / 'test')
         f.close()
-        # with pytest.warns(UserWarning,
-        #                   match=r'Ensemble was set to 1. *.'):
-        pp = preprocessor.Preprocessor(input_file=p)
+        with pytest.warns(UserWarning, match=r'Ensemble was set to 1. *.'):
+            pp = preprocessor.Preprocessor(input_file=p)
 
         # check that keys were reset and config set correctly
-        assert pp._has_ensemble is True # always true
+        assert pp._has_ensemble is False
         assert pp._has_matrix is False
         assert len(pp.file_list) == 1
 

@@ -1,3 +1,5 @@
+import pytest
+
 import os
 import sys
 import glob
@@ -6,6 +8,7 @@ from pathlib import Path
 import unittest.mock as mock
 
 from pyDeltaRCM.model import DeltaModel
+from pyDeltaRCM.shared_tools import ParameterChangedWarning
 
 from . import utilities
 
@@ -183,10 +186,13 @@ class TestLoggerIntegratedDuringInitialization:
         utilities.write_parameter_to_file(f, 'verbose', 1)
         utilities.write_parameter_to_file(f, 'Width', 10001)
         f.close()
-        delta = DeltaModel(input_file=p)
+        # check that warning is raised
+        with pytest.warns(ParameterChangedWarning):
+            delta = DeltaModel(input_file=p)
         _logs = glob.glob(os.path.join(delta.prefix, '*.log'))
         assert len(_logs) == 1  # log file exists
         with open(_logs[0], 'r') as _logfile:
             _lines = _logfile.readlines()
             _joinedlines = ' '.join(_lines)  # collapse to a single string
+        # check that warning is logged
         assert "Parameter 'Width' was changed from 10001 to 10000." in _joinedlines
