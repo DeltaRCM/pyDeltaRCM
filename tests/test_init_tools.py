@@ -1180,6 +1180,16 @@ class TestInputParameterResolution:
         with pytest.warns(UserWarning, match=r"A Preprocessor-only .*set.*"):
             _ = DeltaModel(input_file=p)
 
+    def test_parameter_pp_AND_unused(self, tmp_path):
+        p = utilities.yaml_from_dict(
+            tmp_path, "input.yaml", {"matrix": 0.8, "unused_input_yaml": 42}
+        )
+        with (
+            pytest.warns(UserWarning, match=r"A Preprocessor-only .*matrix.*"),
+            pytest.warns(UserWarning, match=r"One or more .* ['unused_input_yaml']"),
+        ):
+            _ = DeltaModel(input_file=p)
+
     def test_parameter_timesteps_unused_no_warning(self, tmp_path):
         p = utilities.yaml_from_dict(tmp_path, "input.yaml", {"timesteps": 1})
         # ensure no warnings are emitted
@@ -1627,8 +1637,12 @@ class TestCustomInputs:
         file_name = "user_parameters.yaml"
         p, f = utilities.create_temporary_file(tmp_path, file_name)
         utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
-        utilities.write_parameter_to_file(f, "custom_bool", True) # change from default below
-        utilities.write_parameter_to_file(f, "custom_list", [1, 2, 3]) # change from default below
+        utilities.write_parameter_to_file(
+            f, "custom_bool", True
+        )  # change from default below
+        utilities.write_parameter_to_file(
+            f, "custom_list", [1, 2, 3]
+        )  # change from default below
         f.close()
 
         class CustomInputs(DeltaModel):
@@ -1639,18 +1653,21 @@ class TestCustomInputs:
             def hook_import_files(self):
                 """Define the custom YAML parameters."""
                 # custom boolean parameter
-                self.subclass_parameters['custom_bool'] = {
-                    'type': 'bool', 'default': False
+                self.subclass_parameters["custom_bool"] = {
+                    "type": "bool",
+                    "default": False,
                 }
 
                 # custom numeric parameter
-                self.subclass_parameters['custom_number'] = {
-                    'type': ['int', 'float'], 'default': 42
+                self.subclass_parameters["custom_number"] = {
+                    "type": ["int", "float"],
+                    "default": 42,
                 }
 
                 # custom list parameter
-                self.subclass_parameters['custom_list'] = {
-                    'type': ['list'], 'default': []
+                self.subclass_parameters["custom_list"] = {
+                    "type": ["list"],
+                    "default": [],
                 }
 
         delta = CustomInputs(input_file=p)
@@ -1658,24 +1675,6 @@ class TestCustomInputs:
         assert delta.custom_bool == True
         assert delta.custom_number == 42  # default
         assert delta.custom_list == [1, 2, 3]  # default
-
-    def test_custom_inputs_not_defined_warning(self, tmp_path: Path) -> None:
-        # test that input metadata can be a dict
-        file_name = "user_parameters.yaml"
-        p, f = utilities.create_temporary_file(tmp_path, file_name)
-        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
-        utilities.write_parameter_to_file(f, "not_defined_parameter", True) # change from default below
-        f.close()
-
-        class CustomInputs(DeltaModel):
-            def __init__(self, input_file=None, **kwargs):
-                # inherit base DeltaModel methods
-                super().__init__(input_file, **kwargs)
-
-        with pytest.warns(UserWarning, match=r"not_defined_parameter"):
-            delta = CustomInputs(input_file=p)
-
-        assert not hasattr(delta, "not_defined_parameter")
 
     def test_custom_inputs_already_exists(self, tmp_path: Path) -> None:
         # test that input metadata can be a dict
@@ -1691,9 +1690,32 @@ class TestCustomInputs:
 
             def hook_import_files(self):
                 # define a parameter that already exists
-                self.subclass_parameters['theta_water'] = {
-                    'type': 'float', 'default': 10000
+                self.subclass_parameters["theta_water"] = {
+                    "type": "float",
+                    "default": 10000,
                 }
 
-        with pytest.raises(ValueError, match=r"Custom subclass parameter 'theta_water'"):
+        with pytest.raises(
+            ValueError, match=r"Custom subclass parameter 'theta_water'"
+        ):
             delta = CustomInputs(input_file=p)
+
+    def test_custom_model_unused(self, tmp_path: Path) -> None:
+        # test that input metadata can be a dict
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(
+            f, "unused_input_yaml", True
+        )  # change from default below
+        f.close()
+
+        class CustomInputs(DeltaModel):
+            def __init__(self, input_file=None, **kwargs):
+                # inherit base DeltaModel methods
+                super().__init__(input_file, **kwargs)
+
+        with pytest.warns(UserWarning, match=r"One or more .* ['unused_input_yaml']"):
+            delta = CustomInputs(input_file=p)
+
+        assert not hasattr(delta, "unused_input_yaml")

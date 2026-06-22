@@ -3,6 +3,7 @@ import pytest
 import platform
 import os
 from pathlib import Path
+import glob
 
 import unittest.mock as mock
 
@@ -733,6 +734,84 @@ class TestPreprocessorParallelJobsSetups:
         assert pp._is_completed is False
 
         assert pp.config_dict["parallel"] == 2
+
+
+class TestPreprocessorCustomSubclasses:
+
+    def test_subclass_parameter_nowarnings(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(
+            tmp_path,
+            "input.yaml",
+            {
+                "save_eta_figs": True,
+                "timesteps": 2,
+                "custom_bool": True,
+            },  # custom_bool is not default
+        )
+        pp = preprocessor.Preprocessor(p)
+
+        class CustomInputs(DeltaModel):
+            def __init__(self, input_file=None, **kwargs):
+                # inherit base DeltaModel methods
+                super().__init__(input_file, **kwargs)
+
+            def hook_import_files(self):
+                self.subclass_parameters["custom_bool"] = {
+                    "type": "bool",
+                    "default": False,
+                }
+
+        # patch solver for fast run, no warnings issued
+        with mock.patch(
+            "pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep"
+        ) as ptch:
+
+            # run jobs to initialize deltas
+            pp.run_jobs(DeltaModel=CustomInputs)
+
+        # open log and check that True is recorded for custom_bool
+        _logs = glob.glob(os.path.join(tmp_path / "out_dir" / "job_000", "*.log"))
+        assert len(_logs) == 1  # log file exists
+        with open(_logs[0], "r") as _logfile:
+            _lines = _logfile.readlines()
+            _joinedlines = " ".join(_lines)  # collapse to a single string
+            assert "`custom_bool`: True" in _joinedlines
+
+    def test_subclass_parameter_warnunused(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(
+            tmp_path,
+            "input.yaml",
+            {
+                "save_eta_figs": True,
+                "timesteps": 2,
+                "custom_bool": True,
+                "unused_input_yaml": 42,
+            },
+        )
+        pp = preprocessor.Preprocessor(p)
+
+        class CustomInputs(DeltaModel):
+            def __init__(self, input_file=None, **kwargs):
+                # inherit base DeltaModel methods
+                super().__init__(input_file, **kwargs)
+
+        # patch solver for fast run
+        with mock.patch(
+            "pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep"
+        ) as ptch:
+
+            with pytest.warns(
+                UserWarning, match=r"One or more .* ['unused_input_yaml']"
+            ):
+                # run jobs to initialize deltas
+                pp.run_jobs(DeltaModel=CustomInputs)
+
+        _logs = glob.glob(os.path.join(tmp_path / "out_dir" / "job_000", "*.log"))
+        assert len(_logs) == 1  # log file exists
+        with open(_logs[0], "r") as _logfile:
+            _lines = _logfile.readlines()
+            _joinedlines = " ".join(_lines)  # collapse to a single string
+            assert "`custom_bool`: True" in _joinedlines
 
 
 class TestPreprocessorRunJobs:
