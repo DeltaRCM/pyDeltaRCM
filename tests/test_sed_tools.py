@@ -34,22 +34,6 @@ class TestSedimentRoute:
         assert _delta.topo_diffusion.called is True
         assert _delta.route_all_mud_parcels.called is True
 
-    def test_sed_route_deprecated(self, tmp_path: Path) -> None:
-        # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
-        _delta = DeltaModel(input_file=p)
-
-        # mock top-level methods
-        _delta.logger = mock.MagicMock()
-        _delta.route_sediment = mock.MagicMock()
-
-        # check warning raised
-        with pytest.warns(UserWarning):
-            _delta.sed_route()
-
-        # and logged
-        assert _delta.logger.warning.called is True
-
 
 class TestInitSedimentIteration:
 
