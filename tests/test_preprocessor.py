@@ -795,6 +795,12 @@ class TestPreprocessorCustomSubclasses:
                 # inherit base DeltaModel methods
                 super().__init__(input_file, **kwargs)
 
+            def hook_import_files(self):
+                self.subclass_parameters["custom_bool"] = {
+                    "type": "bool",
+                    "default": False,
+                }
+
         # patch solver for fast run
         with mock.patch(
             "pyDeltaRCM.iteration_tools.iteration_tools.solve_water_and_sediment_timestep"
@@ -960,29 +966,28 @@ class TestPreprocessorRunJobs:
     @pytest.mark.skipif(
         platform.system() != "Linux", reason="Parallel support only on Linux OS."
     )
-    def test_run_five_parallel_jobs_bad_types(self, tmp_path: Path) -> None:
+    def test_run_five_parallel_jobs_bad_type_string(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
+        pp_str = preprocessor.Preprocessor(p, parallel="string!")
+        with (
+            mock.patch("pyDeltaRCM.preprocessor._ParallelJob"),
+            mock.patch("multiprocessing.Semaphore"),
+        ):
+            with pytest.raises(ValueError, match=r"Parallel flag *."):
+                pp_str.run_jobs()
+
+    @pytest.mark.skipif(
+        platform.system() != "Linux", reason="Parallel support only on Linux OS."
+    )
+    def test_run_five_parallel_jobs_bad_type_float(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         pp_float = preprocessor.Preprocessor(p, parallel=3.33)
-        pp_str = preprocessor.Preprocessor(p, parallel="string!")
-
-        # patch jobs and semaphore to check number of processes called
         with (
             mock.patch("pyDeltaRCM.preprocessor._ParallelJob"),
             mock.patch("multiprocessing.Semaphore"),
         ):
-
             with pytest.raises(ValueError, match=r"Parallel flag *."):
-                # run the method
                 pp_float.run_jobs()
-
-        with (
-            mock.patch("pyDeltaRCM.preprocessor._ParallelJob"),
-            mock.patch("multiprocessing.Semaphore"),
-        ):
-
-            with pytest.raises(ValueError, match=r"Parallel flag *."):
-                # run the method
-                pp_str.run_jobs()
 
     @pytest.mark.skipif(
         platform.system() == "Linux", reason="Parallel support only on Linux OS."
