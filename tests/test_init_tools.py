@@ -1676,3 +1676,24 @@ class TestCustomInputs:
             delta = CustomInputs(input_file=p)
 
         assert not hasattr(delta, "not_defined_parameter")
+
+    def test_custom_inputs_already_exists(self, tmp_path: Path) -> None:
+        # test that input metadata can be a dict
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        f.close()
+
+        class CustomInputs(DeltaModel):
+            def __init__(self, input_file=None, **kwargs):
+                # inherit base DeltaModel methods
+                super().__init__(input_file, **kwargs)
+
+            def hook_import_files(self):
+                # define a parameter that already exists
+                self.subclass_parameters['theta_water'] = {
+                    'type': 'float', 'default': 10000
+                }
+
+        with pytest.raises(ValueError, match=r"Custom subclass parameter 'theta_water'"):
+            delta = CustomInputs(input_file=p)

@@ -199,11 +199,10 @@ class init_tools(abc.ABC):
         # add custom subclass yaml parameters (yaml or defaults) to input vars
         for k, v in self.subclass_parameters.items():
             if k in input_file_vars:
-                _msg = ("Custom subclass parameter name is already a "
-                        "default yaml parameter of the model, "
-                        "custom parameter value will not be used.")
-                self.log_warning(_msg)
-                warnings.warn(UserWarning(_msg))
+                _msg = (f"Custom subclass parameter '{k}' is already a "
+                        f"default yaml parameter of the model."
+                        f"Choose a different name for custom parameter value.")
+                raise ValueError(_msg)
             elif k in self._user_dict:
                 # get expected types
                 if not type(v["type"]) is list:
