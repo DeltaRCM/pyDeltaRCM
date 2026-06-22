@@ -17,12 +17,9 @@ from pyDeltaRCM.shared_tools import (
     custom_yaml_loader,
     set_random_seed,
     set_random_state,
-    ParameterChangedWarning
+    ParameterChangedWarning,
 )
-from pyDeltaRCM.sed_tools import (
-    MudRouter,
-    SandRouter
-)
+from pyDeltaRCM.sed_tools import MudRouter, SandRouter
 
 # tools for initiating deltaRCM model domain
 
@@ -76,7 +73,6 @@ class init_tools(abc.ABC):
         self._user_dict = user_dict
         self._kwargs_dict = kwargs_dict
 
-
     def init_output_infrastructure(self) -> None:
         """Initialize the output infrastructure (folder and save lists).
 
@@ -101,7 +97,6 @@ class init_tools(abc.ABC):
         self._save_fig_list = dict()  # dict of figure variables to save
         self._save_var_list = dict()  # dict of variables to save
         self._save_var_list["meta"] = dict()  # set up meta dict
-
 
     def init_logger(self) -> None:
         """Initialize a logger.
@@ -144,7 +139,6 @@ class init_tools(abc.ABC):
             "Platform: {}".format(platform.platform()), verbosity=0
         )  # log the os
 
-
     def process_input_to_model(self) -> None:
         """Process input file to model variables.
 
@@ -172,8 +166,10 @@ class init_tools(abc.ABC):
         #   **kwargs input
         for kwk, kwv in self._kwargs_dict.items():
             if kwk in self._user_dict.keys():
-                _msg = ("A keyword specification was also found "
-                        "in the user specified input YAML file: %s" % kwk)
+                _msg = (
+                    "A keyword specification was also found "
+                    "in the user specified input YAML file: %s" % kwk
+                )
                 self.log_warning(_msg)
                 warnings.warn(UserWarning(_msg))
             self._user_dict[kwk] = kwv
@@ -199,9 +195,11 @@ class init_tools(abc.ABC):
         # add custom subclass yaml parameters (yaml or defaults) to input vars
         for k, v in self.subclass_parameters.items():
             if k in input_file_vars:
-                _msg = (f"Custom subclass parameter '{k}' is already a "
-                        f"default yaml parameter of the model."
-                        f"Choose a different name for custom parameter value.")
+                _msg = (
+                    f"Custom subclass parameter '{k}' is already a "
+                    f"default yaml parameter of the model."
+                    f"Choose a different name for custom parameter value."
+                )
                 raise ValueError(_msg)
             elif k in self._user_dict:
                 # get expected types
@@ -240,30 +238,38 @@ class init_tools(abc.ABC):
         # remove special keywords from the dict of user YAML parameters
         # these are keywords related to time or matrix/set expansion
         _no_list = ["timesteps", "time", "time_years", "config", "dryrun", "parallel"]
-        _ = [self._user_dict.pop(key) for key in _no_list if key in self._user_dict.keys()]
+        _ = [
+            self._user_dict.pop(key)
+            for key in _no_list
+            if key in self._user_dict.keys()
+        ]
         # identify unused parameters
         unused_user_keys = [
             k for k, v in self._user_dict.items() if not (k in input_file_vars.keys())
         ]
         if len(unused_user_keys) > 0:
             any_in_preprocessor = [k for k in unused_user_keys if (k in pp_only_kw)]
-            if len(any_in_preprocessor):
-                _msg = ("A Preprocessor-only keyword was specified as input in "
-                        "yaml file or kwargs: {0}. Advanced configurations "
-                        "are only supported by the Preprocessor via the "
-                        "high-level API. Any parameters specified as part of this "
-                        "advanced keyword configuration will not be used!".format(
-                            any_in_preprocessor
-                        ))
+            any_other_unused = [k for k in unused_user_keys if not (k in pp_only_kw)]
+            if len(any_in_preprocessor) > 0:
+                _msg = (
+                    "A Preprocessor-only keyword was specified as input in "
+                    "yaml file or kwargs: {0}. Advanced configurations "
+                    "are only supported by the Preprocessor via the "
+                    "high-level API. Any parameters specified as part of this "
+                    "advanced keyword configuration will not be used!".format(
+                        any_in_preprocessor
+                    )
+                )
                 self.log_warning(_msg)
                 warnings.warn(UserWarning(_msg))
-            else:
-                _msg = ("One or more inputs in yaml file or kwargs were unused by "
-                        "the model during instantiation. "
-                        "The unused keys are: {0}".format(str(unused_user_keys)))
+            if len(any_other_unused) > 0:
+                _msg = (
+                    "One or more inputs in yaml file or kwargs were unused by "
+                    "the model during instantiation. "
+                    "The unused keys are: {0}".format(str(unused_user_keys))
+                )
                 self.log_warning(_msg)
                 warnings.warn(UserWarning(_msg))
-
 
         # process the input file to attributes of the model
         for k, v in list(self._input_file_vars.items()):
@@ -453,12 +459,16 @@ class init_tools(abc.ABC):
         self.L0 = max(1, min(int(round(self._L0_meters / self._dx)), self.L // 4))
         self.N0 = max(3, min(int(round(self._N0_meters / self._dx)), self.W // 4))
         if self.L0 * self._dx != _input_L0_meters:
-            pcw = ParameterChangedWarning("L0_meters", _input_L0_meters, self.L0 * self._dx)
+            pcw = ParameterChangedWarning(
+                "L0_meters", _input_L0_meters, self.L0 * self._dx
+            )
             self.log_warning(format(pcw))
             warnings.warn(pcw)
             self.L0_meters = self.L0 * self._dx
         if self.N0 * self._dx != _input_N0_meters:
-            pcw = ParameterChangedWarning("N0_meters", _input_N0_meters, self.N0 * self._dx)
+            pcw = ParameterChangedWarning(
+                "N0_meters", _input_N0_meters, self.N0 * self._dx
+            )
             self.log_warning(format(pcw))
             warnings.warn(pcw)
             self.N0_meters = self.N0 * self._dx
@@ -875,11 +885,13 @@ class init_tools(abc.ABC):
                     __inlist = self._save_var_list["meta"][_val]
                     __varname = _val
                     if __inlist[0] is None:
-                        _msg = ("Specifying `None` for time varying dimensions "
-                                "of model outputs will soon be deprecated. "
-                                "Change to specifying the name of the "
-                                "variable to save a string, and/or convert to "
-                                "dictionary inputs.")
+                        _msg = (
+                            "Specifying `None` for time varying dimensions "
+                            "of model outputs will soon be deprecated. "
+                            "Change to specifying the name of the "
+                            "variable to save a string, and/or convert to "
+                            "dictionary inputs."
+                        )
                         self.log_warning(_msg)
                         warnings.warn(UserWarning(_msg))
                         __varvalue = None
