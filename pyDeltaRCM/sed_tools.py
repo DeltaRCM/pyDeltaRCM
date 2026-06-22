@@ -58,18 +58,6 @@ class sed_tools(abc.ABC):
         self.hook_route_all_mud_parcels()
         self.route_all_mud_parcels()
 
-    def sed_route(self) -> None:
-        """Deprecated, since v1.3.1. Use :obj:`route_sediment`."""
-        _msg = (
-            "`sed_route` and `hook_sed_route` are deprecated and "
-            "have been replaced with `route_sediment`. "
-            "Running `route_sediment` now, but "
-            "this will be removed in future release."
-        )
-        self.logger.warning(_msg)
-        warnings.warn(UserWarning(_msg))
-        self.route_sediment()
-
     def init_sediment_iteration(self) -> None:
         """Init the water iteration routine.
 
@@ -130,9 +118,7 @@ class sed_tools(abc.ABC):
 
         num_starts = int(self._Np_sed * self._f_bedload)
         inlet_weights = self.get_inlet_weights_sediment(parcel_type="sand")
-        start_indices = get_start_indices(
-            self.inlet, inlet_weights, num_starts
-        )
+        start_indices = get_start_indices(self.inlet, inlet_weights, num_starts)
 
         _msg = "Supplying model state to SandRouter for iteration"
         self.log_info(_msg, verbosity=2)
@@ -198,9 +184,7 @@ class sed_tools(abc.ABC):
 
         num_starts = int(self._Np_sed * (1 - self._f_bedload))
         inlet_weights = self.get_inlet_weights_sediment(parcel_type="mud")
-        start_indices = get_start_indices(
-            self.inlet, inlet_weights, num_starts
-        )
+        start_indices = get_start_indices(self.inlet, inlet_weights, num_starts)
 
         _msg = "Supplying model state to MudRouter for iteration"
         self.log_info(_msg, verbosity=2)
@@ -435,9 +419,7 @@ class BaseRouter:
 
         new_cell = random_pick(weights)
 
-        dist, istep, jstep, _ = get_steps(
-            new_cell, self.iwalk_flat, self.jwalk_flat
-        )
+        dist, istep, jstep, _ = get_steps(new_cell, self.iwalk_flat, self.jwalk_flat)
 
         return istep, jstep, dist
 
