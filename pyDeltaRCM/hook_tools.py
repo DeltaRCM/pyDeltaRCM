@@ -19,10 +19,7 @@ class hook_tools(abc.ABC):
 
         This helper method is early in the `DeltaModel` `__init__` routine.
         """
-        _deprecated_list = {
-            "hook_sed_route": "hook_route_sediment",
-            "hook_run_one_timestep": "hook_solve_water_and_sediment_timestep",
-        }
+        _deprecated_list = {}
         for old_hook, new_hook in _deprecated_list.items():
             if hasattr(self, old_hook):
                 raise AttributeError(

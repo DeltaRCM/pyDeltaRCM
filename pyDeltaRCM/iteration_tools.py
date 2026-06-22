@@ -8,9 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.axes_grid1 as axtk
 
-from pyDeltaRCM.shared_tools import (
-    get_random_state
-)
+from pyDeltaRCM.shared_tools import get_random_state
 
 
 class iteration_tools(abc.ABC):
@@ -46,19 +44,6 @@ class iteration_tools(abc.ABC):
         self.hook_route_sediment()
         self.route_sediment()
         self.hook_after_route_sediment()
-
-    def run_one_timestep(self) -> None:
-        """Deprecated, since v1.3.1. Use :obj:`solve_water_and_sediment_timestep`."""
-        _msg = (
-            "`run_one_timestep` and `hook_run_one_timestep` are "
-            "deprecated and have been replaced with "
-            "`solve_water_and_sediment_timestep`. "
-            "Running `solve_water_and_sediment_timestep` now, but "
-            "this will be removed in future release."
-        )
-        self.logger.warning(_msg)
-        warnings.warn(UserWarning(_msg))
-        self.solve_water_and_sediment_timestep()
 
     def apply_subsidence(self) -> None:
         """Apply subsidence pattern.

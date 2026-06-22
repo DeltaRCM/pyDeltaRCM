@@ -17,12 +17,9 @@ from pyDeltaRCM.shared_tools import (
     custom_yaml_loader,
     set_random_seed,
     set_random_state,
-    ParameterChangedWarning
+    ParameterChangedWarning,
 )
-from pyDeltaRCM.sed_tools import (
-    MudRouter,
-    SandRouter
-)
+from pyDeltaRCM.sed_tools import MudRouter, SandRouter
 
 # tools for initiating deltaRCM model domain
 
@@ -315,15 +312,11 @@ class init_tools(abc.ABC):
         # Length and Width are rounded so domain is integer number of cells
         if self._Length % self._dx != 0:
             _new = int(round(self._Length / self._dx)) * self._dx
-            warnings.warn(
-                ParameterChangedWarning("Length", self._Length, _new)
-            )
+            warnings.warn(ParameterChangedWarning("Length", self._Length, _new))
             self._Length = _new
         if self._Width % self._dx != 0:
             _new = int(round(self._Width / self._dx)) * self._dx
-            warnings.warn(
-                ParameterChangedWarning("Width", self._Width, _new)
-            )
+            warnings.warn(ParameterChangedWarning("Width", self._Width, _new))
             self._Width = _new
         # now guarenteed to be divisible
         self.L = int(self._Length / self._dx)  # num cells in x
@@ -1025,44 +1018,6 @@ class init_tools(abc.ABC):
             "channel_entrance__speed",
         ]
 
-    def _load_past_etas(self, checkpoint):
-        """Handler for new fields in checkpoint file.
-
-        This function was added to allow for old checkpoint files to be loaded
-        without breaking the checkpoint functionality. If the fields are not
-        found a warning is raised, and an array of nan is returned.
-
-        The two fields added in version 2.1.5 are eta0 and eta_init.
-
-        NOTE: This function and warnings will be removed in a future version.
-        """
-        _warned = False  # only warn on the first missing field
-        _warning_msg = (
-            "Checkpoint file does not contain fields `eta0` and/or"
-            "`eta_init`, which were new in version 2.1.5. These fields have been"
-            "filled with np.nan."
-        )
-
-        # look for eta0
-        if "eta0" in checkpoint.keys():
-            _eta0 = checkpoint["eta0"]
-        else:
-            if not _warned:
-                warnings.warn(UserWarning(_warning_msg))
-                _warned = True
-            _eta0 = np.full(checkpoint["eta"].shape, np.nan)
-
-        # look for eta_init
-        if "eta_init" in checkpoint.keys():
-            _eta_init = checkpoint["eta_init"]
-        else:
-            if not _warned:
-                warnings.warn(UserWarning(_warning_msg))
-                _warned = True
-            _eta_init = np.full(checkpoint["eta"].shape, np.nan)
-
-        return _eta0, _eta_init
-
     def load_checkpoint(self, defer_output: bool = False) -> None:
         """Load the checkpoint from the .npz file.
 
@@ -1120,7 +1075,8 @@ class init_tools(abc.ABC):
 
         # load grids
         self.eta = checkpoint["eta"]
-        self.eta0, self.eta_init = self._load_past_etas(checkpoint)
+        self.eta0 = checkpoint["eta0"]
+        self.eta_init = checkpoint["eta_init"]
         self.depth = checkpoint["depth"]
         self.stage = checkpoint["stage"]
         self.uw = checkpoint["uw"]
