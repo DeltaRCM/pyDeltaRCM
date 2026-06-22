@@ -19,7 +19,9 @@ class hook_tools(abc.ABC):
 
         This helper method is early in the `DeltaModel` `__init__` routine.
         """
-        _deprecated_list = {}
+        _deprecated_list = {
+            "hook_null": "hook_null_new",  # a dummy for testing deprecatable hooks
+        }
         for old_hook, new_hook in _deprecated_list.items():
             if hasattr(self, old_hook):
                 raise AttributeError(
