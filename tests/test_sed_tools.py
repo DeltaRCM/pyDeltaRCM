@@ -14,7 +14,7 @@ class TestSedimentRoute:
 
     def test_route_sediment(self, tmp_path: Path) -> None:
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         _delta = DeltaModel(input_file=p)
 
         # mock top-level methods
@@ -28,15 +28,15 @@ class TestSedimentRoute:
         _delta.route_sediment()
 
         # methods called
-        assert (_delta.log_info.call_count == 4)
-        assert (_delta.init_sediment_iteration.called is True)
-        assert (_delta.route_all_sand_parcels.called is True)
-        assert (_delta.topo_diffusion.called is True)
-        assert (_delta.route_all_mud_parcels.called is True)
+        assert _delta.log_info.call_count == 4
+        assert _delta.init_sediment_iteration.called is True
+        assert _delta.route_all_sand_parcels.called is True
+        assert _delta.topo_diffusion.called is True
+        assert _delta.route_all_mud_parcels.called is True
 
     def test_sed_route_deprecated(self, tmp_path: Path) -> None:
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         _delta = DeltaModel(input_file=p)
 
         # mock top-level methods
@@ -48,14 +48,14 @@ class TestSedimentRoute:
             _delta.sed_route()
 
         # and logged
-        assert (_delta.logger.warning.called is True)
+        assert _delta.logger.warning.called is True
 
 
 class TestInitSedimentIteration:
 
     def test_fields_cleared(self, tmp_path: Path) -> None:
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml')
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
         _delta = DeltaModel(input_file=p)
 
         # alter field for initial values going into function
@@ -70,7 +70,7 @@ class TestInitSedimentIteration:
 
         # assertions
         assert np.all(_delta.pad_depth[1:-1, 1:-1] == _delta.depth)
-        assert np.all(_delta.qs == 0)      # field is cleared
+        assert np.all(_delta.qs == 0)  # field is cleared
         assert np.all(_delta.Vp_dep_sand == 0)
         assert np.all(_delta.Vp_dep_mud == 0)
 
@@ -79,9 +79,9 @@ class TestRouteAllSandParcels:
 
     def test_route_sand_parcels(self, tmp_path: Path) -> None:
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'Np_sed': 1000,
-                                      'f_bedload': 0.6})
+        p = utilities.yaml_from_dict(
+            tmp_path, "input.yaml", {"Np_sed": 1000, "f_bedload": 0.6}
+        )
         _delta = DeltaModel(input_file=p)
 
         # mock top-level methods / objects
@@ -93,16 +93,16 @@ class TestRouteAllSandParcels:
             return np.random.randint(0, 5, size=(num_starts,))
 
         patcher = mock.patch(
-            'pyDeltaRCM.shared_tools.get_start_indices',
-            new=_patched_starts)
+            "pyDeltaRCM.shared_tools.get_start_indices", new=_patched_starts
+        )
         patcher.start()
 
         # run the method
         _delta.route_all_sand_parcels()
 
         # methods called
-        assert (_delta._sr.run.call_count == 1)
-        assert (_delta.log_info.call_count == 3)
+        assert _delta._sr.run.call_count == 1
+        assert _delta.log_info.call_count == 3
 
         # stop the patch
         patcher.stop()
@@ -112,9 +112,9 @@ class TestRouteAllMudParcels:
 
     def test_route_mud_parcels(self, tmp_path: Path) -> None:
         # create a delta with default settings
-        p = utilities.yaml_from_dict(tmp_path, 'input.yaml',
-                                     {'Np_sed': 1000,
-                                      'f_bedload': 0.6})
+        p = utilities.yaml_from_dict(
+            tmp_path, "input.yaml", {"Np_sed": 1000, "f_bedload": 0.6}
+        )
         _delta = DeltaModel(input_file=p)
 
         # mock top-level methods / objects
@@ -126,16 +126,43 @@ class TestRouteAllMudParcels:
             return np.random.randint(0, 5, size=(num_starts,))
 
         patcher = mock.patch(
-            'pyDeltaRCM.shared_tools.get_start_indices',
-            new=_patched_starts)
+            "pyDeltaRCM.shared_tools.get_start_indices", new=_patched_starts
+        )
         patcher.start()
 
         # run the method
         _delta.route_all_mud_parcels()
 
         # methods called
-        assert (_delta._mr.run.call_count == 1)
-        assert (_delta.log_info.call_count == 3)
+        assert _delta._mr.run.call_count == 1
+        assert _delta.log_info.call_count == 3
 
         # stop the patch
         patcher.stop()
+
+
+class TestForceDeposit:
+    """Test the force_deposit flag"""
+
+    def test_force_deposit(self, tmp_path: Path) -> None:
+        # create a small domain with low stepmax
+        p = utilities.yaml_from_dict(
+            tmp_path,
+            "input.yaml",
+            {
+                "Width": 2000,
+                "Length": 1000,
+                "Np_sed": 100,
+                "stepmax": 5,
+                "force_deposit": True,
+            },
+        )
+        _delta = DeltaModel(input_file=p)
+
+        vol_lost = 0
+        for _ in range(10):
+            _delta.update()
+            vol_lost += _delta._sr.Vp_lost + _delta._mr.Vp_lost
+
+        # should be no lost volume since force_deposit = True
+        assert vol_lost == pytest.approx(0)

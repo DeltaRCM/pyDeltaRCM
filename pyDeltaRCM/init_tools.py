@@ -652,6 +652,7 @@ class init_tools(abc.ABC):
             self._lambda,
             self._beta,
             self.stepmax,
+            self.force_deposit,
             self.theta_mud,
             self.mod_erosion,
         )
@@ -673,6 +674,7 @@ class init_tools(abc.ABC):
             self.dry_depth,
             self._beta,
             self.stepmax,
+            self.force_deposit,
             self.theta_sand,
             self.mod_erosion,
         )

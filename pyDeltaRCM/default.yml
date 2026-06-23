@@ -175,6 +175,9 @@ alpha:
 stepmax:
   type: ['float', 'int', 'None']
   default: null
+force_deposit:
+  type: ['bool', int]
+  default: False
 sand_frac_bc:
   type: ['float', 'int']
   default: 0
