@@ -336,8 +336,8 @@ class TestDeprecatedHooks:
     class HookDeltaModel(DeltaModel):
         """Dummy class to add old hook."""
 
-        def hook_sed_route(self):
-            """Old hook"""
+        def hook_null(self):
+            """null hook for testing purposes"""
             pass
 
     def test_if_hook_raise_error(self, tmp_path: Path) -> None:
