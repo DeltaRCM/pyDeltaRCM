@@ -139,3 +139,30 @@ class TestRouteAllMudParcels:
 
         # stop the patch
         patcher.stop()
+
+
+class TestForceDeposit:
+    """Test the force_deposit flag"""
+
+    def test_force_deposit(self, tmp_path: Path) -> None:
+        # create a small domain with low stepmax
+        p = utilities.yaml_from_dict(
+            tmp_path,
+            "input.yaml",
+            {
+                "Width": 2000,
+                "Length": 1000,
+                "Np_sed": 100,
+                "stepmax": 5,
+                "force_deposit": True,
+            },
+        )
+        _delta = DeltaModel(input_file=p)
+
+        vol_lost = 0
+        for _ in range(10):
+            _delta.update()
+            vol_lost += _delta._sr.Vp_lost + _delta._mr.Vp_lost
+
+        # should be no lost volume since force_deposit = True
+        assert vol_lost == pytest.approx(0)
