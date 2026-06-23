@@ -8,7 +8,11 @@ from pathlib import Path
 import unittest.mock as mock
 
 from pyDeltaRCM.model import DeltaModel
-from pyDeltaRCM import shared_tools
+from pyDeltaRCM.shared_tools import (
+    set_random_seed,
+    get_random_uniform,
+    ParameterChangedWarning
+)
 from . import utilities
 
 
@@ -120,13 +124,13 @@ class Test__init__:
         utilities.write_parameter_to_file(f, "seed", 9999)
         utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
         f.close()
-        shared_tools.set_random_seed(9999)
-        _preval_same = shared_tools.get_random_uniform(1)
-        shared_tools.set_random_seed(5)
-        _preval_diff = shared_tools.get_random_uniform(1)
+        set_random_seed(9999)
+        _preval_same = get_random_uniform(1)
+        set_random_seed(5)
+        _preval_diff = get_random_uniform(1)
         delta = DeltaModel(input_file=p)
         assert delta.seed == 9999
-        _postval_same = shared_tools.get_random_uniform(1)
+        _postval_same = get_random_uniform(1)
         assert _preval_same == _postval_same
         assert delta.seed == 9999
 
@@ -506,15 +510,32 @@ class TestPublicSettersAndGetters:
 
         # change value
         #  the channel width is then changed internally with `N0`, according
-        #  to the `create_boundary_conditions` so no change is actually made
-        #  here.
-        with pytest.warns(UserWarning):
-            _delta.channel_width = 300
-        assert _delta.channel_width == 250  # not changed!
+        #  to the `create_boundary_conditions`
+        _delta.channel_width = 300
+        assert _delta.channel_width == 250  # not changed bc mocked!!
 
         # assert reinitializers called
         assert _delta.create_boundary_conditions.called is True
         assert _delta.init_sediment_routers.called is True
+
+    def test_setting_getting_channel_width_changed_warning(self, tmp_path: Path) -> None:
+        p = utilities.yaml_from_dict(tmp_path, "input.yaml")
+        _delta = DeltaModel(input_file=p)
+
+        # check initials
+        assert _delta.channel_width == 250
+
+        # change value
+        #  the channel width is then changed internally with `N0`, according
+        #  to the `create_boundary_conditions`
+        _delta.channel_width = 300
+        assert _delta.channel_width == 300  # changed!
+
+        # check that value rounding and warning works
+        with pytest.warns(ParameterChangedWarning):
+            _delta.channel_width = 501
+        assert _delta.channel_width == 500  # changed!
+
 
     def test_setting_getting_flow_depth(self, tmp_path: Path) -> None:
         p = utilities.yaml_from_dict(tmp_path, "input.yaml")

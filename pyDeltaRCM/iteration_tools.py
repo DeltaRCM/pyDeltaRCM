@@ -93,7 +93,14 @@ class iteration_tools(abc.ABC):
         self.stage[:] = np.maximum(self.stage, self._H_SL)
         self.depth[:] = np.maximum(self.stage - self.eta, 0)
 
-        self.eta[0, self.inlet] = self.stage[0, self.inlet] - self._h0
+        # apply bed elevation boundary condition at inlet
+        #   first, calc the change in eta at inlet
+        _eta_change = (self.stage[0, self.inlet] - self._h0) - self.eta[0, self.inlet]
+        self._Vp_inletbc = (
+            np.sum(_eta_change) * self._dx * self._dx
+        )  # for mass cons checks
+        #   now apply boundary condition
+        self.eta[0, self.inlet] += _eta_change
         self.depth[0, self.inlet] = self._h0
 
         self.hook_compute_sand_frac()
@@ -115,6 +122,21 @@ class iteration_tools(abc.ABC):
         """
         if self._verbose >= verbosity:
             self.logger.info(message)
+
+    def log_warning(self, message: str) -> None:
+        """Log warnings.
+
+        We manually log warnings in pyDeltaRCM so that no global settings of the
+        warnings package are affected nor affect this logging.
+
+        Note: `verbosity` not taken as a paramters, we always log warnings.
+
+        Parameters
+        ----------
+        message : :obj:`str`
+            Message string to write to the log as warning.
+        """
+        self.logger.warning(message)
 
     def log_model_time(self) -> None:
         """Log the time of the model.
@@ -164,7 +186,8 @@ class iteration_tools(abc.ABC):
                         "entries in the output NetCDF4 after resuming "
                         "the model run."
                     )
-                    self.logger.warning(_msg)
+                    self.log_warning(_msg)
+                    warnings.warn(_msg)
 
                 self._save_time_since_checkpoint = 0
 

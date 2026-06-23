@@ -544,6 +544,7 @@ class DeltaModel(
                 f"lower the value of gamma. See documentation for "
                 f"more information."
             )
+            self.log_warning(_msg)
             warnings.warn(UserWarning(_msg))
         self._gamma = gamma
 
@@ -1327,6 +1328,30 @@ class DeltaModel(
         self._stepmax = stepmax
 
     @property
+    def force_deposit(self) -> bool:
+        """
+        `force_deposit` is a flag to force mass conservation of sediment parcels
+        that are stuck in loops.
+
+        In the standard DeltaRCM formulation, a sediment parcel that reaches the
+        maximum number of steps with any sediment volume remaining vanishes from
+        the domain, leaving a volume of sediment that entered the domain
+        undeposited. In standard model domain configurations, sediment parcels
+        only rarely become stuck in a loop inside the delta (e.g., a small lake)
+        and meet this condition. Therefore, this modeling choice is a convenient
+        simplification for a small amount of error accrued.
+
+        Optionally, change `force_deposit` to `True` (default is standard
+        behavior `force_deposit=False`)to force all sediment remaining in a
+        parcel to deposit at iteration=`stepmax`.
+        """
+        return self._force_deposit
+
+    @force_deposit.setter
+    def force_deposit(self, force_deposit: bool) -> None:
+        self._force_deposit = force_deposit
+
+    @property
     def clobber_netcdf(self) -> bool:
         """
         Allows overwriting (clobbering) of an existing netCDF output file.
@@ -1429,11 +1454,9 @@ class DeltaModel(
     @time_step.setter
     def time_step(self, new_time_step: float) -> None:
         if new_time_step * self.init_Np_sed < 100:
-            warnings.warn(
-                UserWarning(
-                    "Using a very small time step, " "Delta might evolve very slowly."
-                )
-            )
+            _msg = "Using a very small time step, so the delta might evolve very slowly."
+            self.log_warning(_msg)
+            warnings.warn(UserWarning(_msg))
 
         if self.toggle_subsidence:
             self.sigma = (self.sigma / self._dt) * new_time_step
@@ -1489,14 +1512,6 @@ class DeltaModel(
         self.N0_meters = new_N0_meters
         self.create_boundary_conditions()
         self.init_sediment_routers()
-        if self.channel_width != new_N0_meters:
-            warnings.warn(
-                UserWarning(
-                    "Channel width was updated to {0} m, rather than input {1},"
-                    "due to grid resolution or imposed domain "
-                    "restrictions.".format(self.channel_width, new_N0_meters)
-                )
-            )
 
     @property
     def channel_flow_depth(self) -> float:
