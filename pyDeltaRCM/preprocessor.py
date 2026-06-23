@@ -96,7 +96,8 @@ class BasePreprocessor(abc.ABC):
         Parameters
         ----------
         input_file
-            Path to the input file as string, or Pathlib `Path`.
+            Path to the input file as string, or Pathlib `Path`, or a `dict`, as
+            substitute for a yaml file.
 
         Returns
         -------
@@ -131,22 +132,24 @@ class BasePreprocessor(abc.ABC):
         if self._has_ensemble:
             self._expand_ensemble()
 
-        if self._has_ensemble or self._has_set or self._has_matrix:
-            self._prepare_multijob_output()
+        # prepare output folder(s)
+        self._prepare_multijob_output()
 
         # if there is a matrix or set specification
         if self._has_matrix:
             self._expand_matrix()  # creates self.file_list
         elif self._has_set:
             self._expand_set()
-        # otherwise convert to a simple list on input file
+        # otherwise create info for a single job and go to writer
         else:
-            self._file_list = [self._input_file]
-            self._config_list = [self.config_dict]
+            # find job id and create output file
+            ith_id = "job_000"
+            ith_dir = os.path.join(self._jobs_root, ith_id)
+            _ith_config = self.config_dict.copy()
+            _ith_config["out_dir"] = ith_dir
+            self._config_list = [_ith_config]
 
-        # write the job configs to file, if needed
-        if self._has_ensemble or self._has_set or self._has_matrix:
-            self._write_job_configs()
+        self._write_job_configs()
 
     def _prelim_config_parsing(self) -> None:
         """Preliminary configuration parsing.
@@ -508,7 +511,6 @@ class BasePreprocessor(abc.ABC):
         # loop through each job to write out info
         for c, config in enumerate(self.config_list):
             # write out the job specific yaml file
-            # ith_p = self._write_yaml_config(c, config)
             if self.verbose > 0:
                 print("Writing YAML file for job " + str(int(c)))
 
@@ -1170,23 +1172,22 @@ class Preprocessor(BasePreprocessor):
         """Initialize the python preprocessor.
 
         The initialization includes the entire configuration of the job list
-        (parsing, timesteps, etc.). The jobs are *not* run automatically
-        during instantiation of the class.
+        (parsing, timesteps, etc.). The jobs are *not* run automatically during
+        instantiation of the class.
 
-        You must specify timesteps in either the YAML configuration file or
-        via the `timesteps` parameter.
+        You must specify timesteps in either the YAML configuration file or via
+        the `timesteps` parameter.
 
         Parameters
         ----------
         input_file : :obj:`str`, optional
-            Path to an input YAML configuration file. Must include the
-            `timesteps` parameter if you do not specify the `timesteps` as a
-            keyword argument.
+            Path to an input YAML configuration file or dictionary with
+            parameters. Must include the `timesteps` parameter if you do not
+            specify the `timesteps` as a keyword argument.
 
         timesteps : :obj:`int`, optional
             Number of timesteps to run each of the jobs. Must be specified if
-            you do not specify the `timesteps` parameter in the input YAML
-            file.
+            you do not specify the `timesteps` parameter in the input YAML file.
 
         """
         super().__init__()

@@ -35,9 +35,9 @@ class TestCommandLineInterfaceDirectly:
         f.close()
         subprocess.check_output(['pyDeltaRCM',
                                  '--config', str(p)])
-        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-        exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
-        exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+        exp_path_nc = os.path.join(tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+        exp_path_png0 = os.path.join(tmp_path / 'test', 'job_000', 'eta_00000.png')
+        exp_path_png1 = os.path.join(tmp_path / 'test', 'job_000', 'eta_00001.png')
         assert os.path.isfile(exp_path_nc)
         assert os.path.isfile(exp_path_png0)
         assert os.path.isfile(exp_path_png1)
@@ -64,10 +64,10 @@ class TestCommandLineInterfaceDirectly:
         f.close()
         subprocess.check_output(['python', '-m', 'pyDeltaRCM',
                                  '--config', str(p)])
-        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-        exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
-        exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
-        exp_path_png2 = os.path.join(tmp_path / 'test', 'eta_00002.png')
+        exp_path_nc = os.path.join(tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+        exp_path_png = os.path.join(tmp_path / 'test', 'job_000', 'eta_00000.png')
+        exp_path_png1 = os.path.join(tmp_path / 'test', 'job_000', 'eta_00001.png')
+        exp_path_png2 = os.path.join(tmp_path / 'test', 'job_000', 'eta_00002.png')
         assert os.path.isfile(exp_path_nc)
         assert os.path.isfile(exp_path_png)
         assert os.path.isfile(exp_path_png1)
@@ -90,8 +90,8 @@ class TestCommandLineInterfaceDirectly:
         subprocess.check_output(['python', '-m', 'pyDeltaRCM',
                                  '--config', str(p),
                                  '--dryrun'])
-        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-        exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
+        exp_path_nc = os.path.join(tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+        exp_path_png = os.path.join(tmp_path / 'test', 'job_000', 'eta_00000.png')
         assert not os.path.isfile(exp_path_nc)   # does not exist because --dryrun
         assert not os.path.isfile(exp_path_png)  # does not exist because --dryrun
 
@@ -114,8 +114,8 @@ class TestCommandLineInterfaceDirectly:
         subprocess.check_output(['python', '-m', 'pyDeltaRCM',
                                  '--config', str(p),
                                  '--timesteps', '2'])
-        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-        exp_path_png = os.path.join(tmp_path / 'test', 'eta_00000.png')
+        exp_path_nc = os.path.join(tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+        exp_path_png = os.path.join(tmp_path / 'test', 'job_000', 'eta_00000.png')
         assert os.path.isfile(exp_path_nc)
         assert os.path.isfile(exp_path_png)
 
@@ -149,9 +149,9 @@ class TestCommandLineInterfaceDirectly:
         f.close()
         subprocess.check_output(['pyDeltaRCM',
                                  '--config', str(p), '--timesteps', '2'])
-        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-        exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
-        exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+        exp_path_nc = os.path.join(tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+        exp_path_png0 = os.path.join(tmp_path / 'test', 'job_000', 'eta_00000.png')
+        exp_path_png1 = os.path.join(tmp_path / 'test', 'job_000', 'eta_00001.png')
         assert os.path.isfile(exp_path_nc)
         assert os.path.isfile(exp_path_png0)
         assert os.path.isfile(exp_path_png1)
@@ -177,9 +177,9 @@ class TestCommandLineInterfaceDirectly:
         f.close()
         subprocess.check_output(['pyDeltaRCM',
                                  '--config', str(p), '--time', '1000'])
-        exp_path_nc = os.path.join(tmp_path / 'test', 'pyDeltaRCM_output.nc')
-        exp_path_png0 = os.path.join(tmp_path / 'test', 'eta_00000.png')
-        exp_path_png1 = os.path.join(tmp_path / 'test', 'eta_00001.png')
+        exp_path_nc = os.path.join(tmp_path / 'test', 'job_000', 'pyDeltaRCM_output.nc')
+        exp_path_png0 = os.path.join(tmp_path / 'test', 'job_000', 'eta_00000.png')
+        exp_path_png1 = os.path.join(tmp_path / 'test', 'job_000', 'eta_00001.png')
         assert os.path.isfile(exp_path_nc)
         assert os.path.isfile(exp_path_png0)
         assert os.path.isfile(exp_path_png1)

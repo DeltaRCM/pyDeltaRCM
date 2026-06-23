@@ -17,7 +17,7 @@ class hook_tools(abc.ABC):
         Therefore, we enforce that no old hooks may be used as method names of
         subclassing models.
 
-        This helper method is early in the `DeltaModel` `__init__` routine.
+        This helper method is called early in the `DeltaModel` `__init__` routine.
         """
         _deprecated_list = {
             "hook_sed_route": "hook_route_sediment",

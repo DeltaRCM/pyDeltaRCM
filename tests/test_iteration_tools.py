@@ -238,7 +238,9 @@ class TestOutputCheckpoint:
             "input.yaml",
             {"save_checkpoint": True, "checkpoint_dt": 864000000},
         )
-        _delta = DeltaModel(input_file=p)
+        # issue one warning when initializing
+        with pytest.warns(UserWarning, match=r"interval are not identical"):
+            _delta = DeltaModel(input_file=p)
 
         # force the time to be greater than the checkpoint interval
         _delta._save_time_since_checkpoint = 2 * _delta._checkpoint_dt
@@ -246,11 +248,13 @@ class TestOutputCheckpoint:
         # mock the actual save checkpoint function to see if it was called
         _delta.save_the_checkpoint = mock.MagicMock()
 
-        # this warning is only written to log, so mock the logger
+        # mock the logger for testing in this file
         _delta.logger = mock.MagicMock()
 
-        # run the output checkpoint func
-        _delta.output_checkpoint()
+        # issue second warning when outputting
+        with pytest.warns(UserWarning, match=r"interval are not identical"):
+            # run the output checkpoint func
+            _delta.output_checkpoint()
 
         # assertions
         assert _delta.save_the_checkpoint.call_count == 1

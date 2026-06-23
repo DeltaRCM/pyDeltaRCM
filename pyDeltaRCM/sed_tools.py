@@ -9,8 +9,6 @@ from scipy import ndimage
 
 import warnings
 
-# from . import shared_tools
-
 from pyDeltaRCM.shared_tools import (
     get_inlet_weights,
     get_start_indices,
@@ -66,7 +64,7 @@ class sed_tools(abc.ABC):
             "Running `route_sediment` now, but "
             "this will be removed in future release."
         )
-        self.logger.warning(_msg)
+        self.log_warning(_msg)
         warnings.warn(UserWarning(_msg))
         self.route_sediment()
 

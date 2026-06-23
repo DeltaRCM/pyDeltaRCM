@@ -272,8 +272,10 @@ class TestCheckpointingIntegrations:
         # modify the checkpoint dt to be different than save_dt
         baseModel._checkpoint_dt = baseModel.save_dt * 0.65
 
-        for _ in range(0, 50):
-            baseModel.update()
+        # CHECK for warning about mismatched intervals!
+        with pytest.warns(UserWarning, match=r"Grid save interval and checkpoint interval"):
+            for _ in range(0, 50):
+                baseModel.update()
         baseModel.finalize()
 
         assert baseModel.time == baseModel._dt * 50
