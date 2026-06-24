@@ -341,6 +341,7 @@ r_spec = [
     ("u_max", float32),
     ("qs0", float32),
     ("_u0", float32),
+    ("porosity", float32),
     ("Vp_sed", float32),
     ("Vp_res", float32),
     ("Vp_dep_mud", float32[:, :]),
@@ -474,7 +475,7 @@ class BaseRouter:
         #    determinations require several comparisons and repeated indexing,
         #    so we use a jitted "helper" function to do the operations.
         qw0 = self.qw[px, py]
-        eta_change = Vp_change / (self._dx * self._dx)
+        eta_change = Vp_change / (self._dx * self._dx) / (1 - self.porosity)
 
         eta = self.eta[px, py] + eta_change  # new bed
         depth = self.stage[px, py] - eta  # new depth
@@ -594,6 +595,7 @@ class SandRouter(BaseRouter):
         stepmax,
         force_deposit,
         theta_sed: float,
+        porosity,
         mod_erosion,
     ) -> None:
         self._dt = _dt
@@ -621,6 +623,7 @@ class SandRouter(BaseRouter):
         self.stepmax = stepmax
         self.force_deposit = force_deposit
         self.theta_sed = theta_sed
+        self.porosity = porosity
         self.mod_erosion = mod_erosion
 
     def run(
@@ -878,6 +881,7 @@ class MudRouter(BaseRouter):
         stepmax,
         force_deposit,
         theta_sed: float,
+        porosity,
         mod_erosion,
     ) -> None:
         self._dt = _dt
@@ -900,6 +904,7 @@ class MudRouter(BaseRouter):
         self.stepmax = stepmax
         self.force_deposit = force_deposit
         self.theta_sed = theta_sed
+        self.porosity = porosity
         self.mod_erosion = mod_erosion
 
     def run(
