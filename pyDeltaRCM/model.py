@@ -539,7 +539,7 @@ class DeltaModel(
     def gamma(self, gamma: float) -> None:
         if gamma > 0.1:
             _msg = (
-                f"Gamma value is {gamma}, which is greater than the recommended "
+                f"Gamma value is {gamma:.2f}, which is greater than the recommended "
                 f"maximum of 0.1. Consider adjusting model configuration to "
                 f"lower the value of gamma. See documentation for "
                 f"more information."
