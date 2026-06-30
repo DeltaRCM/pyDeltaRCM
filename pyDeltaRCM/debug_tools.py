@@ -5,9 +5,7 @@ from matplotlib.ticker import MaxNLocator
 import mpl_toolkits.axes_grid1 as axtk
 import abc
 
-from pyDeltaRCM.shared_tools import (
-    custom_unravel
-)
+from pyDeltaRCM.shared_tools import custom_unravel
 
 # tools for water routing algorithms
 
@@ -186,7 +184,6 @@ class debug_tools(abc.ABC):
             elif ind.ndim > 1:
                 if multiline:
                     # travel along axis, extracting lines
-                    cm = matplotlib.colormaps["tab10"].resampled(10)
                     lines = []
                     for i in np.arange(ind.shape[1]):
                         _l = plot_line(
@@ -195,8 +192,7 @@ class debug_tools(abc.ABC):
                             multiline=multiline,
                             nozeros=nozeros,
                             shape=_shape,
-                            color=cm(i),
-                            **kwargs
+                            **kwargs,
                         )
                         lines.append(_l)
                 else:
@@ -339,9 +335,9 @@ def plot_line(_ind, *args, shape=None, nozeros: bool = False, **kwargs):
         ax = plt.gca()
 
     if len(args) == 0:
-        # args = 'k-',
         if not ("color" in kwargs.keys()):
-            kwargs["color"] = "k"
+            # use whatever set_prop_cycle is currently
+            pass
         if not ("marker" in kwargs.keys()):
             kwargs["ls"] = "-"
     if isinstance(_ind, tuple):
@@ -377,12 +373,9 @@ def plot_line(_ind, *args, shape=None, nozeros: bool = False, **kwargs):
                             if nozeros:
                                 pxpys[i, :] = np.nan, np.nan
                             else:
-                                pxpys[i, :] = custom_unravel(
-                                    _ind[i], _shape
-                                )
+                                pxpys[i, :] = custom_unravel(_ind[i], _shape)
                         else:
                             pxpys[i, :] = custom_unravel(_ind[i], _shape)
-
     (_l,) = ax.plot(pxpys[:, 1], pxpys[:, 0], *args, **kwargs)
 
     if block:
