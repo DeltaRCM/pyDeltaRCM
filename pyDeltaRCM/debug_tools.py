@@ -335,9 +335,9 @@ def plot_line(_ind, *args, shape=None, nozeros: bool = False, **kwargs):
         ax = plt.gca()
 
     if len(args) == 0:
-        # args = 'k-',
         if not ("color" in kwargs.keys()):
-            kwargs["color"] = "k"
+            # use whatever set_prop_cycle is currently
+            pass
         if not ("marker" in kwargs.keys()):
             kwargs["ls"] = "-"
     if isinstance(_ind, tuple):
