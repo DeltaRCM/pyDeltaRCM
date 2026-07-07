@@ -367,6 +367,9 @@ class DeltaModel(
 
     @inlet_x.setter
     def inlet_x(self, inlet_x: list) -> None:
+        if inlet_x is not None:
+            if any(x < 0 for x in inlet_x):
+                raise ValueError("inlet_x values must be greater than or equal to 0.")
         self._inlet_x = inlet_x
 
     @property
@@ -375,6 +378,9 @@ class DeltaModel(
 
     @inlet_y.setter
     def inlet_y(self, inlet_y: list) -> None:
+        if inlet_y is not None:
+            if any(y < 0 for y in inlet_y):
+                raise ValueError("inlet_y values must be greater than or equal to 0.")
         self._inlet_y = inlet_y
 
     @property
