@@ -363,6 +363,13 @@ class DeltaModel(
 
     @property
     def inlet_x(self) -> list:
+        """
+        inlet_x specifies the x-coordinates of the inlet cells.
+
+        This should be a list of integers representing the x-coordinates (rows)
+        where the inlet is located. If set to `None`, the default boundary 
+        behavior is used.
+        """
         return self._inlet_x
 
     @inlet_x.setter
@@ -374,6 +381,13 @@ class DeltaModel(
 
     @property
     def inlet_y(self) -> list:
+        """
+        inlet_y specifies the y-coordinates of the inlet cells.
+
+        This should be a list of integers representing the y-coordinates (columns)
+        where the inlet is located. If set to `None`, the default boundary 
+        behavior is used. Must be the same length as `inlet_x`.
+        """
         return self._inlet_y
 
     @inlet_y.setter
@@ -385,10 +399,19 @@ class DeltaModel(
 
     @property
     def inlet_flow_dir(self) -> list:
+        """
+        inlet_flow_dir sets the primary flow direction of water parcels at the inlet.
+
+        This should be a list containing two elements representing the flow vector
+        [dx, dy] at the inlet. If `None`, defaults to [1, 0].
+        """
         return self._inlet_flow_dir
 
     @inlet_flow_dir.setter
     def inlet_flow_dir(self, inlet_flow_dir: list) -> None:
+        if inlet_flow_dir is not None:
+            if len(inlet_flow_dir) != 2:
+                raise ValueError("inlet_flow_dir must be a list of length 2.")
         self._inlet_flow_dir = inlet_flow_dir
 
     @property
