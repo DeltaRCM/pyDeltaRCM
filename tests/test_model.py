@@ -201,6 +201,33 @@ class Test__init__:
         with pytest.raises(ValueError):
             _ = DeltaModel(input_file=p)
 
+    def test_negative_inlet_x(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_x", [-1])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
+    def test_negative_inlet_y(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_y", [-1])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
+    def test_bad_length_inlet_flow_dir(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_flow_dir", [1, 0, 0])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
     def test_negative_itermax(self, tmp_path: Path) -> None:
         file_name = "user_parameters.yaml"
         p, f = utilities.create_temporary_file(tmp_path, file_name)
