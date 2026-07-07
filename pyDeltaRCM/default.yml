@@ -187,3 +187,12 @@ clobber_netcdf:
 legacy_netcdf:
   type: 'bool'
   default: False
+inlet_x:
+  type: ['list', 'None']
+  default: null
+inlet_y:
+  type: ['list', 'None']
+  default: null
+inlet_flow_dir:
+  type: ['list', 'None']
+  default: null

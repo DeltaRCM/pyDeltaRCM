@@ -631,7 +631,14 @@ class init_tools(abc.ABC):
         self.cell_type[: self.L0, :] = cell_land
         self.cell_type[: self.L0, channel_inds:y_channel_max] = cell_channel
 
-        self.inlet = np.array(np.unique(np.where(self.cell_type == 1)[1]))
+        if hasattr(self, 'inlet_x') and hasattr(self, 'inlet_y') and self.inlet_x is not None and self.inlet_y is not None:
+            self.inlet = np.ravel_multi_index((np.array(self.inlet_x), np.array(self.inlet_y)), self.cell_type.shape)
+        else:
+            inlet_y = np.array(np.unique(np.where(self.cell_type[0, :] == 1)[0]))
+            self.inlet = np.ravel_multi_index((np.zeros_like(inlet_y), inlet_y), self.cell_type.shape)
+        
+        if not hasattr(self, 'inlet_flow_dir') or self.inlet_flow_dir is None:
+            self.inlet_flow_dir = [1, 0]
         self.eta[:] = self.stage - self.depth
 
         # update eta trackers with initial bed elevation

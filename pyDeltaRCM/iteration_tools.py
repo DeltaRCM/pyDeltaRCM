@@ -95,13 +95,13 @@ class iteration_tools(abc.ABC):
 
         # apply bed elevation boundary condition at inlet
         #   first, calc the change in eta at inlet
-        _eta_change = (self.stage[0, self.inlet] - self._h0) - self.eta[0, self.inlet]
+        _eta_change = (self.stage.flat[self.inlet] - self._h0) - self.eta.flat[self.inlet]
         self._Vp_inletbc = (
             np.sum(_eta_change) * self._dx * self._dx
         )  # for mass cons checks
         #   now apply boundary condition
-        self.eta[0, self.inlet] += _eta_change
-        self.depth[0, self.inlet] = self._h0
+        self.eta.flat[self.inlet] += _eta_change
+        self.depth.flat[self.inlet] = self._h0
 
         self.hook_compute_sand_frac()
         self.compute_sand_frac()

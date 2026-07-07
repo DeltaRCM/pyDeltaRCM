@@ -362,6 +362,30 @@ class DeltaModel(
         self._L0_meters = L0_meters
 
     @property
+    def inlet_x(self) -> list:
+        return self._inlet_x
+
+    @inlet_x.setter
+    def inlet_x(self, inlet_x: list) -> None:
+        self._inlet_x = inlet_x
+
+    @property
+    def inlet_y(self) -> list:
+        return self._inlet_y
+
+    @inlet_y.setter
+    def inlet_y(self, inlet_y: list) -> None:
+        self._inlet_y = inlet_y
+
+    @property
+    def inlet_flow_dir(self) -> list:
+        return self._inlet_flow_dir
+
+    @inlet_flow_dir.setter
+    def inlet_flow_dir(self, inlet_flow_dir: list) -> None:
+        self._inlet_flow_dir = inlet_flow_dir
+
+    @property
     def S0(self) -> float:
         """
         S0 is the characteristic slope for the delta.
