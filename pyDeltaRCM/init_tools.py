@@ -635,15 +635,32 @@ class init_tools(abc.ABC):
         has_y = hasattr(self, 'inlet_y') and self.inlet_y is not None
         if has_x or has_y:
             if not (has_x and has_y):
-                raise ValueError("Both `inlet_x` and `inlet_y` must be provided if custom inlet coordinates are used.")
+                missing = 'inlet_y' if has_x else 'inlet_x'
+                provided = 'inlet_x' if has_x else 'inlet_y'
+                val = getattr(self, provided)
+                raise ValueError(
+                    f"Both `inlet_x` and `inlet_y` must be provided if custom inlet coordinates are used. "
+                    f"Specified `{provided}`={val}, but `{missing}` is missing or None."
+                )
             if len(self.inlet_x) != len(self.inlet_y):
-                raise ValueError("`inlet_x` and `inlet_y` must have the same length.")
+                raise ValueError(
+                    f"`inlet_x` and `inlet_y` must have the same length, "
+                    f"but got len(inlet_x)={len(self.inlet_x)} ({self.inlet_x}) and len(inlet_y)={len(self.inlet_y)} ({self.inlet_y})."
+                )
             inlet_x_arr = np.array(self.inlet_x)
             inlet_y_arr = np.array(self.inlet_y)
-            if np.any(inlet_x_arr < 0) or np.any(inlet_x_arr >= self.L):
-                raise ValueError("inlet_x values must be within domain length (0 to L-1).")
-            if np.any(inlet_y_arr < 0) or np.any(inlet_y_arr >= self.W):
-                raise ValueError("inlet_y values must be within domain width (0 to W-1).")
+            invalid_x = inlet_x_arr[(inlet_x_arr < 0) | (inlet_x_arr >= self.L)]
+            if len(invalid_x) > 0:
+                raise ValueError(
+                    f"inlet_x values must be within domain length (0 to L-1 = {self.L - 1}), "
+                    f"but got invalid values: {invalid_x.tolist()}."
+                )
+            invalid_y = inlet_y_arr[(inlet_y_arr < 0) | (inlet_y_arr >= self.W)]
+            if len(invalid_y) > 0:
+                raise ValueError(
+                    f"inlet_y values must be within domain width (0 to W-1 = {self.W - 1}), "
+                    f"but got invalid values: {invalid_y.tolist()}."
+                )
             self.inlet = np.ravel_multi_index((inlet_x_arr, inlet_y_arr), self.cell_type.shape)
             self.cell_type[inlet_x_arr, inlet_y_arr] = cell_channel
         else:

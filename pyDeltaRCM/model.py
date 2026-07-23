@@ -375,11 +375,16 @@ class DeltaModel(
     @inlet_x.setter
     def inlet_x(self, inlet_x: list) -> None:
         if inlet_x is not None:
-            if any(x < 0 for x in inlet_x):
-                raise ValueError("inlet_x values must be greater than or equal to 0.")
+            invalid_vals = [x for x in inlet_x if x < 0]
+            if invalid_vals:
+                raise ValueError(
+                    f"inlet_x values must be greater than or equal to 0, but got negative values: {invalid_vals}."
+                )
             if hasattr(self, "_inlet_y") and self._inlet_y is not None:
                 if len(inlet_x) != len(self._inlet_y):
-                    raise ValueError("inlet_x and inlet_y must have the same length.")
+                    raise ValueError(
+                        f"inlet_x and inlet_y must have the same length, but got len(inlet_x)={len(inlet_x)} and len(inlet_y)={len(self._inlet_y)}."
+                    )
         self._inlet_x = inlet_x
 
     @property
@@ -396,11 +401,16 @@ class DeltaModel(
     @inlet_y.setter
     def inlet_y(self, inlet_y: list) -> None:
         if inlet_y is not None:
-            if any(y < 0 for y in inlet_y):
-                raise ValueError("inlet_y values must be greater than or equal to 0.")
+            invalid_vals = [y for y in inlet_y if y < 0]
+            if invalid_vals:
+                raise ValueError(
+                    f"inlet_y values must be greater than or equal to 0, but got negative values: {invalid_vals}."
+                )
             if hasattr(self, "_inlet_x") and self._inlet_x is not None:
                 if len(inlet_y) != len(self._inlet_x):
-                    raise ValueError("inlet_x and inlet_y must have the same length.")
+                    raise ValueError(
+                        f"inlet_x and inlet_y must have the same length, but got len(inlet_x)={len(self._inlet_x)} and len(inlet_y)={len(inlet_y)}."
+                    )
         self._inlet_y = inlet_y
 
     @property
@@ -417,9 +427,13 @@ class DeltaModel(
     def inlet_flow_dir(self, inlet_flow_dir: list) -> None:
         if inlet_flow_dir is not None:
             if len(inlet_flow_dir) != 2:
-                raise ValueError("inlet_flow_dir must be a list of length 2.")
+                raise ValueError(
+                    f"inlet_flow_dir must be a list of length 2, but got {inlet_flow_dir} of length {len(inlet_flow_dir)}."
+                )
             if not all(isinstance(v, (int, float)) for v in inlet_flow_dir):
-                raise ValueError("inlet_flow_dir elements must be numeric.")
+                raise ValueError(
+                    f"inlet_flow_dir elements must be numeric, but got {inlet_flow_dir}."
+                )
         self._inlet_flow_dir = inlet_flow_dir
 
     @property
