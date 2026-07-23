@@ -631,8 +631,21 @@ class init_tools(abc.ABC):
         self.cell_type[: self.L0, :] = cell_land
         self.cell_type[: self.L0, channel_inds:y_channel_max] = cell_channel
 
-        if hasattr(self, 'inlet_x') and hasattr(self, 'inlet_y') and self.inlet_x is not None and self.inlet_y is not None:
-            self.inlet = np.ravel_multi_index((np.array(self.inlet_x), np.array(self.inlet_y)), self.cell_type.shape)
+        has_x = hasattr(self, 'inlet_x') and self.inlet_x is not None
+        has_y = hasattr(self, 'inlet_y') and self.inlet_y is not None
+        if has_x or has_y:
+            if not (has_x and has_y):
+                raise ValueError("Both `inlet_x` and `inlet_y` must be provided if custom inlet coordinates are used.")
+            if len(self.inlet_x) != len(self.inlet_y):
+                raise ValueError("`inlet_x` and `inlet_y` must have the same length.")
+            inlet_x_arr = np.array(self.inlet_x)
+            inlet_y_arr = np.array(self.inlet_y)
+            if np.any(inlet_x_arr < 0) or np.any(inlet_x_arr >= self.L):
+                raise ValueError("inlet_x values must be within domain length (0 to L-1).")
+            if np.any(inlet_y_arr < 0) or np.any(inlet_y_arr >= self.W):
+                raise ValueError("inlet_y values must be within domain width (0 to W-1).")
+            self.inlet = np.ravel_multi_index((inlet_x_arr, inlet_y_arr), self.cell_type.shape)
+            self.cell_type[inlet_x_arr, inlet_y_arr] = cell_channel
         else:
             inlet_y = np.array(np.unique(np.where(self.cell_type[0, :] == 1)[0]))
             self.inlet = np.ravel_multi_index((np.zeros_like(inlet_y), inlet_y), self.cell_type.shape)

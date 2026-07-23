@@ -377,6 +377,9 @@ class DeltaModel(
         if inlet_x is not None:
             if any(x < 0 for x in inlet_x):
                 raise ValueError("inlet_x values must be greater than or equal to 0.")
+            if hasattr(self, "_inlet_y") and self._inlet_y is not None:
+                if len(inlet_x) != len(self._inlet_y):
+                    raise ValueError("inlet_x and inlet_y must have the same length.")
         self._inlet_x = inlet_x
 
     @property
@@ -395,6 +398,9 @@ class DeltaModel(
         if inlet_y is not None:
             if any(y < 0 for y in inlet_y):
                 raise ValueError("inlet_y values must be greater than or equal to 0.")
+            if hasattr(self, "_inlet_x") and self._inlet_x is not None:
+                if len(inlet_y) != len(self._inlet_x):
+                    raise ValueError("inlet_x and inlet_y must have the same length.")
         self._inlet_y = inlet_y
 
     @property
@@ -412,6 +418,8 @@ class DeltaModel(
         if inlet_flow_dir is not None:
             if len(inlet_flow_dir) != 2:
                 raise ValueError("inlet_flow_dir must be a list of length 2.")
+            if not all(isinstance(v, (int, float)) for v in inlet_flow_dir):
+                raise ValueError("inlet_flow_dir elements must be numeric.")
         self._inlet_flow_dir = inlet_flow_dir
 
     @property
