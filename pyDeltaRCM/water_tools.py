@@ -114,9 +114,9 @@ class water_tools(abc.ABC):
 
         # flux from ghost node
         start_inlets, start_counts = np.unique(start_indices, return_counts=True)
-        self.qxn.flat[start_inlets] += start_counts
-        self.qyn.flat[start_indices] += 0  # this could be omitted...
-        self.qwn.flat[start_indices] += self.Qp_water / self._dx / 2
+        self.qxn.flat[start_inlets] += start_counts * self.inlet_flow_dir[0]
+        self.qyn.flat[start_inlets] += start_counts * self.inlet_flow_dir[1]
+        self.qwn.flat[start_inlets] += start_counts * (self.Qp_water / self._dx / 2)
 
         # load the initial indices into the walk indices
         self.free_surf_walk_inds[:, _step] = start_indices
@@ -514,9 +514,9 @@ class water_tools(abc.ABC):
 
         self.qw = (self.qx**2 + self.qy**2) ** (0.5)
 
-        self.qx[0, self.inlet] = self.qw0
-        self.qy[0, self.inlet] = 0
-        self.qw[0, self.inlet] = self.qw0
+        self.qx.flat[self.inlet] = self.qw0 * self.inlet_flow_dir[0]
+        self.qy.flat[self.inlet] = self.qw0 * self.inlet_flow_dir[1]
+        self.qw.flat[self.inlet] = self.qw0
 
     def update_velocity_field(self) -> None:
         """Update flow velocity fields.

@@ -201,6 +201,93 @@ class Test__init__:
         with pytest.raises(ValueError):
             _ = DeltaModel(input_file=p)
 
+    def test_negative_inlet_x(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_x", [-1])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
+    def test_negative_inlet_y(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_y", [-1])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
+    def test_bad_length_inlet_flow_dir(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_flow_dir", [1, 0, 0])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
+    def test_mismatched_length_inlet_x_y(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_x", [0, 0])
+        utilities.write_parameter_to_file(f, "inlet_y", [10])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
+    def test_inlet_x_only_raises(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_x", [0, 0])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
+    def test_inlet_y_only_raises(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_y", [10, 11])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
+    def test_out_of_bounds_inlet_x(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_x", [9999])
+        utilities.write_parameter_to_file(f, "inlet_y", [10])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
+    def test_out_of_bounds_inlet_y(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_x", [0])
+        utilities.write_parameter_to_file(f, "inlet_y", [9999])
+        f.close()
+        with pytest.raises(ValueError):
+            _ = DeltaModel(input_file=p)
+
+    def test_custom_inlet_valid_initialization(self, tmp_path: Path) -> None:
+        file_name = "user_parameters.yaml"
+        p, f = utilities.create_temporary_file(tmp_path, file_name)
+        utilities.write_parameter_to_file(f, "out_dir", tmp_path / "out_dir")
+        utilities.write_parameter_to_file(f, "inlet_x", [2, 2, 2])
+        utilities.write_parameter_to_file(f, "inlet_y", [10, 11, 12])
+        utilities.write_parameter_to_file(f, "inlet_flow_dir", [0, 1])
+        f.close()
+        delta = DeltaModel(input_file=p)
+        assert np.all(delta.cell_type[2, [10, 11, 12]] == 1)
+        assert delta.inlet_flow_dir == [0, 1]
+
     def test_negative_itermax(self, tmp_path: Path) -> None:
         file_name = "user_parameters.yaml"
         p, f = utilities.create_temporary_file(tmp_path, file_name)

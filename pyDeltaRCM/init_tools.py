@@ -631,7 +631,44 @@ class init_tools(abc.ABC):
         self.cell_type[: self.L0, :] = cell_land
         self.cell_type[: self.L0, channel_inds:y_channel_max] = cell_channel
 
-        self.inlet = np.array(np.unique(np.where(self.cell_type == 1)[1]))
+        has_x = hasattr(self, 'inlet_x') and self.inlet_x is not None
+        has_y = hasattr(self, 'inlet_y') and self.inlet_y is not None
+        if has_x or has_y:
+            if not (has_x and has_y):
+                missing = 'inlet_y' if has_x else 'inlet_x'
+                provided = 'inlet_x' if has_x else 'inlet_y'
+                val = getattr(self, provided)
+                raise ValueError(
+                    f"Both `inlet_x` and `inlet_y` must be provided if custom inlet coordinates are used. "
+                    f"Specified `{provided}`={val}, but `{missing}` is missing or None."
+                )
+            if len(self.inlet_x) != len(self.inlet_y):
+                raise ValueError(
+                    f"`inlet_x` and `inlet_y` must have the same length, "
+                    f"but got len(inlet_x)={len(self.inlet_x)} ({self.inlet_x}) and len(inlet_y)={len(self.inlet_y)} ({self.inlet_y})."
+                )
+            inlet_x_arr = np.array(self.inlet_x)
+            inlet_y_arr = np.array(self.inlet_y)
+            invalid_x = inlet_x_arr[(inlet_x_arr < 0) | (inlet_x_arr >= self.L)]
+            if len(invalid_x) > 0:
+                raise ValueError(
+                    f"inlet_x values must be within domain length (0 to L-1 = {self.L - 1}), "
+                    f"but got invalid values: {invalid_x.tolist()}."
+                )
+            invalid_y = inlet_y_arr[(inlet_y_arr < 0) | (inlet_y_arr >= self.W)]
+            if len(invalid_y) > 0:
+                raise ValueError(
+                    f"inlet_y values must be within domain width (0 to W-1 = {self.W - 1}), "
+                    f"but got invalid values: {invalid_y.tolist()}."
+                )
+            self.inlet = np.ravel_multi_index((inlet_x_arr, inlet_y_arr), self.cell_type.shape)
+            self.cell_type[inlet_x_arr, inlet_y_arr] = cell_channel
+        else:
+            inlet_y = np.array(np.unique(np.where(self.cell_type[0, :] == 1)[0]))
+            self.inlet = np.ravel_multi_index((np.zeros_like(inlet_y), inlet_y), self.cell_type.shape)
+        
+        if not hasattr(self, 'inlet_flow_dir') or self.inlet_flow_dir is None:
+            self.inlet_flow_dir = [1, 0]
         self.eta[:] = self.stage - self.depth
 
         # update eta trackers with initial bed elevation
