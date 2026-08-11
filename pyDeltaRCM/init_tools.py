@@ -331,24 +331,16 @@ class init_tools(abc.ABC):
         #   check if need to round length, then log and warn and change
         if self._Length % self._dx != 0:
             _new = int(round(self._Length / self._dx)) * self._dx
-<<<<<<< HEAD
             pcw = ParameterChangedWarning("Length", self._Length, _new)
             self.log_warning(format(pcw))
             warnings.warn(pcw)
-=======
-            warnings.warn(ParameterChangedWarning("Length", self._Length, _new))
->>>>>>> 01fc30d (initial steps to adding porosity to model input and sediment parcel <-> bed exchange)
             self._Length = _new
         #   check if need to round width, then log and warn and change
         if self._Width % self._dx != 0:
             _new = int(round(self._Width / self._dx)) * self._dx
-<<<<<<< HEAD
             pcw = ParameterChangedWarning("Width", self._Width, _new)
             self.log_warning(format(pcw))
             warnings.warn(pcw)
-=======
-            warnings.warn(ParameterChangedWarning("Width", self._Width, _new))
->>>>>>> 01fc30d (initial steps to adding porosity to model input and sediment parcel <-> bed exchange)
             self._Width = _new
         # now guaranteed to be divisible
         self.L = int(self._Length / self._dx)  # num cells in x
