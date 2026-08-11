@@ -178,6 +178,9 @@ stepmax:
 force_deposit:
   type: ['bool', int]
   default: False
+porosity:
+  type: ['float', 'int']
+  default: 0
 sand_frac_bc:
   type: ['float', 'int']
   default: 0

@@ -671,6 +671,7 @@ class init_tools(abc.ABC):
             self.stepmax,
             self.force_deposit,
             self.theta_mud,
+            self.porosity,
             self.mod_erosion,
         )
         # initialize the SandRouter object
@@ -693,6 +694,7 @@ class init_tools(abc.ABC):
             self.stepmax,
             self.force_deposit,
             self.theta_sand,
+            self.porosity,
             self.mod_erosion,
         )
 

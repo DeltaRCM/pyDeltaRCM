@@ -1352,6 +1352,21 @@ class DeltaModel(
         self._force_deposit = force_deposit
 
     @property
+    def porosity(self) -> float:
+        """
+        `porosity` of deposited sediment.
+
+        Default is 0, no porosity. Must be between 0 and 1.
+        """
+        return self._porosity
+
+    @porosity.setter
+    def porosity(self, porosity: float) -> None:
+        if (porosity < 0) or (porosity > 1):
+            raise ValueError("Value for porosity must be between 0 and 1, inclusive.")
+        self._porosity = porosity
+
+    @property
     def clobber_netcdf(self) -> bool:
         """
         Allows overwriting (clobbering) of an existing netCDF output file.
@@ -1454,7 +1469,9 @@ class DeltaModel(
     @time_step.setter
     def time_step(self, new_time_step: float) -> None:
         if new_time_step * self.init_Np_sed < 100:
-            _msg = "Using a very small time step, so the delta might evolve very slowly."
+            _msg = (
+                "Using a very small time step, so the delta might evolve very slowly."
+            )
             self.log_warning(_msg)
             warnings.warn(UserWarning(_msg))
 
