@@ -1351,6 +1351,7 @@ class DeltaModel(
     def force_deposit(self, force_deposit: bool) -> None:
         self._force_deposit = force_deposit
 
+    @property
     def porosity(self) -> float:
         """
         `porosity` of deposited sediment.
