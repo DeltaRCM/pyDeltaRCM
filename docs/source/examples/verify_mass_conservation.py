@@ -72,7 +72,11 @@ class MassConservationCheck(pyDeltaRCM.DeltaModel):
         total amount of landscape change (volume) is close to the total
         amount of sediment put into the domain.
         """
-        # calculate change in input sediment and deposit volume
+
+        # check the change in volume of the deposit for this timestep
+        act_deposit_volume = np.sum((self.eta - self.eta_init) * self.dx**2) * (
+            1 - self.porosity
+        )
         input_sed_volume = self.Qs0 * self.dt
         act_deposit_volume = np.sum((self.eta - self.eta_init) * self.dx**2)
 
