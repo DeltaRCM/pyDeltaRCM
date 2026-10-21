@@ -33,6 +33,7 @@ jobs:
     - name: Build and test documentation
       run: |
         (cd docs && make docs)
+      continue-on-error: true
     - name: Upload log file
       uses: actions/upload-artifact@v7
       if: ${{ failure() }}

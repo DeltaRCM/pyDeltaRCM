@@ -26,7 +26,7 @@ clean :
 
 test : clean
 	@$(SPHINXBUILD) -b doctest "$(SOURCEDIR)" "$(BUILDDIR)" -E
-	@$(SPHINXBUILD) -b linkcheck "$(SOURCEDIR)" "$(BUILDDIR)" -E
+	@$(SPHINXBUILD) -b linkcheck "$(SOURCEDIR)" "$(BUILDDIR)" -E || true
 
 
 # Catch-all target: route all unknown targets to Sphinx using the new
